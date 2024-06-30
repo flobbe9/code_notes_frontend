@@ -1,0 +1,327 @@
+:root {
+    --testBorder: 1px solid black;
+}
+
+/* Mobile */
+@media screen {
+
+}
+
+/* Tablet */
+@media screen and (min-width: 576px) {
+
+}
+
+/* Desktop */
+@media screen and (min-width: 1200px) {
+
+}
+
+body {
+    margin: 0;
+}
+
+.App {
+    
+    /* text selection color */
+    ::-moz-selection { /* firefox */
+        background: var(--themeColor);
+        color: white;
+    }
+    ::selection {
+        background: var(--themeColor);
+        color: white;
+    }
+
+    /* Other */
+    .rotating {
+        -webkit-animation: rotating 2s linear infinite;
+        -moz-animation: rotating 2s linear infinite;
+        -ms-animation: rotating 2s linear infinite;
+        -o-animation: rotating 2s linear infinite;
+        animation: rotating 2s linear infinite;
+    }
+
+    .dontMarkText {
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+    }
+
+    /* Buttons */
+    .blackButton {
+        border-color: black;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: var(--transitionTime);
+
+        &:disabled {
+            color: grey;
+
+            &:hover {
+                background-color: black;
+            }
+        }
+    }
+    
+    .blackButtonContained {
+        border: none;
+        background-color: black;
+        color: white;
+    }
+
+    .blackButtonContained:hover {
+        background-color: rgb(77, 77, 77);
+    }
+    
+    .blackButtonOutlined {
+        color: black;
+    }
+    
+    .blackButtonOutlined:hover {
+        border-color: black;
+    }
+
+    .buttonSmall {
+        padding: 5px 10px 5px 10px;
+    }
+
+    .buttonMedium {
+        padding: 10px 25px 10px 25px;
+    }
+
+    .whiteButton {
+        background-color: white;
+        border: none;
+        border-radius: 5px;
+        color: black;
+    }
+    
+    .whiteButtonPortrait {
+        height: 140px;
+        width: 100px;
+    }
+
+    .whiteButtonLandscape {
+        height: 100px;
+        width: 140px;
+    }
+
+    .smallIconButton {
+        background-color: transparent;
+        border-radius: 100%;
+        height: 28px;
+        transition: background-color var(--transitionTime), padding var(--transitionTime);
+    }
+    
+    .disabledButton {
+        box-shadow: none;
+        cursor: default;
+        opacity: 0.5;
+    }
+
+    /* Flex */
+    .flex {
+        display: flex;
+    }
+    
+    .flexCenter {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    .flexCenterStart {
+        align-items: flex-start;
+        display: flex;
+        justify-content: center;
+    }
+
+    .flexCenterEnd {
+        align-items: flex-end;
+        display: flex;
+        justify-content: center;
+    }
+
+    .flexLeft {
+        align-items: center;
+        display: flex;
+        justify-content: left;
+    }
+
+    .flexLeftStart {
+        align-items: flex-start;
+        display: flex;
+        justify-content: left;
+    }
+
+    .flexLeftEnd {
+        align-items: flex-end;
+        display: flex;
+        justify-content: left;
+    }
+
+    .flexRight {
+        align-items: center;
+        display: flex;
+        justify-content: right;
+    }
+    
+    .flexRightStart {
+        align-items: flex-start;
+        display: flex;
+        justify-content: right;
+    }
+
+    .flexRightEnd {
+        align-items: flex-end;
+        display: flex;
+        justify-content: right;
+    }
+
+    .flex1 {
+        flex: 1;
+    }
+
+    /* Other */
+    .textCenter {
+        text-align: center;
+    }
+
+    .textLeft {
+        text-align: left;
+    }
+
+    .textRight {
+        text-align: right;
+    }
+
+    .link {
+        text-decoration: none;
+
+        &:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    }
+
+    .whiteLink {
+        color: white;
+        text-decoration: none;
+        
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .blackLink {
+        color: black;
+        text-decoration: none;
+        
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .themeLink {
+        color: black;
+        text-decoration: none;
+        transition: var(--transitionTime);
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    .blueLink {
+        color: blue;
+        cursor: pointer;
+        text-decoration: none;
+        transition: color var(--transitionTime);
+
+        &:hover {
+            color: rgb(142, 142, 255);
+        }
+    }
+
+    .dontBreakText {
+        white-space: nowrap;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .hover {
+        cursor: pointer;
+        transition: opacity var(--transitionTime);
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+
+    .hoverStrong {
+        cursor: pointer;
+        transition: opacity var(--transitionTime);
+
+        &:hover {
+            opacity: 0.5;
+        }
+    }
+
+    .boxShadowLight {
+        box-shadow: 0px 3px 5px 0px rgb(180, 180, 180);
+    }
+
+    .boxShadowGrey {
+        box-shadow: 1px 3px 3px 0px rgb(151, 151, 151);
+    }
+
+    .boxShadowDark {
+        box-shadow: 0px 3px 5px 0px rgb(90, 90, 90);
+    }
+
+    .minorMarginTopOne {
+        margin-top: 1px;
+    }
+
+    .dontMarkText {
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+    }
+    
+    .rotating {
+        -webkit-animation: rotating 2s linear infinite;
+        -moz-animation: rotating 2s linear infinite;
+        -ms-animation: rotating 2s linear infinite;
+        -o-animation: rotating 2s linear infinite;
+        animation: rotating 2s linear infinite;
+    }
+
+    .disabled {
+        opacity: 0.5 !important;
+        cursor: default !important;
+    }
+
+    .fullWidth {
+        width: 100%;
+    }
+
+    .fullWindowWidth {
+        /* not doing 100 because the browser's scrollbar would not be considered */
+        width: 98vw;
+    }
+}
+
+@keyframes rotating {
+    from {transform: rotate(0deg)}
+    to {transform: rotate(360deg)} 
+}
