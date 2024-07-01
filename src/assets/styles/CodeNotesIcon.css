@@ -1,0 +1,12 @@
+.CodeNotesIcon {
+    position: relative;
+    
+    .icon {
+        position: absolute;
+    }
+
+    #htmlBracketsIcon {
+        left: 9px;
+        top: -7px;
+    }
+}

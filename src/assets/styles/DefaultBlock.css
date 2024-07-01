@@ -1,0 +1,5 @@
+.DefaultBlock {
+    &:hover {
+        border: var(--testBorder);
+    }
+}
