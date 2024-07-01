@@ -1,0 +1,15 @@
+/* TODO: delete ? */
+@font-face {
+    font-family: codeFontLight;
+    src: url("/src/assets/fonts/Inconsolata_Expanded-Light.ttf");
+}
+
+@font-face {
+    font-family: noteFont;
+    src: url("/src/assets/fonts/Caveat-VariableFont_wght.ttf");
+}
+
+@font-face {
+    font-family: roundFont;
+    src: url("/src/assets/fonts/VarelaRound-Regular.ttf");
+}

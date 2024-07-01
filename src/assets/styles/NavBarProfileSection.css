@@ -1,0 +1,7 @@
+.NavBarProfileSection {
+
+    #ButtonRegister {
+        background-color: var(--matBlack);
+        border: 1px solid white;
+    }
+}
