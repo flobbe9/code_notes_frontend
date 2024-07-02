@@ -18,7 +18,6 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-// TODO: mobile
 export default function NavBar({...otherProps}: Props) {
 
     const { id, className, style } = getCleanDefaultProps(otherProps, "NavBar", true);
@@ -30,7 +29,7 @@ export default function NavBar({...otherProps}: Props) {
             style={style}
         >
             {/* Left */}
-            <Flex className="col-4">
+            <Flex className="col-6">
                 <Link to="/" className="whiteLink hover" title="Start page">
                     <Flex verticalAlign="center" className="fullHeight">
                         <CodeNotesIcon />
@@ -39,12 +38,9 @@ export default function NavBar({...otherProps}: Props) {
                 </Link>
             </Flex>
 
-            {/* Center */}
-            <Flex className="col-4"></Flex>
-
             {/* Right */}
             <Flex 
-                className="col-4 pe-1"
+                className="col-6 pe-1"
                 horizontalAlign="right" 
                 verticalAlign="center"
             >

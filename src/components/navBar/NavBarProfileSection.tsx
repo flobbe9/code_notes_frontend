@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import "../../assets/styles/NavBarProfileSection.css";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Link from "../helpers/CustomLink";
 import Button from "../helpers/Button";
 import { log } from "../../helpers/utils";
+import { AppContext } from "../App";
 
 
 interface Props extends DefaultProps {
@@ -18,7 +19,8 @@ export default function NavBarProfileSection({...otherProps}: Props) {
 
     const { id, className, style, children } = getCleanDefaultProps(otherProps, "NavBarProfileSection");
 
-    const isLoggedIn = false;
+    const { getDeviceWidth, isLoggedIn } = useContext(AppContext);
+    const { isMobileWidth } = getDeviceWidth();
 
 
     return (
@@ -38,15 +40,30 @@ export default function NavBarProfileSection({...otherProps}: Props) {
                         title="Profile"
                     />
                 :
-                    // Login / Register links
                     <div>
-                        <Button id="Register" className="me-5 hover">
-                            <Link to="/register" className="whiteLink">Create Account</Link>
-                        </Button>
-
-                        <Link to="/login" className="whiteLink hover">Login</Link>
+                        {
+                            isMobileWidth ?
+                                <div className="textRight">
+                                    {/* Register */}
+                                    <Link to="/register" id="Register" className="whiteLink dontBreakText">Create Account</Link>
+                                    <br />
+                                    {/* Login */}
+                                    <Link to="/login" className="whiteLink">Login</Link>
+                                </div>
+                            :
+                                <div>
+                                    {/* Register */}
+                                    <Button id="Register" className="me-5 transition" _hover={{backgroundColor: "white"}}>
+                                        <Link to="/register" id="Register" className="whiteLink">Create Account</Link>
+                                    </Button>
+            
+                                    {/* Login */}
+                                    <Link to="/login" className="whiteLink hover">Login</Link>
+                                </div>
+                        }
                     </div>
             }  
+
             {children}
         </div>
     )

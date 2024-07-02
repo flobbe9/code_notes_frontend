@@ -1,4 +1,13 @@
 .NavBar {
-    border-bottom: 1px solid black;
-    padding: 10px;
+    background-color: var(--matBlack);
+    color: white;
+    font-family: codeFontLight;
+    min-height: 66px;
+    padding: 10px 15px;
+
+    .accountIcon {
+        border: 1px solid black;
+        border-radius: 100%;
+        padding: 3px;
+    }
 }

@@ -3,5 +3,11 @@
     #ButtonRegister {
         background-color: var(--matBlack);
         border: 1px solid white;
+
+        &:hover {
+            #CustomLinkRegister {
+                color: black;
+            }
+        }
     }
 }
