@@ -2,9 +2,7 @@ import React from "react";
 import "../../assets/styles/NavBar.css";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
-import CodeNotesIcon from "../CodeNotesIcon";
 import Link from "../helpers/CustomLink"
-import CodeNotesLabel from "../CodeNotesLabel";
 import NavBarProfileSection from "./NavBarProfileSection";
 
 
@@ -32,15 +30,21 @@ export default function NavBar({...otherProps}: Props) {
             <Flex className="col-6">
                 <Link to="/" className="whiteLink hover" title="Start page">
                     <Flex verticalAlign="center" className="fullHeight">
-                        <CodeNotesIcon />
-                        <CodeNotesLabel className="ms-5" />
+                        {/* Icon */}
+                        <img src="/img/favicon.ico" alt="favicon" className="invertColor" height={45} />
+
+                        {/* Label */}
+                        <div className="ms-3" style={{fontSize: "1.2em"}}>
+                            <span style={{fontFamily: "var(--codeFont)"}}>Code</span>
+                            <span style={{fontFamily: "noteFont"}}> Notes</span>
+                        </div>
                     </Flex>
                 </Link>
             </Flex>
 
             {/* Right */}
             <Flex 
-                className="col-6 pe-1"
+                className="col-6"
                 horizontalAlign="right" 
                 verticalAlign="center"
             >

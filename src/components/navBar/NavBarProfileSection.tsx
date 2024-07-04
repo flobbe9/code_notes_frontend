@@ -17,7 +17,7 @@ interface Props extends DefaultProps {
  */
 export default function NavBarProfileSection({...otherProps}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "NavBarProfileSection");
+    const { id, className, style, children } = getCleanDefaultProps(otherProps, "NavBarProfileSection", true);
 
     const { getDeviceWidth, isLoggedIn } = useContext(AppContext);
     const { isMobileWidth } = getDeviceWidth();
