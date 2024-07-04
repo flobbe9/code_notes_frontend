@@ -1,0 +1,30 @@
+.SearchBar {
+    border: 3px solid var(--bs-gray-300);
+    border-radius: 20px;
+    padding: 10px;
+
+    #searchInput {
+        border: none;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    /* Search icon */
+    .fa-solid.fa-magnifying-glass {
+        color: var(--bs-gray-600);
+        padding-right: 8px;
+    }
+
+    #clearSearchValueButton {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        
+        /* X icon */
+        .fa-solid.fa-xmark {
+            color: var(--bs-gray-600);
+        }
+    }
+}

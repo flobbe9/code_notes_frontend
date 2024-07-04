@@ -8,25 +8,18 @@ import { isObjectFalsy, log } from "../../helpers/utils";
 
 interface Props extends HelperProps {
 
-    /** Default is false. */
-    disabled?: boolean,
     /** Button type (e.g. "submit") */
     type?: ButtonType,
     /** Default is "" */
     title?: string,
-    onClick?: (event?) => void,
     onSubmit?: (event?) => void,
     /** 
      * Button will be disabled and show "spinner" while awaiting the promise. 
      * Remember to set this button's color explicitly for the "spinner" to match children's color.
      */
     onClickPromise?: (event?) => Promise<any>,
-    /** Styles on hover */
-    _hover?: CSSProperties,
     /** Styles on click */
-    _click?: CSSProperties,
-    /** Styles while disabled. Default styles from class "disabledButton" will be replaced by this style. */
-    _disabled?: CSSProperties
+    _click?: CSSProperties
 }
 
 
@@ -64,8 +57,14 @@ export default function Button({
         toggleIsHover();
         toggleIsClick();
 
-
     }, []);
+
+
+    useEffect(() => {
+        
+        setIsDisabled(disabled);
+        
+    }, [disabled]);
 
 
     /**

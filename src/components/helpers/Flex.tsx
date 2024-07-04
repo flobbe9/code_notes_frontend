@@ -1,6 +1,5 @@
-import React, { forwardRef, LegacyRef, MutableRefObject } from "react";
+import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { isBlank } from "../../helpers/utils";
 import { FlexDirection, FlexWrap, TextAlign } from "../../abstract/CSSTypes";
 import HelperProps from "../../abstract/HelperProps";
 
@@ -16,7 +15,6 @@ interface Props extends HelperProps {
     flexDirection?: FlexDirection,
     /** Default is "wrap". See {@link FlexWrap} */
     flexWrap?: FlexWrap,
-    onClick?: (event) => void
 }
 
 
@@ -28,31 +26,43 @@ interface Props extends HelperProps {
  * 
  * @since 0.0.1
  */
-export default forwardRef(function({horizontalAlign, 
-                                    verticalAlign,
-                                    disableFlex = false,
-                                    flexDirection = "row",
-                                    flexWrap = "wrap",
-                                    onClick,
-                                    rendered = true,
-                                    ...otherProps}: Props,
-    ref: LegacyRef<HTMLDivElement>) {
+export default forwardRef(function(
+    {
+        horizontalAlign, 
+        verticalAlign,
+        disableFlex = false,
+        flexDirection = "row",
+        flexWrap = "wrap",
+        onClick,
+        rendered = true,
+        _hover = {},
+        ...otherProps
+    }: Props,
+    ref: Ref<HTMLDivElement>) {
 
+    
+    const [isHover, setIsHover] = useState(false);
+    
     const { id, className, style, children } = getCleanDefaultProps(otherProps);
 
+    const componentRef = useRef(null)
 
-    function getCssDisplay(): string {
+    // make "ref" usable inside this component
+    useImperativeHandle(ref, () => componentRef.current!, []);
 
-        let display = "flex";
 
-        if (disableFlex)
-            display = "";
+    useEffect(() => {
 
-        // always call this last
-        if (!rendered)
-            display = "none";
+        toggleIsHover();
+    }, []);
 
-        return display;
+
+    function toggleIsHover(): void {
+
+        const component = $(componentRef.current!);
+
+        component.on("mouseenter", () => setIsHover(true))
+                 .on("mouseleave", () => setIsHover(false));
     }
 
 
@@ -63,14 +73,16 @@ export default forwardRef(function({horizontalAlign,
             style={{
                 ...style,
                 alignItems: verticalAlign,
-                display: getCssDisplay(),
+                display: "flex",
                 flexDirection: flexDirection,
                 flexWrap: flexWrap,
                 justifyContent: horizontalAlign,
+                ...(isHover ? _hover : {}),
             }}
-            ref={ref}
+            ref={componentRef}
             onClick={onClick}
-            >
+            hidden={!rendered}
+        >
             {children}
         </div>
     )

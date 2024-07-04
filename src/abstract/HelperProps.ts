@@ -1,13 +1,22 @@
+import { CSSProperties } from 'react';
 import DefaultProps from './DefaultProps';
 
 
 /**
  * Props for helper components. Extends {@link DefaultProps}.
  * 
- * @since 0.1.4
+ * @since 0.0.1
  */
 export default interface HelperProps extends DefaultProps {
 
     /** If false, this component will get passed ```display: none``` */
-    rendered?: boolean
+    rendered?: boolean,
+    disabled?: boolean,
+    onClick?: (event?) => void,
+    /** Style for given event */
+    _hover?: CSSProperties,
+    /** Style for given event */
+    _focus?: CSSProperties,
+    /** Style for given event */
+    _disabled?: CSSProperties
 }

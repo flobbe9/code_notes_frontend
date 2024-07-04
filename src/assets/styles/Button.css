@@ -1,6 +1,6 @@
 .Button {
     border: none;
-    border-radius: 10px;
+    border-radius: var(--borderRadius);
     padding: 10px 15px;
 
     &:hover {
