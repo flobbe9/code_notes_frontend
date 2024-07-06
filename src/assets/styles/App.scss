@@ -1,14 +1,8 @@
 @import "./global/fonts.scss";
 @import "./global/functions.scss";
 @import "./global/helpers.scss";
+@import "./global/variables.scss";
 
-:root {
-    --borderRadius: 10px;
-    --codeFont: var(--bs-font-monospace);
-    --matBlack: rgb(49, 49, 49);
-    --testBorder: 1px solid black;
-    --transitionTime: 0.2s;
-}
 
 .App {
     font-family: roundFont;

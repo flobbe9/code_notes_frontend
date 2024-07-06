@@ -13,7 +13,10 @@ interface Props extends HelperProps {
     _checked?: CSSProperties,
 
     isChecked?: boolean,
-    setIsChecked?: (isChecked: boolean) => void
+    setIsChecked?: (isChecked: boolean) => void,
+
+    /** If ```true``` the children (or default icon) wont be hidden while not checked */
+    dontHideChildren?: boolean
 }
 
 
@@ -30,6 +33,7 @@ export default forwardRef(function Checkbox({
         onClick,
         isChecked = false,
         setIsChecked,
+        dontHideChildren = false,
         _hover = {},
         _disabled = {},
         _checked = {},
@@ -91,7 +95,7 @@ export default forwardRef(function Checkbox({
 
 
     return (
-        <HelperDiv 
+        <Flex 
             id={id} 
             className={className}
             style={{
@@ -102,6 +106,8 @@ export default forwardRef(function Checkbox({
             title={title}
             rendered={rendered}
             onClick={handleClick}
+            verticalAlign="center"
+            horizontalAlign="center"
             ref={componentRef}
             _hover={_hover}
         >
@@ -113,13 +119,9 @@ export default forwardRef(function Checkbox({
                 hidden
             />
                 
-            <Flex
-                verticalAlign="center"
-                horizontalAlign="center"
-                rendered={checked}
-            >
+            <HelperDiv className="checkboxContent dontSelectText" rendered={checked || dontHideChildren}>
                 {children || <i className="fa-solid fa-check"></i>}
-            </Flex>
-        </HelperDiv>
+            </HelperDiv>
+        </Flex>
     )
 })

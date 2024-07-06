@@ -147,13 +147,7 @@
 }
 
 .hover {
-    @include hoverCursor();
-
-    transition: opacity var(--transitionTime);
-
-    &:hover {
-        opacity: 0.7;
-    }
+    @include hover();
 }
 
 .hoverStrong {

@@ -101,7 +101,7 @@ export default forwardRef(function SearchBar(
     
     
     /**
-     * Indicates wether to use the default disabled style or not.
+     * Indicates whether to use the default disabled style or not.
      * 
      * @returns ```true``` if ```disabled``` and ```_disabled``` style is falsy
      */

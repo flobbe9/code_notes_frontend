@@ -1,3 +1,49 @@
+:root {
+    --startPageSideBarWidthWidthMobile: 50vw;
+    --iconColor: rgb(179, 179, 179);
+    --placeHolderColor: rgba(255, 255, 255, 0.582);
+    --tagFilterContainerPadding: 1rem;
+    --startPageSideBarWidth: 200px;
+}
+
 .StartPageSideBar {
-    border: var(--testBorder);
+    .toolBar {
+        background-color: rgb(31, 4, 94);
+        color: white;
+        padding: 1rem;
+        
+        /* Burger button icon */
+        .fa-solid.fa-bars {
+            margin-top: 18px;
+        }
+    }
+    
+    .tagFilterContainer {
+        background-color: rgb(21, 1, 70);
+        border-radius: var(--borderRadius);
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        color: white;
+        padding: var(--tagFilterContainerPadding);
+        width: 0;
+
+        .SearchBar {
+            padding: 5px;
+
+            #searchInput {
+                &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+                    color: var(--placeHolderColor);
+                }
+                &::-moz-placeholder { /* Firefox 19+ */
+                    color: var(--placeHolderColor);
+                }
+                &:-ms-input-placeholder { /* IE 10+ */
+                    color: var(--placeHolderColor);
+                }
+                &:-moz-placeholder { /* Firefox 18- */
+                    color: var(--placeHolderColor);
+                }
+            }
+        }
+    }
 }

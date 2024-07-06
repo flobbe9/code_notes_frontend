@@ -6,6 +6,7 @@ import SearchBar from "./helpers/SearchBar";
 import { JQueryEasing } from "../abstract/CSSTypes";
 import { getCssConstant, log } from "../helpers/utils";
 import { AppContext } from "./App";
+import StartPageSideBarTagList from "./StartPageSideBarTagList";
 
 
 interface Props extends DefaultProps {
@@ -16,7 +17,6 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-// TODO: strg + b toggle
 // IDEA: filter icon
 export default function StartPageSideBar({...otherProps}: Props) {
 
@@ -109,14 +109,18 @@ export default function StartPageSideBar({...otherProps}: Props) {
             <Flex className="fullHeight" flexWrap="nowrap">
                 {/* Toolbar */}
                 <div className="toolBar">
-                    <i className="fa-solid fa-bars fa-xl hover" onClick={toggleTagFilterContainer}></i>
+                    <i 
+                        className="fa-solid fa-bars fa-xl hover" 
+                        onClick={toggleTagFilterContainer}
+                        title="Ctrl + B"
+                    ></i>
                 </div>
 
                 {/* Tag filter container */}
                 <div className="tagFilterContainer hidden" ref={tagFilterContainerRef}>
                     <SearchBar 
                         placeHolder="Search tags..."
-                        _focus={{borderColor: "orange"}} 
+                        _focus={{borderColor: "var(--accentColor)"}} 
                         _searchIcon={{color: "var(--iconColor)"}}
                         _searchInput={{color: "white"}} 
                         _xIcon={{color: "var(--iconColor)"}}
@@ -124,14 +128,7 @@ export default function StartPageSideBar({...otherProps}: Props) {
 
                     <hr />
 
-                    <div className="tagList">
-                        <div>
-                            Tag
-                        </div>
-                        <div>
-                            Tag
-                        </div>
-                    </div>
+                    <StartPageSideBarTagList />
                 </div>
             </Flex>
                 

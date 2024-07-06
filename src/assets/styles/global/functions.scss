@@ -5,13 +5,13 @@
 }
 
 @mixin tablet {
-    @media screen and (min-width: 576px) and (max-width: 1199px) {
+    @media screen and (min-width: 576px) and (max-width: 991px) {
         @content;
     }
 }
 
 @mixin desktop {
-    @media screen and (min-width: 1200px) {
+    @media screen and (min-width: 992px) {
         @content;
     }
 }
@@ -37,6 +37,15 @@
         &:disabled {
             cursor: default;
         }
+    }
+}
+
+@mixin hover() {
+    &:not([disabled]):hover {
+        transition: opacity var(--transitionTime);
+        opacity: 0.7;
+
+        @include hoverCursor();
     }
 }
 
