@@ -1,0 +1,79 @@
+@mixin mobile {
+    @media screen and (max-width: 575px) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media screen and (min-width: 576px) and (max-width: 1199px) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media screen and (min-width: 1200px) {
+        @content;
+    }
+}
+
+@mixin dontSelectText() {
+    // iOS Safari
+    -webkit-touch-callout: none; 
+    // Safari
+    -webkit-user-select: none; 
+    // Konqueror HTML
+    -khtml-user-select: none; 
+    // Old versions of Firefox
+    -moz-user-select: none; 
+    // Internet Explorer/Edge
+    -ms-user-select: none; 
+    user-select: none;
+}
+
+@mixin hoverCursor() {
+    &:hover {
+        cursor: pointer;
+
+        &:disabled {
+            cursor: default;
+        }
+    }
+}
+
+@mixin disabled() {
+    cursor: default !important;
+    opacity: 0.5 !important;
+}
+
+@mixin selectText {
+    // firefox
+    &::-moz-selection {
+        @content;
+    }
+
+    &::selection {
+        @content;
+    }
+}
+
+@mixin placeholder {
+     // Chrome/Opera/Safari
+     &::-webkit-input-placeholder {
+        @content;
+    }
+
+    // Firefox 19+
+    &::-moz-placeholder {
+        @content;
+    }
+    
+    // IE 10+
+    &:-ms-input-placeholder {
+        @content;
+    }
+    
+    // Firefox 18-
+    &:-moz-placeholder {
+        @content;
+    }
+}

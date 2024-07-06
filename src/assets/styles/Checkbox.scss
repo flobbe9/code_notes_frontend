@@ -1,0 +1,21 @@
+@import "App.scss";
+.Checkbox {
+    border: 2px solid grey;
+    border-radius: 5px;
+    height: 30px;
+    padding: 5px;
+    position: relative;
+    width: 30px;
+
+    @include hoverCursor();
+
+    // disabled
+    &:has(.checkboxInput:disabled) {
+        cursor: default;
+        opacity: 0.5;
+    }
+
+    .checkboxInput {
+        position: absolute;
+    }
+}

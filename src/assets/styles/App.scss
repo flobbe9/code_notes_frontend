@@ -1,37 +1,19 @@
+@import "./global/fonts.scss";
+@import "./global/functions.scss";
+
 :root {
+    --borderRadius: 10px;
+    --codeFont: var(--bs-font-monospace);
+    --matBlack: rgb(49, 49, 49);
     --testBorder: 1px solid black;
-}
-
-/* Mobile */
-@media screen {
-
-}
-
-/* Tablet */
-@media screen and (min-width: 576px) {
-
-}
-
-/* Desktop */
-@media screen and (min-width: 1200px) {
-
-}
-
-body {
-    margin: 0;
+    --transitionTime: 0.2s;
 }
 
 .App {
-    
-    /* text selection color */
-    ::-moz-selection { /* firefox */
-        background: var(--themeColor);
-        color: white;
-    }
-    ::selection {
-        background: var(--themeColor);
-        color: white;
-    }
+    font-family: roundFont;
+    margin: 0;
+    /* To keep scrollbar */
+    min-height: 101vh;
 
     /* Other */
     .rotating {
@@ -42,79 +24,14 @@ body {
         animation: rotating 2s linear infinite;
     }
 
-    .dontMarkText {
-        -webkit-touch-callout: none; /* iOS Safari */
-        -webkit-user-select: none; /* Safari */
-        -khtml-user-select: none; /* Konqueror HTML */
-        -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-        user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+    .dontSelectText {
+        @include dontSelectText()
     }
 
-    /* Buttons */
-    .blackButton {
-        border-color: black;
-        border-radius: 5px;
-        text-decoration: none;
-        transition: var(--transitionTime);
-
-        &:disabled {
-            color: grey;
-
-            &:hover {
-                background-color: black;
-            }
+    .dontMarkPlaceholder {
+        @include placeholder {
+            @include dontSelectText();
         }
-    }
-    
-    .blackButtonContained {
-        border: none;
-        background-color: black;
-        color: white;
-    }
-
-    .blackButtonContained:hover {
-        background-color: rgb(77, 77, 77);
-    }
-    
-    .blackButtonOutlined {
-        color: black;
-    }
-    
-    .blackButtonOutlined:hover {
-        border-color: black;
-    }
-
-    .buttonSmall {
-        padding: 5px 10px 5px 10px;
-    }
-
-    .buttonMedium {
-        padding: 10px 25px 10px 25px;
-    }
-
-    .whiteButton {
-        background-color: white;
-        border: none;
-        border-radius: 5px;
-        color: black;
-    }
-    
-    .whiteButtonPortrait {
-        height: 140px;
-        width: 100px;
-    }
-
-    .whiteButtonLandscape {
-        height: 100px;
-        width: 140px;
-    }
-
-    .smallIconButton {
-        background-color: transparent;
-        border-radius: 100%;
-        height: 28px;
-        transition: background-color var(--transitionTime), padding var(--transitionTime);
     }
     
     .disabledButton {
@@ -226,16 +143,6 @@ body {
         }
     }
 
-    .themeLink {
-        color: black;
-        text-decoration: none;
-        transition: var(--transitionTime);
-
-        &:hover {
-            text-decoration: none;
-        }
-    }
-
     .blueLink {
         color: blue;
         cursor: pointer;
@@ -256,7 +163,8 @@ body {
     }
 
     .hover {
-        cursor: pointer;
+        @include hoverCursor();
+
         transition: opacity var(--transitionTime);
 
         &:hover {
@@ -265,7 +173,8 @@ body {
     }
 
     .hoverStrong {
-        cursor: pointer;
+        @include hoverCursor();
+
         transition: opacity var(--transitionTime);
 
         &:hover {
@@ -289,7 +198,7 @@ body {
         margin-top: 1px;
     }
 
-    .dontMarkText {
+    .dontSelectText {
         -webkit-touch-callout: none; /* iOS Safari */
         -webkit-user-select: none; /* Safari */
         -khtml-user-select: none; /* Konqueror HTML */
@@ -306,18 +215,33 @@ body {
         animation: rotating 2s linear infinite;
     }
 
+    .invertColor {
+        filter: invert(1);
+    }
+
+    .transition {
+        transition: var(--transitionTime);
+    }
+
     .disabled {
-        opacity: 0.5 !important;
-        cursor: default !important;
+        @include disabled();
     }
 
     .fullWidth {
         width: 100%;
     }
 
-    .fullWindowWidth {
+    .fullViewWidth {
         /* not doing 100 because the browser's scrollbar would not be considered */
         width: 98vw;
+    }
+
+    .fullHeight {
+        height: 100%;
+    }
+
+    .fullViewHeight {
+        height: 100vh;
     }
 }
 
