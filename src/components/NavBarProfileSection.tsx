@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
-import "../../assets/styles/NavBarProfileSection.css";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import Link from "../helpers/CustomLink";
-import Button from "../helpers/Button";
-import { log } from "../../helpers/utils";
-import { AppContext } from "../App";
+import "./../assets/styles/NavBarProfileSection.css";
+import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
+import Link from "./helpers/CustomLink";
+import Button from "./helpers/Button";
+import { log } from "./../helpers/utils";
+import { AppContext } from "./App";
 
 
 interface Props extends DefaultProps {
@@ -58,7 +58,7 @@ export default function NavBarProfileSection({...otherProps}: Props) {
                                     </Button>
             
                                     {/* Login */}
-                                    <Link to="/login" className="whiteLink hover">Login</Link>
+                                    <Link to="/login" className="whiteLink hover dontMarkText">Login</Link>
                                 </div>
                         }
                     </div>

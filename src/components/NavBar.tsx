@@ -1,8 +1,8 @@
 import React from "react";
-import "../../assets/styles/NavBar.css";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import Flex from "../helpers/Flex";
-import Link from "../helpers/CustomLink"
+import "./../assets/styles/NavBar.css";
+import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
+import Flex from "./helpers/Flex";
+import Link from "./helpers/CustomLink"
 import NavBarProfileSection from "./NavBarProfileSection";
 
 
@@ -23,13 +23,13 @@ export default function NavBar({...otherProps}: Props) {
     return (
         <Flex 
             id={id} 
-            className={className}
+            className={className + " p-3"}
             style={style}
         >
             {/* Left */}
             <Flex className="col-6">
                 <Link to="/" className="whiteLink hover" title="Start page">
-                    <Flex verticalAlign="center" className="fullHeight">
+                    <Flex verticalAlign="center" className="fullHeight dontMarkText">
                         {/* Icon */}
                         <img src="/img/favicon.ico" alt="favicon" className="invertColor" height={45} />
 
