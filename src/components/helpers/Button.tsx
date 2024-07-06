@@ -10,8 +10,6 @@ interface Props extends HelperProps {
 
     /** Button type (e.g. "submit") */
     type?: ButtonType,
-    /** Default is "" */
-    title?: string,
     onSubmit?: (event?) => void,
     /** 
      * Button will be disabled and show "spinner" while awaiting the promise. 
@@ -147,7 +145,7 @@ export default function Button({
     return (
         <button 
             id={id} 
-            className={className + (isDefaultDisabledStyle() ? " disabledButton" : "")}
+            className={className + (isDefaultDisabledStyle() ? " disabledButton" : "") + " dontSelectText"}
             ref={componentRef}
             style={{
                 ...style,

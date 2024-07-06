@@ -1,4 +1,4 @@
-import React, { CSSProperties, forwardRef, LegacyRef, useEffect, useRef, useState } from "react";
+import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "../../assets/styles/SearchBar.css";
 import HelperProps from "../../abstract/HelperProps";
 import Flex from "./Flex";
@@ -11,17 +11,17 @@ interface Props extends HelperProps {
     /** Default is "Search..." */
     placeHolder?: string,
     /** Default is "" */
-    title?: string,
-    /** Default is "" */
     defaultValue?: string,
     /** Applied to searchInput */
     onKeyDown?: (event?) => void,
     /** Applied to searchInput */
     onKeyUp?: (event?) => void,
+    /** Default is {} */
+    _searchIcon?: CSSProperties,
+    /** Default is {} */
+    _searchInput?: CSSProperties,
     /** Styles for the "delete search value" icon. Default is {} */
     _xIcon?: CSSProperties,
-    /** Default is {} */
-    _serachIcon?: CSSProperties,
 }
 
 
@@ -38,14 +38,15 @@ export default forwardRef(function SearchBar(
         onKeyDown,
         onKeyUp,
         onClick,
+        _searchIcon = {},
+        _searchInput = {},
         _xIcon = {},
-        _serachIcon = {},
         _hover = {},
         _focus = {},
         _disabled = {},
         ...otherProps
     }: Props, 
-    inputRef: LegacyRef<HTMLInputElement>
+    inputRef: Ref<HTMLInputElement>
 ) {
 
     const [isFocus, setIsFocus] = useState(false);
@@ -53,11 +54,19 @@ export default forwardRef(function SearchBar(
     const { id, className, style, children } = getCleanDefaultProps(otherProps, "SearchBar");
 
     const componentRef = useRef(null);
+    const inputRefLocal = useRef(null);
+
+    useImperativeHandle(inputRef, () => inputRefLocal.current!, []);
 
 
     useEffect(() => {
 
+        window.addEventListener("keydown", handleKeyDown);
         toggleIsFocus();
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        }
     }, []);
 
 
@@ -102,6 +111,22 @@ export default forwardRef(function SearchBar(
     }
 
 
+    /**
+     * Handle global keydown events related to this component.
+     * 
+     * @param event 
+     */
+    function handleKeyDown(event): void {
+
+        const keyName = event.key;
+
+        if (keyName === "/") {
+            event.preventDefault();
+            $(inputRefLocal.current!).trigger("focus");
+        }
+    }
+
+
     return (
         <Flex 
             id={id} 
@@ -118,14 +143,16 @@ export default forwardRef(function SearchBar(
             ref={componentRef}
         >
             {/* Search icon */}
-            <i className="fa-solid fa-magnifying-glass" style={_serachIcon}></i>
+            <i className="fa-solid fa-magnifying-glass" style={_searchIcon}></i>
 
             {/* Search input */}
+            {/* TODO: dont use ids */}
             <input 
                 id="searchInput"
-                className="fullWidth"
+                className="fullWidth dontMarkPlaceholder"
+                style={_searchInput}
                 type="text"
-                ref={inputRef} 
+                ref={inputRefLocal} 
                 placeholder={placeHolder}
                 defaultValue={defaultValue}
                 title={title}

@@ -1,10 +1,12 @@
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, Ref } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { FlexDirection, FlexWrap, TextAlign } from "../../abstract/CSSTypes";
 import HelperProps from "../../abstract/HelperProps";
+import HelperDiv from "./HelperDiv";
 
 
 interface Props extends HelperProps {
+
     /** Wont be set at all if ```undefined``` */
     horizontalAlign?: TextAlign,
     /** Wont be set at all if ```undefined``` */
@@ -34,40 +36,18 @@ export default forwardRef(function(
         flexDirection = "row",
         flexWrap = "wrap",
         onClick,
+        title = "",
         rendered = true,
         _hover = {},
         ...otherProps
     }: Props,
     ref: Ref<HTMLDivElement>) {
 
-    
-    const [isHover, setIsHover] = useState(false);
-    
     const { id, className, style, children } = getCleanDefaultProps(otherProps);
-
-    const componentRef = useRef(null)
-
-    // make "ref" usable inside this component
-    useImperativeHandle(ref, () => componentRef.current!, []);
-
-
-    useEffect(() => {
-
-        toggleIsHover();
-    }, []);
-
-
-    function toggleIsHover(): void {
-
-        const component = $(componentRef.current!);
-
-        component.on("mouseenter", () => setIsHover(true))
-                 .on("mouseleave", () => setIsHover(false));
-    }
 
 
     return (
-        <div 
+        <HelperDiv 
             id={id} 
             className={className}
             style={{
@@ -77,13 +57,14 @@ export default forwardRef(function(
                 flexDirection: flexDirection,
                 flexWrap: flexWrap,
                 justifyContent: horizontalAlign,
-                ...(isHover ? _hover : {}),
             }}
-            ref={componentRef}
+            _hover={_hover}
+            title={title}
+            ref={ref}
             onClick={onClick}
-            hidden={!rendered}
+            rendered={rendered}
         >
             {children}
-        </div>
+        </HelperDiv>
     )
 })

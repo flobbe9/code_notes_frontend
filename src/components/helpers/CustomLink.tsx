@@ -1,15 +1,14 @@
 import React from "react";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { Link } from "react-router-dom";
 import { LINK_DEFAULT_REL } from "../../helpers/constants";
 import { LinkTarget } from "../../abstract/CSSTypes";
+import HelperProps from "../../abstract/HelperProps";
 
 
-interface Props extends DefaultProps {
+interface Props extends HelperProps {
     /** Url to navigate to. If not absolute, this will be interpreted as path. */
     to: string,
-    /** Default is "" */
-    title?: string,
     /** Default is "" */
     rel?: string,
     /** Default is "_self" */
@@ -22,13 +21,22 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function CustomLink({to, title = "", rel = "", target = "_self", ...otherProps}: Props) {
+export default function CustomLink(
+    {
+        to, 
+        title = "", 
+        rel = "", 
+        target = "_self", 
+        rendered = true,
+        onClick,
+        ...otherProps
+    }: Props
+) {
 
     const { id, className, style, children } = getCleanDefaultProps(otherProps, "CustomLink");
 
     return (
         <Link 
-            
             to={to}
             id={id} 
             className={className}
@@ -36,6 +44,8 @@ export default function CustomLink({to, title = "", rel = "", target = "_self", 
             rel={LINK_DEFAULT_REL + " " + rel}
             title={title}
             target={target}
+            onClick={onClick}
+            hidden={!rendered}
         >
             {children}
         </Link>
