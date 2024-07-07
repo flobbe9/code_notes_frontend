@@ -23,6 +23,9 @@ export default function TagCheckbox({...otherProps}: Props) {
             style={style}
             dontHideChildren
             _checked={{backgroundColor: "var(--accentColor)"}}
+            _disabled={{
+                
+            }}
         >
             {children}
         </Checkbox>

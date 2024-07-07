@@ -36,7 +36,7 @@ export default function StartPageSideBar({...otherProps}: Props) {
     }, []);
 
 
-    function slideInTagFilterContainer(duration = 400, easing: JQueryEasing = "easeOutSine"): void {
+    function slideInTagFilterContainer(duration = 100, easing: JQueryEasing = "easeOutSine"): void {
 
         const tagFilterContainer = $(tagFilterContainerRef.current!);
 
@@ -54,7 +54,7 @@ export default function StartPageSideBar({...otherProps}: Props) {
     }
 
 
-    function slideOutTagFilterContainer(duration = 300, easing: JQueryEasing = "easeInSine"): void {
+    function slideOutTagFilterContainer(duration = 100, easing: JQueryEasing = "easeInSine"): void {
 
         const tagFilterContainer = $(tagFilterContainerRef.current!);
 

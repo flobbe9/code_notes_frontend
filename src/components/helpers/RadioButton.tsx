@@ -4,7 +4,7 @@ import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import { log } from "../../helpers/utils";
 import Flex from "./Flex";
-import HelperDiv from "./HelperDiv";
+import HiddenInput from "./HiddenInput";
 
 
 interface Props extends HelperProps {
@@ -42,7 +42,10 @@ export default forwardRef(function RadioButton(
         onClick,
         _checked = {},
         _hover = {},
-        _disabled = {},
+        _disabled = {
+            cursor: "default",
+            opacity: 0.5
+        },
         ...otherProps
     }: Props,
     ref: Ref<HTMLInputElement>
@@ -113,14 +116,12 @@ export default forwardRef(function RadioButton(
             horizontalAlign="center"
             verticalAlign="center"
         >
-            {/* Hidden input */}
-            <input 
+            <HiddenInput 
+                type="radio" 
                 className="radioButtonInput"
-                type="radio"
                 name={radioGroup}
                 ref={inputRef}
                 disabled={disabled}
-                hidden
             />
 
             {/* Content */}

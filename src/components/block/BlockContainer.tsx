@@ -9,7 +9,8 @@ import CodeBlockWithVariables from "./CodeBlockWithVariables";
 import Button from "../helpers/Button";
 import BlockContainerTagList from "./BlockContainerTagList";
 import Flex from "../helpers/Flex";
-import BlockContainerTitle from "./BlockContainerTitle";
+import ContentEditableDiv from "../helpers/ContentEditableDiv";
+import { getRandomString } from "../../helpers/utils";
 
 
 interface Props extends DefaultProps {
@@ -31,22 +32,33 @@ export default function BlockContainer({...otherProps}: Props) {
             className={className}
             style={style}
         >
-            <Flex>
+            <Flex className="mb-3">
                 {/* Title */}
-                <BlockContainerTitle />
+                <ContentEditableDiv
+                    id={id} 
+                    className={className + " blockContainerTitle"}
+                    style={style}
+                    _focus={{
+                        borderColor: "orange",
+                        outline: "none"
+                    }}
+                >
+                    Title...
+                </ContentEditableDiv>
 
                 {/* Tags */}
                 <BlockContainerTagList />
+
+                {/* Container Footer */}
+                {/* <Flex className="blockContainerFooter" horizontalAlign="right">
+                    <Button>Delete</Button>
+
+                    <Button>Save</Button>
+                </Flex> */}
             </Flex>
 
             {/* List of blocks */}
             {testBlockList}
-
-            {/* Save button */}
-            <Button>Save</Button>
-
-            {/* Delete button */}
-            <Button>Delete</Button>
                 
             {children}
         </div>
@@ -55,15 +67,15 @@ export default function BlockContainer({...otherProps}: Props) {
 
 
 const testBlockList = [
-    <DefaultBlock>
+    <DefaultBlock key={getRandomString()}>
         <PlainTextBlock />
     </DefaultBlock>,
 
-    <DefaultCodeBlock>
+    <DefaultCodeBlock key={getRandomString()}>
         <CodeBlock />
     </DefaultCodeBlock>,
 
-    <DefaultCodeBlock>
+    <DefaultCodeBlock key={getRandomString()}>
         <CodeBlockWithVariables />
     </DefaultCodeBlock>
 ]

@@ -5,6 +5,7 @@ import HelperProps from "../../abstract/HelperProps";
 import HelperDiv from "./HelperDiv";
 import { log } from "../../helpers/utils";
 import Flex from "./Flex";
+import HiddenInput from "./HiddenInput";
 
 
 interface Props extends HelperProps {
@@ -34,7 +35,10 @@ export default forwardRef(function Checkbox({
         setIsChecked,
         dontHideChildren = false,
         _hover = {},
-        _disabled = {},
+        _disabled = {
+            cursor: "default",
+            opacity: 0.5
+        },
         _checked = {},
         ...otherProps
     }: Props,
@@ -110,13 +114,13 @@ export default forwardRef(function Checkbox({
             ref={componentRef}
             _hover={_hover}
         >
-            <input 
-                type="checkbox" 
+
+            <HiddenInput
+                type="checkbox"
                 className="checkboxInput"
                 checked={checked}
                 disabled={disabled}
-                hidden
-            />
+             />
                 
             <HelperDiv 
                 className="checkboxContent dontSelectText" 

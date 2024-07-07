@@ -7,12 +7,6 @@
     width: fit-content;
     @include hoverCursor();
 
-    // case: disabled
-    &:has(.radioButtonInput:disabled) {
-        cursor: default;
-        opacity: 0.5;
-    }
-
     .radioButtonContent {        
         .defaultIcon {
             $minSize: 25px;

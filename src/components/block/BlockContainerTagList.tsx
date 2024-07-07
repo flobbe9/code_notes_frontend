@@ -1,6 +1,7 @@
 import React from "react";
 import "../../assets/styles/BlockContainerTagList.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import ContentEditableDiv from "../helpers/ContentEditableDiv";
 
 
 interface Props extends DefaultProps {
@@ -21,9 +22,9 @@ export default function BlockContainerTagList({...otherProps}: Props) {
             className={className}
             style={style}
         >
-            <div contentEditable>
+            <ContentEditableDiv>
                 Tags...
-            </div>
+            </ContentEditableDiv>
                 
             {children}
         </div>

@@ -1,4 +1,4 @@
-import { CSSProperties, ReactNode } from "react";
+import { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { log } from "../helpers/utils";
 
 
@@ -10,7 +10,9 @@ export default interface DefaultProps {
     id?: string,
     className?: string,
     children?: ReactNode,
-    style?: CSSProperties
+    style?: CSSProperties,
+    /** Any other html attribute */
+    other?: HTMLAttributes<any>
 }
 
 
@@ -29,5 +31,6 @@ export function getCleanDefaultProps(props: DefaultProps, componentName?: string
         className: (componentName || "") + " " + (props.className || ""),
         children: props.children || "",
         style: props.style || {},
+        other: props.other || {}
     }
 }

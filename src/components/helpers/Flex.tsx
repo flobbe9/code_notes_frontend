@@ -43,7 +43,7 @@ export default forwardRef(function(
     }: Props,
     ref: Ref<HTMLDivElement>) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps);
+    const { id, className, style, children, other } = getCleanDefaultProps(otherProps);
 
 
     return (
@@ -63,6 +63,7 @@ export default forwardRef(function(
             ref={ref}
             onClick={onClick}
             rendered={rendered}
+            other={other}
         >
             {children}
         </HelperDiv>

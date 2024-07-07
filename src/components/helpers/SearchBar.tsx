@@ -119,11 +119,12 @@ export default forwardRef(function SearchBar(
     function handleKeyDown(event): void {
 
         const keyName = event.key;
-
-        if (keyName === "/") {
-            event.preventDefault();
-            $(inputRef.current!).trigger("focus");
-        }
+ 
+        // TODO: dont do this if focues on another input
+        // if (keyName === "/") {
+        //     event.preventDefault();
+        //     $(inputRef.current!).trigger("focus");
+        // }
     }
 
 
