@@ -1,0 +1,28 @@
+@import "./global/functions.scss";
+
+.RadioButton {
+    border: 2px solid var(--codeGrey);
+    border-radius: 5px;
+    padding: 3px;
+    width: fit-content;
+    @include hoverCursor();
+
+    // case: disabled
+    &:has(.radioButtonInput:disabled) {
+        cursor: default;
+        opacity: 0.5;
+    }
+
+    .radioButtonContent {        
+        .defaultIcon {
+            $minSize: 25px;
+            
+            background-color: var(--accentColor);
+            border-radius: 5px;
+            height: 100%;
+            min-height: $minSize;
+            min-width: $minSize;
+            width: 100%;
+        }
+    }
+}

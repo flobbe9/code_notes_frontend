@@ -1,5 +1,5 @@
 import React, { CSSProperties, useEffect, useRef, useState } from "react";
-import "../../assets/styles/Button.css";
+import "../../assets/styles/Button.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import { ButtonType } from "../../abstract/CSSTypes";
@@ -155,6 +155,7 @@ export default function Button({
             }}
             hidden={!rendered}
             disabled={isDisabled}
+            title={title}
             type={type}
             onClick={handleClick}
             onSubmit={onSubmit}

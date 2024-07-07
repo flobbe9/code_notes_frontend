@@ -1,21 +1,17 @@
-@import "App.scss";
+@import "./global/functions.scss";
+
 .Checkbox {
-    border: 2px solid grey;
+    border: 2px solid var(--codeGrey);
     border-radius: 5px;
     height: 30px;
     padding: 5px;
-    position: relative;
     width: 30px;
 
     @include hoverCursor();
 
-    // disabled
+    // case: disabled
     &:has(.checkboxInput:disabled) {
         cursor: default;
         opacity: 0.5;
-    }
-
-    .checkboxInput {
-        position: absolute;
     }
 }

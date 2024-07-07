@@ -4,6 +4,7 @@
     padding: 10px;
 
     #searchInput {
+        background-color: transparent;
         border: none;
 
         &:focus {

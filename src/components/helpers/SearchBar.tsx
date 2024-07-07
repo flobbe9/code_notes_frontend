@@ -46,7 +46,7 @@ export default forwardRef(function SearchBar(
         _disabled = {},
         ...otherProps
     }: Props, 
-    inputRef: Ref<HTMLInputElement>
+    ref: Ref<HTMLInputElement>
 ) {
 
     const [isFocus, setIsFocus] = useState(false);
@@ -54,9 +54,9 @@ export default forwardRef(function SearchBar(
     const { id, className, style, children } = getCleanDefaultProps(otherProps, "SearchBar");
 
     const componentRef = useRef(null);
-    const inputRefLocal = useRef(null);
+    const inputRef = useRef(null);
 
-    useImperativeHandle(inputRef, () => inputRefLocal.current!, []);
+    useImperativeHandle(ref, () => inputRef.current!, []);
 
 
     useEffect(() => {
@@ -122,7 +122,7 @@ export default forwardRef(function SearchBar(
 
         if (keyName === "/") {
             event.preventDefault();
-            $(inputRefLocal.current!).trigger("focus");
+            $(inputRef.current!).trigger("focus");
         }
     }
 
@@ -152,7 +152,7 @@ export default forwardRef(function SearchBar(
                 className="fullWidth dontMarkPlaceholder"
                 style={_searchInput}
                 type="text"
-                ref={inputRefLocal} 
+                ref={inputRef} 
                 placeholder={placeHolder}
                 defaultValue={defaultValue}
                 title={title}

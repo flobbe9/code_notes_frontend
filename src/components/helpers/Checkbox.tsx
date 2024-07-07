@@ -15,14 +15,13 @@ interface Props extends HelperProps {
     isChecked?: boolean,
     setIsChecked?: (isChecked: boolean) => void,
 
-    /** If ```true``` the children (or default icon) wont be hidden while not checked */
+    /** If ```true``` the children (or default icon) will be visible while checked. Default is ```false``` */
     dontHideChildren?: boolean
 }
 
 
 /**
- * Custom checkbox with minimal styles. Try to keep component's ```position: relative``` though since the hidden input
- * has ```position: absolute```.
+ * Custom checkbox with minimal styles. 
  * 
  * @since 0.0.1
  */
@@ -39,7 +38,7 @@ export default forwardRef(function Checkbox({
         _checked = {},
         ...otherProps
     }: Props,
-    ref: Ref<HTMLInputElement>
+    ref: Ref<HTMLDivElement>
 ) {
 
     const [checked, setChecked] = useState(isChecked);
@@ -119,7 +118,11 @@ export default forwardRef(function Checkbox({
                 hidden
             />
                 
-            <HelperDiv className="checkboxContent dontSelectText" rendered={checked || dontHideChildren}>
+            <HelperDiv 
+                className="checkboxContent dontSelectText" 
+                rendered={checked || dontHideChildren}
+                title={title}
+            >
                 {children || <i className="fa-solid fa-check"></i>}
             </HelperDiv>
         </Flex>

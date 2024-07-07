@@ -1,0 +1,9 @@
+@import "./global/functions.scss";
+
+.Button {
+    border: none;
+    border-radius: var(--borderRadius);
+    padding: 10px 15px;
+
+    @include hoverCursor();
+}
