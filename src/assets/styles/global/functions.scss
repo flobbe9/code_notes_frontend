@@ -31,12 +31,8 @@
 }
 
 @mixin hoverCursor() {
-    &:hover {
+    &:not([disabled]):hover {
         cursor: pointer;
-
-        &:disabled {
-            cursor: default;
-        }
     }
 }
 
@@ -44,9 +40,9 @@
     &:not([disabled]):hover {
         transition: opacity var(--transitionTime);
         opacity: 0.7;
-
-        @include hoverCursor();
     }
+
+    @include hoverCursor();
 }
 
 @mixin disabled() {

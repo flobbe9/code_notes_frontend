@@ -1,5 +1,5 @@
 import React from "react";
-import "../../assets/styles/BlockContainer.css";
+import "../../assets/styles/BlockContainer.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import DefaultBlock from "./DefaultBlock";
 import DefaultCodeBlock from "./DefaultCodeBlock";
@@ -7,7 +7,7 @@ import CodeBlock from "./CodeBlock";
 import PlainTextBlock from "./PlainTextBlock";
 import CodeBlockWithVariables from "./CodeBlockWithVariables";
 import Button from "../helpers/Button";
-import TagContainer from "./TagContainer";
+import BlockContainerTagList from "./BlockContainerTagList";
 import Flex from "../helpers/Flex";
 import BlockContainerTitle from "./BlockContainerTitle";
 
@@ -36,7 +36,7 @@ export default function BlockContainer({...otherProps}: Props) {
                 <BlockContainerTitle />
 
                 {/* Tags */}
-                <TagContainer />
+                <BlockContainerTagList />
             </Flex>
 
             {/* List of blocks */}
@@ -58,12 +58,10 @@ const testBlockList = [
     <DefaultBlock>
         <PlainTextBlock />
     </DefaultBlock>,
-    <br />,
 
     <DefaultCodeBlock>
         <CodeBlock />
     </DefaultCodeBlock>,
-    <br />,
 
     <DefaultCodeBlock>
         <CodeBlockWithVariables />

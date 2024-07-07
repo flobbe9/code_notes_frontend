@@ -1,5 +1,4 @@
 import React, { createContext } from "react";
-import "../assets/styles/StartPageContent.css";
 import DefaultProps from "../abstract/DefaultProps";
 import StartPageContent from "./StartPageContent";
 import StartPageSideBar from "./StartPageSideBar";
@@ -13,10 +12,11 @@ interface Props extends DefaultProps {
 
 /**
  * Container defining the context for all components on start page. Try to keep this as clean as possible and
- * use this only for the context.
+ * write logic only for the context. Do styling in child components
  * 
  * @since 0.0.1
  */
+// TODO: mobile
 export default function StartPageContainer({children, ...otherProps}: Props) {
 
     const context = {
@@ -25,10 +25,11 @@ export default function StartPageContainer({children, ...otherProps}: Props) {
 
     return (
         <StartPageContext.Provider value={context}>
-            <Flex>
-                <StartPageSideBar className="col-4" />
+            <Flex flexWrap="nowrap">
+                {/* TODO: make width relative to window */}
+                <StartPageSideBar />
 
-                <StartPageContent className="col-8" />
+                <StartPageContent />
             </Flex>
 
             {children}

@@ -1,5 +1,5 @@
 import React from "react";
-import "../../assets/styles/TagContainer.css";
+import "../../assets/styles/BlockContainerTagList.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 
 
@@ -11,9 +11,9 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-export default function TagContainer({...otherProps}: Props) {
+export default function BlockContainerTagList({...otherProps}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "TagContainer");
+    const { id, className, style, children } = getCleanDefaultProps(otherProps, "BlockContainerTagList");
 
     return (
         <div 

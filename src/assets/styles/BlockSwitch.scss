@@ -1,0 +1,23 @@
+@import "./global/functions.scss";
+
+.BlockSwitch {
+    .blockSwitch {
+        background-color: white;
+        border-radius: 5px;
+        height: 40px;
+        margin-left: 5px;
+        min-width: 40px;
+        padding: 5px;
+        @include dontSelectText();
+
+        // case: not checked
+        &:has(.radioButtonInput:not(:checked)):hover {
+            @include hover();
+        }
+    }
+
+    .curlyBraces {
+        margin-left: 1px;
+        font-weight: bold;
+    }
+}
