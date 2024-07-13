@@ -1,4 +1,4 @@
-import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { CSSProperties, forwardRef, HTMLAttributes, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "../../assets/styles/RadioButton.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
@@ -19,6 +19,8 @@ interface Props extends HelperProps {
     setCheckedRadioIndex: (checkedRadioIndex: number) => void,
     /** If ```true``` the children (or default icon) will be visible while checked. Default is ```false``` */
     dontHideChildren?: boolean,
+    /** Default is ```undefined``` */
+    tabIndex?: number,
     /** Style. Default is ```false``` */
     _checked?: CSSProperties
 }
@@ -39,6 +41,7 @@ export default forwardRef(function RadioButton(
         disabled = false,
         dontHideChildren = false,
         title = "",
+        tabIndex,
         onClick,
         _checked = {},
         _hover = {},
@@ -109,7 +112,7 @@ export default forwardRef(function RadioButton(
                 ...(checked ? _checked : {}),
                 ...(disabled ? _disabled : {})
             }}
-            _hover={_hover}
+            _hover={checked ? _hover : {}}
             rendered={rendered}
             onClick={handleClick}
             title={title}
@@ -122,6 +125,7 @@ export default forwardRef(function RadioButton(
                 name={radioGroup}
                 ref={inputRef}
                 disabled={disabled}
+                tabIndex={tabIndex}
             />
 
             {/* Content */}

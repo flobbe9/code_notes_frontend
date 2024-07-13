@@ -1,8 +1,10 @@
-import React, { createContext } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import DefaultProps from "../abstract/DefaultProps";
 import StartPageContent from "./StartPageContent";
 import StartPageSideBar from "./StartPageSideBar";
 import Flex from "./helpers/Flex";
+import { getCSSValueAsNumber, isBlank, log } from "../helpers/utils";
+import { AppContext } from "./App";
 
 
 interface Props extends DefaultProps {
@@ -16,20 +18,51 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-// TODO: mobile
 export default function StartPageContainer({children, ...otherProps}: Props) {
 
-    const context = {
+    const [startPageSidebarWidth, setStartPageSideBarWidth] = useState<string>();
+    const [startPageContentWidth, setStartPageContentWidth] = useState<string>();
 
+    const { windowSize } = useContext(AppContext);
+
+    const context = {
+        setStartPageSideBarWidth
     }
+
+
+    useEffect(() => {
+        updateStartPageContentWidth();
+
+    }, [startPageSidebarWidth, windowSize]);
+
+
+    function updateStartPageContentWidth(): void {
+
+        setStartPageContentWidth(calculateStartPageContentWidth());
+    }
+
+
+    function calculateStartPageContentWidth(): string | undefined {
+
+        const windowWidth = $("#App").innerWidth();
+
+        // case: sidebar not rendered yet
+        if (isBlank(startPageSidebarWidth) || isBlank(windowWidth?.toString()))
+            return;
+        
+        const windowWidthNumber = getCSSValueAsNumber(windowWidth!, 2);
+        const sideBarWidthNumber = getCSSValueAsNumber(startPageSidebarWidth!, 0);
+
+        return (windowWidthNumber - sideBarWidthNumber) + "px";
+    }
+
 
     return (
         <StartPageContext.Provider value={context}>
             <Flex flexWrap="nowrap">
-                {/* TODO: make width relative to window */}
                 <StartPageSideBar />
 
-                <StartPageContent />
+                <StartPageContent style={{width: startPageContentWidth}} />
             </Flex>
 
             {children}
@@ -40,4 +73,5 @@ export default function StartPageContainer({children, ...otherProps}: Props) {
 
 export const StartPageContext = createContext({
 
+    setStartPageSideBarWidth: (width: string | undefined) => {}
 });

@@ -26,6 +26,7 @@ interface Props extends HelperProps {
  * 
  * @since 0.0.1
  */
+// TODO: outline on focus
 export default forwardRef(function Checkbox({
         rendered = true,
         disabled = false,
@@ -112,7 +113,7 @@ export default forwardRef(function Checkbox({
             verticalAlign="center"
             horizontalAlign="center"
             ref={componentRef}
-            _hover={_hover}
+            _hover={checked ? _hover : {}}
         >
 
             <HiddenInput

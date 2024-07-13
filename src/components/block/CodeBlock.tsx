@@ -18,13 +18,17 @@ export default function CodeBlock({...otherProps}: Props) {
 
     const { id, className, style, children } = getCleanDefaultProps(otherProps, "CodeBlock");
 
+    // TODO: 
+        // remove block on backspace if value is empty
+
     return (
         <div 
             id={id} 
             className={className}
             style={style}
         >
-            <Editor width={700} height={20} defaultValue="Code block" />
+            {/* <Editor width={700} height={20} defaultValue="Code block" /> */}
+            <code>asdf</code>
                 
             {children}
         </div>

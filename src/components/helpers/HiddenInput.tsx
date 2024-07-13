@@ -12,7 +12,9 @@ interface Props extends HelperProps {
     /** Default is ```true``` */
     readOnly?: boolean,
     /** Default is ```undefined``` */
-    checked?: boolean
+    checked?: boolean,
+    /** Default undefined */
+    tabIndex?: number
 }
 
 
@@ -29,6 +31,7 @@ export default forwardRef(function HiddenInput(
         disabled = false,
         readOnly = true,
         checked,
+        tabIndex,
         ...otherProps
     }: Props,
     ref: Ref<HTMLInputElement>
@@ -47,6 +50,7 @@ export default forwardRef(function HiddenInput(
             disabled={disabled}
             checked={checked}
             readOnly={readOnly}
+            tabIndex={tabIndex}
             {...other}
         />
     )

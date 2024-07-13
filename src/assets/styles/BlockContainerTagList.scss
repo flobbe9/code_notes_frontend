@@ -1,3 +1,18 @@
-.TagContainer {
-    border: var(--testBorder);
+@import "./global/functions.scss";
+
+.BlockContainerTagList {
+    border: none;
+    border-radius: var(--borderRadius);
+    padding-right: 5px;
+    
+    .tagInputContainer {
+        // depends on "scrollBar()" mixin
+        margin-bottom: 4px;
+        overflow: auto;
+        @include scrollBar();
+
+        &:hover {
+            margin-bottom: 0;
+        }
+    }
 }

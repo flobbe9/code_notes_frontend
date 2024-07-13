@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { forwardRef, Ref, useState } from "react";
 import "../../assets/styles/BlockSwitch.scss";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import RadioButton from "../helpers/RadioButton";
 import { getRandomString } from "../../helpers/utils";
+import HelperProps from "../../abstract/HelperProps";
 
 
-interface Props extends DefaultProps {
-
+interface Props extends HelperProps {
+    tabIndex: number
 }
 
 
@@ -16,11 +17,17 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function BlockSwitch({...otherProps}: Props) {
+export default forwardRef(function BlockSwitch({
+    title = "",
+    rendered,
+    tabIndex,
+    _hover = {},
+    ...otherProps
+}: Props, ref: Ref<HTMLDivElement>) {
     
     const [checkedRadioIndex, setCheckedRadioIndex] = useState(0);
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "BlockSwitch");
+    const { id, className, style, children, other } = getCleanDefaultProps(otherProps, "BlockSwitch");
 
     const radioGroup = getRandomString();
 
@@ -30,45 +37,53 @@ export default function BlockSwitch({...otherProps}: Props) {
             className={className}
             style={style}
             flexWrap="nowrap"
+            rendered={rendered}
+            title={title}
+            other={other}
+            ref={ref}
+            _hover={_hover}
         >
             {/* TextBlock switch */}
             <RadioButton 
-                className="blockSwitch"
+                className="switchButton"
                 radioGroup={radioGroup} 
                 radioIndex={0}
                 checkedRadioIndex={checkedRadioIndex}
                 setCheckedRadioIndex={setCheckedRadioIndex}
                 dontHideChildren
                 title="Plain text"
-                _checked={{backgroundColor: "orange"}} 
+                tabIndex={tabIndex}
+                _checked={{borderColor: "var(--accentColor)"}} 
             >
                 <i className="fa-solid fa-align-left"></i>
             </RadioButton>
 
             {/* CodeBlock switch */}
             <RadioButton
-                className="blockSwitch"
+                className="switchButton"
                 radioGroup={radioGroup} 
                 radioIndex={1}
                 checkedRadioIndex={checkedRadioIndex}
                 setCheckedRadioIndex={setCheckedRadioIndex}
                 dontHideChildren
                 title="Code"
-                _checked={{backgroundColor: "orange"}} 
+                tabIndex={tabIndex}
+                _checked={{borderColor: "var(--accentColor)"}} 
             >
                 <i className="fa-solid fa-code"></i>
             </RadioButton>
 
             {/* CodBlockWithVariable switch */}
             <RadioButton
-                className="blockSwitch"
+                className="switchButton"
                 radioGroup={radioGroup} 
                 radioIndex={2}
                 checkedRadioIndex={checkedRadioIndex}
                 setCheckedRadioIndex={setCheckedRadioIndex}
                 dontHideChildren
                 title="Code with variables"
-                _checked={{backgroundColor: "orange"}} 
+                tabIndex={tabIndex}
+                _checked={{borderColor: "var(--accentColor)"}} 
             >
                 <i className="fa-solid fa-dollar-sign"></i>
                 <span className="curlyBraces">&#123;&#125;</span> 
@@ -77,4 +92,4 @@ export default function BlockSwitch({...otherProps}: Props) {
             {children}
         </Flex>
     )
-}
+})

@@ -1,0 +1,59 @@
+@import "./global/functions.scss";
+
+.TagInput {
+    $containerWidth: 130px;
+    $borderRadius: 3px;
+
+    background-color: rgb(235, 235, 235);
+    border: 2px solid transparent;
+    border-radius: $borderRadius;
+    min-width: $containerWidth;
+    width: $containerWidth;
+    
+    &:has(.tagInput:focus) {
+        background-color: white;
+        border: 2px solid var(--accentColor);
+        
+        .tagInputDeleteButton {
+            display: none;
+        }
+        
+        .tagInput {
+            width: $containerWidth - 4px; // 4px = (2 * borderWidth)
+        }
+    }
+    
+    .tagInput {
+        background-color: rgb(235, 235, 235);
+        border: none;
+        padding: 0px 7px;
+        width: 100%;
+    
+        @include placeholder {
+            @include dontSelectText();
+        }
+
+        &:focus {
+            background-color: white;
+            outline: none;
+        }
+    }
+
+    .tagInputDeleteButton {
+        background-color: rgb(150, 150, 150);
+        
+        border-radius: $borderRadius;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+
+        padding: 0.3rem 0.3rem;
+        transition: var(--transitionTimeFast);
+        width: fit-content;
+
+        @include hoverCursor();
+        
+        .fa-solid.fa-xmark {
+            width: fit-content;
+        }
+    }
+}

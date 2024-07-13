@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "../assets/styles/StartPageContent.css";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import BlockContainer from "./block/BlockContainer";
 import SearchBar from "./helpers/SearchBar";
-import { log } from "../helpers/utils";
+import { getRandomString, log } from "../helpers/utils";
+import { AppContext } from "./App";
 
 
 interface Props extends DefaultProps {
@@ -20,6 +21,30 @@ export default function StartPageContent({...otherProps}: Props) {
 
     const { id, className, style, children } = getCleanDefaultProps(otherProps, "StartPageContent", true);
 
+    const { isKeyPressed } = useContext(AppContext);
+
+    const searchInputRef = useRef(null);
+
+
+    useEffect(() => {
+        $(window).on("keydown", handleKeyDown);
+
+        return () => {
+            $(window).off("keydown", handleKeyDown);
+        }
+    }, []);
+
+
+    function handleKeyDown(event): void {
+
+        // focus search input on Strg + Shift + F
+        if (isKeyPressed("Control") && isKeyPressed("Shift") && event.key === "F") {
+            event.preventDefault();
+            $(searchInputRef.current!).trigger("focus");
+        }
+    }
+
+    
     return (
         <div 
             id={id} 
@@ -27,7 +52,13 @@ export default function StartPageContent({...otherProps}: Props) {
             style={style}
         >
             {/* Search bar */}
-            <SearchBar placeHolder="Search notes..." className="m-3" _focus={{borderColor: "var(--accentColor)"}} />
+            <SearchBar 
+                className="m-3" 
+                placeHolder="Search Title, tag, note text..." 
+                title="Search notes"
+                ref={searchInputRef}
+                _focus={{borderColor: "var(--accentColor)"}}
+            />
 
             {/* List of blockContainers */}
             {testBlockContainers}
@@ -39,5 +70,6 @@ export default function StartPageContent({...otherProps}: Props) {
 
 
 const testBlockContainers = [
-    <BlockContainer />
+    <BlockContainer key={getRandomString()} />,
+    <BlockContainer key={getRandomString()} />
 ]

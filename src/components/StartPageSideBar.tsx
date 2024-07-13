@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import "../assets/styles/StartPageSideBar.css";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Flex from "./helpers/Flex";
@@ -7,6 +7,8 @@ import { JQueryEasing } from "../abstract/CSSTypes";
 import { getCssConstant, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import StartPageSideBarTagList from "./StartPageSideBarTagList";
+import { StartPageContext } from "./StartPageContext";
+import Button from "./helpers/Button";
 
 
 interface Props extends DefaultProps {
@@ -18,17 +20,21 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 // IDEA: filter icon
+// TODO: tab order
 export default function StartPageSideBar({...otherProps}: Props) {
 
     const { id, className, style, children } = getCleanDefaultProps(otherProps, "StartPageSideBar", true);
 
+    const componentRef = useRef(null);
     const tagFilterContainerRef = useRef(null);
 
     const { getDeviceWidth, isKeyPressed } = useContext(AppContext);
+    const { setStartPageSideBarWidth } = useContext(StartPageContext);
 
 
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
+        updateSideBarWidthState();
 
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
@@ -49,7 +55,9 @@ export default function StartPageSideBar({...otherProps}: Props) {
                 paddingLeft: getCssConstant("tagFilterContainerPadding"),
             },
             duration,
-            easing
+            easing,
+            // update sibarWidth
+            () => updateSideBarWidthState()
         );
     }
 
@@ -66,7 +74,10 @@ export default function StartPageSideBar({...otherProps}: Props) {
             },
             duration,
             easing,
-            () => tagFilterContainer.hide()
+            () => {
+                tagFilterContainer.hide();
+                updateSideBarWidthState();
+            }
         );
     }
 
@@ -95,31 +106,39 @@ export default function StartPageSideBar({...otherProps}: Props) {
         if (keyName === "Escape")
             slideOutTagFilterContainer();
 
-        if (isKeyPressed("Control") && keyName === "b")
+        if (isKeyPressed("Control") && keyName === "b") {
+            event.preventDefault();
             toggleTagFilterContainer();
+        }
+    }
+
+
+    function updateSideBarWidthState(): void {
+
+        setStartPageSideBarWidth($(componentRef.current!).outerWidth()?.toString())
     }
 
 
     return (
         <div 
             id={id} 
-            className={className + " fullViewHeight me-2"}
+            className={className + " fullViewHeight"}
             style={style}
+            ref={componentRef}
         >
             <Flex className="fullHeight" flexWrap="nowrap">
                 {/* Toolbar */}
                 <div className="toolBar">
-                    <i 
-                        className="fa-solid fa-bars fa-xl hover" 
-                        onClick={toggleTagFilterContainer}
-                        title="Ctrl + B"
-                    ></i>
+                    <Button className="toolBarToggleButton hover" onClick={toggleTagFilterContainer}>
+                        <i className="fa-solid fa-bars fa-xl" title="Ctrl + B"></i>
+                    </Button>
                 </div>
 
                 {/* Tag filter container */}
                 <div className="tagFilterContainer hidden" ref={tagFilterContainerRef}>
                     <SearchBar 
                         placeHolder="Search tags..."
+                        title="Search tags"
                         _focus={{borderColor: "var(--accentColor)"}} 
                         _searchIcon={{color: "var(--iconColor)"}}
                         _searchInput={{color: "white"}} 

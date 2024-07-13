@@ -29,7 +29,7 @@ export default function NavBar({...otherProps}: Props) {
             {/* Left */}
             <Flex className="col-6">
                 <Link to="/" className="whiteLink hover" title="Start page">
-                    <Flex verticalAlign="center" className="fullHeight dontMarkText">
+                    <Flex verticalAlign="center" className="fullHeight dontSelectText">
                         {/* Icon */}
                         <img src="/img/favicon.ico" alt="favicon" className="invertColor" height={45} />
 

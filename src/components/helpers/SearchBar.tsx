@@ -1,4 +1,4 @@
-import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { CSSProperties, forwardRef, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "../../assets/styles/SearchBar.css";
 import HelperProps from "../../abstract/HelperProps";
 import Flex from "./Flex";
@@ -31,7 +31,7 @@ interface Props extends HelperProps {
 export default forwardRef(function SearchBar(
     {
         placeHolder = "Search...",
-        title = "",
+        title = "Search bar",
         defaultValue = "",
         disabled = false,
         rendered = true,
@@ -53,6 +53,7 @@ export default forwardRef(function SearchBar(
 
     const { id, className, style, children } = getCleanDefaultProps(otherProps, "SearchBar");
 
+
     const componentRef = useRef(null);
     const inputRef = useRef(null);
 
@@ -61,12 +62,7 @@ export default forwardRef(function SearchBar(
 
     useEffect(() => {
 
-        window.addEventListener("keydown", handleKeyDown);
-        toggleIsFocus();
-
-        return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-        }
+        addFocusEvents();
     }, []);
 
 
@@ -82,7 +78,7 @@ export default forwardRef(function SearchBar(
     }
 
 
-    function toggleIsFocus(): void {
+    function addFocusEvents(): void {
 
         if (disabled)
             return;
@@ -108,23 +104,6 @@ export default forwardRef(function SearchBar(
     function isDefaultDisabledStyle(): boolean {
 
         return disabled && isObjectFalsy(_disabled);
-    }
-
-
-    /**
-     * Handle global keydown events related to this component.
-     * 
-     * @param event 
-     */
-    function handleKeyDown(event): void {
-
-        const keyName = event.key;
- 
-        // TODO: dont do this if focues on another input
-        // if (keyName === "/") {
-        //     event.preventDefault();
-        //     $(inputRef.current!).trigger("focus");
-        // }
     }
 
 
@@ -164,11 +143,13 @@ export default forwardRef(function SearchBar(
             />
 
             {/* X icon */}
+            {/* TODO: clear search results as well as search input */}
             <button 
                 id="clearSearchValueButton" 
                 className={(!disabled ? "hover" : "")} 
                 disabled={disabled} 
                 onClick={handleXIconClick}
+                title="Clear search"
             >
                 <i className="fa-solid fa-xmark m-1" style={_xIcon}></i>
             </button>

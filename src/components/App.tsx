@@ -1,10 +1,11 @@
 import React, { createContext, useEffect, useRef, useState } from 'react';
-import '../assets/styles/App.css';
+import '../assets/styles/App.scss';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
+import { getCSSValueAsNumber, isNumberFalsy, isStringFalsy, log, logWarn } from '../helpers/utils';
 import NavBar from './NavBar';
 import StartPageContainer from './StartPageContext';
+import useKeyPress from '../hooks/useKeyPress';
 
 
 /**
@@ -19,6 +20,10 @@ export default function App() {
 
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    const { isKeyPressed } = useKeyPress();
+
     /** Time the toast popup takes to slide up and down in ms. */
     const toastSlideDuration = 400;
 
@@ -27,13 +32,18 @@ export default function App() {
         moveToast,
 
         windowSize,
-        getDeviceWidth
+        getDeviceWidth,
+
+        isLoggedIn,
+
+        isKeyPressed
     }
 
     const toastRef = useRef(null);
 
     
     useEffect(() => {
+
         window.addEventListener("keydown", handleWindowKeyDown);
         window.addEventListener("resize", handleWindowResize);
 
@@ -133,7 +143,7 @@ export default function App() {
             isDesktopWidth: windowWidth >= 992,
         }
     }
-    
+
 
     function handleWindowKeyDown(event): void {
 
@@ -153,6 +163,9 @@ export default function App() {
                     <div className="content">
                         <Routes>
                             <Route path="/" element={<StartPageContainer />} />
+                            <Route path="/register" element={<div>Register</div>} />
+                            <Route path="/login" element={<div>login</div>} />
+                            <Route path="*" element={<div>404</div>} />
                         </Routes>
                     </div>
 
@@ -175,5 +188,9 @@ export const AppContext = createContext({
     moveToast: (hideToast = false, screenTime?: number) => {},
 
     windowSize: [0, 0],
-    getDeviceWidth: () => {return {isMobileWidth: false, isTabletWidth: false,isDesktopWidth: true}}
+    getDeviceWidth: () => {return {isMobileWidth: false, isTabletWidth: false,isDesktopWidth: true}},
+
+    isLoggedIn: false,
+
+    isKeyPressed: (keyName: string): boolean => {return false}
 });

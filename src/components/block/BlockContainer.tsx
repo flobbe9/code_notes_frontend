@@ -9,8 +9,8 @@ import CodeBlockWithVariables from "./CodeBlockWithVariables";
 import Button from "../helpers/Button";
 import BlockContainerTagList from "./BlockContainerTagList";
 import Flex from "../helpers/Flex";
-import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import { getRandomString } from "../../helpers/utils";
+import BlockContainerTitle from "./BlockContainerTitle";
 
 
 interface Props extends DefaultProps {
@@ -32,34 +32,43 @@ export default function BlockContainer({...otherProps}: Props) {
             className={className}
             style={style}
         >
-            <Flex className="mb-3">
-                {/* Title */}
-                <ContentEditableDiv
-                    id={id} 
-                    className={className + " blockContainerTitle"}
-                    style={style}
-                    _focus={{
-                        borderColor: "orange",
-                        outline: "none"
-                    }}
+            <div className="contentContainer">
+                <Flex className="fullWidth" flexWrap="nowrap">
+                    {/* Title */}
+                    <BlockContainerTitle className="me-1 col-6" />
+
+                    {/* Tags */}
+                    <BlockContainerTagList className="col-6" />
+                </Flex>
+
+                {/* List of blocks */}
+                {testBlockList}
+            </div>
+                
+            {/* Container Footer */}
+            {/* TODO: move this below the container */}
+            {/* TODO: use icons instead of text */}
+            {/* TOOD: add some kind of onclick style */}
+            <Flex className="footer mt-1 me-2" horizontalAlign="right">
+                {/* Delete */}
+                <Button 
+                    className="me-2 hover transition" 
+                    title="Delete note" 
+                    style={{backgroundColor: "rgb(248, 141, 141)"}}
                 >
-                    Title...
-                </ContentEditableDiv>
+                    <i className="fa-solid fa-trash"></i>
+                </Button>
 
-                {/* Tags */}
-                <BlockContainerTagList />
-
-                {/* Container Footer */}
-                {/* <Flex className="blockContainerFooter" horizontalAlign="right">
-                    <Button>Delete</Button>
-
-                    <Button>Save</Button>
-                </Flex> */}
+                {/* Save */}
+                <Button 
+                    className="hover" 
+                    title="Save note"
+                    style={{backgroundColor: "rgb(141, 141, 248)"}}
+                >
+                    <i className="fa-solid fa-floppy-disk"></i>
+                </Button>
             </Flex>
 
-            {/* List of blocks */}
-            {testBlockList}
-                
             {children}
         </div>
     )

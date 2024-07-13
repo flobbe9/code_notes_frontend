@@ -1,19 +1,11 @@
 @import "./global/functions.scss";
 
 .BlockContainer {
-    border: 2px solid var(--codeGrey);
-    border-radius: var(--borderRadius);
-    padding: 5px;
-
-    .blockContainerTitle {
-        border: none;
-        border-bottom: 2px solid var(--codeGrey);
-        border-radius: 0;
-        font-size: 2em;
-        min-width: 50%;
+    margin-bottom: 25px;
     
-        @include placeholder {
-            color: var(--codeGrey);
-        }
+    .contentContainer {
+        border: 2px solid var(--codeGrey);
+        border-radius: var(--borderRadius);
+        padding: 5px;
     }
 }

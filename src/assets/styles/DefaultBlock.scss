@@ -2,6 +2,7 @@
 
 .DefaultBlock {
     margin: 5px 0;
+    position: relative;
     
     .blockContent {
         border: 1px solid var(--codeGrey);
@@ -12,20 +13,30 @@
             border-radius: var(--borderRadius);
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
-            background-color: var(--matBlue);
-            color: red;
+            background-color: rgb(150, 150, 150);
         }
 
         .defaultBlockButton {
-            opacity: 0.7;
             padding: 0.5rem 0.5rem;
             transition: var(--transitionTimeFast);
-    
-            @include hoverCursor();
-            
-            &:not([disabled]):hover {
-                opacity: 1;
+        }
+    }
+
+    .blockSettings {
+        .BlockSwitch {
+            // pseudo hidden to use fake "toggle slide". dont change "display" here because of <Flex>
+            opacity: 0;
+            width: 0;
+            z-index: -1;
+
+            .RadioButton {
+                position: absolute;
             }
+        }
+
+        .toggleBlockSwitchButton {
+            background-color: transparent;
+            padding: 0.5rem 1rem;
         }
     }
 }

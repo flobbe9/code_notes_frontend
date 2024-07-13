@@ -1,7 +1,7 @@
 import React from "react";
 import "../assets/styles/StartPageSideBarTagList.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import TagCheckbox from "./TagCheckbox";
+import Checkbox from "./helpers/Checkbox";
 
 
 interface Props extends DefaultProps {
@@ -18,17 +18,33 @@ export default function StartPageSideBarTagList({...otherProps}: Props) {
 
     const { id, className, style, children } = getCleanDefaultProps(otherProps, "StartPageSideBarTagList", true);
 
+    // TODO: add some kind of clear all button
+    
     return (
         <div 
             id={id} 
             className={className}
             style={style}
         >
-            <TagCheckbox>Docker</TagCheckbox>
-            <TagCheckbox>Linux</TagCheckbox>
-            <TagCheckbox>Shell</TagCheckbox>
-            <TagCheckbox>Tag</TagCheckbox>
-                
+            <Checkbox 
+                id={id} 
+                className={className}
+                style={style}
+                dontHideChildren
+                _checked={{borderColor: "var(--accentColor)"}}
+            >
+                Docker
+            </Checkbox>
+
+            <Checkbox 
+                id={id} 
+                className={className}
+                style={style}
+                dontHideChildren
+                _checked={{borderColor: "var(--accentColor)"}}
+            >
+                Linux
+            </Checkbox>                
             {children}
         </div>
     )

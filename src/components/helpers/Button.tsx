@@ -17,7 +17,8 @@ interface Props extends HelperProps {
      */
     onClickPromise?: (event?) => Promise<any>,
     /** Styles on click */
-    _click?: CSSProperties
+    _click?: CSSProperties,
+    tabIndex?: number
 }
 
 
@@ -29,6 +30,7 @@ export default function Button({
     disabled = false,
     type,
     title = "",
+    tabIndex,
     onClick,
     onSubmit,
     onClickPromise,
@@ -43,7 +45,7 @@ export default function Button({
     const [isHover, setIsHover] = useState(false);
     const [isClick, setIsClick] = useState(false);
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "Button");
+    const { id, className, style, children, other } = getCleanDefaultProps(otherProps, "Button");
 
     const componentRef = useRef(null);
 
@@ -149,16 +151,18 @@ export default function Button({
             ref={componentRef}
             style={{
                 ...style,
-                ...(isHover ? _hover : {}),
-                ...(isClick ? _click : {}),
+                ...(isHover && !disabled ? _hover : {}),
+                ...(isClick && !disabled ? _click : {}),
                 ...(isDisabled ? _disabled : {})
             }}
             hidden={!rendered}
             disabled={isDisabled}
             title={title}
             type={type}
+            tabIndex={tabIndex}
             onClick={handleClick}
             onSubmit={onSubmit}
+            {...other}
         >
             {/* Content */}
             <span hidden={isAwaitingPromise}>{children}</span>

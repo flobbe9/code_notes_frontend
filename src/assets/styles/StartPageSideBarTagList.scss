@@ -1,2 +1,28 @@
+@import "./global/functions.scss";
+
 .StartPageSideBarTagList {
+    
+    .Checkbox {
+        border-color: white;
+        height: fit-content;
+        justify-content: left !important;
+        line-break: anywhere;
+        margin: 10px 0;
+        min-height: 50px;
+        width: fit-content;
+
+        // case: input not checked and not disabled
+        &:has(.checkboxInput:not(:disabled):not(:checked)):hover {
+            @include hover();
+        }
+            
+        // case: focused
+        &:has(.checkboxInput:focus) {
+            @include focusOutline(white);
+        }
+
+        .checkboxContent {
+            margin-right: 10px;
+        }
+    }
 }

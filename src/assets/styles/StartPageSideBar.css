@@ -1,5 +1,5 @@
 :root {
-    --startPageSideBarWidthWidthMobile: 50vw;
+    --startPageSideBarWidthWidthMobile: 30vw;
     --iconColor: rgb(179, 179, 179);
     --placeHolderColor: rgba(255, 255, 255, 0.582);
     --tagFilterContainerPadding: 1rem;
@@ -8,18 +8,27 @@
 
 .StartPageSideBar {
     .toolBar {
-        background-color: rgb(31, 4, 94);
+        background-color: var(--matBlueLight);
         color: white;
-        padding: 1rem;
+        padding: 0.5rem;
         
-        /* Burger button icon */
-        .fa-solid.fa-bars {
-            margin-top: 18px;
+        .toolBarToggleButton {
+            background-color: transparent;
+            color: white;
+            margin-top: 10px;
+            padding: 0.5rem;
+
+            &:focus {
+                outline-color: white;
+            }
+
+            .fa-solid.fa-bars {
+            }
         }
     }
     
     .tagFilterContainer {
-        background-color: rgb(21, 1, 70);
+        background-color: var(--matBlue);
         border-radius: var(--borderRadius);
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
