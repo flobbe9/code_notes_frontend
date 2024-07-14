@@ -3,7 +3,7 @@
 .RadioButton {
     border: 2px solid var(--codeGrey);
     border-radius: 5px;
-    padding: 3px;
+    padding: 2px;
     width: fit-content;
     @include hoverCursor();
 

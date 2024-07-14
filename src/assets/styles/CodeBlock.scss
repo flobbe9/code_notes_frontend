@@ -1,0 +1,31 @@
+.CodeBlock {
+    margin: 3px;
+    
+    // tag that <Editor> props are passed to
+    section {
+        max-height: 20vh;
+
+        .vsCodeEditor {
+            .minimap {
+                display: none;
+            }
+
+            // line number container
+            .margin {
+                background-color: var(--codeGrey);
+            }
+
+            .lines-content {
+                background-color: var(--codeGrey);
+
+                // line container
+                .view-lines {
+                    
+                    .view-line {
+                        
+                    }
+                }
+            }
+        }
+    }
+}

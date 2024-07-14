@@ -28,7 +28,7 @@ export default function BlockContainerTitle({...otherProps}: Props) {
                 className="titleInput" 
                 type="text" 
                 title="Note title"
-                placeholder="Title..."
+                placeholder="Note title..."
             />
 
             {children}

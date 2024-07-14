@@ -4,6 +4,7 @@ import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps"
 import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
 import BlockSwitch from "./BlockSwitch";
+import SearchBar from "../helpers/SearchBar";
 
 
 interface Props extends DefaultProps {
@@ -22,36 +23,62 @@ export default function DefaultBlock({...otherProps}: Props) {
 
     const { id, className, style, children } = getCleanDefaultProps(otherProps, "DefaultBlock");
 
+    const componentRef = useRef(null);
     const blockSwitchRef = useRef(null);
+    const languageSearchBarRef = useRef(null);
 
     // IDEA: make custom colors and pass them to buttons as border color
 
-    const [isShowBlockSwitch, setIsShowBlockSwitch] = useState(false);
+    const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
 
 
     function toggleBlockSwitch(): void {
 
         const blockSwitch = $(blockSwitchRef.current!);
 
-        setIsShowBlockSwitch(!isShowBlockSwitch);
-
         // case: show block switch
-        if (!isShowBlockSwitch)
+        if (!isShowBlockSettings)
             // radio buttons back to static
             blockSwitch.children(".RadioButton").css("position", "static");
 
         // fake "toggle slide"
         blockSwitch.animate(
             {
-                width: isShowBlockSwitch ? 0 : "136px",
-                opacity: isShowBlockSwitch ? 0 : 1,
-                zIndex: isShowBlockSwitch ? -1 : 0
+                width: isShowBlockSettings ? 0 : "136px",
+                opacity: isShowBlockSettings ? 0 : 1,
+                zIndex: isShowBlockSettings ? -1 : 0
             }, 
             300,
             "swing",
             // radio buttons to absolute so they dont widen the container width
-            () => blockSwitch.children(".RadioButton").css("position", (isShowBlockSwitch ? "absolute" : "static"))
+            () => blockSwitch.children(".RadioButton").css("position", (isShowBlockSettings ? "absolute" : "static"))
         )
+    }
+
+
+    function toggleLanguageSearchBar(): void {
+
+        const languageSearchBar = $(componentRef.current!).find(".languageSearchBar");
+
+        // fake "toggle slide"
+        languageSearchBar.animate(
+            {
+                width: isShowBlockSettings ? 0 : "150px",
+                opacity: isShowBlockSettings ? 0 : 1,
+                zIndex: isShowBlockSettings ? -1 : 0
+            }, 
+            300,
+            "swing"
+        )
+    }
+
+
+    function toggleBlockSettings(): void {
+
+        setIsShowBlockSettings(!isShowBlockSettings);
+
+        toggleBlockSwitch();
+        toggleLanguageSearchBar();
     }
 
 
@@ -62,6 +89,7 @@ export default function DefaultBlock({...otherProps}: Props) {
             style={style}
             flexWrap="nowrap"
             verticalAlign="start"
+            ref={componentRef}
         >
             <Flex className="blockContent fullWidth" flexWrap="nowrap">
                 {/* Block */}
@@ -75,17 +103,28 @@ export default function DefaultBlock({...otherProps}: Props) {
                 </Button>
             </Flex>
 
-            <Flex className="blockSettings" flexWrap="nowrap" verticalAlign="center">
+            <Flex className="blockSettings" flexWrap="nowrap" verticalAlign="start">
                 {/* Block switch */}
-                <BlockSwitch className="" ref={blockSwitchRef} tabIndex={isShowBlockSwitch ? 0 : -1} />
+                <BlockSwitch ref={blockSwitchRef} tabIndex={isShowBlockSettings ? 0 : -1} />
+
+                {/* Search Language */}
+                {/* TODO: hide this for plain text block */}
+                {/* TODO: add drop down */}
+                <SearchBar 
+                    className={"languageSearchBar " + (isShowBlockSettings ? "ms-1 me-1" : "")}
+                    placeHolder="Language..." 
+                    ref={languageSearchBarRef}
+                    _xIcon={{display: "none"}} 
+                    _searchIcon={{padding: "2px"}} 
+                />
 
                 {/* Toggle block switch */}
                 <Button 
-                    className="toggleBlockSwitchButton ms-1 transition" 
-                    style={{backgroundColor: isShowBlockSwitch ? "var(--codeGrey)" : "transparent"}}
-                    title="Change section type"
-                    onClick={toggleBlockSwitch}
-                    _hover={isShowBlockSwitch ? {} : {backgroundColor: "buttonFace"}}
+                    className="toggleBlockSettingsButton transition" 
+                    style={{backgroundColor: isShowBlockSettings ? "var(--codeGrey)" : "transparent"}}
+                    title="Section settings"
+                    onClick={toggleBlockSettings}
+                    _hover={isShowBlockSettings ? {} : {backgroundColor: "buttonFace"}}
                 >
                     <i className="fa-solid fa-ellipsis-vertical"></i>
                 </Button>

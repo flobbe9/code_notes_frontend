@@ -51,8 +51,7 @@ export default forwardRef(function SearchBar(
 
     const [isFocus, setIsFocus] = useState(false);
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "SearchBar");
-
+    const { id, className, style, children, other } = getCleanDefaultProps(otherProps, "SearchBar");
 
     const componentRef = useRef(null);
     const inputRef = useRef(null);
@@ -121,6 +120,7 @@ export default forwardRef(function SearchBar(
             flexWrap="nowrap"
             verticalAlign="center"
             ref={componentRef}
+            other={other}
         >
             {/* Search icon */}
             <i className="fa-solid fa-magnifying-glass" style={_searchIcon}></i>
@@ -137,6 +137,7 @@ export default forwardRef(function SearchBar(
                 defaultValue={defaultValue}
                 title={title}
                 disabled={disabled}
+                spellCheck={false}
                 onClick={onClick}
                 onKeyDown={onKeyDown}
                 onKeyUp={onKeyUp}

@@ -53,8 +53,15 @@ export default function NavBarProfileSection({...otherProps}: Props) {
                             :
                                 <div>
                                     {/* Register */}
-                                    <Button id="Register" className="me-5 transition" _hover={{backgroundColor: "white"}} other={{tabIndex: -1}}>
-                                        <Link to="/register" id="Register" className="whiteLink"><code>Create Account</code></Link>
+                                    <Button 
+                                        id="Register" 
+                                        className="me-5 transition" 
+                                        _hover={{backgroundColor: "white"}} 
+                                        other={{tabIndex: -1}}
+                                    >
+                                        <Link to="/register" id="Register" className="whiteLink">
+                                            <code>Create Account</code>
+                                        </Link>
                                     </Button>
             
                                     {/* Login */}

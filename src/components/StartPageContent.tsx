@@ -55,7 +55,7 @@ export default function StartPageContent({...otherProps}: Props) {
             <SearchBar 
                 className="m-3" 
                 placeHolder="Search Title, tag, note text..." 
-                title="Search notes"
+                title="Search notes (Ctrl+Shift+F)"
                 ref={searchInputRef}
                 _focus={{borderColor: "var(--accentColor)"}}
             />

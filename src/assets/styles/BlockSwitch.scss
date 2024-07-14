@@ -4,10 +4,9 @@
     .switchButton {
         background-color: white;
         border-radius: 5px;
-        height: 40px;
         margin-left: 5px;
         min-width: 40px;
-        padding: 5px;
+        padding: 4px 0;
         @include dontSelectText();
 
         // case: not checked

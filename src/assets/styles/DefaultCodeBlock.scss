@@ -1,0 +1,11 @@
+.DefaultCodeBlock {
+    background-color: var(--codeGrey);
+    border-radius: var(--borderRadius);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    
+    .copyButton {
+        border-radius: 0;
+        padding: 0.5rem 1rem !important;
+    }
+}

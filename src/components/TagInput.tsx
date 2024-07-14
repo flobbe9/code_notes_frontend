@@ -62,6 +62,7 @@ export default function TagInput({...otherProps}: Props) {
                 placeholder="Tag..."
                 onKeyDown={handleKeyDown}
                 title="Tag"
+                spellCheck={false}
                 ref={inputRef}
             />
 

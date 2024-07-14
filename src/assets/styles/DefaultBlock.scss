@@ -5,7 +5,6 @@
     position: relative;
     
     .blockContent {
-        border: 1px solid var(--codeGrey);
         border-radius: var(--borderRadius);
         position: relative;
 
@@ -34,7 +33,15 @@
             }
         }
 
-        .toggleBlockSwitchButton {
+        // pseudo hidden to use fake "toggle slide". dont change "display" here because of <Flex>
+        .SearchBar {
+            opacity: 0;
+            padding: 2px;
+            width: 0;
+            z-index: -1;
+        }
+
+        .toggleBlockSettingsButton {
             background-color: transparent;
             padding: 0.5rem 1rem;
         }

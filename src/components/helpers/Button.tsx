@@ -165,7 +165,7 @@ export default function Button({
             {...other}
         >
             {/* Content */}
-            <span hidden={isAwaitingPromise}>{children}</span>
+            <span hidden={isAwaitingPromise} className="flexCenter">{children}</span>
 
             {/* Spinner */}
             <i className={"fa-solid fa-circle-notch" + (isAwaitingPromise && " rotating")} hidden={!isAwaitingPromise}></i>

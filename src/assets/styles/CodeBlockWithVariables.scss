@@ -1,0 +1,39 @@
+.CodeBlockWithVariables {
+    .codeInput {
+        margin: 0;
+        max-height: 20vh;
+        padding: 5px 10px;
+
+        // input
+        .ContentEditableDiv {
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    .addVariableButton {
+        background-color: rgb(177, 177, 177);
+        border-radius: 0;
+        color: black;
+        text-wrap: nowrap;
+        padding: 0.3rem 0.5rem !important;
+
+        .fa-plus {
+            // color: rgb(209, 209, 255);
+            // color: black;
+        }
+
+        .fa-dollar-sign {
+            color: rgb(153, 255, 0);
+            color: black;
+        }
+
+        .curlyBraces {
+            color: rgb(42, 110, 255);
+            color: black;
+            margin-left: 2px;
+            font-weight: bold;
+        }
+    }
+}
