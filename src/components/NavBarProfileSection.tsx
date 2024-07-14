@@ -45,20 +45,20 @@ export default function NavBarProfileSection({...otherProps}: Props) {
                             isMobileWidth ?
                                 <div className="textRight">
                                     {/* Register */}
-                                    <Link to="/register" id="Register" className="whiteLink dontBreakText">Create Account</Link>
+                                    <Link to="/register" id="Register" className="whiteLink dontBreakText"><code>Create Account</code></Link>
                                     <br />
                                     {/* Login */}
-                                    <Link to="/login" className="whiteLink">Login</Link>
+                                    <Link to="/login" className="whiteLink"><code>Login</code></Link>
                                 </div>
                             :
                                 <div>
                                     {/* Register */}
                                     <Button id="Register" className="me-5 transition" _hover={{backgroundColor: "white"}} other={{tabIndex: -1}}>
-                                        <Link to="/register" id="Register" className="whiteLink">Create Account</Link>
+                                        <Link to="/register" id="Register" className="whiteLink"><code>Create Account</code></Link>
                                     </Button>
             
                                     {/* Login */}
-                                    <Link to="/login" className="whiteLink hover dontSelectText">Login</Link>
+                                    <Link to="/login" className="whiteLink hover dontSelectText"><code>Login</code></Link>
                                 </div>
                         }
                     </div>

@@ -1,8 +1,11 @@
 .NavBar {
     background-color: var(--matBlack);
     color: white;
-    font-family: codeFontLight;
     min-height: 66px;
+
+    code {
+        color: white;
+    }
 
     .accountIcon {
         border: 1px solid black;

@@ -35,7 +35,7 @@ export default function NavBar({...otherProps}: Props) {
 
                         {/* Label */}
                         <div className="ms-3" style={{fontSize: "1.2em"}}>
-                            <span style={{fontFamily: "var(--codeFont)"}}>Code</span>
+                            <span><code>Code</code></span>
                             <span style={{fontFamily: "noteFont"}}> Notes</span>
                         </div>
                     </Flex>
