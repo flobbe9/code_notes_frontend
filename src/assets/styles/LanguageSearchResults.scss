@@ -1,0 +1,34 @@
+@import "./global/functions.scss";
+
+.LanguageSearchResults {
+    background-color: white;
+    border: 3px solid var(--bs-gray-300);
+    border-radius: var(--borderRadius);
+    margin-left: 3px;
+    max-height: 170px;
+    overflow: auto;
+    padding: 5px;
+    position: absolute;
+    width: 150px;
+
+    @include scrollBar();
+
+    // readonly input
+    .searchResult {
+        border: none;
+        border-radius: var(--borderRadius);
+        padding: 3px 7px;
+        transition: var(--transitionTime);
+        width: 100%;
+
+        &:hover {
+            background-color: var(--codeGrey);
+            @include hoverCursor();
+        }
+
+        &:focus {
+            background-color: var(--codeGrey);
+            outline: none;
+        }
+    }
+}

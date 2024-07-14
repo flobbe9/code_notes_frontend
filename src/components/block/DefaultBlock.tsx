@@ -5,6 +5,8 @@ import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
 import BlockSwitch from "./BlockSwitch";
 import SearchBar from "../helpers/SearchBar";
+import LanguageSearchResults from "../LanguageSearchResults";
+import { log } from "../../helpers/utils";
 
 
 interface Props extends DefaultProps {
@@ -36,7 +38,7 @@ export default function DefaultBlock({...otherProps}: Props) {
 
         const blockSwitch = $(blockSwitchRef.current!);
 
-        // case: show block switch
+        // case: show block settings
         if (!isShowBlockSettings)
             // radio buttons back to static
             blockSwitch.children(".RadioButton").css("position", "static");
@@ -63,6 +65,7 @@ export default function DefaultBlock({...otherProps}: Props) {
         // fake "toggle slide"
         languageSearchBar.animate(
             {
+                // TODO: make 150 a css variable and replace in language search results
                 width: isShowBlockSettings ? 0 : "150px",
                 opacity: isShowBlockSettings ? 0 : 1,
                 zIndex: isShowBlockSettings ? -1 : 0
@@ -73,6 +76,7 @@ export default function DefaultBlock({...otherProps}: Props) {
     }
 
 
+    // TODO: toggle hide all others
     function toggleBlockSettings(): void {
 
         setIsShowBlockSettings(!isShowBlockSettings);
@@ -109,14 +113,17 @@ export default function DefaultBlock({...otherProps}: Props) {
 
                 {/* Search Language */}
                 {/* TODO: hide this for plain text block */}
-                {/* TODO: add drop down */}
+                {/* TODO: hide x icon button (tab) */}
                 <SearchBar 
                     className={"languageSearchBar " + (isShowBlockSettings ? "ms-1 me-1" : "")}
                     placeHolder="Language..." 
                     ref={languageSearchBarRef}
+                    _focus={{borderColor: "var(--accentColor)"}}
                     _xIcon={{display: "none"}} 
                     _searchIcon={{padding: "2px"}} 
-                />
+                >
+                    <LanguageSearchResults />
+                </SearchBar>
 
                 {/* Toggle block switch */}
                 <Button 
@@ -126,7 +133,7 @@ export default function DefaultBlock({...otherProps}: Props) {
                     onClick={toggleBlockSettings}
                     _hover={isShowBlockSettings ? {} : {backgroundColor: "buttonFace"}}
                 >
-                    <i className="fa-solid fa-ellipsis-vertical"></i>
+                    <i className="fa-solid fa-ellipsis-vertical dontSelectText"></i>
                 </Button>
             </Flex>
         </Flex>
