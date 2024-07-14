@@ -226,14 +226,13 @@ export function insertString(targetString: string, insertionString: string, inse
  * Move cursor a text input element. If ```start === end``` the cursor will be shifted normally to given position.
  * If ```start !== end``` the text between the indices will be marked.
  * 
- * @param textInputId id of text input element to move the cursor in
+ * @param textInput jquery text input element to move the cursor in
  * @param start index of selection start, default is 0
  * @param end index of selection end, default is ```start``` param
  * @param debug if true a warn log will be displayed in case of falsy id, default is true
  */
-export function moveCursor(textInputId: string, start = 0, end = start, debug = false): void {
+export function moveCursor(textInput: JQuery, start = 0, end = start, debug = false): void {
 
-    const textInput = getJQueryElementById(textInputId, debug);
     if (!textInput)
         return;
 

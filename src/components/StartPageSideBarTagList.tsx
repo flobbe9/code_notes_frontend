@@ -14,9 +14,9 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function StartPageSideBarTagList({...otherProps}: Props) {
+export default function StartPageSideBarTagList({...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "StartPageSideBarTagList", true);
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBarTagList", true);
 
     // TODO: add some kind of clear all button
     
@@ -25,6 +25,7 @@ export default function StartPageSideBarTagList({...otherProps}: Props) {
             id={id} 
             className={className}
             style={style}
+            {...otherProps}
         >
             <Checkbox 
                 id={id} 

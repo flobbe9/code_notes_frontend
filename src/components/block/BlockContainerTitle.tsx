@@ -14,15 +14,16 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function BlockContainerTitle({...otherProps}: Props) {
+export default function BlockContainerTitle({...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "BlockContainerTitle");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainerTitle");
 
     return (
         <div 
             id={id} 
             className={className}
             style={style}
+            {...otherProps}
         >
             <input 
                 className="titleInput" 

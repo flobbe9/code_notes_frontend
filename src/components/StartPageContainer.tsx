@@ -18,7 +18,7 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function StartPageContainer({children, ...otherProps}: Props) {
+export default function StartPageContainer({children, ...props}: Props) {
 
     const [startPageSidebarWidth, setStartPageSideBarWidth] = useState<string>();
     const [startPageContentWidth, setStartPageContentWidth] = useState<string>();
@@ -58,7 +58,7 @@ export default function StartPageContainer({children, ...otherProps}: Props) {
 
 
     return (
-        <StartPageContext.Provider value={context}>
+        <StartPageContext.Provider value={context} {...props}>
             <Flex flexWrap="nowrap">
                 <StartPageSideBar />
 

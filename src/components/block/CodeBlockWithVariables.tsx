@@ -1,7 +1,13 @@
-import React from "react";
-import "../../assets/styles/CodeBlockWithVariables.css";
+import React, { useEffect, useRef, useState } from "react";
+import "../../assets/styles/CodeBlockWithVariables.scss";
+import 'highlight.js/styles/github.css';
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
+import Button from "../helpers/Button";
+import ContentEditableDiv from "../helpers/ContentEditableDiv";
+import hljs from "highlight.js";
+import Sanitized from "../helpers/Sanitized";
+import { log } from "../../helpers/utils";
 
 
 interface Props extends DefaultProps {
@@ -12,26 +18,82 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-export default function CodeBlockWithVariables({...otherProps}: Props) {
+// TODO: replace "other" again
+export default function CodeBlockWithVariables({...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "CodeBlockWithVariables");
+    const [highlightedInputValue, setHighlightedInputValue] = useState("");
+    const [inputText, setInputText] = useState("");
+
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeBlockWithVariables");
+    
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+
+    }, [highlightedInputValue])
+
+    // TODO: 
+        // full size mode
+        // buttons
+        // hightlighting
+        // inputs
+        // mark focused line like in vscode (?)
+    
+    function handleKeyDown(event): void {
+
+        const keyName = (event.key as string);
+
+        // else if is enter 
+            // if is exceed view height
+                // prevent default
+
+        // else if is backspace
+            // delete last char from text
+            // prevent default
+    }
+
+
+    // on focus out
+        // highlight
+            // get inner text
+            // highlight
+            // parse
+            // replace inner text
+        // convert vars to inputs
+
+    // replace vars with inputs
+        // find $[[]] in inner text
+        // save start index
+        // get value inside
+        // remove from inner text
+        // add input with value to inner html pos
+        
+
 
     return (
-        <div 
+        <Flex 
             id={id} 
-            className={className}
+            className={className + " fullWidth"}
             style={style}
+            flexWrap="nowrap"
+            {...otherProps}
         >
-            <Flex flexWrap="nowrap">
-                <code className="fullWidth">Code with vars</code>
+            {/* TODO: make this a component */}
+            <pre className="fullWidth codeInput">
+                <code>
+                    <ContentEditableDiv {...{spellCheck: false, onKeyDown: handleKeyDown}} ref={inputRef} /> 
+                </code>
+            </pre>
 
-                <Flex horizontalAlign="right" className="fullWidth">
-                    <button>Add variable</button>
-
-                </Flex>
+            <Flex horizontalAlign="right">
+                <Button className="addVariableButton defaultBlockButton hover flexCenter" title="Add variable">
+                    <i className="fa-solid fa-plus me-3"></i>
+                    <i className="fa-solid fa-dollar-sign"></i>
+                    <span className="curlyBraces">&#123;&#125;</span> 
+                </Button>
             </Flex>
                 
             {children}
-        </div>
+        </Flex>
     )
 }

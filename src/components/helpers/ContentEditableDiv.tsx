@@ -26,14 +26,14 @@ export default forwardRef(function ContentEditableDiv(
         },
         _hover = {},
         _focus = {},
-        ...otherProps
+        ...props
     }: Props,
     ref: Ref<HTMLDivElement>
 ) {
 
     const [isFocus, setIsFocus] = useState(false);
     
-    const { id, className, style, children, other } = getCleanDefaultProps(otherProps, "ContentEditableDiv");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ContentEditableDiv");
     
     const componentRef = useRef(null);
     const hiddencomponentRef = useRef(null);
@@ -109,7 +109,7 @@ export default forwardRef(function ContentEditableDiv(
                 onClick={onClick}
                 disabled={disabled}
                 _hover={_hover}
-                other={other}
+                {...otherProps}
             >
                 {children}
             </HelperDiv>

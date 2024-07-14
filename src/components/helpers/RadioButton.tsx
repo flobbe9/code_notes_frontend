@@ -49,14 +49,14 @@ export default forwardRef(function RadioButton(
             cursor: "default",
             opacity: 0.5
         },
-        ...otherProps
+        ...props
     }: Props,
     ref: Ref<HTMLInputElement>
 ) {
 
     const [checked, setChecked] = useState(isChecked());
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "RadioButton");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "RadioButton");
 
     const inputRef = useRef(null);
 
@@ -118,6 +118,7 @@ export default forwardRef(function RadioButton(
             title={title}
             horizontalAlign="center"
             verticalAlign="center"
+            {...otherProps}
         >
             <HiddenInput 
                 type="radio" 

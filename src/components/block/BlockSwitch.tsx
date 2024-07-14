@@ -22,12 +22,12 @@ export default forwardRef(function BlockSwitch({
     rendered,
     tabIndex,
     _hover = {},
-    ...otherProps
+    ...props
 }: Props, ref: Ref<HTMLDivElement>) {
     
     const [checkedRadioIndex, setCheckedRadioIndex] = useState(0);
 
-    const { id, className, style, children, other } = getCleanDefaultProps(otherProps, "BlockSwitch");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockSwitch");
 
     const radioGroup = getRandomString();
 
@@ -39,9 +39,9 @@ export default forwardRef(function BlockSwitch({
             flexWrap="nowrap"
             rendered={rendered}
             title={title}
-            other={other}
             ref={ref}
             _hover={_hover}
+            {...otherProps}
         >
             {/* TextBlock switch */}
             <RadioButton 

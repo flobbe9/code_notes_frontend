@@ -14,9 +14,9 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-export default function BlockContainerTagList({...otherProps}: Props) {
+export default function BlockContainerTagList({...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "BlockContainerTagList");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainerTagList");
 
 
     return (
@@ -24,6 +24,7 @@ export default function BlockContainerTagList({...otherProps}: Props) {
             id={id} 
             className={className}
             style={style}
+            {...otherProps}
         >
             <Flex className="tagInputContainer" flexWrap="nowrap">
                 <TagInput className="me-2" />

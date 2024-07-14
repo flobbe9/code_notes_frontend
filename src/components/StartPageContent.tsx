@@ -17,9 +17,9 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function StartPageContent({...otherProps}: Props) {
+export default function StartPageContent({...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "StartPageContent", true);
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageContent", true);
 
     const { isKeyPressed } = useContext(AppContext);
 
@@ -50,6 +50,7 @@ export default function StartPageContent({...otherProps}: Props) {
             id={id} 
             className={className + " fullWidth"}
             style={style}
+            {...otherProps}
         >
             {/* Search bar */}
             <SearchBar 

@@ -30,9 +30,9 @@ export default function Sanitized({
     parseOptions,
     sanitizeOptions,
     rendered = true,
-    ...otherProps}: Props) {
+    ...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps);
+    const { id, className, style, children } = getCleanDefaultProps(props);
 
     // add component props to parsed html
     const defaultParserOptions: HTMLReactParserOptions = {

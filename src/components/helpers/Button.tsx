@@ -37,7 +37,7 @@ export default function Button({
     _hover = {},
     _click = {},
     _disabled = {},
-    ...otherProps
+    ...props
 }: Props) {
 
     const [isAwaitingPromise, setIsAwaitingPromise] = useState(false);
@@ -45,7 +45,7 @@ export default function Button({
     const [isHover, setIsHover] = useState(false);
     const [isClick, setIsClick] = useState(false);
 
-    const { id, className, style, children, other } = getCleanDefaultProps(otherProps, "Button");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Button");
 
     const componentRef = useRef(null);
 
@@ -162,7 +162,7 @@ export default function Button({
             tabIndex={tabIndex}
             onClick={handleClick}
             onSubmit={onSubmit}
-            {...other}
+            {...otherProps}
         >
             {/* Content */}
             <span hidden={isAwaitingPromise} className="flexCenter">{children}</span>

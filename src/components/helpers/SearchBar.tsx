@@ -4,6 +4,7 @@ import HelperProps from "../../abstract/HelperProps";
 import Flex from "./Flex";
 import { isObjectFalsy, log } from "../../helpers/utils";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import Button from "./Button";
 
 
 interface Props extends HelperProps {
@@ -44,14 +45,14 @@ export default forwardRef(function SearchBar(
         _hover = {},
         _focus = {},
         _disabled = {},
-        ...otherProps
+        ...props
     }: Props, 
     ref: Ref<HTMLInputElement>
 ) {
 
     const [isFocus, setIsFocus] = useState(false);
 
-    const { id, className, style, children, other } = getCleanDefaultProps(otherProps, "SearchBar");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "SearchBar");
 
     const componentRef = useRef(null);
     const inputRef = useRef(null);
@@ -107,55 +108,56 @@ export default forwardRef(function SearchBar(
 
 
     return (
-        <Flex 
-            id={id} 
-            className={className + (isDefaultDisabledStyle() ? " disabledButton" : "")}
-            style={{
-                ...style,
-                ...(disabled ? _disabled : {}),
-                ...(isFocus ? _focus : {})
-            }}
-            rendered={rendered}
-            _hover={_hover}
-            flexWrap="nowrap"
-            verticalAlign="center"
-            ref={componentRef}
-            other={other}
-        >
-            {/* Search icon */}
-            <i className="fa-solid fa-magnifying-glass" style={_searchIcon}></i>
-
-            {/* Search input */}
-            {/* TODO: dont use ids */}
-            <input 
-                id="searchInput"
-                className="fullWidth dontMarkPlaceholder"
-                style={_searchInput}
-                type="text"
-                ref={inputRef} 
-                placeholder={placeHolder}
-                defaultValue={defaultValue}
-                title={title}
-                disabled={disabled}
-                spellCheck={false}
-                onClick={onClick}
-                onKeyDown={onKeyDown}
-                onKeyUp={onKeyUp}
-            />
-
-            {/* X icon */}
-            {/* TODO: clear search results as well as search input */}
-            <button 
-                id="clearSearchValueButton" 
-                className={(!disabled ? "hover" : "")} 
-                disabled={disabled} 
-                onClick={handleXIconClick}
-                title="Clear search"
+        <div>
+            <Flex 
+                id={id} 
+                className={className + (isDefaultDisabledStyle() ? " disabledButton" : "")}
+                style={{
+                    ...style,
+                    ...(disabled ? _disabled : {}),
+                    ...(isFocus ? _focus : {})
+                }}
+                rendered={rendered}
+                _hover={_hover}
+                flexWrap="nowrap"
+                verticalAlign="center"
+                ref={componentRef}
+                {...otherProps}
             >
-                <i className="fa-solid fa-xmark m-1" style={_xIcon}></i>
-            </button>
-                
+                {/* Search icon */}
+                <i className="fa-solid fa-magnifying-glass" style={_searchIcon}></i>
+
+                {/* Search input */}
+                {/* TODO: dont use ids */}
+                <input 
+                    id="searchInput"
+                    className="fullWidth dontMarkPlaceholder searchInput"
+                    style={_searchInput}
+                    type="text"
+                    ref={inputRef} 
+                    placeholder={placeHolder}
+                    defaultValue={defaultValue}
+                    title={title}
+                    disabled={disabled}
+                    spellCheck={false}
+                    onClick={onClick}
+                    onKeyDown={onKeyDown}
+                    onKeyUp={onKeyUp}
+                />
+
+                {/* X icon */}
+                {/* TODO: clear search results as well as search input */}
+                <Button 
+                    className={"clearSearchValueButton " + (!disabled ? "hover" : "")} 
+                    disabled={disabled} 
+                    onClick={handleXIconClick}
+                    title="Clear search"
+                >
+                    <i className="fa-solid fa-xmark m-1" style={_xIcon}></i>
+                </Button>
+            </Flex>
+                    
             {children}
-        </Flex>
+        </div>
     )
 })

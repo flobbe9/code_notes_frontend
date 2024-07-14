@@ -16,15 +16,16 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function NavBar({...otherProps}: Props) {
+export default function NavBar({...props}: Props) {
 
-    const { id, className, style } = getCleanDefaultProps(otherProps, "NavBar", true);
+    const { id, className, style, ...otherProps } = getCleanDefaultProps(props, "NavBar", true);
 
     return (
         <Flex 
             id={id} 
             className={className + " p-3"}
             style={style}
+            {...otherProps}
         >
             {/* Left */}
             <Flex className="col-6">

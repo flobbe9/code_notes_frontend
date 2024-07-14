@@ -32,12 +32,12 @@ export default forwardRef(function HiddenInput(
         readOnly = true,
         checked,
         tabIndex,
-        ...otherProps
+        ...props
     }: Props,
     ref: Ref<HTMLInputElement>
 ) {
 
-    const { id, className, style, other } = getCleanDefaultProps(otherProps, "HiddenInput");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "HiddenInput");
 
     return (
         <input 
@@ -51,7 +51,7 @@ export default forwardRef(function HiddenInput(
             checked={checked}
             readOnly={readOnly}
             tabIndex={tabIndex}
-            {...other}
+            {...otherProps}
         />
     )
 })

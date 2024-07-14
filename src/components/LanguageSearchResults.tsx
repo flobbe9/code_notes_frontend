@@ -12,15 +12,20 @@ interface Props extends DefaultProps {
 /**
  * @since latest
  */
-export default function LanguageSearchResults({...otherProps}: Props) {
+export default function LanguageSearchResults({...props}: Props) {
 
-    const { id, className, style, children, other } = getCleanDefaultProps(otherProps, "LanguageSearchResults");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "LanguageSearchResults");
 
     const inputRef = useRef(null);
 
     // TODO
         // pass list
         // default value = selected element
+        // on search result select
+            // set input value
+            // hide search results
+        // on empty search
+            // show all possible results
 
     function handleFocus(event): void {
 
@@ -33,7 +38,7 @@ export default function LanguageSearchResults({...otherProps}: Props) {
             id={id} 
             className={className}
             style={style}
-            {...other}
+            {...otherProps}
         >
             <input 
                 className="searchResult" 

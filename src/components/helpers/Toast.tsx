@@ -18,9 +18,9 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default forwardRef(function Toast({summary, message = "", sevirity = "info", ...otherProps}: Props, ref: LegacyRef<HTMLDivElement> | undefined) {
+export default forwardRef(function Toast({summary, message = "", sevirity = "info", ...props}: Props, ref: LegacyRef<HTMLDivElement> | undefined) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "Toast", true);
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Toast", true);
 
     const { moveToast } = useContext(AppContext);
 
@@ -31,6 +31,7 @@ export default forwardRef(function Toast({summary, message = "", sevirity = "inf
             ref={ref}
             className={className}
             style={style}
+            {...otherProps}
         >
             <div className={"textContainer " + sevirity}>
                 <div className="summary">

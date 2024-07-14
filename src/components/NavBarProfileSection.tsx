@@ -15,9 +15,9 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-export default function NavBarProfileSection({...otherProps}: Props) {
+export default function NavBarProfileSection({...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "NavBarProfileSection", true);
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NavBarProfileSection", true);
 
     const { getDeviceWidth, isLoggedIn } = useContext(AppContext);
     const { isMobileWidth } = getDeviceWidth();
@@ -28,6 +28,7 @@ export default function NavBarProfileSection({...otherProps}: Props) {
             id={id} 
             className={className}
             style={style}
+            {...otherProps}
         >
             {
                 isLoggedIn ?
@@ -57,7 +58,7 @@ export default function NavBarProfileSection({...otherProps}: Props) {
                                         id="Register" 
                                         className="me-5 transition" 
                                         _hover={{backgroundColor: "white"}} 
-                                        other={{tabIndex: -1}}
+                                        {...{tabIndex: -1}}
                                     >
                                         <Link to="/register" id="Register" className="whiteLink">
                                             <code>Create Account</code>

@@ -41,14 +41,14 @@ export default forwardRef(function Checkbox({
             opacity: 0.5
         },
         _checked = {},
-        ...otherProps
+        ...props
     }: Props,
     ref: Ref<HTMLDivElement>
 ) {
 
     const [checked, setChecked] = useState(isChecked);
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "Checkbox");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Checkbox");
 
     const componentRef = useRef(null);
 
@@ -114,6 +114,7 @@ export default forwardRef(function Checkbox({
             horizontalAlign="center"
             ref={componentRef}
             _hover={checked ? _hover : {}}
+            {...otherProps}
         >
 
             <HiddenInput

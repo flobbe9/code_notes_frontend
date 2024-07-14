@@ -29,11 +29,11 @@ export default function CustomLink(
         target = "_self", 
         rendered = true,
         onClick,
-        ...otherProps
+        ...props
     }: Props
 ) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "CustomLink");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CustomLink");
 
     return (
         <Link 
@@ -46,6 +46,7 @@ export default function CustomLink(
             target={target}
             onClick={onClick}
             hidden={!rendered}
+            {...otherProps}
         >
             {children}
         </Link>

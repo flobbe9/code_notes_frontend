@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../../assets/styles/DefaultBlock.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
@@ -21,9 +21,9 @@ interface Props extends DefaultProps {
  *  
  * @since 0.0.1
  */
-export default function DefaultBlock({...otherProps}: Props) {
+export default function DefaultBlock({...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "DefaultBlock");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultBlock");
 
     const componentRef = useRef(null);
     const blockSwitchRef = useRef(null);
@@ -76,7 +76,6 @@ export default function DefaultBlock({...otherProps}: Props) {
     }
 
 
-    // TODO: toggle hide all others
     function toggleBlockSettings(): void {
 
         setIsShowBlockSettings(!isShowBlockSettings);
@@ -94,6 +93,7 @@ export default function DefaultBlock({...otherProps}: Props) {
             flexWrap="nowrap"
             verticalAlign="start"
             ref={componentRef}
+            {...otherProps}
         >
             <Flex className="blockContent fullWidth" flexWrap="nowrap">
                 {/* Block */}

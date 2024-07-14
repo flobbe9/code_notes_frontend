@@ -15,9 +15,9 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-export default function TagInput({...otherProps}: Props) {
+export default function TagInput({...props}: Props) {
 
-    const { id, className, style, children, other } = getCleanDefaultProps(otherProps, "TagInput");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagInput");
 
     const inputRef = useRef(null);
     const hiddenInputRef = useRef(null);
@@ -51,7 +51,7 @@ export default function TagInput({...otherProps}: Props) {
             className={className}
             style={style}
             flexWrap="nowrap"
-            {...other}
+            {...otherProps}
         >
             {/* for shifting focus */}
             <HiddenInput type={"radio"} ref={hiddenInputRef} tabIndex={-1} />

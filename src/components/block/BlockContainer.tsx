@@ -22,15 +22,16 @@ interface Props extends DefaultProps {
  * Container containing a list of different ```Block``` components.
  * @since 0.0.1
  */
-export default function BlockContainer({...otherProps}: Props) {
+export default function BlockContainer({...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "BlockContainer");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainer");
 
     return (
         <div 
             id={id} 
             className={className}
             style={style}
+            {...otherProps}
         >
             <div className="contentContainer">
                 <Flex className="fullWidth" flexWrap="nowrap">
@@ -46,8 +47,6 @@ export default function BlockContainer({...otherProps}: Props) {
             </div>
                 
             {/* Container Footer */}
-            {/* TODO: move this below the container */}
-            {/* TODO: use icons instead of text */}
             {/* TOOD: add some kind of onclick style */}
             <Flex className="footer mt-1 me-2" horizontalAlign="right">
                 {/* Delete */}

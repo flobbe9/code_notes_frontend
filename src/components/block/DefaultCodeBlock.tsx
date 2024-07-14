@@ -15,9 +15,9 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-export default function DefaultCodeBlock({...otherProps}: Props) {
+export default function DefaultCodeBlock({...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "DefaultCodeBlock");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultCodeBlock");
 
     return (
         <DefaultBlock>
@@ -26,6 +26,7 @@ export default function DefaultCodeBlock({...otherProps}: Props) {
                 id={id} 
                 className={className}
                 style={style}
+                {...otherProps}
             >
                 <Flex className="" flexWrap="nowrap">
                     {children}

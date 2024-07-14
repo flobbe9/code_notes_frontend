@@ -7,7 +7,7 @@ import { JQueryEasing } from "../abstract/CSSTypes";
 import { getCssConstant, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import StartPageSideBarTagList from "./StartPageSideBarTagList";
-import { StartPageContext } from "./StartPageContext";
+import { StartPageContext } from "./StartPageContainer";
 import Button from "./helpers/Button";
 
 
@@ -20,10 +20,9 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 // IDEA: filter icon
-// TODO: tab order
-export default function StartPageSideBar({...otherProps}: Props) {
+export default function StartPageSideBar({...props}: Props) {
 
-    const { id, className, style, children } = getCleanDefaultProps(otherProps, "StartPageSideBar", true);
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
 
     const componentRef = useRef(null);
     const tagFilterContainerRef = useRef(null);
@@ -125,6 +124,7 @@ export default function StartPageSideBar({...otherProps}: Props) {
             className={className + " fullViewHeight"}
             style={style}
             ref={componentRef}
+            {...otherProps}
         >
             <Flex className="fullHeight" flexWrap="nowrap">
                 {/* Toolbar */}

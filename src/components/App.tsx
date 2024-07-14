@@ -4,7 +4,7 @@ import Toast, { ToastSevirity } from './helpers/Toast';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { getCSSValueAsNumber, isNumberFalsy, isStringFalsy, log, logWarn } from '../helpers/utils';
 import NavBar from './NavBar';
-import StartPageContainer from './StartPageContext';
+import StartPageContainer from './StartPageContainer';
 import useKeyPress from '../hooks/useKeyPress';
 
 

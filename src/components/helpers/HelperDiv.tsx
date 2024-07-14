@@ -5,9 +5,6 @@ import { log } from "../../helpers/utils";
 
 
 interface Props extends HelperProps {
-
-    /** Default is ```false``` */
-    contentEditable?: boolean,
 }
 
 
@@ -22,16 +19,15 @@ export default forwardRef(function HelperDiv(
         onClick,
         disabled = false,
         rendered = true,
-        contentEditable = false,
         _hover = {},
-        ...otherProps
+        ...props
     }: Props,
     ref: Ref<HTMLDivElement>
 ) {
 
     const [isHover, setIsHover] = useState(false);
     
-    const { id, className, style, children, other } = getCleanDefaultProps(otherProps);
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props);
 
     const componentRef = useRef(null)
 
@@ -76,8 +72,8 @@ export default forwardRef(function HelperDiv(
             title={title}
             onClick={handleClick}
             hidden={!rendered}
-            contentEditable={contentEditable}
-            {...other}
+            contentEditable={otherProps.contentEditable}
+            {...otherProps}
         >
             {children}
         </div>
