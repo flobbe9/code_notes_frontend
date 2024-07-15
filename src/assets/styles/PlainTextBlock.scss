@@ -1,0 +1,17 @@
+.PlainTextBlock {
+    height: 100%;
+
+    .plainTextInput {
+        &:focus {
+            outline: none;
+        }
+        
+        code {
+            background-color: var(--codeGrey);
+            border-radius: var(--borderRadius);
+            color: black;;
+            font-size: 1em;
+            padding: 3px 7px;
+        }
+    }
+}
