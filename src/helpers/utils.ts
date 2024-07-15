@@ -1,51 +1,87 @@
 import $ from "jquery";
 import { ApiExceptionFormat } from "../abstract/ApiExceptionFormat";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
-import { DEFAULT_HTML_SANTIZER_OPTIONS, ENV } from "./constants";
+import { CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
 import { CSSProperties } from "react";
 import parse, { Element } from "html-react-parser";
 import sanitize from "sanitize-html";
 import CryptoJS from "crypto-js";
 
 
-export function log(text?: any, obj?: any, debug = false): void {
+export function log(message?: any, ...optionalParams: any[]): void {
 
-    if (!debug) 
-        console.log(text);
-    
-    else {
-        try {
-            throw Error(text);
-            
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    if (obj)
-        console.log(obj);
+    console.log(message, ...optionalParams);
 }
 
 
-export function logWarn(text?: any): void {
+export function logDebug(message?: any, ...optionalParams: any[]): void {
 
-    try {
-        throw Error(text);
-        
-    } catch (e) {
-        console.warn(e);
-    }
+    console.log(new Error(message), ...optionalParams);
 }
 
 
-export function logError(text?: any): void {
+export function logWarn(message?: any, ...optionalParams: any[]): void {
 
-    try {
-        throw Error(text);
-        
-    } catch (e) {
-        console.error(e);
+    console.warn(new Error(message), ...optionalParams);
+}
+
+
+export function logWarnFiltered(message?: any, ...optionalParams: any[]): void {
+
+    logFiltered("warn", message, ...optionalParams);
+}
+
+
+export function logError(message?: any, ...optionalParams: any[]): void {
+
+    console.error(Error(message), ...optionalParams);
+}
+
+
+export function logErrorFiltered(message?: any, ...optionalParams: any[]): void {
+
+    logFiltered("error", message, ...optionalParams);
+}
+
+
+/**
+ * Dont log given ```obj``` if it contains one of {@link CONSOLE_MESSAGES_TO_AVOID}s strings. Log normally if ```obj``` is not
+ * of type ```string```, ```number``` or ```Error```.
+ * 
+ * @param sevirity of obj to choose text background color
+ * @param obj to filter before logging
+ * @param optionalParams 
+ */
+function logFiltered(sevirity: LogSevirity, obj?: any, ...optionalParams: any[]): void {
+
+    let messageToCheck = obj;
+
+    // case: cannot filter obj
+    if (!obj || (typeof obj !== "string" && typeof obj !== "number" && !(obj instanceof Error))) {
+       logColored(sevirity, obj, ...optionalParams);
+       return;
     }
+
+    // case: Error
+    if (obj instanceof Error)
+        messageToCheck = obj.stack;
+
+    // compare to avoid messages
+    for (const messageToAvoid of CONSOLE_MESSAGES_TO_AVOID) 
+        // case: avoid obj
+        if (includesIgnoreCaseTrim(messageToCheck, messageToAvoid)) 
+            return; 
+        
+    logColored(sevirity, messageToCheck, ...optionalParams);
+}
+
+
+function logColored(sevirity: LogSevirity, obj?: any, ...optionalParams: any[]): void {
+
+    // get log color by sevirity
+    const color = LOG_SEVIRITY_COLORS[sevirity];
+
+    log("%c" + obj, "background: " + color, ...optionalParams);
 }
 
 

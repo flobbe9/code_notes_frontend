@@ -59,3 +59,18 @@ export const DEFAULT_HTML_SANTIZER_OPTIONS: sanitize.IOptions = {
 // Crypto
 export const CRYPTO_KEY = process.env.REACT_APP_CRYPTO_KEY || "";
 export const CRYPTO_IV = process.env.REACT_APP_CRYPTO_IV || "";
+
+
+// Custom log
+export type LogSevirity = "error" | "warn" | "info";
+export const LOG_SEVIRITY_COLORS: Record<LogSevirity, string> = {
+    "info": "white",
+    "warn": "rgb(255, 233, 174)",
+    "error": "rgb(255, 191, 191)"
+}
+
+/** Dont log to console if the 'message' contains one of these strings */
+export const CONSOLE_MESSAGES_TO_AVOID: (string | number)[] = [
+    // unallowed children of content editable
+    "Warning: A component is `contentEditable` and contains `children` managed by React",
+];
