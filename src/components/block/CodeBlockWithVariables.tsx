@@ -18,7 +18,6 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-// TODO: replace "other" again
 export default function CodeBlockWithVariables({...props}: Props) {
 
     const [highlightedInputValue, setHighlightedInputValue] = useState("");

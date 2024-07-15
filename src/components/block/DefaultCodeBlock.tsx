@@ -21,7 +21,6 @@ export default function DefaultCodeBlock({...props}: Props) {
 
     return (
         <DefaultBlock>
-            {/* TODO: is this div necessary? */}
             <div     
                 id={id} 
                 className={className}

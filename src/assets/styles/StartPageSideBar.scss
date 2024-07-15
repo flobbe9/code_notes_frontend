@@ -1,3 +1,5 @@
+@import "./global/functions.scss";
+
 :root {
     --startPageSideBarWidthWidthMobile: 30vw;
     --iconColor: rgb(179, 179, 179);
@@ -21,9 +23,6 @@
             &:focus {
                 outline-color: white;
             }
-
-            .fa-solid.fa-bars {
-            }
         }
     }
     
@@ -39,20 +38,23 @@
         .SearchBar {
             padding: 5px;
 
-            #searchInput {
-                &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-                    color: var(--placeHolderColor);
-                }
-                &::-moz-placeholder { /* Firefox 19+ */
-                    color: var(--placeHolderColor);
-                }
-                &:-ms-input-placeholder { /* IE 10+ */
-                    color: var(--placeHolderColor);
-                }
-                &:-moz-placeholder { /* Firefox 18- */
+            .searchInput {
+                @include placeholder {
                     color: var(--placeHolderColor);
                 }
             }
+
+            .clearSearchValueButton {
+                // for outline to be white on focus
+                color: white;
+            }
+        }
+
+        .resetButton {
+            border: 3px solid var(--bs-gray-300);
+            background-color: transparent;
+            color: white;
+            padding: 3px 5px;
         }
     }
 }

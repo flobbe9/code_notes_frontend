@@ -20,42 +20,4 @@
             transition: var(--transitionTimeFast);
         }
     }
-
-    .blockSettings {
-        // case: focus language search
-        &:has(.languageSearchBar .searchInput:focus) {
-            .LanguageSearchResults {
-                display: block;
-            }
-        }
-
-        .BlockSwitch {
-            // pseudo hidden to use fake "toggle slide". dont change "display" here because of <Flex>
-            opacity: 0;
-            width: 0;
-            z-index: -1;
-
-            .RadioButton {
-                position: absolute;
-            }
-        }
-
-        // pseudo hidden to use fake "toggle slide". dont change "display" here because of <Flex>
-        .languageSearchBar {
-            opacity: 0;
-            padding: 2px;
-            position: relative;
-            width: 0;
-            z-index: -1;
-        }
-
-        .LanguageSearchResults {
-            display: none;
-        }
-
-        .toggleBlockSettingsButton {
-            background-color: transparent;
-            padding: 0.5rem 1rem;
-        }
-    }
 }

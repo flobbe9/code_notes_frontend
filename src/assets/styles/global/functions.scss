@@ -101,9 +101,9 @@
         height: $size;
         width: $size;
     }
-    
+
     &::-webkit-scrollbar-track {
-        background: white; 
+        background: transparent; 
     }
     
     &::-webkit-scrollbar-thumb {
@@ -116,13 +116,13 @@
     } 
 }
 
-@mixin focusOutline($color) {
+@mixin focusOutline($color: currentColor) {
     outline: 3px solid $color;
     outline-offset: 1px;
 }
 
-@mixin buttonFocus() {
+@mixin buttonFocus($color: currentColor) {
     &:focus {
-        @include focusOutline(black);
+        @include focusOutline($color);
     }
 }

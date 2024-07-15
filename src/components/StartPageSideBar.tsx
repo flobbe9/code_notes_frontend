@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef } from "react";
-import "../assets/styles/StartPageSideBar.css";
+import "../assets/styles/StartPageSideBar.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Flex from "./helpers/Flex";
 import SearchBar from "./helpers/SearchBar";
@@ -144,6 +144,15 @@ export default function StartPageSideBar({...props}: Props) {
                         _searchInput={{color: "white"}} 
                         _xIcon={{color: "var(--iconColor)"}}
                     />
+
+                    {/* Reset tag filters */}
+                    {/* TODO: disable if no tags selected */}
+                    {/* TODO: add functionality */}
+                    <Flex className="mt-3" horizontalAlign="right">
+                        <Button className="resetButton hover" title="Reset tag filter">
+                            Reset   
+                        </Button>
+                    </Flex>
 
                     <hr />
 

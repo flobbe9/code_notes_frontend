@@ -26,7 +26,6 @@ interface Props extends HelperProps {
  * 
  * @since 0.0.1
  */
-// TODO: outline on focus
 export default forwardRef(function Checkbox({
         rendered = true,
         disabled = false,
