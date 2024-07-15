@@ -115,7 +115,7 @@ export default forwardRef(function ContentEditableDiv(
             </HelperDiv>
 
             {/* for deviating the focus if disabled */}
-            <HiddenInput type="radio" ref={hiddencomponentRef} />
+            <HiddenInput type="radio" ref={hiddencomponentRef} tabIndex={-1} />
         </>
     )
 })

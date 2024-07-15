@@ -1,5 +1,9 @@
 @import "./global/functions.scss";
 
+:root {
+    --languageSearchBarWidth: 150px
+}
+
 .LanguageSearchResults {
     background-color: white;
     border: 3px solid var(--bs-gray-300);
@@ -9,7 +13,7 @@
     overflow: auto;
     padding: 5px;
     position: absolute;
-    width: 150px;
+    width: var(--languageSearchBarWidth);
     z-index: 1;
 
     @include scrollBar();

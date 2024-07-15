@@ -14,6 +14,8 @@ export default interface HelperProps extends DefaultProps {
     rendered?: boolean,
     disabled?: boolean,
     onClick?: (event?) => void,
+    /** Not applied to ```<HelperDiv>``` */
+    onFocusOut?: (event?) => void,
     /** Style for given event */
     _hover?: CSSProperties,
     /** Style for given event */

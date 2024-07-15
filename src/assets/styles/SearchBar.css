@@ -3,7 +3,7 @@
     border-radius: 20px;
     padding: 10px;
 
-    #searchInput {
+    .searchInput {
         background-color: transparent;
         border: none;
 

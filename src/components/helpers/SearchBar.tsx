@@ -11,12 +11,6 @@ interface Props extends HelperProps {
 
     /** Default is "Search..." */
     placeHolder?: string,
-    /** Default is "" */
-    defaultValue?: string,
-    /** Applied to searchInput */
-    onKeyDown?: (event?) => void,
-    /** Applied to searchInput */
-    onKeyUp?: (event?) => void,
     /** Default is {} */
     _searchIcon?: CSSProperties,
     /** Default is {} */
@@ -32,13 +26,14 @@ interface Props extends HelperProps {
 export default forwardRef(function SearchBar(
     {
         placeHolder = "Search...",
-        title = "Search bar",
+        title = placeHolder || "Search bar",
         defaultValue = "",
         disabled = false,
         rendered = true,
         onKeyDown,
         onKeyUp,
         onClick,
+        onFocusOut,
         _searchIcon = {},
         _searchInput = {},
         _xIcon = {},
@@ -52,7 +47,7 @@ export default forwardRef(function SearchBar(
 
     const [isFocus, setIsFocus] = useState(false);
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "SearchBar");
+    const { id, className, style, children, onFocus, ...otherProps } = getCleanDefaultProps(props, "SearchBar");
 
     const componentRef = useRef(null);
     const inputRef = useRef(null);
@@ -74,7 +69,7 @@ export default forwardRef(function SearchBar(
 
     function clearInputValue(): void {
 
-        getSearchBar().val("");
+        getSearchBarInput().val("");
     }
 
 
@@ -83,16 +78,21 @@ export default forwardRef(function SearchBar(
         if (disabled)
             return;
 
-        const input = getSearchBar();
+        const input = getSearchBarInput();
 
         input.on("focus", () => setIsFocus(true))
-             .on("focusout", () => setIsFocus(false));
+             .on("focusout", (event) => {
+                setIsFocus(false);
+
+                if (onFocusOut)
+                    onFocusOut(event)
+             });
     }
 
 
-    function getSearchBar(): JQuery {
+    function getSearchBarInput(): JQuery {
 
-        return $(componentRef.current!).children("#searchInput");
+        return $(componentRef.current!).children(".searchInput");
     }
     
     
@@ -128,9 +128,7 @@ export default forwardRef(function SearchBar(
                 <i className="fa-solid fa-magnifying-glass" style={_searchIcon}></i>
 
                 {/* Search input */}
-                {/* TODO: dont use ids */}
                 <input 
-                    id="searchInput"
                     className="fullWidth dontMarkPlaceholder searchInput"
                     style={_searchInput}
                     type="text"
@@ -140,9 +138,11 @@ export default forwardRef(function SearchBar(
                     title={title}
                     disabled={disabled}
                     spellCheck={false}
+                    tabIndex={otherProps.tabIndex}
                     onClick={onClick}
                     onKeyDown={onKeyDown}
                     onKeyUp={onKeyUp}
+                    onFocus={onFocus}
                 />
 
                 {/* X icon */}
