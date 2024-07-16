@@ -24,9 +24,6 @@ interface Props extends DefaultProps {
  * Container containing a list of different ```Block``` components.
  * @since 0.0.1
  */
-// TODO: 
-    // add container button
-    // add block button
 export default function BlockContainer({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainer");
@@ -47,35 +44,32 @@ export default function BlockContainer({...props}: Props) {
                     <BlockContainerTagList className="col-6" />
                 </Flex>
 
-                {/* List of blocks */}
+                {/* Blocks */}
                 {testBlockList}
 
                 <AddNewBlock className="mt-4" />
             </div>
                 
-            {/* TOOD: add some kind of onclick style */}
-            {/* TODO: on hover
-                    slide wider
-                    who descriptive text
-            */}
             <Flex className="footer mt-1 me-2" horizontalAlign="right">
                 {/* Delete */}
-                <Button 
+                <ButtonSlideLabel 
                     className="me-2 hover transition" 
+                    label="Delete Note"
                     title="Delete note" 
                     style={{backgroundColor: "rgb(248, 141, 141)"}}
                 >
                     <i className="fa-solid fa-trash"></i>
-                </Button>
+                </ButtonSlideLabel>
 
                 {/* Save */}
-                <Button 
+                <ButtonSlideLabel 
+                    label="Save Note"
                     className="hover" 
                     title="Save note"
                     style={{backgroundColor: "rgb(141, 141, 248)"}}
                 >
                     <i className="fa-solid fa-floppy-disk"></i>
-                </Button>
+                </ButtonSlideLabel>
             </Flex>
 
             {children}

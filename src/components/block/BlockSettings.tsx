@@ -66,7 +66,7 @@ export default function BlockSettings({...props}: Props) {
             {
                 width: isShowBlockSettings ? 0 : languageSearchBarWidth,
                 opacity: isShowBlockSettings ? 0 : 1,
-                zIndex: isShowBlockSettings ? -1 : 0
+                zIndex: isShowBlockSettings ? -1 : 1
             }, 
             300,
             "swing"
@@ -136,15 +136,14 @@ export default function BlockSettings({...props}: Props) {
                 title="Search programming language"
                 tabIndex={isShowBlockSettings ? 0 : -1}
                 onFocus={handleLanguageSearchFocus}
-                onFocusOut={handleLanguageSearchFocusOut}
+                onBlur={handleLanguageSearchFocusOut}
                 onKeyDown={handleLanguageSearchKeyDown}
                 _focus={{borderColor: "var(--accentColor)"}}
                 _searchIcon={{padding: "2px"}} 
             >
                 <LanguageSearchResults 
-                    className="mt-1" 
                     rendered={areLanguageSearchResultsRendered} 
-                    onFocusOut={handleLanguageSearchResultsFocusOut}
+                    onBlur={handleLanguageSearchResultsFocusOut}
                 />
             </SearchBar>
 

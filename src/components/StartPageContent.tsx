@@ -1,10 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import "../assets/styles/StartPageContent.css";
+import "../assets/styles/StartPageContent.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import BlockContainer from "./block/BlockContainer";
 import SearchBar from "./helpers/SearchBar";
 import { getRandomString, log } from "../helpers/utils";
 import { AppContext } from "./App";
+import ButtonSlideLabel from "./helpers/ButtonSlideLabel";
+import Flex from "./helpers/Flex";
+import Button from "./helpers/Button";
 
 
 interface Props extends DefaultProps {
@@ -52,14 +55,22 @@ export default function StartPageContent({...props}: Props) {
             style={style}
             {...otherProps}
         >
-            {/* Search bar */}
-            <SearchBar 
-                className="m-3" 
-                placeHolder="Search Title, tag, note text..." 
-                title="Search notes (Ctrl+Shift+F)"
-                ref={searchInputRef}
-                _focus={{borderColor: "var(--accentColor)"}}
-            />
+            <Flex className="mb-3" flexWrap="nowrap" verticalAlign="center">
+                {/* Search bar */}
+                <SearchBar 
+                    className="m-3 fullWidth" 
+                    placeHolder="Search Title, tag, note text..." 
+                    title="Search notes (Ctrl+Shift+F)"
+                    ref={searchInputRef}
+                    _focus={{borderColor: "var(--accentColor)"}}
+                />
+
+                {/* Add block container */}
+                <Button className="addBlockContainerButton hover">
+                    <i className="fa-solid fa-plus me-1"></i>
+                    <span>New Note</span>
+                </Button>
+            </Flex>
 
             {/* List of blockContainers */}
             {testBlockContainers}
