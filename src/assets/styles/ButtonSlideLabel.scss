@@ -6,7 +6,8 @@
         opacity: 0;
         position: absolute;
         text-wrap: nowrap;
-
+        z-index: -1;
+        
         .addBlockButtonLabel {
             margin-left: 3px;
         }

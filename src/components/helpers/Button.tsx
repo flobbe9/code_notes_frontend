@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useRef, useState } from "react";
+import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "../../assets/styles/Button.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
@@ -25,38 +25,38 @@ interface Props extends HelperProps {
 /**
  * @since 0.0.1
  */
-export default function Button({
-    rendered = true,
-    disabled = false,
-    type,
-    title = "",
-    tabIndex,
-    onClick,
-    onSubmit,
-    onClickPromise,
-    _hover = {},
-    _click = {},
-    _disabled = {},
-    ...props
-}: Props) {
+export default forwardRef(function Button({
+        rendered = true,
+        disabled = false,
+        type,
+        title = "",
+        tabIndex,
+        onClick,
+        onSubmit,
+        onClickPromise,
+        _hover = {},
+        _click = {},
+        _disabled = {},
+        ...props
+    }: Props, 
+    ref: Ref<HTMLElement>
+) {
 
     const [isAwaitingPromise, setIsAwaitingPromise] = useState(false);
     const [isDisabled, setIsDisabled] = useState(disabled);
     const [isHover, setIsHover] = useState(false);
-    const [isClick, setIsClick] = useState(false);
+    const [isMouseDown, setIsMouseDown] = useState(false);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Button");
 
     const componentRef = useRef(null);
+    useImperativeHandle(ref, () => componentRef.current!, []);
 
 
     useEffect(() => {
 
-        initMinWidth();
-
-        toggleIsHover();
-        toggleIsClick();
-
+        // wait for adjacent elements to be rendered as well
+        setTimeout(() => initMinWidth(), 200);
     }, []);
 
 
@@ -79,26 +79,39 @@ export default function Button({
     }
 
 
-    function toggleIsHover(): void {
+    function handleMouseEnter(event): void {
 
         if (isDisabled)
             return;
 
-        const component = $(componentRef.current!);
-
-        component
-            .on("mouseenter", () => setIsHover(true))
-            .on("mouseleave", () => setIsHover(false));
+        setIsHover(true);
     }
 
 
-    function toggleIsClick(): void {
+    function handleMouseLeave(event): void {
 
-        const component = $(componentRef.current!);
+        if (isDisabled)
+            return;
 
-        component
-            .on("mousedown", () => setIsClick(true))
-            .on("mouseup", () => setIsClick(false));
+        setIsHover(false);
+    }
+
+
+    function handleMouseDown(event): void {
+
+        if (disabled)
+            return;
+
+        setIsMouseDown(true);
+    }
+
+
+    function handleMouseUp(event): void {
+
+        if (disabled)
+            return;
+
+        setIsMouseDown(false);
     }
 
 
@@ -109,6 +122,9 @@ export default function Button({
      */
     function handleClick(event): void {
 
+        if (disabled)
+            return;
+
         if (onClick)
             onClick(event);
 
@@ -118,6 +134,9 @@ export default function Button({
 
 
     async function handleClickPromise(event): Promise<any> {
+
+        if (disabled)
+            return;
 
         // case: no function passed
         if (!onClickPromise)
@@ -152,7 +171,7 @@ export default function Button({
             style={{
                 ...style,
                 ...(isHover && !disabled ? _hover : {}),
-                ...(isClick && !disabled ? _click : {}),
+                ...(isMouseDown && !disabled ? _click : {}),
                 ...(isDisabled ? _disabled : {})
             }}
             hidden={!rendered}
@@ -162,6 +181,10 @@ export default function Button({
             tabIndex={tabIndex}
             onClick={handleClick}
             onSubmit={onSubmit}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
             {...otherProps}
         >
             {/* Content */}
@@ -171,4 +194,4 @@ export default function Button({
             <i className={"fa-solid fa-circle-notch" + (isAwaitingPromise && " rotating")} hidden={!isAwaitingPromise}></i>
         </button>
     )
-}
+})

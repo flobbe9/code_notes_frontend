@@ -26,7 +26,10 @@ export default function ButtonSlideLabel({label, title, ...props}: Props) {
 
     useEffect(() => {
 
-        setInitialBlockButtonLabelWidth(getBlockButtonLabelWidth());
+        // wait for adjacent elements to render as well
+        setTimeout(() => {
+            setInitialBlockButtonLabelWidth(getBlockButtonLabelWidth());
+        }, 200);
     }, []);
 
 
@@ -44,7 +47,8 @@ export default function ButtonSlideLabel({label, title, ...props}: Props) {
         buttonLabelElement.animate(
             {
                 opacity: 1,
-                width: initialBlockButtonLabelWidth
+                width: initialBlockButtonLabelWidth,
+                zIndex: 0
             },
             300
         )
@@ -61,7 +65,8 @@ export default function ButtonSlideLabel({label, title, ...props}: Props) {
         buttonLabelElement.animate(
             {
                 opacity: 0,
-                width: 0
+                width: 0,
+                zIndex: -1
             },
             300,
             "easeOutSine",
