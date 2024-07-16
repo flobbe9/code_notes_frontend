@@ -6,7 +6,6 @@ import DefaultCodeBlock from "./DefaultCodeBlock";
 import CodeBlock from "./CodeBlock";
 import PlainTextBlock from "./PlainTextBlock";
 import CodeBlockWithVariables from "./CodeBlockWithVariables";
-import Button from "../helpers/Button";
 import BlockContainerTagList from "./BlockContainerTagList";
 import Flex from "../helpers/Flex";
 import { getRandomString } from "../../helpers/utils";
@@ -28,6 +27,7 @@ export default function BlockContainer({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainer");
 
+    
     return (
         <div 
             id={id} 

@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, Ref, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperDiv from "./HelperDiv";
 import HelperProps from "../../abstract/HelperProps";
@@ -13,7 +13,6 @@ interface Props extends HelperProps {
 /**
  * @since 0.0.1
  */
-// TODO: supress content editable child warnings in console
 export default forwardRef(function ContentEditableDiv(
     {
         disabled = false,
@@ -41,33 +40,6 @@ export default forwardRef(function ContentEditableDiv(
     useImperativeHandle(ref, () => componentRef.current!, []);
 
 
-    useEffect(() => {
-        addFocusEvent();
-
-    }, []);
-
-
-    useEffect(() => {
-        removeFocusEvent();
-        addFocusEvent();
-        
-    }, [disabled]);
-
-
-    function addFocusEvent(): void {
-        
-        $(componentRef.current!).on("focus", handleFocus);
-        $(componentRef.current!).on("focusout", handleFocusOut);
-    }
-
-
-    function removeFocusEvent(): void {
-
-        $(componentRef.current!).off("focus", handleFocus);
-        $(componentRef.current!).off("focusout", handleFocusOut);
-    }
-
-
     function handleFocus(event): void {
 
         if (disabled) {
@@ -79,7 +51,7 @@ export default forwardRef(function ContentEditableDiv(
     }
 
 
-    function handleFocusOut(event): void {
+    function handleBlur(event): void {
 
         if (disabled) 
             return;
@@ -108,6 +80,8 @@ export default forwardRef(function ContentEditableDiv(
                 contentEditable
                 onClick={onClick}
                 disabled={disabled}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
                 _hover={_hover}
                 {...otherProps}
             >

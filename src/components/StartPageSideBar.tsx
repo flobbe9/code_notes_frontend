@@ -20,6 +20,7 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 // IDEA: filter icon
+// TODO: slide breaks some elements
 export default function StartPageSideBar({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
@@ -121,7 +122,7 @@ export default function StartPageSideBar({...props}: Props) {
     return (
         <div 
             id={id} 
-            className={className + " fullViewHeight"}
+            className={className}
             style={style}
             ref={componentRef}
             {...otherProps}
@@ -130,7 +131,7 @@ export default function StartPageSideBar({...props}: Props) {
                 {/* Toolbar */}
                 <div className="toolBar">
                     <Button className="toolBarToggleButton hover" onClick={toggleTagFilterContainer}>
-                        <i className="fa-solid fa-bars fa-xl" title="Ctrl + B"></i>
+                        <i className="fa-solid fa-bars fa-xl" title="Side bar (Ctrl + B)"></i>
                     </Button>
                 </div>
 

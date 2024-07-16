@@ -1,6 +1,4 @@
 .NavBarProfileSection {
-    font-size: 1.2em;
-
     #ButtonRegister {
         background-color: var(--matBlack);
         border: 1px solid white;

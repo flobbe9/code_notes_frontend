@@ -3,6 +3,10 @@
 @import "./global/helpers.scss";
 @import "./global/variables.scss";
 
+/* disable reacts error overlay */
+#webpack-dev-server-client-overlay {
+    display: none;
+}
 
 .App {
     font-family: roundFont;

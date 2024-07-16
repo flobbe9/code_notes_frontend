@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useRef } from "react";
 import "../../assets/styles/DefaultCodeBlock.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import DefaultBlock from "./DefaultBlock";
 import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
-import ContentEditableDiv from "../helpers/ContentEditableDiv";
+import { log } from "../../helpers/utils";
 
 
 interface Props extends DefaultProps {
@@ -19,6 +19,28 @@ export default function DefaultCodeBlock({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultCodeBlock");
 
+    const copyIconRef = useRef(null);
+
+
+    function animateCopyIcon(): void {
+
+        const copyIcon = $(copyIconRef.current!);
+
+        copyIcon.animate(
+            {
+                opacity: 0,
+                fontSize: "3em"
+            },
+            400,
+            "easeOutSine",
+            () => {
+                copyIcon.css("opacity", 1);
+                copyIcon.css("fontSize", "1em");
+            }
+        );
+    }
+
+
     return (
         <DefaultBlock>
             <div     
@@ -27,11 +49,17 @@ export default function DefaultCodeBlock({...props}: Props) {
                 style={style}
                 {...otherProps}
             >
-                <Flex className="" flexWrap="nowrap">
+                <Flex flexWrap="nowrap">
                     {children}
 
                     <Flex horizontalAlign="right">
-                        <Button className="defaultBlockButton hover copyButton">
+                        {/* Copy */}
+                        <Button
+                            className="defaultBlockButton hover copyButton"
+                            title="Copy"
+                            onClick={animateCopyIcon}
+                        >
+                            <i className="fa-solid fa-copy" ref={copyIconRef}></i>
                             <i className="fa-solid fa-copy"></i>
                         </Button>
                     </Flex>

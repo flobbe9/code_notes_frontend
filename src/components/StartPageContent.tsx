@@ -5,7 +5,6 @@ import BlockContainer from "./block/BlockContainer";
 import SearchBar from "./helpers/SearchBar";
 import { getRandomString, log } from "../helpers/utils";
 import { AppContext } from "./App";
-import ButtonSlideLabel from "./helpers/ButtonSlideLabel";
 import Flex from "./helpers/Flex";
 import Button from "./helpers/Button";
 
@@ -55,10 +54,10 @@ export default function StartPageContent({...props}: Props) {
             style={style}
             {...otherProps}
         >
-            <Flex className="mb-3" flexWrap="nowrap" verticalAlign="center">
+            <Flex className="mb-4 mt-3" flexWrap="nowrap" verticalAlign="center">
                 {/* Search bar */}
                 <SearchBar 
-                    className="m-3 fullWidth" 
+                    className="fullWidth" 
                     placeHolder="Search Title, tag, note text..." 
                     title="Search notes (Ctrl+Shift+F)"
                     ref={searchInputRef}
@@ -66,7 +65,7 @@ export default function StartPageContent({...props}: Props) {
                 />
 
                 {/* Add block container */}
-                <Button className="addBlockContainerButton hover">
+                <Button className="addBlockContainerButton hover ms-2">
                     <i className="fa-solid fa-plus me-1"></i>
                     <span>New Note</span>
                 </Button>
@@ -82,6 +81,10 @@ export default function StartPageContent({...props}: Props) {
 
 
 const testBlockContainers = [
+    <BlockContainer key={getRandomString()} />,
+    <BlockContainer key={getRandomString()} />,
+    <BlockContainer key={getRandomString()} />,
+    <BlockContainer key={getRandomString()} />,
     <BlockContainer key={getRandomString()} />,
     <BlockContainer key={getRandomString()} />
 ]

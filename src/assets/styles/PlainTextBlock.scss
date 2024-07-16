@@ -3,6 +3,7 @@
 
     .plainTextInput {
         &:focus {
+            letter-spacing: 1px;
             outline: none;
         }
         

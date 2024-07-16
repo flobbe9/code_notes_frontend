@@ -6,6 +6,11 @@
     
     .copyButton {
         border-radius: 0;
+        min-height: 2em;
         padding: 0.5rem 1rem !important;
+
+        .fa-copy {
+            position: absolute;
+        }
     }
 }

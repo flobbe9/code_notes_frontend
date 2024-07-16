@@ -46,10 +46,10 @@ export default function NavBarProfileSection({...props}: Props) {
                             isMobileWidth ?
                                 <div className="textRight">
                                     {/* Register */}
-                                    <Link to="/register" id="Register" className="whiteLink dontBreakText"><code>Create Account</code></Link>
+                                    <Link to="/register" id="Register" className="whiteLink dontBreakText">Create Account</Link>
                                     <br />
                                     {/* Login */}
-                                    <Link to="/login" className="whiteLink"><code>Login</code></Link>
+                                    <Link to="/login" className="whiteLink">Login</Link>
                                 </div>
                             :
                                 <div>
@@ -61,12 +61,12 @@ export default function NavBarProfileSection({...props}: Props) {
                                         {...{tabIndex: -1}}
                                     >
                                         <Link to="/register" id="Register" className="whiteLink">
-                                            <code>Create Account</code>
+                                            Create Account
                                         </Link>
                                     </Button>
             
                                     {/* Login */}
-                                    <Link to="/login" className="whiteLink hover dontSelectText"><code>Login</code></Link>
+                                    <Link to="/login" className="whiteLink hover dontSelectText">Login</Link>
                                 </div>
                         }
                     </div>

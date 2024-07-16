@@ -1,14 +1,19 @@
+@import "./global/functions.scss";
+
 .CodeBlockWithVariables {
     .codeInput {
+        font-family: codeFont;
+        font-weight: bold;
         margin: 0;
         max-height: 20vh;
+        max-width: 100%;
+        overflow: auto;
         padding: 5px 10px;
 
-        // input
-        .ContentEditableDiv {
-            &:focus {
-                outline: none;
-            }
+        @include scrollBar();
+
+        &:focus {
+            outline: none;
         }
     }
 
@@ -22,6 +27,9 @@
         .fa-plus {
             // color: rgb(209, 209, 255);
             // color: black;
+            background-color: white;
+            border-radius: 100%;
+            padding: 3px;
         }
 
         .fa-dollar-sign {

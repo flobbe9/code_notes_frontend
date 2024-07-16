@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import "../../assets/styles/BlockSettings.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
@@ -7,6 +7,7 @@ import SearchBar from "../helpers/SearchBar";
 import LanguageSearchResults from "../LanguageSearchResults";
 import BlockSwitch from "./BlockSwitch";
 import { getCssConstant, getCSSValueAsNumber, log } from "../../helpers/utils";
+import { AppContext } from "../App";
 
 
 interface Props extends DefaultProps {
@@ -19,6 +20,7 @@ interface Props extends DefaultProps {
  */
 export default function BlockSettings({...props}: Props) {
     
+    const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
     const [areLanguageSearchResultsRendered, setAreLanguageSearchResultsRendered] = useState(false);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockSettings");
@@ -29,7 +31,8 @@ export default function BlockSettings({...props}: Props) {
 
     // IDEA: make custom colors and pass them to buttons as border color
 
-    const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
+    const { getDeviceWidth } = useContext(AppContext);
+    const { isMobileWidth } = getDeviceWidth();
 
 
     function toggleBlockSwitch(): void {
@@ -121,11 +124,13 @@ export default function BlockSettings({...props}: Props) {
             className={className}
             style={style}
             verticalAlign="start"
-            flexWrap="nowrap"
+            horizontalAlign={isMobileWidth ? "right" : "center"}
+            // wrap for mobile view
+            flexWrap={isMobileWidth && isShowBlockSettings ? "wrap" : "nowrap"}
             ref={componentRef}
             {...otherProps}
         >
-            <BlockSwitch ref={blockSwitchRef} tabIndex={isShowBlockSettings ? 0 : -1} />
+            <BlockSwitch className="" ref={blockSwitchRef} tabIndex={isShowBlockSettings ? 0 : -1} />
 
             {/* Search Language */}
             {/* TODO: hide this for plain text block */}

@@ -18,8 +18,6 @@ export default function StartPageSideBarTagList({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBarTagList", true);
 
-    // TODO: add some kind of clear all button
-    
     return (
         <div 
             id={id} 

@@ -109,7 +109,7 @@ export default function PlainTextBlock({...props}: Props) {
                 onFocus={handleFocus}
                 onBlur={handleBlur}
             >
-                Plain text with some <code>code</code>
+                Plain text with some <code>code...</code>
             </ContentEditableDiv>
 
             {children}

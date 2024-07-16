@@ -77,18 +77,12 @@ export default function CodeBlockWithVariables({...props}: Props) {
             flexWrap="nowrap"
             {...otherProps}
         >
-            {/* TODO: make this a component */}
-            <pre className="fullWidth codeInput">
-                <code>
-                    <ContentEditableDiv {...{spellCheck: false, onKeyDown: handleKeyDown}} ref={inputRef} /> 
-                </code>
-            </pre>
+            <ContentEditableDiv className="fullWidth codeInput" ref={inputRef} spellCheck={false} onKeyDown={handleKeyDown} /> 
 
             <Flex horizontalAlign="right">
                 <Button className="addVariableButton defaultBlockButton hover flexCenter" title="Add variable">
-                    <i className="fa-solid fa-plus me-3"></i>
+                    <i className="fa-solid fa-plus me-2"></i>
                     <i className="fa-solid fa-dollar-sign"></i>
-                    <span className="curlyBraces">&#123;&#125;</span> 
                 </Button>
             </Flex>
                 

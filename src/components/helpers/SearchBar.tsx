@@ -19,8 +19,6 @@ interface Props extends HelperProps {
     _xIcon?: CSSProperties,
 }
 
-// TODO: remove outer div, continue here
-    // fix language searchbar
 
 /**
  * @since 0.0.1
