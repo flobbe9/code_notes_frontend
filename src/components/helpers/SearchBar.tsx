@@ -1,8 +1,8 @@
-import React, { CSSProperties, forwardRef, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { CSSProperties, forwardRef, Ref, useImperativeHandle, useRef, useState } from "react";
 import "../../assets/styles/SearchBar.css";
 import HelperProps from "../../abstract/HelperProps";
 import Flex from "./Flex";
-import { isObjectFalsy, log } from "../../helpers/utils";
+import { isObjectFalsy } from "../../helpers/utils";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Button from "./Button";
 
@@ -19,6 +19,8 @@ interface Props extends HelperProps {
     _xIcon?: CSSProperties,
 }
 
+// TODO: remove outer div, continue here
+    // fix language searchbar
 
 /**
  * @since 0.0.1
@@ -33,7 +35,8 @@ export default forwardRef(function SearchBar(
         onKeyDown,
         onKeyUp,
         onClick,
-        onFocusOut,
+        onFocus,
+        onBlur,
         _searchIcon = {},
         _searchInput = {},
         _xIcon = {},
@@ -47,18 +50,12 @@ export default forwardRef(function SearchBar(
 
     const [isFocus, setIsFocus] = useState(false);
 
-    const { id, className, style, children, onFocus, ...otherProps } = getCleanDefaultProps(props, "SearchBar");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "SearchBar");
 
     const componentRef = useRef(null);
     const inputRef = useRef(null);
 
     useImperativeHandle(ref, () => inputRef.current!, []);
-
-
-    useEffect(() => {
-
-        addFocusEvents();
-    }, []);
 
 
     function handleXIconClick(event): void {
@@ -73,20 +70,27 @@ export default forwardRef(function SearchBar(
     }
 
 
-    function addFocusEvents(): void {
+    function handleFocus(event): void {
 
         if (disabled)
             return;
 
-        const input = getSearchBarInput();
+        setIsFocus(true);
 
-        input.on("focus", () => setIsFocus(true))
-             .on("focusout", (event) => {
-                setIsFocus(false);
+        if (onFocus)
+            onFocus(event);
+    }
 
-                if (onFocusOut)
-                    onFocusOut(event)
-             });
+
+    function handleBlur(event): void {
+
+        if (disabled)
+            return;
+
+        setIsFocus(false);
+
+        if (onBlur)
+            onBlur(event);
     }
 
 
@@ -108,56 +112,54 @@ export default forwardRef(function SearchBar(
 
 
     return (
-        <div>
-            <Flex 
-                id={id} 
-                className={className + (isDefaultDisabledStyle() ? " disabledButton" : "")}
-                style={{
-                    ...style,
-                    ...(disabled ? _disabled : {}),
-                    ...(isFocus ? _focus : {})
-                }}
-                rendered={rendered}
-                _hover={_hover}
-                flexWrap="nowrap"
-                verticalAlign="center"
-                ref={componentRef}
-                {...otherProps}
+        <Flex 
+            id={id} 
+            className={className + (isDefaultDisabledStyle() ? " disabledButton" : "")}
+            style={{
+                ...style,
+                ...(disabled ? _disabled : {}),
+                ...(isFocus ? _focus : {})
+            }}
+            rendered={rendered}
+            _hover={_hover}
+            flexWrap="nowrap"
+            verticalAlign="center"
+            ref={componentRef}
+            {...otherProps}
+        >
+            {/* Search icon */}
+            <i className="fa-solid fa-magnifying-glass" style={_searchIcon}></i>
+
+            {/* Search input */}
+            <input 
+                className="fullWidth dontMarkPlaceholder searchInput"
+                style={_searchInput}
+                type="text"
+                ref={inputRef} 
+                placeholder={placeHolder}
+                defaultValue={defaultValue}
+                title={title}
+                disabled={disabled}
+                spellCheck={false}
+                tabIndex={otherProps.tabIndex}
+                onClick={onClick}
+                onKeyDown={onKeyDown}
+                onKeyUp={onKeyUp}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+            />
+
+            {/* X icon */}
+            {/* TODO: clear search results as well as search input */}
+            <Button 
+                className={"clearSearchValueButton " + (!disabled ? "hover" : "")} 
+                disabled={disabled} 
+                onClick={handleXIconClick}
+                title="Clear search"
             >
-                {/* Search icon */}
-                <i className="fa-solid fa-magnifying-glass" style={_searchIcon}></i>
-
-                {/* Search input */}
-                <input 
-                    className="fullWidth dontMarkPlaceholder searchInput"
-                    style={_searchInput}
-                    type="text"
-                    ref={inputRef} 
-                    placeholder={placeHolder}
-                    defaultValue={defaultValue}
-                    title={title}
-                    disabled={disabled}
-                    spellCheck={false}
-                    tabIndex={otherProps.tabIndex}
-                    onClick={onClick}
-                    onKeyDown={onKeyDown}
-                    onKeyUp={onKeyUp}
-                    onFocus={onFocus}
-                />
-
-                {/* X icon */}
-                {/* TODO: clear search results as well as search input */}
-                <Button 
-                    className={"clearSearchValueButton " + (!disabled ? "hover" : "")} 
-                    disabled={disabled} 
-                    onClick={handleXIconClick}
-                    title="Clear search"
-                >
-                    <i className="fa-solid fa-xmark m-1" style={_xIcon}></i>
-                </Button>
-            </Flex>
-                    
+                <i className="fa-solid fa-xmark m-1" style={_xIcon}></i>
+            </Button>
             {children}
-        </div>
+        </Flex>
     )
 })
