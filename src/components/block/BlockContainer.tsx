@@ -11,6 +11,8 @@ import BlockContainerTagList from "./BlockContainerTagList";
 import Flex from "../helpers/Flex";
 import { getRandomString } from "../../helpers/utils";
 import BlockContainerTitle from "./BlockContainerTitle";
+import AddNewBlock from "./AddNewBlock";
+import ButtonSlideLabel from "../helpers/ButtonSlideLabel";
 
 
 interface Props extends DefaultProps {
@@ -22,6 +24,9 @@ interface Props extends DefaultProps {
  * Container containing a list of different ```Block``` components.
  * @since 0.0.1
  */
+// TODO: 
+    // add container button
+    // add block button
 export default function BlockContainer({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainer");
@@ -34,7 +39,7 @@ export default function BlockContainer({...props}: Props) {
             {...otherProps}
         >
             <div className="contentContainer">
-                <Flex className="fullWidth" flexWrap="nowrap">
+                <Flex className="fullWidth mb-4" flexWrap="nowrap">
                     {/* Title */}
                     <BlockContainerTitle className="me-1 col-6" />
 
@@ -44,10 +49,15 @@ export default function BlockContainer({...props}: Props) {
 
                 {/* List of blocks */}
                 {testBlockList}
+
+                <AddNewBlock className="mt-4" />
             </div>
                 
-            {/* Container Footer */}
             {/* TOOD: add some kind of onclick style */}
+            {/* TODO: on hover
+                    slide wider
+                    who descriptive text
+            */}
             <Flex className="footer mt-1 me-2" horizontalAlign="right">
                 {/* Delete */}
                 <Button 

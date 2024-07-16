@@ -1,0 +1,14 @@
+.ButtonSlideLabel {
+    font-size: 1em;
+
+    .addBlockButtonLabelContainer {
+        line-height: 1;
+        opacity: 0;
+        position: absolute;
+        text-wrap: nowrap;
+
+        .addBlockButtonLabel {
+            margin-left: 3px;
+        }
+    }
+}
