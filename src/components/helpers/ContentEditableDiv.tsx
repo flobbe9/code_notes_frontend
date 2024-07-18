@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, Ref, useContext, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperDiv from "./HelperDiv";
 import HelperProps from "../../abstract/HelperProps";
@@ -13,6 +13,7 @@ interface Props extends HelperProps {
 /**
  * @since 0.0.1
  */
+// TODO: strip styles on copy paste
 export default forwardRef(function ContentEditableDiv(
     {
         disabled = false,
@@ -33,7 +34,7 @@ export default forwardRef(function ContentEditableDiv(
     const [isFocus, setIsFocus] = useState(false);
     
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ContentEditableDiv");
-    
+
     const componentRef = useRef(null);
     const hiddencomponentRef = useRef(null);
     

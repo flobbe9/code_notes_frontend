@@ -1,9 +1,16 @@
+@import "./global/functions.scss";
+
 .PlainTextBlock {
     height: 100%;
 
     .plainTextInput {
+        max-height: 20vh;
+        overflow: auto;
+
+        @include scrollBar();
+
         &:focus {
-            letter-spacing: 1px;
+            // letter-spacing: 1px;
             outline: none;
         }
         

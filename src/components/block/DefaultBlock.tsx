@@ -28,6 +28,8 @@ export default function DefaultBlock({...props}: Props) {
 
     const componentRef = useRef(null);
    
+    // TODO:
+        // drag and drop?
 
 
     return (

@@ -8,12 +8,30 @@
         max-height: 20vh;
         max-width: 100%;
         overflow: auto;
-        padding: 5px 10px;
+        padding: 10px 10px;
 
         @include scrollBar();
 
         &:focus {
             outline: none;
+        }
+
+        &:has(.variableInput) {
+            padding: 5px 10px;
+        }
+
+        .variableInput {
+            border: 2px solid transparent;
+            border-radius: var(--borderRadius);
+            margin: 0 2px;
+            padding: 3px 7px;
+            // barely includes default placeholder
+            width: 150px;
+
+            &:focus {
+                border-color: var(--accentColor);
+                outline: none;
+            }
         }
     }
 
@@ -25,8 +43,6 @@
         padding: 0.3rem 0.5rem !important;
 
         .fa-plus {
-            // color: rgb(209, 209, 255);
-            // color: black;
             background-color: white;
             border-radius: 100%;
             padding: 3px;
@@ -42,6 +58,16 @@
             color: black;
             margin-left: 2px;
             font-weight: bold;
+        }
+    }
+    
+    .copyButton {
+        border-radius: 0;
+        min-height: 2em;
+        padding: 0.5rem 1rem !important;
+
+        .fa-copy {
+            position: absolute;
         }
     }
 }

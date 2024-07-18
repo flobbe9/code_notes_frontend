@@ -1019,3 +1019,22 @@ export function hashDate(date = new Date()): string {
 
     return hash(stripTimeFromDate(date).getTime().toString());
 }
+
+
+/**
+ * Note: user will need to consent for this function to work.
+ * 
+ * @returns raw unstyled text currently copied to clipboard
+ */
+export async function getClipboardText(): Promise<string> {
+
+    return navigator.clipboard.readText();
+}
+
+/**
+ * @param text to copy to clipboard
+ */
+export async function setClipboardText(text: string): Promise<void> {
+
+    navigator.clipboard.writeText(text);
+}

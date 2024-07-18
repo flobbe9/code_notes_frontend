@@ -19,6 +19,7 @@ export const DEFAULT_HTML_SANTIZER_OPTIONS: sanitize.IOptions = {
     allowedTags: [
         "a",
         "bdo",
+        "br",
         "code",
         "div",
         "em",
@@ -26,6 +27,7 @@ export const DEFAULT_HTML_SANTIZER_OPTIONS: sanitize.IOptions = {
         "figure",
         "h1", "h2", "h3", "h4", "h5", "h6",
         "img",
+        "input",
         "kbd",
         "mark",
         "p",
@@ -48,6 +50,7 @@ export const DEFAULT_HTML_SANTIZER_OPTIONS: sanitize.IOptions = {
         "h5": [...ALLOWED_TAG_ATTRIBUTES],
         "h6": [...ALLOWED_TAG_ATTRIBUTES],
         "img": ["src", "alt", ...ALLOWED_TAG_ATTRIBUTES],
+        "input": ["placeholder", "value", "defaultValue", ...ALLOWED_TAG_ATTRIBUTES],
         "mark": ["alt", "color", ...ALLOWED_TAG_ATTRIBUTES],
         "p": [...ALLOWED_TAG_ATTRIBUTES],
         "span": [...ALLOWED_TAG_ATTRIBUTES],
@@ -74,3 +77,10 @@ export const CONSOLE_MESSAGES_TO_AVOID: (string | number)[] = [
     // unallowed children of content editable
     "Warning: A component is `contentEditable` and contains `children` managed by React",
 ];
+
+
+// Blocks
+export const VARIABLE_INPUT_SEQUENCE_REGEX = /^.*\$\[\[.*\]\].*$/;
+export const VARIABLE_INPUT_DEFAULT_PLACEHOLDER = "VARIABLE_NAME";
+export const VARIABLE_INPUT_START_SEQUENCE = "$[[";
+export const VARIABLE_INPUT_END_SEQUENCE = "]]";
