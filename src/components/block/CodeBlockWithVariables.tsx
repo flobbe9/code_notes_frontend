@@ -10,6 +10,7 @@ import { equalsIgnoreCase, getClipboardText, insertString, isBlank, log, setClip
 import sanitize from "sanitize-html";
 import { VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_START_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
 import { AppContext } from "../App";
+import { useInitialStyles } from "../../hooks/useInitialStyles";
 
 
 interface Props extends DefaultProps {
@@ -28,6 +29,8 @@ export default function CodeBlockWithVariables({...props}: Props) {
     
     const inputDivRef = useRef(null);
     const copyIconRef = useRef(null);
+
+    useInitialStyles(".inputDiv", [["max-width", "width"]], 100);
     
     
     // TODO: 
@@ -40,11 +43,11 @@ export default function CodeBlockWithVariables({...props}: Props) {
             // just under full window size
             // x close
                 // also on escape and click outside
-        // copy
         // highlight
             // pending animation if takes longer than 300ms (?)
             // disable while pending
         // consider max input size
+        // variable input styles?
 
 
     /**
@@ -113,6 +116,9 @@ export default function CodeBlockWithVariables({...props}: Props) {
     }
 
 
+    /**
+     * Remove highlighting of inputDiv content and parse ```<input>```s to inputVariableSequences.
+     */
     function unHighlightInputDivContent(): void {
 
         const inputDiv = $(inputDivRef.current!);
@@ -315,26 +321,64 @@ export default function CodeBlockWithVariables({...props}: Props) {
         // remove special chars
         clipboardText = cleanUpSpecialChars(clipboardText);
 
-        await setClipboardText(clipboardText);
+        setClipboardText(clipboardText);
     }
 
 
-    async function copyCodeToClipboard(): Promise<void> {
+    /**
+     * Copy content of inputDiv to clipboard considering the variableInput values, line breaks as well as spaces.
+     * 
+     * Appending a hidden div is necessary to keep line breaks when pasting. For some reason using ```innerText``` on an element
+     * inside a ```<pre>``` tag will keep the line breaks and spaces.
+     */
+    async function copyInputDivContentToClipboard(): Promise<void> {
 
         const inputDiv = $(inputDivRef.current!);
-        let inputHtml = inputDiv.html();
+        let inputDivHtml = inputDiv.html();
 
-        // TODO: consider inputs
-            // either use plain text or consider breaks somehow
-                // insert \n?
-                // consider spaces?
+        // get varialbeInput values
+        const variableInputValues = getVariableInputValues();
 
-        // sanitize
-        inputHtml = sanitizeForInputDiv(inputHtml);
+        // remove highlights and clean up <input>s
+        inputDivHtml = sanitize(inputDivHtml, {
+            allowedTags: ["div", "br", "input"],
+            allowedAttributes: {}
+        });
 
-        setClipboardText(inputHtml);
+        // replace <input>s with their values
+        const inputDivHtmlArray = inputDivHtml.split("<input />");
+        inputDivHtml = inputDivHtmlArray.reduce((prev, curr, i) => prev + variableInputValues[i - 1] + curr);
+
+        // create hidden div inside inputDiv
+        const hiddenDiv = document.createElement("div");
+        hiddenDiv.style.display = "none";
+        // add sanitized content
+        hiddenDiv.innerHTML = inputDivHtml;
+
+        // use inner text for keeping line breaks and spaces
+        await setClipboardText(hiddenDiv.innerText);
+
+        // remove hidden div
+        hiddenDiv.remove();
     }
 
+
+    /**
+     * @returns list of values of variableInputs inside inputDiv
+     */
+    function getVariableInputValues(): string[] {
+
+        let values: string[] = [];
+
+        $(inputDivRef.current!).find("input")
+                               .each((i, input) => {
+                                    if (input.type === "text")
+                                        values.push(input.value)
+                                });
+
+        return values;
+    }
+    
 
     function animateCopyIcon(): void {
 
@@ -367,8 +411,14 @@ export default function CodeBlockWithVariables({...props}: Props) {
         const variableInputs = $(".variableInput");
 
         // case: focus was not on a variable input
-        if (!variableInputs.length || !variableInputs.has(":focus"))
+        if (!variableInputs.length || !variableInputs.has(":focus")) {
+            // start timeout
+                // add overlay
+            
+            // await this
             highlightInputDivContent();
+            // kill timeout on finish
+        }
     }
 
 
@@ -420,7 +470,7 @@ export default function CodeBlockWithVariables({...props}: Props) {
 
         animateCopyIcon();
 
-        await copyCodeToClipboard();
+        await copyInputDivContentToClipboard();
     }
 
 
@@ -432,16 +482,20 @@ export default function CodeBlockWithVariables({...props}: Props) {
             flexWrap="nowrap"
             {...otherProps}
         >
-            <ContentEditableDiv 
-                className="fullWidth codeInput" 
-                ref={inputDivRef} 
-                spellCheck={false} 
-                onKeyDown={handleKeyDown} 
-                onKeyUp={handleKeyUp}
-                onKeyDownCapture={handleKeyDownCapture}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-            /> 
+            <pre className="inputDivContainer fullWidth">
+                <code>
+                    <ContentEditableDiv 
+                        className="inputDiv" 
+                        ref={inputDivRef} 
+                        spellCheck={false} 
+                        onKeyDown={handleKeyDown} 
+                        onKeyUp={handleKeyUp}
+                        onKeyDownCapture={handleKeyDownCapture}
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
+                    /> 
+                </code>
+            </pre>
 
             <Flex horizontalAlign="right" flexWrap="nowrap">
                 {/* Add variable */}

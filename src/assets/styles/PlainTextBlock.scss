@@ -6,6 +6,7 @@
     .plainTextInput {
         max-height: 20vh;
         overflow: auto;
+        white-space: pre-wrap;
 
         @include scrollBar();
 

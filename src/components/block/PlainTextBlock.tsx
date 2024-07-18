@@ -7,6 +7,7 @@ import { getClipboardText, isBlank, log, setClipboardText } from "../../helpers/
 import sanitize from "sanitize-html";
 import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
 import { AppContext } from "../App";
+import { useInitialStyles } from "../../hooks/useInitialStyles";
 
 
 interface Props extends DefaultProps {
@@ -24,6 +25,8 @@ export default function PlainTextBlock({...props}: Props) {
     const { isKeyPressed } = useContext(AppContext);
 
     const inputDivRef = useRef(null);
+
+    useInitialStyles(".inputDiv", [["max-width", "width"]], 100);
 
 
     function handleFocus(event): void {
