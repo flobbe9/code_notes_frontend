@@ -6,13 +6,16 @@
     
     .blockContent {
         border-radius: var(--borderRadius);
-        position: relative;
 
         .deleteBlockButton {
             border-radius: var(--borderRadius);
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
             background-color: rgb(150, 150, 150);
+
+            &:hover {
+                background-color: rgb(184, 184, 184);
+            }
         }
 
         .defaultBlockButton {

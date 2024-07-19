@@ -2,7 +2,7 @@
 
 .RadioButton {
     border: 2px solid var(--codeGrey);
-    border-radius: 5px;
+    border-radius: var(--borderRadius);
     padding: 2px;
     width: fit-content;
     @include hoverCursor();
@@ -12,7 +12,7 @@
             $minSize: 25px;
             
             background-color: var(--accentColor);
-            border-radius: 5px;
+            border-radius: var(--borderRadius);
             height: 100%;
             min-height: $minSize;
             min-width: $minSize;

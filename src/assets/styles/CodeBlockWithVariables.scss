@@ -1,12 +1,21 @@
 @import "./global/functions.scss";
 
+:root {
+    --codeBlockWithVariablesMinHeight: 20vh;
+}
+
 .CodeBlockWithVariables {
     .inputDivContainer {
         margin: 0;
 
+        code {
+            height: 100%;
+            display: block;
+        }
+
         .inputDiv {
             margin: 0;
-            max-height: 20vh;
+            max-height: var(--codeBlockWithVariablesMinHeight);
             overflow: auto;
             padding: 10px 10px;
             white-space: pre-wrap;
@@ -23,7 +32,7 @@
 
             .variableInput {
                 border: 2px solid transparent;
-                border-radius: 3px;
+                border-radius: var(--borderRadius);
                 margin: 0 2px;
                 padding: 3px 7px;
                 // barely includes default placeholder
@@ -63,6 +72,7 @@
         }
     }
     
+    // TODO: move this to defaultcodeblock file?
     .copyButton {
         border-radius: 0;
         min-height: 2em;
@@ -70,6 +80,22 @@
 
         .fa-copy {
             position: absolute;
+        }
+    }
+
+    // TODO: move this to defaultcodeblock file?
+    .fullScreenButton {
+        $margin: 0.4em;
+        $hoverMargin: $margin - 0.2em;
+
+        background-color: transparent;
+        padding: 5px;
+        margin: $margin $margin 0 0;
+        transition: 0.2s;
+
+        &:hover {
+            font-size: 1.2em;
+            margin: $hoverMargin $hoverMargin 0 0;
         }
     }
 }

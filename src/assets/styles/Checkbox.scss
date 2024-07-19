@@ -2,7 +2,7 @@
 
 .Checkbox {
     border: 2px solid var(--codeGrey);
-    border-radius: 5px;
+    border-radius: var(--borderRadius);
     height: 30px;
     padding: 5px;
     width: 30px;

@@ -95,8 +95,10 @@ export default function BlockSettings({...props}: Props) {
 
             const firstSearchResult = $(componentRef.current!).find(".LanguageSearchResults input").first();
             firstSearchResult.trigger("focus");
-            setAreLanguageSearchResultsRendered(true)
-        }
+            setAreLanguageSearchResultsRendered(true);
+        
+        } else if (keyName === "Escape")
+            $(languageSearchBarRef.current!).trigger("blur");
     }
     
     
