@@ -477,12 +477,12 @@ export default function CodeBlockWithVariables({...props}: Props) {
 
         const keyName = event.key;
 
-        if (keyName === "Backspace")
-            handleBackspace(event);
+        if (keyName === "Backspace" || keyName === "Delete")
+            cleanUpEmptyInputDiv(event);
     }
 
 
-    function handleBackspace(event): void {
+    function cleanUpEmptyInputDiv(event): void {
 
         const inputDiv = $(inputDivRef.current!);
         const inputBreaks = inputDiv.find("br");

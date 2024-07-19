@@ -1,10 +1,8 @@
 .CodeBlock {
     margin: 3px;
     
-    // tag that <Editor> props are passed to
+    // = <Editor /> tag
     section {
-        max-height: 20vh;
-
         .vsCodeEditor {
             .minimap {
                 display: none;

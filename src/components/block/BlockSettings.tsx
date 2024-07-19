@@ -6,8 +6,10 @@ import Button from "../helpers/Button";
 import SearchBar from "../helpers/SearchBar";
 import LanguageSearchResults from "../LanguageSearchResults";
 import BlockSwitch from "./BlockSwitch";
-import { getCssConstant, getCSSValueAsNumber, log } from "../../helpers/utils";
+import { getCssConstant, getCSSValueAsNumber, includesIgnoreCase, log } from "../../helpers/utils";
 import { AppContext } from "../App";
+import { CODE_BLOCK_LANGUAGES } from "../../helpers/constants";
+import { DefaultBlockContext } from "./DefaultBlock";
 
 
 interface Props extends DefaultProps {
@@ -20,8 +22,15 @@ interface Props extends DefaultProps {
  */
 export default function BlockSettings({...props}: Props) {
     
-    const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
     const [areLanguageSearchResultsRendered, setAreLanguageSearchResultsRendered] = useState(false);
+
+    const { 
+        isShowBlockSettings, 
+        setIsShowBlockSettings,
+
+        setCodeBlockLanguage
+        
+    } = useContext(DefaultBlockContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockSettings");
 
@@ -47,7 +56,7 @@ export default function BlockSettings({...props}: Props) {
         // fake "toggle slide"
         blockSwitch.animate(
             {
-                width: isShowBlockSettings ? 0 : "136px",
+                width: isShowBlockSettings ? 0 : getCssConstant("blockSwitchWidth"),
                 opacity: isShowBlockSettings ? 0 : 1,
                 zIndex: isShowBlockSettings ? -1 : 0
             }, 
@@ -90,6 +99,7 @@ export default function BlockSettings({...props}: Props) {
 
         const keyName = event.key;
 
+        // TODO: does not work anymore
         if (keyName === "ArrowDown") {
             event.preventDefault();
 
@@ -99,6 +109,10 @@ export default function BlockSettings({...props}: Props) {
         
         } else if (keyName === "Escape")
             $(languageSearchBarRef.current!).trigger("blur");
+
+        // TODO: update search results
+            // do something like "no match" if no results
+            // sort alphabetically
     }
     
     
@@ -108,15 +122,30 @@ export default function BlockSettings({...props}: Props) {
     }
     
     
-    function handleLanguageSearchFocusOut(event): void {
+    function handleLanguageSearchBlur(event): void {
 
-        setAreLanguageSearchResultsRendered(false);
+        if (!includesIgnoreCase(event.target.className, "searchInput")) 
+            setAreLanguageSearchResultsRendered(false);
     }
 
 
     function handleLanguageSearchResultsFocusOut(event): void {
 
         setAreLanguageSearchResultsRendered(false);
+    }
+
+
+    function handleSelectLanguage(language: string): void {
+
+        // if is code block
+        setCodeBlockLanguage(language);
+
+        // else if is code block with variables
+        // TODO
+        
+        setAreLanguageSearchResultsRendered(false);
+
+        // TOOD: consider closing settings or making selection the search bar value
     }
     
 
@@ -143,13 +172,15 @@ export default function BlockSettings({...props}: Props) {
                 title="Search programming language"
                 tabIndex={isShowBlockSettings ? 0 : -1}
                 onFocus={handleLanguageSearchFocus}
-                onBlur={handleLanguageSearchFocusOut}
+                onBlur={handleLanguageSearchBlur}
                 onKeyDown={handleLanguageSearchKeyDown}
                 _focus={{borderColor: "var(--accentColor)"}}
                 _searchIcon={{padding: "2px"}} 
             >
                 <LanguageSearchResults 
                     rendered={areLanguageSearchResultsRendered} 
+                    possibleSearchResults={CODE_BLOCK_LANGUAGES}
+                    handleSelect={handleSelectLanguage}
                     onBlur={handleLanguageSearchResultsFocusOut}
                 />
             </SearchBar>

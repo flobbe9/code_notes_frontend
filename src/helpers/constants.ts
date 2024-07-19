@@ -79,8 +79,41 @@ export const CONSOLE_MESSAGES_TO_AVOID: (string | number)[] = [
 ];
 
 
-// Blocks
+// CodeBlockWithVariables
 export const VARIABLE_INPUT_SEQUENCE_REGEX = /^.*\$\[\[.*\]\].*$/;
 export const VARIABLE_INPUT_DEFAULT_PLACEHOLDER = "VARIABLE_NAME";
 export const VARIABLE_INPUT_START_SEQUENCE = "$[[";
 export const VARIABLE_INPUT_END_SEQUENCE = "]]";
+
+
+// CodeBlock
+export const CODE_BLOCK_LANGUAGES = [
+    "TypeScript",
+    "JavaScript",
+    "CSS",
+    "LESS",
+    "SCSS",
+    "JSON",
+    "HTML",
+    "XML",
+    "PHP",
+    "C#",
+    "C++",
+    "Razor",
+    "Markdown",
+    "Diff",
+    "Java",
+    "VB",
+    "CoffeeScript",
+    "Handlebars",
+    "Batch",
+    "Pug",
+    "F#",
+    "Lua",
+    "Powershell",
+    "Python",
+    "Ruby",
+    "SASS",
+    "R",
+    "Objective-C"
+]

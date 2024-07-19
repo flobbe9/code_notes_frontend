@@ -4,10 +4,15 @@ import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { moveCursor } from "../helpers/utils";
 import HelperDiv from "./helpers/HelperDiv";
 import HelperProps from "../abstract/HelperProps";
+import { getRandomString } from './../helpers/utils';
 
 
 interface Props extends HelperProps {
 
+    possibleSearchResults: string[],
+
+    /** Executed on result select */
+    handleSelect: (language: string) => void
 }
 
 
@@ -16,6 +21,8 @@ interface Props extends HelperProps {
  */
 export default function LanguageSearchResults({
     rendered = false,
+    possibleSearchResults = [],
+    handleSelect,
     ...props
 }: Props) {
 
@@ -52,13 +59,29 @@ export default function LanguageSearchResults({
 
     function handleFocus(event): void {
 
-        // prevent input value select on focus
-        moveCursor($(inputRef.current!), 0);
+        // prevent input text select on focus
+        moveCursor($(event.target), 0);
     }
 
 
     function handleKeyDown(event): void {
 
+    }
+
+
+    function mapResults(): JSX.Element[] {
+
+        return possibleSearchResults.map(result => {
+            return <input 
+                className="searchResult" 
+                readOnly 
+                value={result}
+                onFocus={handleFocus}
+                tabIndex={-1}
+                key={getRandomString()}
+                onClick={() => handleSelect(result)}
+            />
+        })
     }
 
 
@@ -71,62 +94,7 @@ export default function LanguageSearchResults({
             rendered={rendered}
             {...otherProps}
         >
-            <input 
-                className="searchResult" 
-                readOnly 
-                value="Java" 
-                ref={inputRef}
-                onFocus={handleFocus}
-                tabIndex={-1}
-            />
-            <input 
-                className="searchResult" 
-                readOnly 
-                value="Javascript" 
-                ref={inputRef}
-                onFocus={handleFocus}
-                tabIndex={-1}
-            />
-                        <input 
-                className="searchResult" 
-                readOnly 
-                value="Javascript" 
-                ref={inputRef}
-                onFocus={handleFocus}
-                tabIndex={-1}
-            />
-                        <input 
-                className="searchResult" 
-                readOnly 
-                value="Javascript" 
-                ref={inputRef}
-                onFocus={handleFocus}
-                tabIndex={-1}
-            />
-                        <input 
-                className="searchResult" 
-                readOnly 
-                value="Javascript" 
-                ref={inputRef}
-                onFocus={handleFocus}
-                tabIndex={-1}
-            />
-                        <input 
-                className="searchResult" 
-                readOnly 
-                value="Javascript" 
-                ref={inputRef}
-                onFocus={handleFocus}
-                tabIndex={-1}
-            />
-            <input 
-                className="searchResult" 
-                readOnly 
-                value="Javascript" 
-                ref={inputRef}
-                onFocus={handleFocus}
-                tabIndex={-1}
-            />
+            {mapResults()}
                 
             {children}
         </HelperDiv>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import "../../assets/styles/DefaultBlock.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
@@ -24,39 +24,66 @@ interface Props extends DefaultProps {
  */
 export default function DefaultBlock({...props}: Props) {
 
+    const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
+
+    // codeblock language state
+    const [codeBlockLanguage, setCodeBlockLanguage] = useState("");
+
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultBlock");
 
     const componentRef = useRef(null);
-   
+
+    const context = {
+        isShowBlockSettings, 
+        setIsShowBlockSettings,
+
+        codeBlockLanguage, 
+        setCodeBlockLanguage
+    }
+
     // TODO:
         // drag and drop?
         // pass block type in here
 
 
     return (
-        <Flex 
-            id={id} 
-            className={className}
-            style={style}
-            flexWrap="nowrap"
-            verticalAlign="start"
-            ref={componentRef}
-            {...otherProps}
-        >
-            <Flex className="blockContent fullWidth" flexWrap="nowrap">
-                {/* Block */}
-                <div className="defaultBlockChildren fullWidth">
-                    {children}
-                </div>
+        <DefaultBlockContext.Provider value={context}>
+            <Flex 
+                id={id} 
+                className={className}
+                style={style}
+                flexWrap="nowrap"
+                verticalAlign="start"
+                ref={componentRef}
+                {...otherProps}
+            >
+                <Flex className="blockContent fullWidth" flexWrap="nowrap">
+                    {/* Block */}
+                    <div className="defaultBlockChildren fullWidth">
+                        {children}
+                    </div>
 
-                {/* Delete block */}
-                <Button className="deleteBlockButton defaultBlockButton" title="Delete section">
-                    <i className="fa-solid fa-xmark"></i>
-                </Button>
+                    {/* Delete block */}
+                    <Button className="deleteBlockButton defaultBlockButton" title="Delete section">
+                        <i className="fa-solid fa-xmark"></i>
+                    </Button>
+                </Flex>
+
+                {/* Settings */}
+                {/* TODO: pass block type
+                            make block type enum
+                */}
+                <BlockSettings />
             </Flex>
-
-            {/* Settings */}
-            <BlockSettings />
-        </Flex>
+        </DefaultBlockContext.Provider>
     )
 }
+
+
+export const DefaultBlockContext = createContext({
+    isShowBlockSettings: false,
+    setIsShowBlockSettings: (isShow: boolean) => {},
+
+    codeBlockLanguage: "",
+    setCodeBlockLanguage: (language: string) => {}
+});

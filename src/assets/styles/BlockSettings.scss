@@ -1,3 +1,7 @@
+:root {
+    --blockSwitchWidth: 136px;
+}
+
 .BlockSettings {
     .BlockSwitch {
         // pseudo hidden to use fake "toggle slide". dont change "display" here because of <Flex>
