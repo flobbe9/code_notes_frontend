@@ -2,10 +2,11 @@ import React, { createContext, useEffect, useRef, useState } from 'react';
 import '../assets/styles/App.scss';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { getCSSValueAsNumber, isNumberFalsy, isStringFalsy, log, logWarn } from '../helpers/utils';
+import { getCSSValueAsNumber, isNumberFalsy, isStringFalsy, log, logWarn, stringToNumber } from '../helpers/utils';
 import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
 import useKeyPress from '../hooks/useKeyPress';
+import Overlay from './helpers/Overlay';
 
 
 /**
@@ -17,6 +18,8 @@ export default function App() {
     const [toastMessage, setToastMessage] = useState("");
     const [toastSevirity, setToastSevirity] = useState<ToastSevirity>("info");
     const [toastScreenTimeTimeout, setToastScreenTimeTimeout] = useState<NodeJS.Timeout>();
+
+    const [isAppOverlayVisible, setIsAppOverlayVisible] = useState(false);
 
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
@@ -36,7 +39,11 @@ export default function App() {
 
         isLoggedIn,
 
-        isKeyPressed
+        isKeyPressed,
+
+        toggleAppOverlay,
+        isAppOverlayVisible,
+        getAppOverlayZIndex
     }
 
     const toastRef = useRef(null);
@@ -53,7 +60,7 @@ export default function App() {
         }
 
     }, []);
-    
+
 
     /**
      * Set given text to toast and call ```toggle()``` on it.
@@ -154,10 +161,30 @@ export default function App() {
     }
 
 
+    function toggleAppOverlay(): void {
+
+        setIsAppOverlayVisible(!isAppOverlayVisible);
+    }
+    
+
+    function getAppOverlayZIndex(): number {
+
+        const appOverlay = $("#OverlayApp");
+
+        return stringToNumber(appOverlay.css("zIndex"));
+    }
+
+
     return (
         <AppContext.Provider value={context}>
             <BrowserRouter>
                 <div id="App" className="App">
+                    <Overlay 
+                        id="App"
+                        isOverlayVisible={isAppOverlayVisible} 
+                        setIsOverlayVisible={setIsAppOverlayVisible} 
+                    />
+
                     <NavBar />
 
                     <div className="content">
@@ -192,5 +219,9 @@ export const AppContext = createContext({
 
     isLoggedIn: false,
 
-    isKeyPressed: (keyName: string): boolean => {return false}
+    isKeyPressed: (keyName: string): boolean => {return false},
+
+    toggleAppOverlay: () => {},
+    isAppOverlayVisible: false,
+    getAppOverlayZIndex: () => {return 10 as number}
 });
