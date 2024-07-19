@@ -1,10 +1,9 @@
-import React, { CSSProperties, forwardRef, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "../../assets/styles/Button.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import { ButtonType } from "../../abstract/CSSTypes";
 import { isObjectFalsy, log } from "../../helpers/utils";
-import { AppContext } from "../App";
 
 
 interface Props extends HelperProps {

@@ -30,6 +30,7 @@ export default function DefaultBlock({...props}: Props) {
    
     // TODO:
         // drag and drop?
+        // pass block type in here
 
 
     return (
@@ -49,11 +50,12 @@ export default function DefaultBlock({...props}: Props) {
                 </div>
 
                 {/* Delete block */}
-                <Button className="deleteBlockButton defaultBlockButton hover" title="Delete section">
+                <Button className="deleteBlockButton defaultBlockButton" title="Delete section">
                     <i className="fa-solid fa-xmark"></i>
                 </Button>
             </Flex>
 
+            {/* Settings */}
             <BlockSettings />
         </Flex>
     )

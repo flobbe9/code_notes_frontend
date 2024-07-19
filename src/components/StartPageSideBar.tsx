@@ -20,7 +20,6 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 // IDEA: filter icon
-// TODO: slide breaks some elements
 export default function StartPageSideBar({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);

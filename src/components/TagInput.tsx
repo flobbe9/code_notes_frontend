@@ -20,7 +20,6 @@ export default function TagInput({...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagInput");
 
     const inputRef = useRef(null);
-    const hiddenInputRef = useRef(null);
 
             // input
                 // on key down
@@ -40,8 +39,7 @@ export default function TagInput({...props}: Props) {
     
     function handleEnterKey(event): void {
 
-        // unfocus
-        $(hiddenInputRef.current!).trigger("focus");
+        $(inputRef.current!).trigger("blur")
     }
 
         
@@ -53,9 +51,6 @@ export default function TagInput({...props}: Props) {
             flexWrap="nowrap"
             {...otherProps}
         >
-            {/* for shifting focus */}
-            <HiddenInput type={"radio"} ref={hiddenInputRef} tabIndex={-1} />
-
             <input 
                 type="text" 
                 className="tagInput"

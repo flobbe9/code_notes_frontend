@@ -13,11 +13,12 @@ interface Props extends HelperProps {
 /**
  * @since 0.0.1
  */
-// TODO: strip styles on copy paste
 export default forwardRef(function ContentEditableDiv(
     {
         disabled = false,
         onClick,
+        onFocus,
+        onBlur,
         rendered = true,
         title = "",
         _disabled = {
@@ -49,6 +50,9 @@ export default forwardRef(function ContentEditableDiv(
         }
 
         setIsFocus(true);
+
+        if (onFocus)
+            onFocus(event);
     }
 
 
@@ -58,6 +62,9 @@ export default forwardRef(function ContentEditableDiv(
             return;
         
         setIsFocus(false);
+
+        if (onBlur)
+            onBlur(event);
     }
 
 
