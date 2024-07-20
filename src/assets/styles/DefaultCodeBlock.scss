@@ -1,3 +1,5 @@
+@import "./global/functions.scss";
+
 .DefaultCodeBlock {
     background-color: var(--codeGrey);
     border-radius: var(--codeBorderRadius);
@@ -11,6 +13,23 @@
 
         .fa-copy {
             position: absolute;
+        }
+    }
+
+        
+    // TODO: move this to defaultcodeblock file?
+    .fullScreenButton {
+        $margin: 0.4em;
+        $hoverMargin: $margin - 0.2em;
+
+        background-color: transparent;
+        padding: 5px;
+        margin: $margin $margin 0 0;
+        transition: 0.2s;
+
+        @include customHover {
+            font-size: 1.2em;
+            margin: $hoverMargin $hoverMargin 0 0;
         }
     }
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../assets/styles/PlainTextBlock.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
@@ -25,8 +25,16 @@ export default function PlainTextBlock({...props}: Props) {
     const { isKeyPressed } = useContext(AppContext);
 
     const inputDivRef = useRef(null);
+    const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
 
-    useInitialStyles(".inputDiv", [["max-width", "width"]], 100);
+    
+    useInitialStyles(inputDivJQuery, [["max-width", "width"]], 100);
+
+
+    useEffect(() => {
+        setInputDivJQuery($(inputDivRef.current!));
+
+    }, []);
 
 
     function handleFocus(event): void {

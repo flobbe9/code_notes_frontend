@@ -11,6 +11,8 @@ import sanitize from "sanitize-html";
 import { VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_START_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
 import { AppContext } from "../App";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
+import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
+import { DefaultBlockContext } from "./DefaultBlock";
 
 
 interface Props extends DefaultProps {
@@ -19,12 +21,17 @@ interface Props extends DefaultProps {
 
 
 /**
+ * Component containing block with the less complex code editor but including variable inputs that are considered by the copy button.
+ * 
  * @since 0.0.1
  */
 export default function CodeBlockWithVariables({...props}: Props) {
 
     const [isFullScreen, setIsFullScreen] = useState(false);
     
+    const inputDivRef = useRef(null);
+    const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
+
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeBlockWithVariables");
     
     const { 
@@ -33,12 +40,17 @@ export default function CodeBlockWithVariables({...props}: Props) {
         isAppOverlayVisible, 
         getAppOverlayZIndex
     } = useContext(AppContext);
+
+    const { animateCopyIcon } = useContext(DefaultCodeBlockContext);
+
+
+    useInitialStyles(inputDivJQuery, [["max-width", "width"]], 100);
+
     
-    const inputDivRef = useRef(null);
-    const copyIconRef = useRef(null);
-
-
-    useInitialStyles(".inputDiv", [["max-width", "width"]], 100);
+    useEffect(() => {
+        setInputDivJQuery($(inputDivRef.current!));
+        
+    }, []);
 
 
     useEffect(() => {
@@ -396,25 +408,6 @@ export default function CodeBlockWithVariables({...props}: Props) {
 
         return values;
     }
-    
-
-    function animateCopyIcon(): void {
-
-        const copyIcon = $(copyIconRef.current!);
-
-        copyIcon.animate(
-            {
-                opacity: 0,
-                fontSize: "3em"
-            },
-            400,
-            "easeOutSine",
-            () => {
-                copyIcon.css("opacity", 1);
-                copyIcon.css("fontSize", "1em");
-            }
-        );
-    } 
 
 
     function handleFocus(event): void {
@@ -601,7 +594,7 @@ export default function CodeBlockWithVariables({...props}: Props) {
             {
                 top: 0,
             },
-            100,
+            300,
             "swing", 
             () => {
                 // reset to initial styles
@@ -648,8 +641,10 @@ export default function CodeBlockWithVariables({...props}: Props) {
                     title={isFullScreen ? "Normal screen" : "Fullscreen"}
                     onClick={toggleFullScreen}
                 >
-                    {!isFullScreen && <i className="fa-solid fa-up-right-and-down-left-from-center"></i>}
-                    {isFullScreen && <i className="fa-solid fa-down-left-and-up-right-to-center"></i>}
+                    {isFullScreen ?
+                        <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                        <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                    }
                 </Button>
 
                 {/* Add variable */}
@@ -668,7 +663,7 @@ export default function CodeBlockWithVariables({...props}: Props) {
                     title="Copy"
                     onClick={handleCopyClick}
                 >
-                    <i className="fa-solid fa-copy" ref={copyIconRef}></i>
+                    <i className="fa-solid fa-copy"></i>
                     <i className="fa-solid fa-copy"></i>
                 </Button>
             </Flex>

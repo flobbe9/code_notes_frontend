@@ -1,9 +1,9 @@
 .CodeBlock {
-    margin: 3px;
-    
     // = <Editor /> tag
     section {
         .vsCodeEditor {
+            margin: 3px;
+
             .minimap {
                 display: none;
             }

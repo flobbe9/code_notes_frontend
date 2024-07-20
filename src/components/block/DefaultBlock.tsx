@@ -25,6 +25,7 @@ interface Props extends DefaultProps {
 export default function DefaultBlock({...props}: Props) {
 
     const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
+    const [areBlockSettingsDisabled, setAreBlockSettingsDisabled] = useState(false);
 
     // codeblock language state
     const [codeBlockLanguage, setCodeBlockLanguage] = useState("");
@@ -36,6 +37,8 @@ export default function DefaultBlock({...props}: Props) {
     const context = {
         isShowBlockSettings, 
         setIsShowBlockSettings,
+        areBlockSettingsDisabled,
+        setAreBlockSettingsDisabled,
 
         codeBlockLanguage, 
         setCodeBlockLanguage
@@ -54,6 +57,7 @@ export default function DefaultBlock({...props}: Props) {
                 style={style}
                 flexWrap="nowrap"
                 verticalAlign="start"
+                horizontalAlign="center"
                 ref={componentRef}
                 {...otherProps}
             >
@@ -63,7 +67,7 @@ export default function DefaultBlock({...props}: Props) {
                         {children}
                     </div>
 
-                    {/* Delete block */}
+                    {/* Delete button */}
                     <Button className="deleteBlockButton defaultBlockButton" title="Delete section">
                         <i className="fa-solid fa-xmark"></i>
                     </Button>
@@ -73,7 +77,7 @@ export default function DefaultBlock({...props}: Props) {
                 {/* TODO: pass block type
                             make block type enum
                 */}
-                <BlockSettings />
+                <BlockSettings areBlockSettingsDisabled={areBlockSettingsDisabled} />
             </Flex>
         </DefaultBlockContext.Provider>
     )
@@ -83,6 +87,8 @@ export default function DefaultBlock({...props}: Props) {
 export const DefaultBlockContext = createContext({
     isShowBlockSettings: false,
     setIsShowBlockSettings: (isShow: boolean) => {},
+    areBlockSettingsDisabled: false,
+    setAreBlockSettingsDisabled: (areDisabled: boolean) => {},
 
     codeBlockLanguage: "",
     setCodeBlockLanguage: (language: string) => {}

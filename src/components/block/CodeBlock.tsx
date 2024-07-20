@@ -1,10 +1,15 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../assets/styles/CodeBlock.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { Editor, useMonaco } from "@monaco-editor/react";
-import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, log } from "../../helpers/utils";
+import { Editor } from "@monaco-editor/react";
+import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, log, setClipboardText } from "../../helpers/utils";
 import { DefaultBlockContext } from "./DefaultBlock";
 import { AppContext } from "../App";
+import Button from "../helpers/Button";
+import Flex from "../helpers/Flex";
+import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
+import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
+import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
 
 
 interface Props extends DefaultProps {
@@ -13,6 +18,13 @@ interface Props extends DefaultProps {
 
 
 /**
+ * Component containing the block with the complex code editor (vscode).
+ * 
+ * Width:
+ * 
+ * The editors width is animated on "toggle block settings" using "px" as unit. In any non-dynamic state the width unit must
+ * be "%" for it to adapt to window resize.
+ * 
  * @since 0.0.1
  */
 export default function CodeBlock({...props}: Props) {
@@ -25,74 +37,123 @@ export default function CodeBlock({...props}: Props) {
 
     const maxNumLines = 15;
 
-    // state init width
+    const [isEditorMounted, setIsEditorMounted] = useState(false);
     const [editorHeight, setEditorHeight] = useState(getInitialEditorHeight());
-    const [initEditorWidth, setInitEditorWidth] = useState<number>(NaN);
+    /** Refers to the editors width with collapsed block settings. Is updated on window resize. */
+    const [fullEditorWidth, setFullEditorWidth] = useState<number>(NaN);
     const [editorWidth, setEditorWidth] = useState("100%");
+    const [numEditorLines, setNumEditorLines] = useState(1);
 
-    const { getDeviceWidth } = useContext(AppContext);
+    const [isFullScreen, setIsFullScreen] = useState(false);
+
+    const { 
+        getDeviceWidth, 
+        toggleAppOverlay, 
+        isAppOverlayVisible, 
+        getAppOverlayZIndex 
+    } = useContext(AppContext);
+
     const { 
         isShowBlockSettings, 
-        
+        areBlockSettingsDisabled, 
+        setAreBlockSettingsDisabled, 
         codeBlockLanguage
     } = useContext(DefaultBlockContext);
 
-    const { isMobileWidth } = getDeviceWidth();
+    const { animateCopyIcon } = useContext(DefaultCodeBlockContext);
+
+    const { isTabletWidth } = getDeviceWidth();
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeBlock");
 
     const componentRef = useRef(null);
+    const editorRef = useRef(null);
+    const copyButtonRef = useRef(null);
+    const fullScreenButtonRef = useRef(null);
 
 
     useEffect(() => {
-        setTimeout(() => {
-            setInitEditorWidth(getEditor().width()!);
+        setAreBlockSettingsDisabled(true);
 
-        }, 100);
     }, []);
+
+
+    useEffect(() => {
+        if (isEditorMounted)
+            updateActualEditorHeight();
+
+    }, [editorHeight, numEditorLines]);
 
     
     useEffect(() => {
-        updateEditorHeight();
-
-    }, [editorHeight]);
-
-
-    useEffect(() => {
-        updateEditorWidth();
+        if (isEditorMounted)
+            updateActualEditorWidth(); 
 
     }, [editorWidth]);
 
 
     useEffect(() => {
         // case: init width has ben set
-        if (!isNumberFalsy(initEditorWidth))
+        if (!isNumberFalsy(fullEditorWidth))
             handleToggleBlockSettings();
 
-    }, [isShowBlockSettings])
+    }, [isShowBlockSettings]);
 
-    // TODO: 
-        // full screen
-        // height
-            // paste does not increase height enough
-                // count lines on control key
-                // break if min height is reached
-                // set editor height 
-        // width
-            // blank space on the right
+    
+    useEffect(() => {
+        $(window).on("keydown", handleGlobalKeyDown);
+
+        return () => {
+            $(window).off("keydown", handleGlobalKeyDown);
+        }
+
+    }, [isFullScreen, isAppOverlayVisible]);
+
+
+    useEffect(() => {
+        // deactivate full screen on overlay click
+        if (!isAppOverlayVisible && isFullScreen) 
+            deactivateFullScreen();
+
+    }, [isAppOverlayVisible]);
+
+
+    useEffect(() => {
+        if (!isEditorMounted)
+            return;
+        
+        updateFullEditorWidth();
+
+        setAreBlockSettingsDisabled(false);
+
+
+    }, [isEditorMounted])
+
+
+    useWindowResizeCallback(handleWindowResize);
+
 
     function handleChange(value: string, event): void {
 
-        setTimeout(() => {
-            updateEditorHeight();
-        }, 5);
+        if (!isFullScreen)
+            setTimeout(() => setNumEditorLines(getNumLines(value)), 5);
+    }
+
+
+    /**
+     * @param value complete content of the editor
+     * @returns the current number of lines inside the editor
+     */
+    function getNumLines(value: string): number {
+
+        return value.split("\n").length;
     }
 
 
     /**
      * Check if editor height still fits number of rendered lines and adjust if not.
      */
-    function updateEditorHeight(): void {
+    function updateActualEditorHeight(): void {
 
         const linesHeightComparison = compareEditorHeightToLinesHeight();
 
@@ -116,7 +177,7 @@ export default function CodeBlock({...props}: Props) {
     function compareEditorHeightToLinesHeight(): number {
 
         const linesHeight = getLinesHeight();
-        const heightDifference = editorHeight - linesHeight - (2 * editorLineHeight);
+        const heightDifference = editorHeight - linesHeight - (1 * editorLineHeight);
 
         // dont devide by 0
         if (heightDifference === 0)
@@ -126,11 +187,12 @@ export default function CodeBlock({...props}: Props) {
     }
 
 
+    /**
+     * @returns the total height of all lines inside the editor
+     */
     function getLinesHeight(): number {
 
-        const component = $(componentRef.current!);
-
-        return component.find(".view-lines .view-line").length * editorLineHeight;
+        return numEditorLines * editorLineHeight;
 
     }
     
@@ -148,12 +210,6 @@ export default function CodeBlock({...props}: Props) {
     function handleRemoveLine(): void {
 
         setEditorHeight(editorHeight - 19);
-    }
-
-
-    function getEditor(): JQuery {
-
-        return $(componentRef.current!).children("section");
     }
 
 
@@ -182,55 +238,268 @@ export default function CodeBlock({...props}: Props) {
 
         // case: show block settings
         if (isShowBlockSettings) {
-            const blockSwitchWidth = getCSSValueAsNumber(getCssConstant("blockSwitchWidth"), 2);
-            const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
-            const blockSettingsWidth = blockSwitchWidth + languageSearchBarWidth;
-
+            const fullEditorWidth = updateFullEditorWidth();
+            const blockSettingsWidth = getBlockSettingsWidth();
             const randomOffset = 3; // is a wild guess, depneds on the block settings' width and margin etc
 
             // if mobile use only language search bar width, since settings will wrap
-            const newEditorWidth = initEditorWidth - (isMobileWidth ? languageSearchBarWidth : blockSettingsWidth) + randomOffset; 
+            const newEditorWidth = fullEditorWidth - blockSettingsWidth + randomOffset; 
 
             setEditorWidth(newEditorWidth + "px");
         
         // case: hide block settings
         } else
-            setEditorWidth(initEditorWidth + "px");
+            setEditorWidth(fullEditorWidth + "px");
     }
 
 
     /**
      * Animate the width of the editor to ```editorWidth```.
      */ 
-    function updateEditorWidth(): void {
+    function updateActualEditorWidth(): void {
 
-        getEditor().animate(
-            {
-                width: editorWidth,
-            },
-            isShowBlockSettings ? 0 : 300,
-            "swing"
+        const editor = getOuterEditorContainer();
+
+        editor.animate(
+            { width: editorWidth },
+            isShowBlockSettings ? 0 : BLOCK_SETTINGS_ANIMATION_DURATION,
+            "swing",
+            () => {
+                // wait for block settings animation to finish, even though editor is done
+                setTimeout(() => {
+                    getOuterEditorContainer().css("width", "98%")
+                }, isShowBlockSettings ? BLOCK_SETTINGS_ANIMATION_DURATION : 0);
+            }
         )
     }
 
 
+    function handleWindowResize(): void {
+
+        if (isShowBlockSettings)
+            setFullEditorWidth(getOuterEditorContainer().width()! - getBlockSettingsWidth());
+
+        else
+            updateFullEditorWidth();
+    }
+
+
+    /**
+     * @returns the most outer container (a ```<section>```) of the monaco editor. The ```editorRef``` is somewhere deeper inside
+     */
+    function getOuterEditorContainer(): JQuery {
+
+        return $(componentRef.current!).find("section").first();
+    }
+
+
+    async function handleCopyClick(event): Promise<void> {
+
+        animateCopyIcon();
+
+        setClipboardText((editorRef.current as any).getValue())
+    }
+
+
+    function handleEditorMount(editor, monaco): void {
+
+        // assign ref
+        (editorRef.current as any) = editor;
+
+        setIsEditorMounted(true);
+    }
+
+
+    /**
+     * Update ```fullEditorWidth``` state with the current outer width of the editor container in px.
+     */
+    function updateFullEditorWidth(): number {
+
+        const newFullEditorWidth = getOuterEditorContainer().width()!;
+
+        setFullEditorWidth(newFullEditorWidth);
+
+        return newFullEditorWidth;
+    }
+
+    
+
+    function toggleFullScreen(event): void {
+
+        if (isFullScreen)
+            deactivateFullScreen();
+        else
+            activateFullscreen();
+    }
+
+
+    function activateFullscreen(): void {
+
+        activateFullScreenStyles();
+
+        setIsFullScreen(true);
+
+        toggleAppOverlay();
+
+        $(editorRef.current!).trigger("focus");
+    }
+
+
+    function deactivateFullScreen() {
+
+        deactivateFullScreenStyles();
+
+        setIsFullScreen(false);
+
+        if (isAppOverlayVisible)
+            toggleAppOverlay();
+    }
+
+    
+    function handleGlobalKeyDown(event): void {
+
+        const keyName = event.key;
+
+        if (keyName === "Escape") 
+            handleEscape(event);
+    }
+
+
+    function handleEscape(event): void {
+
+        if (isFullScreen)
+            deactivateFullScreen();
+    }
+    
+
+    function activateFullScreenStyles(): void {
+
+        const editor = getOuterEditorContainer();
+        const blockContent = editor.parents(".blockContent");
+
+        const appOverlayZIndex = getAppOverlayZIndex();
+        
+        blockContent.animate(
+            { width: "90vw" },
+            100,
+            "swing",
+            () => editor.css({
+                width: "100%"
+            })
+        );
+
+        blockContent.css({
+            position: "fixed",
+            zIndex: appOverlayZIndex + 1
+        });
+
+        blockContent.animate({top: "90px"}, 300);
+
+        editor.animate({height: "80vh"});
+    }
+
+
+    function deactivateFullScreenStyles(): void {
+
+        const editor = getOuterEditorContainer();
+        const blockContent = editor.parents(".blockContent");
+        
+        // move up just a little bit
+        blockContent.css({
+            position: "relative",
+            top: "30px",
+        });
+        
+        // resize quickly
+        blockContent.css({
+            width: "100%"
+        });
+        editor.css({
+            height: editorHeight,
+            width: isShowBlockSettings ? editorWidth : fullEditorWidth
+        });
+
+        // animate to start pos
+        blockContent.animate(
+            {
+                top: 0,
+            },
+            300,
+            "swing", 
+            () => {
+                // reset to initial styles
+                blockContent.css({
+                    position: "static",
+                    top: "auto",
+                    zIndex: 0
+                });
+            }
+        )
+    }
+
+
+    /**
+     * @returns the width of the expanded block settings, not including the toggle button and considering
+     *          mobile mode.
+     */
+    function getBlockSettingsWidth(): number {
+
+        const blockSwitchWidth = getCSSValueAsNumber(getCssConstant("blockSwitchWidth"), 2);
+        const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
+        
+        return (isTabletWidth ? 0 : blockSwitchWidth) + languageSearchBarWidth;
+    }
+
+
     return (
-        <div 
+        <Flex 
             id={id} 
             className={className + " fullWidth"}
             style={style}
             ref={componentRef}
+            flexWrap="nowrap"
             {...otherProps}
         >
-            <Editor 
-                className="vsCodeEditor" 
-                height={editorHeight} 
-                width={"100%"}
-                onChange={handleChange}
-                language={codeBlockLanguage.toLowerCase()}
-            />
+            {/* Editor */}
+            <div className="fullWidth">
+                <Editor 
+                    className="vsCodeEditor" 
+                    height={editorHeight} 
+                    width={"98%"}
+                    onChange={handleChange}
+                    language={codeBlockLanguage.toLowerCase()}
+                    onMount={handleEditorMount}
+                />
+            </div>
+
+            {/* Fullscreen button */}
+            <div style={{position: "relative"}}>
+                <Button 
+                    className={"fullScreenButton"}
+                    title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                    disabled={areBlockSettingsDisabled}
+                    ref={fullScreenButtonRef}
+                    onClick={toggleFullScreen}
+                >
+                    {isFullScreen ?
+                        <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                        <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                    }
+                </Button>
+            </div>
+
+            {/* Copy button */}
+            <Button
+                className="defaultBlockButton hover copyButton fullHeight"
+                title="Copy"
+                ref={copyButtonRef}
+                onClick={handleCopyClick}
+            >
+                <i className="fa-solid fa-copy"></i>
+                <i className="fa-solid fa-copy"></i>
+            </Button>
                 
             {children}
-        </div>
+        </Flex>
     )
 }

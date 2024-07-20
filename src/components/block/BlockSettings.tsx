@@ -8,19 +8,21 @@ import LanguageSearchResults from "../LanguageSearchResults";
 import BlockSwitch from "./BlockSwitch";
 import { getCssConstant, getCSSValueAsNumber, includesIgnoreCase, log } from "../../helpers/utils";
 import { AppContext } from "../App";
-import { CODE_BLOCK_LANGUAGES } from "../../helpers/constants";
+import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES } from "../../helpers/constants";
 import { DefaultBlockContext } from "./DefaultBlock";
 
 
 interface Props extends DefaultProps {
 
+    /** Applies to the toggle button. Default should be ```false``` */
+    areBlockSettingsDisabled: boolean
 }
 
 
 /**
  * @since 0.0.1
  */
-export default function BlockSettings({...props}: Props) {
+export default function BlockSettings({areBlockSettingsDisabled, ...props}: Props) {
     
     const [areLanguageSearchResultsRendered, setAreLanguageSearchResultsRendered] = useState(false);
 
@@ -41,7 +43,7 @@ export default function BlockSettings({...props}: Props) {
     // IDEA: make custom colors and pass them to buttons as border color
 
     const { getDeviceWidth } = useContext(AppContext);
-    const { isMobileWidth } = getDeviceWidth();
+    const { isTabletWidth } = getDeviceWidth();
 
 
     function toggleBlockSwitch(): void {
@@ -60,7 +62,7 @@ export default function BlockSettings({...props}: Props) {
                 opacity: isShowBlockSettings ? 0 : 1,
                 zIndex: isShowBlockSettings ? -1 : 0
             }, 
-            300,
+            BLOCK_SETTINGS_ANIMATION_DURATION,
             "swing",
             // radio buttons to absolute so they dont widen the container width
             () => blockSwitch.children(".RadioButton").css("position", (isShowBlockSettings ? "absolute" : "static"))
@@ -80,7 +82,7 @@ export default function BlockSettings({...props}: Props) {
                 opacity: isShowBlockSettings ? 0 : 1,
                 zIndex: isShowBlockSettings ? -1 : 1
             }, 
-            300,
+            BLOCK_SETTINGS_ANIMATION_DURATION,
             "swing"
         )
     }
@@ -155,9 +157,9 @@ export default function BlockSettings({...props}: Props) {
             className={className}
             style={style}
             verticalAlign="start"
-            horizontalAlign={isMobileWidth ? "right" : "center"}
+            horizontalAlign={isTabletWidth ? "right" : "center"}
             // wrap for mobile view
-            flexWrap={isMobileWidth && isShowBlockSettings ? "wrap" : "nowrap"}
+            flexWrap={isTabletWidth && isShowBlockSettings ? "wrap" : "nowrap"}
             ref={componentRef}
             {...otherProps}
         >
@@ -190,6 +192,7 @@ export default function BlockSettings({...props}: Props) {
                 className="toggleBlockSettingsButton transition" 
                 style={{backgroundColor: isShowBlockSettings ? "var(--codeGrey)" : "transparent"}}
                 title="Section settings"
+                disabled={areBlockSettingsDisabled}
                 onClick={toggleBlockSettings}
                 _hover={isShowBlockSettings ? {} : {backgroundColor: "buttonFace"}}
             >

@@ -5,18 +5,18 @@ import { AppContext } from "../components/App";
 
 
 /**
- * On render set value of ```cssAttributeToChange``` to value of ```cssAttributeToUse```:
+ * As soon as given ```element``` is present, set value of ```cssAttributeToChange``` to value of ```cssAttributeToUse```:
  * 
- * ```$(elementIdentifier).css(cssAttributeToChange, element.css(cssAttributeToUse));```.
+ * ```element.css(cssAttributeToChange, element.css(cssAttributeToUse));```.
  * 
  * Uses {@link AppContext}.
  * 
- * @param elementIdentifier of element to set the styles for. Will be used like ```element = $(elementIdentifier)```
+ * @param element to set the styles for. May be an uninitialized jquery object from a state
  * @param cssAttributes touples formatted like ```[cssAttributeToChange, cssAttributeToUse]```.
  * @param timeout milliseconds after which to set the styles. Default is 0
  */
 export function useInitialStyles(
-    elementIdentifier: string, 
+    element: JQuery,
     cssAttributes: [string, string][],
     timeout = 0
 ) {
@@ -25,11 +25,9 @@ export function useInitialStyles(
 
 
     useEffect(() => {
-        checkElementIdentifier();
-
         setInitialStyle();
 
-    }, []);
+    }, [element]);
 
 
     useEffect(() => {
@@ -62,27 +60,18 @@ export function useInitialStyles(
 
 
     /**
-     * Log a warning message if ```elementIdentifier``` is invalid.
-     */
-    function checkElementIdentifier(): void {
-
-        const element = $(elementIdentifier);
-
-        // case: falsy element
-        if (!element || !element.length) 
-            logWarn(`'useInitialStyle' failed. Element with 'elementIdentifier' ${elementIdentifier} is falsy`);
-    }
-
-
-    /**
      * Iterate attributes and execute ```callback``` on all of them. 
      * 
      * @param callback to execute
      */
     function attributesCallback(callback: (cssAttributeToChange: string, cssAttributeToUse: string, element: JQuery) => any): any {
 
+        // case: element not present (yet)
+        if (!element.length)
+            return;
+
         cssAttributes.forEach(touple => {
-            callback(touple[0], touple[1], $(elementIdentifier));
+            callback(touple[0], touple[1], element);
         });
     }
 }

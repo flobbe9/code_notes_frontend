@@ -117,3 +117,8 @@ export const CODE_BLOCK_LANGUAGES = [
     "R",
     "Objective-C"
 ]
+
+
+// Other
+/** Time the block settings slide animation takes (in ms). */
+export const BLOCK_SETTINGS_ANIMATION_DURATION = 300;

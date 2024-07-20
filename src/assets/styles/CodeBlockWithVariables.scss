@@ -71,31 +71,4 @@
             font-weight: bold;
         }
     }
-    
-    // TODO: move this to defaultcodeblock file?
-    .copyButton {
-        border-radius: 0;
-        min-height: 2em;
-        padding: 0.5rem 1rem !important;
-
-        .fa-copy {
-            position: absolute;
-        }
-    }
-
-    // TODO: move this to defaultcodeblock file?
-    .fullScreenButton {
-        $margin: 0.4em;
-        $hoverMargin: $margin - 0.2em;
-
-        background-color: transparent;
-        padding: 5px;
-        margin: $margin $margin 0 0;
-        transition: 0.2s;
-
-        &:hover {
-            font-size: 1.2em;
-            margin: $hoverMargin $hoverMargin 0 0;
-        }
-    }
 }

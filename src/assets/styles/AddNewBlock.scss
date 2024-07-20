@@ -1,4 +1,8 @@
 .AddNewBlock {
+    .Button {
+        border-radius: var(--codeBorderRadius);
+    }
+    
     .fa-plus {
         background-color: white;
         border-radius: 100%;

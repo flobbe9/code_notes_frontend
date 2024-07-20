@@ -3,6 +3,7 @@ import "../../assets/styles/Overlay.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import HelperDiv from "./HelperDiv";
+import { log } from "../../helpers/utils";
 
 
 interface Props extends HelperProps {
@@ -35,6 +36,7 @@ export default forwardRef(function Overlay(
     }: Props,
     ref: Ref<HTMLDivElement>
 ) {
+
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Overlay");
 
     const componentRef = useRef(null);
@@ -50,9 +52,51 @@ export default forwardRef(function Overlay(
     }, [hideOnEscape]);
 
 
+    useEffect(() => {
+        handleStateChange(isOverlayVisible);
+
+    }, [isOverlayVisible]);
+
+
     function hideOverlay(): void {
 
+        const overlay = $(componentRef.current!);
+
         setIsOverlayVisible(false);
+
+        overlay.animate(
+            {
+                opacity: 0,
+            },
+            200,
+            "swing",
+            () => overlay.hide()
+        );
+
+    }
+
+
+    function showOverlay(): void {
+
+        const overlay = $(componentRef.current!);
+
+        setIsOverlayVisible(true);
+
+        overlay.show();
+
+        overlay.animate({
+            opacity: 0.3
+        });
+    }
+
+
+    function handleStateChange(isOverlayVisible: boolean): void {
+
+        if (isOverlayVisible)
+            showOverlay();
+
+        else
+            hideOverlay();
     }
 
 
@@ -88,7 +132,6 @@ export default forwardRef(function Overlay(
             className={className}
             style={style}
             ref={componentRef}
-            rendered={isOverlayVisible}
             onClick={handleClick}
             {...otherProps}
         >
