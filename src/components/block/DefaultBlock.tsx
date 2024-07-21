@@ -29,6 +29,7 @@ export default function DefaultBlock({...props}: Props) {
 
     // codeblock language state
     const [codeBlockLanguage, setCodeBlockLanguage] = useState("");
+    // code block with vars language
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultBlock");
 

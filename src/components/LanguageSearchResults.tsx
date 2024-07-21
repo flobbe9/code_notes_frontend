@@ -35,6 +35,7 @@ export default function LanguageSearchResults({
     // TODO
         // pass list
         // default value = selected element
+        // add option "none"
         // on search result select
             // set input value
             // hide search results

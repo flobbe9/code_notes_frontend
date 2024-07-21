@@ -20,12 +20,15 @@ interface Props extends DefaultProps {
  */
 export default function StartPageContainer({children, ...props}: Props) {
 
+    const [isShowSideBar, setIsShowSideBar] = useState(false);
     const [startPageSidebarWidth, setStartPageSideBarWidth] = useState<string>();
     const [startPageContentWidth, setStartPageContentWidth] = useState<string>();
 
     const { windowSize } = useContext(AppContext);
 
     const context = {
+        isShowSideBar, 
+        setIsShowSideBar,
         setStartPageSideBarWidth
     }
 
@@ -58,7 +61,7 @@ export default function StartPageContainer({children, ...props}: Props) {
 
 
     return (
-        <StartPageContext.Provider value={context} {...props}>
+        <StartPageContainerContext.Provider value={context} {...props}>
             <Flex flexWrap="nowrap">
                 <StartPageSideBar />
 
@@ -66,12 +69,13 @@ export default function StartPageContainer({children, ...props}: Props) {
             </Flex>
 
             {children}
-        </StartPageContext.Provider>
+        </StartPageContainerContext.Provider>
     )
 }
 
 
-export const StartPageContext = createContext({
-
+export const StartPageContainerContext = createContext({
+    isShowSideBar: false, 
+    setIsShowSideBar: (isShow: boolean) => {},
     setStartPageSideBarWidth: (width: string | undefined) => {}
 });

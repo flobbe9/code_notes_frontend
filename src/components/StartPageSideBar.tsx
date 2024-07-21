@@ -7,7 +7,7 @@ import { JQueryEasing } from "../abstract/CSSTypes";
 import { getCssConstant, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import StartPageSideBarTagList from "./StartPageSideBarTagList";
-import { StartPageContext } from "./StartPageContainer";
+import { StartPageContainerContext } from "./StartPageContainer";
 import Button from "./helpers/Button";
 
 
@@ -28,7 +28,11 @@ export default function StartPageSideBar({...props}: Props) {
     const tagFilterContainerRef = useRef(null);
 
     const { getDeviceWidth, isKeyPressed } = useContext(AppContext);
-    const { setStartPageSideBarWidth } = useContext(StartPageContext);
+    
+    const { 
+        setStartPageSideBarWidth,
+        setIsShowSideBar
+    } = useContext(StartPageContainerContext);
 
 
     useEffect(() => {
@@ -42,6 +46,8 @@ export default function StartPageSideBar({...props}: Props) {
 
 
     function slideInTagFilterContainer(duration = 100, easing: JQueryEasing = "easeOutSine"): void {
+
+        setIsShowSideBar(true);
 
         const tagFilterContainer = $(tagFilterContainerRef.current!);
 
@@ -62,6 +68,8 @@ export default function StartPageSideBar({...props}: Props) {
 
 
     function slideOutTagFilterContainer(duration = 100, easing: JQueryEasing = "easeInSine"): void {
+
+        setIsShowSideBar(false);
 
         const tagFilterContainer = $(tagFilterContainerRef.current!);
 
@@ -127,7 +135,7 @@ export default function StartPageSideBar({...props}: Props) {
             {...otherProps}
         >
             <Flex className="fullHeight" flexWrap="nowrap">
-                {/* Toolbar */}
+                {/* Toolbar button */}
                 <div className="toolBar">
                     <Button className="toolBarToggleButton hover" onClick={toggleTagFilterContainer}>
                         <i className="fa-solid fa-bars fa-xl" title="Side bar (Ctrl + B)"></i>

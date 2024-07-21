@@ -10,6 +10,7 @@ import Flex from "../helpers/Flex";
 import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
 import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
+import { StartPageContainerContext } from "../StartPageContainer";
 
 
 interface Props extends DefaultProps {
@@ -27,6 +28,10 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
+// TODO: 
+    // change theme (settings)
+        // adjust some css classes
+    // toggle minimap ? (settings)
 export default function CodeBlock({...props}: Props) {
 
     /** Height of one line of the monaco vscode editor in px */
@@ -42,6 +47,7 @@ export default function CodeBlock({...props}: Props) {
     /** Refers to the editors width with collapsed block settings. Is updated on window resize. */
     const [fullEditorWidth, setFullEditorWidth] = useState<number>(NaN);
     const [editorWidth, setEditorWidth] = useState("100%");
+    const [editorTransition, setEditorTransition] = useState(0);
     const [numEditorLines, setNumEditorLines] = useState(1);
 
     const [isFullScreen, setIsFullScreen] = useState(false);
@@ -62,7 +68,9 @@ export default function CodeBlock({...props}: Props) {
 
     const { animateCopyIcon } = useContext(DefaultCodeBlockContext);
 
-    const { isTabletWidth } = getDeviceWidth();
+    const { isShowSideBar } = useContext(StartPageContainerContext);
+
+    const { isMobileWidth, isTabletWidth } = getDeviceWidth();
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeBlock");
 
@@ -98,6 +106,14 @@ export default function CodeBlock({...props}: Props) {
             handleToggleBlockSettings();
 
     }, [isShowBlockSettings]);
+
+
+    useEffect(() => {
+        // case: init width has ben set
+        if (!isNumberFalsy(fullEditorWidth))
+            handleToggleSideBar();
+
+    }, [isShowSideBar]);
 
     
     useEffect(() => {
@@ -245,7 +261,30 @@ export default function CodeBlock({...props}: Props) {
             // if mobile use only language search bar width, since settings will wrap
             const newEditorWidth = fullEditorWidth - blockSettingsWidth + randomOffset; 
 
+            setEditorTransition(0);
             setEditorWidth(newEditorWidth + "px");
+        
+        // case: hide block settings
+        } else {
+            setEditorTransition(BLOCK_SETTINGS_ANIMATION_DURATION);
+            setEditorWidth(fullEditorWidth + "px");
+        }
+    }
+
+
+    /**
+     * Increase or decrease the editors width by the ```<StartPageSideBar>``` width depending on whether the it's visible or not.
+     */
+    function handleToggleSideBar(): void {
+
+        setEditorTransition(0);
+
+        // case: show side bar
+        if (isShowSideBar) {
+            const fullEditorWidth = updateFullEditorWidth();
+            const sideBarWidth = getSideBarWidth();
+
+            setEditorWidth(fullEditorWidth - sideBarWidth + "px");
         
         // case: hide block settings
         } else
@@ -254,7 +293,7 @@ export default function CodeBlock({...props}: Props) {
 
 
     /**
-     * Animate the width of the editor to ```editorWidth```.
+     * Animate the width of the editor to ```editorWidth``` using ```editorTransition``` as animation duration.
      */ 
     function updateActualEditorWidth(): void {
 
@@ -262,13 +301,13 @@ export default function CodeBlock({...props}: Props) {
 
         editor.animate(
             { width: editorWidth },
-            isShowBlockSettings ? 0 : BLOCK_SETTINGS_ANIMATION_DURATION,
+            editorTransition,
             "swing",
             () => {
-                // wait for block settings animation to finish, even though editor is done
+                // wait for other animations to finish, even though editor is done
                 setTimeout(() => {
                     getOuterEditorContainer().css("width", "98%")
-                }, isShowBlockSettings ? BLOCK_SETTINGS_ANIMATION_DURATION : 0);
+                }, 500);
             }
         )
     }
@@ -451,6 +490,20 @@ export default function CodeBlock({...props}: Props) {
     }
 
 
+    /**
+     * @returns the width of the expanded side bart, not including the toggle button and considering
+     *          mobile mode.
+     */
+    function getSideBarWidth(): number {
+
+        // if is mobile
+        if (isMobileWidth) 
+            return $(window).width()! * 0.3; // startPageSideBarWidthWidthMobile = 30vw
+        
+        return getCSSValueAsNumber(getCssConstant("startPageSideBarWidth"), 2);
+    }
+
+
     return (
         <Flex 
             id={id} 
@@ -460,33 +513,36 @@ export default function CodeBlock({...props}: Props) {
             flexWrap="nowrap"
             {...otherProps}
         >
-            {/* Editor */}
-            <div className="fullWidth">
-                <Editor 
-                    className="vsCodeEditor" 
-                    height={editorHeight} 
-                    width={"98%"}
-                    onChange={handleChange}
-                    language={codeBlockLanguage.toLowerCase()}
-                    onMount={handleEditorMount}
-                />
-            </div>
+            <Flex className="fullWidth" style={{backgroundColor: "var(--vsCodeBlack)"}} flexWrap="nowrap">
+                {/* Editor */}
+                <div className="fullWidth">
+                    <Editor 
+                        className="vsCodeEditor" 
+                        height={editorHeight} 
+                        width={"98%"}
+                        language={codeBlockLanguage.toLowerCase()}
+                        theme="vs-dark"
+                        onChange={handleChange}
+                        onMount={handleEditorMount}
+                    />
+                </div>
 
-            {/* Fullscreen button */}
-            <div style={{position: "relative"}}>
-                <Button 
-                    className={"fullScreenButton"}
-                    title={isFullScreen ? "Normal screen" : "Fullscreen"}
-                    disabled={areBlockSettingsDisabled}
-                    ref={fullScreenButtonRef}
-                    onClick={toggleFullScreen}
-                >
-                    {isFullScreen ?
-                        <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
-                        <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
-                    }
-                </Button>
-            </div>
+                {/* Fullscreen button */}
+                <div style={{position: "relative"}}>
+                    <Button 
+                        className={"fullScreenButton"}
+                        title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                        disabled={areBlockSettingsDisabled}
+                        ref={fullScreenButtonRef}
+                        onClick={toggleFullScreen}
+                    >
+                        {isFullScreen ?
+                            <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                            <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        }
+                    </Button>
+                </div>
+            </Flex>
 
             {/* Copy button */}
             <Button

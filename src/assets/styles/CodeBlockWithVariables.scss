@@ -5,6 +5,11 @@
 }
 
 .CodeBlockWithVariables {
+    background-color: var(--codeGrey);
+    border-radius: var(--codeBorderRadius);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+
     .inputDivContainer {
         margin: 0;
 
@@ -47,7 +52,8 @@
     }
 
     .addVariableButton {
-        background-color: rgb(177, 177, 177);
+        background-color: rgb(192, 192, 192);
+        background-color: white;
         border-radius: 0;
         color: black;
         text-wrap: nowrap;

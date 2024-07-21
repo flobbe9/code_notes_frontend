@@ -1,13 +1,18 @@
 @import "./global/functions.scss";
 
 .DefaultCodeBlock {
-    background-color: var(--codeGrey);
+    background-color: white;
+    border: 2px solid var(--codeGrey);
     border-radius: var(--codeBorderRadius);
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    padding: 2px;
     
     .copyButton {
+        background-color: rgb(230, 230, 230);
         border-radius: 0;
+        border-top-right-radius: var(--borderRadius);
+        border-bottom-right-radius: var(--borderRadius);
         min-height: 2em;
         padding: 0.5rem 1rem !important;
 
@@ -16,19 +21,22 @@
         }
     }
 
-        
-    // TODO: move this to defaultcodeblock file?
     .fullScreenButton {
+        $fontSize: 0.8em;
+        $hoverFontSize: 1em;
+        $fontSizeDiff: $hoverFontSize - $fontSize + 0.1em;
+
         $margin: 0.4em;
-        $hoverMargin: $margin - 0.2em;
+        $hoverMargin: $margin - $fontSizeDiff;
 
         background-color: transparent;
+        font-size: $fontSize;
         padding: 5px;
         margin: $margin $margin 0 0;
-        transition: 0.2s;
+        transition: 0.1s;
 
         @include customHover {
-            font-size: 1.2em;
+            font-size: $hoverFontSize;
             margin: $hoverMargin $hoverMargin 0 0;
         }
     }

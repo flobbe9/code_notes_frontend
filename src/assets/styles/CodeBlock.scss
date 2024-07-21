@@ -1,7 +1,19 @@
 .CodeBlock {
+    border-radius: var(--codeBorderRadius);
+    border-top-right-radius: var(--borderRadius);
+    border-bottom-right-radius: var(--borderRadius);
+
+    .fullScreenButton {
+        color: white;
+    }
+
+    .copyButton {
+    }
+
     // = <Editor /> tag
     section {
         .vsCodeEditor {
+            background-color: var(--vsCodeBlack);
             margin: 3px;
 
             .minimap {
@@ -10,12 +22,9 @@
 
             // line number container
             .margin {
-                background-color: var(--codeGrey);
             }
 
             .lines-content {
-                background-color: var(--codeGrey);
-
                 // line container
                 .view-lines {
                     

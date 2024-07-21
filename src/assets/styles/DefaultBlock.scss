@@ -8,10 +8,10 @@
         border-radius: var(--borderRadius);
 
         .deleteBlockButton {
+            background-color: var(--codeGrey);
             border-radius: var(--borderRadius);
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
-            background-color: rgb(150, 150, 150);
 
             &:hover {
                 background-color: rgb(184, 184, 184);

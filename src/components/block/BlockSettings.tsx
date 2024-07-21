@@ -183,6 +183,7 @@ export default function BlockSettings({areBlockSettingsDisabled, ...props}: Prop
                     rendered={areLanguageSearchResultsRendered} 
                     possibleSearchResults={CODE_BLOCK_LANGUAGES}
                     handleSelect={handleSelectLanguage}
+                    // TODO: does this work?
                     onBlur={handleLanguageSearchResultsFocusOut}
                 />
             </SearchBar>

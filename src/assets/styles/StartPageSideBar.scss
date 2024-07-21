@@ -1,11 +1,11 @@
 @import "./global/functions.scss";
 
 :root {
-    --startPageSideBarWidthWidthMobile: 30vw;
     --iconColor: rgb(179, 179, 179);
     --placeHolderColor: rgba(255, 255, 255, 0.582);
-    --tagFilterContainerPadding: 1rem;
     --startPageSideBarWidth: 200px;
+    --startPageSideBarWidthWidthMobile: 30vw; // hardcoded in CodeBlock
+    --tagFilterContainerPadding: 1rem;
 }
 
 .StartPageSideBar {

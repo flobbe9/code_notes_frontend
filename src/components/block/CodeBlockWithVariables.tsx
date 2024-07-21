@@ -92,18 +92,13 @@ export default function CodeBlockWithVariables({...props}: Props) {
     /**
      * Highlight inner content of input. Also add ```<input>```s if necessary.
      */
-    // TODO: 
-        // recursive
-        // cover inner childs one by one
-        // (?)
     function highlightInputDivContent(): void {
         
         const inputDiv = $(inputDivRef.current!);
         const inputChildren = inputDiv.children();
 
-        // TODO: make this a helper
+        // case: first line is not a node
         const firstLine = getFirstInputDivContentLine();
-
         let highlightedHtmlString = "";
 
         // case: first line with inputs
@@ -660,14 +655,14 @@ export default function CodeBlockWithVariables({...props}: Props) {
                 {/* Copy */}
                 <Button
                     className="defaultBlockButton hover copyButton fullHeight"
-                    title="Copy"
+                    title="Copy with variables"
                     onClick={handleCopyClick}
                 >
                     <i className="fa-solid fa-copy"></i>
                     <i className="fa-solid fa-copy"></i>
                 </Button>
             </Flex>
-                
+            
             {children}
         </Flex>
     )
