@@ -14,6 +14,8 @@ import Overlay from './helpers/Overlay';
  */
 export default function App() {
 
+    // TODO appUser state
+
     const [toastSummary, setToastSummary] = useState("");
     const [toastMessage, setToastMessage] = useState("");
     const [toastSevirity, setToastSevirity] = useState<ToastSevirity>("info");

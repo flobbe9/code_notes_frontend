@@ -4,7 +4,6 @@ import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import { log } from "../helpers/utils";
-import HiddenInput from "./helpers/HiddenInput";
 
 
 interface Props extends DefaultProps {
@@ -15,6 +14,7 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
+// TODO: implement max length 50
 export default function TagInput({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagInput");
@@ -42,7 +42,7 @@ export default function TagInput({...props}: Props) {
         $(inputRef.current!).trigger("blur")
     }
 
-        
+
     return (
         <Flex 
             id={id} 
