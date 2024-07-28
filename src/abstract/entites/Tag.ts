@@ -6,6 +6,8 @@ import { AbstractEntity } from "./AbstractEntity";
  * Notes will get tags in order to improove search results. 
  * All tags are unique to the logged in ```AppUser```.
  * 
+ * Equivalent to the ```<TagInput />``` component
+ * 
  * Extends {@link AbstractEntity}.
  * 
  * @since 0.0.1

@@ -3,7 +3,7 @@
  * 
  * @since 0.0.1
  */
-export enum BlockType {
+export enum NoteInputType {
 
     PLAIN_TEXT,
 

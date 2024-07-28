@@ -13,8 +13,6 @@ export default interface HelperProps extends DefaultProps {
     /** If false, this component will get passed ```display: none``` */
     rendered?: boolean,
     disabled?: boolean,
-    onClick?: (event?) => void,
-    /** Not applied to ```<HelperDiv>``` */
     /** Style for given event */
     _hover?: CSSProperties,
     /** Style for given event */

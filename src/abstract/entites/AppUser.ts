@@ -17,7 +17,9 @@ export class AppUser extends AbstractEntity {
 
     role: AppUserRole;
 
-    tags: Tag[];
+    tags?: Tag[] | null;
 
-    notes: Note[];
+    notes?: Note[] | null;
+
+    csrfToken?: string | null;
 }

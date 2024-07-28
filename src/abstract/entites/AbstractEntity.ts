@@ -5,5 +5,5 @@
  */
 export abstract class AbstractEntity {
 
-    id: number;
+    id?: number;
 }
