@@ -1,8 +1,8 @@
 import React, { CSSProperties, forwardRef, Ref, useImperativeHandle, useRef, useState } from "react";
-import "../../assets/styles/SearchBar.css";
+import "../../assets/styles/SearchBar.scss";
 import HelperProps from "../../abstract/HelperProps";
 import Flex from "./Flex";
-import { isObjectFalsy } from "../../helpers/utils";
+import { isObjectFalsy, log } from "../../helpers/utils";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Button from "./Button";
 
@@ -119,10 +119,10 @@ export default forwardRef(function SearchBar(
                 ...(isFocus ? _focus : {})
             }}
             rendered={rendered}
-            _hover={_hover}
             flexWrap="nowrap"
             verticalAlign="center"
             ref={componentRef}
+            _hover={_hover}
             {...otherProps}
         >
             {/* Search icon */}
@@ -148,9 +148,8 @@ export default forwardRef(function SearchBar(
             />
 
             {/* X icon */}
-            {/* TODO: clear search results as well as search input */}
             <Button 
-                className={"clearSearchValueButton " + (!disabled ? "hover" : "")} 
+                className="clearSearchValueButton" 
                 disabled={disabled} 
                 onClick={handleXIconClick}
                 title="Clear search"

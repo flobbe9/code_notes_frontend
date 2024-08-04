@@ -20,17 +20,22 @@
 
     @include scrollBar();
 
-    // readonly input
-    .searchResult {
+    .searchResultInput {
         border: none;
         border-radius: var(--borderRadius);
+        caret-color: var(--codeGrey);
         padding: 3px 7px;
         transition: var(--transitionTime);
         width: 100%;
 
-        &:hover {
+        @include customHover {
             background-color: var(--codeGrey);
             @include hoverCursor();
+        }
+
+        &:disabled {
+            background-color: white;
+            color: black;
         }
 
         &:focus {

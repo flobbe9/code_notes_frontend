@@ -1,35 +1,35 @@
 .CodeBlock {
-    border-radius: var(--codeBorderRadius);
-    border-top-right-radius: var(--borderRadius);
-    border-bottom-right-radius: var(--borderRadius);
+    .editorContainer {
+        background-color: var(--vsCodeBlack);
+        border-radius: var(--codeBorderRadius);
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
 
-    .fullScreenButton {
-        color: white;
-    }
-
-    .copyButton {
-    }
-
-    // = <Editor /> tag
-    section {
-        .vsCodeEditor {
-            background-color: var(--vsCodeBlack);
-            margin: 3px;
-
-            .minimap {
-                display: none;
-            }
-
-            // line number container
-            .margin {
-            }
-
-            .lines-content {
-                // line container
-                .view-lines {
-                    
-                    .view-line {
+        .fullScreenButton {
+            color: white;
+        }
+        
+        // = <Editor /> tag
+        section {
+            .vsCodeEditor {
+                background-color: var(--vsCodeBlack);
+                margin: 3px;
+                
+                .minimap {
+                    display: none;
+                }
+                
+                // line number container
+                .margin {
+                }
+                
+                .lines-content {
+                    // line container
+                    .view-lines {
                         
+                        .view-line {
+                            
+                        }
                     }
                 }
             }

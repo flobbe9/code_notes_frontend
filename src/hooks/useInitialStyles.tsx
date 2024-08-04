@@ -16,7 +16,7 @@ import { AppContext } from "../components/App";
  * @param timeout milliseconds after which to set the styles. Default is 0
  */
 export function useInitialStyles(
-    element: JQuery,
+    element: JQuery | undefined,
     cssAttributes: [string, string][],
     timeout = 0
 ) {
@@ -67,7 +67,7 @@ export function useInitialStyles(
     function attributesCallback(callback: (cssAttributeToChange: string, cssAttributeToUse: string, element: JQuery) => any): any {
 
         // case: element not present (yet)
-        if (!element.length)
+        if (!element || !element.length)
             return;
 
         cssAttributes.forEach(touple => {

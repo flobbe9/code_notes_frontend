@@ -378,6 +378,49 @@ export function getElementWidthRelativeToWindow(width: string | number, unitDigi
 
 
 /**
+ * @param text to measure
+ * @param fontSize of text, unit should be included
+ * @param fontFamily of text
+ * @param fontWeight of text, default is "normal"
+ * @returns width of text in px
+ */
+export function getTextWidth(text: string, fontSize: string, fontFamily: string, fontWeight = "400"): number {
+
+    if (isEmpty(text))
+        return 0;
+
+    // create hidden inputDiv
+    let hiddenInputDiv = $(
+        `<div
+            id="hiddenInputDivElement"
+            style='
+                border: none; 
+                width: fit-content;
+                font-size: ${fontSize};
+                font-family:  ${fontFamily};
+                font-weight: ${fontWeight};
+            ' 
+            contenteditable
+        >
+            ${text}
+        </div>`
+    );
+    
+    // render
+    $("body").append(hiddenInputDiv);
+    hiddenInputDiv = $("#hiddenInputDivElement");
+
+    // get width
+    const hiddenInputDivWidth = (hiddenInputDiv.width());
+
+    // clean up
+    $(hiddenInputDiv).remove();    
+
+    return hiddenInputDivWidth || 0;
+}
+
+
+/**
  * Confirm page refresh, tab close and window close with browser popup.<p>
  * 
  * Do nothing if ```API_ENV``` is "dev".
@@ -1037,4 +1080,52 @@ export async function getClipboardText(): Promise<string> {
 export async function setClipboardText(text: string): Promise<void> {
 
     navigator.clipboard.writeText(text);
+}
+
+
+/**
+ * @param eventKey to check
+ * @param includeEnter whether to return ```true``` if event key equals "Enter"
+ * @returns ```true``` if given eventKey would take up space when inserted into a text input
+ */
+export function isEventKeyTakingUpSpace(eventKey: string, includeEnter = true): boolean {
+
+    if (isEmpty(eventKey))
+        return false;
+
+    return eventKey.length === 1 || (includeEnter && eventKey === "Enter");
+}
+
+
+/**
+ * @param text string to clean up. Wont be altered
+ * @returns same text string but with some special chars replaced
+*/
+export function cleanUpSpecialChars(text: string): string {
+
+    let cleanHtml = text;
+    cleanHtml = cleanHtml.replaceAll("&amp;", "&");
+    cleanHtml = cleanHtml.replaceAll("&lt;", "<");
+    cleanHtml = cleanHtml.replaceAll("&gt;", ">");
+    cleanHtml = cleanHtml.replaceAll("&nbsp;", " ");
+
+    return cleanHtml;
+}
+
+
+/**
+ * @param str to change first char to upper case of (wont be altered)
+ * @returns a copy of given string with the first char to upper case or a blank string
+ */
+export function toUpperCaseFirstChar(str: string): string {
+
+    // case: blank
+    if (isBlank(str))
+        return str;
+
+    // case: only one char
+    if (str.length === 1)
+        return str.toUpperCase();
+
+    return str.charAt(0).toUpperCase() + str.substring(1);
 }

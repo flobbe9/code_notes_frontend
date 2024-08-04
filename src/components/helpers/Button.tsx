@@ -4,6 +4,7 @@ import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import { ButtonType } from "../../abstract/CSSTypes";
 import { isObjectFalsy, log } from "../../helpers/utils";
+import { useInitialStyles } from "../../hooks/useInitialStyles";
 
 
 interface Props extends HelperProps {
@@ -46,38 +47,28 @@ export default forwardRef(function Button({
     const [isDisabled, setIsDisabled] = useState(disabled);
     const [isHover, setIsHover] = useState(false);
     const [isMouseDown, setIsMouseDown] = useState(false);
+    // state with jquery
+    const [componentJQuery, setComponentJQuery] = useState<JQuery>();
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Button");
 
     const componentRef = useRef(null);
+
     useImperativeHandle(ref, () => componentRef.current!, []);
+
+    useInitialStyles(componentJQuery, [["min-width", "width"]], 200);
 
 
     useEffect(() => {
+        setComponentJQuery($(componentRef.current!));
 
-        if (onClickPromise)
-            // wait for adjacent elements to be rendered as well
-            setTimeout(() => initMinWidth(), 200);
     }, []);
 
 
     useEffect(() => {
-        
         setIsDisabled(disabled);
         
     }, [disabled]);
-
-
-    /**
-     * Set "min-width" to "width" for button to keep it's width if children's width changes.
-     */
-    function initMinWidth(): void {
-
-        const component = $(componentRef.current!);
-        const componentWidth = component.css("width") || "";
-
-        component.css("minWidth", componentWidth);
-    }
 
 
     function handleMouseEnter(event): void {
@@ -189,7 +180,7 @@ export default forwardRef(function Button({
             {...otherProps}
         >
             {/* Content */}
-            <span hidden={isAwaitingPromise} className="flexCenter">{children}</span>
+            <span hidden={isAwaitingPromise} className="buttonContentContainer flexCenter">{children}</span>
 
             {/* Spinner */}
             <i className={"fa-solid fa-circle-notch" + (isAwaitingPromise && " rotating")} hidden={!isAwaitingPromise}></i>

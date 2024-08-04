@@ -102,8 +102,6 @@ export default function useKeyPress(checkAllKeys = false) {
             logWarn("Failed to determine if key is pressed. 'keyName' is falsy");
             return false;
         }
-        
-        // log(pressedKeys)
 
         return pressedKeys.has(keyName);
     }

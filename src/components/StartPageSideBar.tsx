@@ -22,6 +22,8 @@ interface Props extends DefaultProps {
 // IDEA: filter icon
 export default function StartPageSideBar({...props}: Props) {
 
+    // TODO: tags state
+
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
 
     const componentRef = useRef(null);
@@ -120,9 +122,10 @@ export default function StartPageSideBar({...props}: Props) {
     }
 
 
+    // TODO: still necessary?
     function updateSideBarWidthState(): void {
 
-        setStartPageSideBarWidth($(componentRef.current!).outerWidth()?.toString())
+        // setStartPageSideBarWidth($(componentRef.current!).outerWidth()?.toString())
     }
 
 

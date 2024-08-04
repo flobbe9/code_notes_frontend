@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../assets/styles/BlockSettings.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
@@ -6,31 +6,44 @@ import Button from "../helpers/Button";
 import SearchBar from "../helpers/SearchBar";
 import LanguageSearchResults from "../LanguageSearchResults";
 import BlockSwitch from "./BlockSwitch";
-import { getCssConstant, getCSSValueAsNumber, includesIgnoreCase, log } from "../../helpers/utils";
+import { getCssConstant, getCSSValueAsNumber, includesIgnoreCase, includesIgnoreCaseTrim, isEmpty, isEventKeyTakingUpSpace, log } from "../../helpers/utils";
 import { AppContext } from "../App";
-import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES } from "../../helpers/constants";
+import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES } from "../../helpers/constants";
 import { DefaultBlockContext } from "./DefaultBlock";
+import { NoteInput } from "../../abstract/entites/NoteInput";
+import { NoteInputType } from "../../abstract/NoteInputType";
+import { ProgrammingLanguage } from "../../abstract/ProgrammingLanguage";
 
 
 interface Props extends DefaultProps {
 
     /** Applies to the toggle button. Default should be ```false``` */
-    areBlockSettingsDisabled: boolean
+    areBlockSettingsDisabled: boolean,
+
+    noteInput: NoteInput
 }
 
 
 /**
+ * Component containing the language searchbar and block switch for one block.
+ * 
  * @since 0.0.1
  */
-export default function BlockSettings({areBlockSettingsDisabled, ...props}: Props) {
+export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...props}: Props) {
     
-    const [areLanguageSearchResultsRendered, setAreLanguageSearchResultsRendered] = useState(false);
+    const [showLanguageSearchResults, setShowLanguageSearchResults] = useState(false);
+    
+    /** List of all possible results */
+    const [allLanguageSearchResults, setAllLanguageResults] = useState<ProgrammingLanguage[]>([]);
+    /** List of results after searching. Init value is all results */
+    const [languageSearchResults, setLanguageSearchResults] = useState<string[]>(mapLanguageNames(allLanguageSearchResults));
 
     const { 
         isShowBlockSettings, 
         setIsShowBlockSettings,
 
-        setCodeBlockLanguage
+        setCodeBlockLanguage,
+        setCodeBlockcodeBlockWithVariablesLanguage
         
     } = useContext(DefaultBlockContext);
 
@@ -46,31 +59,50 @@ export default function BlockSettings({areBlockSettingsDisabled, ...props}: Prop
     const { isTabletWidth } = getDeviceWidth();
 
 
-    function toggleBlockSwitch(): void {
+    useEffect(() => {
+        const allLanguageSearchResults = getAllLanguagesByBlockType();
+
+        setAllLanguageResults(allLanguageSearchResults);
+        setLanguageSearchResults(mapLanguageNames(allLanguageSearchResults));
+
+    }, []);
+
+
+    /**
+     * Slide toggle the block switch.
+     * 
+     * @param hide whether to hide the block switch regardles of it's current state
+     */
+    function toggleBlockSwitch(hide = isShowBlockSettings): void {
 
         const blockSwitch = $(blockSwitchRef.current!);
 
         // case: show block settings
-        if (!isShowBlockSettings)
+        if (!hide)
             // radio buttons back to static
             blockSwitch.children(".RadioButton").css("position", "static");
 
         // fake "toggle slide"
         blockSwitch.animate(
             {
-                width: isShowBlockSettings ? 0 : getCssConstant("blockSwitchWidth"),
-                opacity: isShowBlockSettings ? 0 : 1,
-                zIndex: isShowBlockSettings ? -1 : 0
+                width: hide ? 0 : getCssConstant("blockSwitchWidth"),
+                opacity: hide ? 0 : 1,
+                zIndex: hide ? -1 : 0
             }, 
             BLOCK_SETTINGS_ANIMATION_DURATION,
             "swing",
             // radio buttons to absolute so they dont widen the container width
-            () => blockSwitch.children(".RadioButton").css("position", (isShowBlockSettings ? "absolute" : "static"))
+            () => blockSwitch.children(".RadioButton").css("position", (hide ? "absolute" : "static"))
         )
     }
 
 
-    function toggleLanguageSearchBar(): void {
+    /**
+     * Slide toggle the language searchbar.
+     * 
+     * @param hide whether to hide the searchbar regardles of it's current state
+     */
+    function toggleLanguageSearchBar(hide = isShowBlockSettings): void {
 
         const languageSearchBar = $(componentRef.current!).find(".languageSearchBar");
         const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
@@ -78,9 +110,9 @@ export default function BlockSettings({areBlockSettingsDisabled, ...props}: Prop
         // fake "toggle slide"
         languageSearchBar.animate(
             {
-                width: isShowBlockSettings ? 0 : languageSearchBarWidth,
-                opacity: isShowBlockSettings ? 0 : 1,
-                zIndex: isShowBlockSettings ? -1 : 1
+                width: hide ? 0 : languageSearchBarWidth,
+                opacity: hide ? 0 : 1,
+                zIndex: hide ? -1 : 1
             }, 
             BLOCK_SETTINGS_ANIMATION_DURATION,
             "swing"
@@ -88,12 +120,17 @@ export default function BlockSettings({areBlockSettingsDisabled, ...props}: Prop
     }
 
 
-    function toggleBlockSettings(): void {
+    /**
+     * Slide toggle this component except the toggle button.
+     * 
+     * @param hide whether to hide the block settings regardles of their current state
+     */
+    function toggleBlockSettings(hide = isShowBlockSettings): void {
 
-        setIsShowBlockSettings(!isShowBlockSettings);
+        setIsShowBlockSettings(!hide);
 
-        toggleBlockSwitch();
-        toggleLanguageSearchBar();
+        toggleBlockSwitch(hide);
+        toggleLanguageSearchBar(hide);
     }
 
 
@@ -101,55 +138,128 @@ export default function BlockSettings({areBlockSettingsDisabled, ...props}: Prop
 
         const keyName = event.key;
 
-        // TODO: does not work anymore
         if (keyName === "ArrowDown") {
             event.preventDefault();
 
-            const firstSearchResult = $(componentRef.current!).find(".LanguageSearchResults input").first();
-            firstSearchResult.trigger("focus");
-            setAreLanguageSearchResultsRendered(true);
+            const firstLanguageSearchResult = $(componentRef.current!).find(".LanguageSearchResults input").first();
+            firstLanguageSearchResult.trigger("focus");
+            
+            setShowLanguageSearchResults(true);
         
-        } else if (keyName === "Escape")
+        } else if (keyName === "Escape") {
             $(languageSearchBarRef.current!).trigger("blur");
+            setShowLanguageSearchResults(false);
 
-        // TODO: update search results
-            // do something like "no match" if no results
-            // sort alphabetically
+        } else if (keyName === "Tab")
+            setShowLanguageSearchResults(false);
     }
     
     
     function handleLanguageSearchFocus(event): void {
         
-        setAreLanguageSearchResultsRendered(true);
+        setShowLanguageSearchResults(true);
     }
     
     
     function handleLanguageSearchBlur(event): void {
 
-        if (!includesIgnoreCase(event.target.className, "searchInput")) 
-            setAreLanguageSearchResultsRendered(false);
-    }
-
-
-    function handleLanguageSearchResultsFocusOut(event): void {
-
-        setAreLanguageSearchResultsRendered(false);
+        setShowLanguageSearchResults(false);
     }
 
 
     function handleSelectLanguage(language: string): void {
 
-        // if is code block
-        setCodeBlockLanguage(language);
+        // update language state
+        if (noteInput.type === NoteInputType.CODE)
+            setCodeBlockLanguage(language);
 
-        // else if is code block with variables
-        // TODO
-        
-        setAreLanguageSearchResultsRendered(false);
+        else if (noteInput.type === NoteInputType.CODE_WITH_VARIABLES)
+            setCodeBlockcodeBlockWithVariablesLanguage(language);
 
-        // TOOD: consider closing settings or making selection the search bar value
+        // hide result box
+        setShowLanguageSearchResults(false);
+
+        // hide settings
+        toggleBlockSettings(true);
+
+        // set searchbar value to selected language
+        $(languageSearchBarRef.current!).prop("value", language);
     }
-    
+
+
+    function handleLanguageSearchKeyUp(event): void {
+
+        const keyName = event.key;
+        
+        if (keyName === " ") 
+            event.preventDefault();
+
+        else if (isEventKeyTakingUpSpace(keyName, false) || keyName === "Backspace")
+            handleLanguageSearch(event);
+    }
+
+
+    function handleLanguageSearch(event): void {
+
+        const currentSearchInputValue: string = $(languageSearchBarRef.current!).prop("value");
+
+        const newLanguageSearchResults: string[] = [];
+
+        // find matches and map names
+        allLanguageSearchResults.forEach(languageSearchResult => {
+            if (searchInputValueMatchesLanguageSearchResult(currentSearchInputValue, languageSearchResult))
+                newLanguageSearchResults.push(languageSearchResult.name);
+        });
+
+        // sort alphabetically
+        newLanguageSearchResults.sort();
+
+        setLanguageSearchResults(newLanguageSearchResults);
+    }
+
+
+    /**
+     * @returns the complete list of available programming languages for current block type
+     */
+    function getAllLanguagesByBlockType(): ProgrammingLanguage[] {
+
+        if (noteInput.type === NoteInputType.CODE)
+            return CODE_BLOCK_LANGUAGES;
+
+        if (noteInput.type === NoteInputType.CODE_WITH_VARIABLES)
+            return CODE_BLOCK_WITH_VARIABLES_LANGUAGES;
+
+        return [];
+    }
+
+
+    /**
+     * Indicates whether given search value matches given search result.
+     * 
+     * Use ```includesIgnoreCaseTrim``` as criteria for both name and aliases.
+     * 
+     * @param searchInputValue the search string the user typed
+     * @param languageSearchResult the search result to check the input value against
+     * @returns true if given input value either matches the languages name or at least one of the aliases
+     */
+    function searchInputValueMatchesLanguageSearchResult(searchInputValue: string, languageSearchResult: ProgrammingLanguage): boolean {
+
+        const matchesName = includesIgnoreCaseTrim(languageSearchResult.name, searchInputValue);
+        const matchesAlias = includesIgnoreCaseTrim(languageSearchResult.aliases || [], searchInputValue);
+
+        return matchesName || matchesAlias;
+    }
+
+
+    /**
+     * @param languages to map the name of
+     * @returns string array with ```name```s of programming languages
+     */
+    function mapLanguageNames(languages: ProgrammingLanguage[]): string[] {
+
+        return (languages || []).map(languageSearchResult => languageSearchResult.name);
+    }
+
 
     return (
         <Flex 
@@ -166,35 +276,35 @@ export default function BlockSettings({areBlockSettingsDisabled, ...props}: Prop
             <BlockSwitch className="" ref={blockSwitchRef} tabIndex={isShowBlockSettings ? 0 : -1} />
 
             {/* Search Language */}
-            {/* TODO: hide this for plain text block */}
             <SearchBar 
                 className={"languageSearchBar " + (isShowBlockSettings ? "ms-1 me-1" : "")}
                 placeHolder="Language..." 
                 ref={languageSearchBarRef}
                 title="Search programming language"
-                tabIndex={isShowBlockSettings ? 0 : -1}
+                tabIndex={isShowBlockSettings ? undefined : -1}
+                rendered={noteInput.type !== NoteInputType.PLAIN_TEXT}
                 onFocus={handleLanguageSearchFocus}
                 onBlur={handleLanguageSearchBlur}
                 onKeyDown={handleLanguageSearchKeyDown}
+                onKeyUp={handleLanguageSearchKeyUp}
                 _focus={{borderColor: "var(--accentColor)"}}
                 _searchIcon={{padding: "2px"}} 
             >
                 <LanguageSearchResults 
-                    rendered={areLanguageSearchResultsRendered} 
-                    possibleSearchResults={CODE_BLOCK_LANGUAGES}
+                    rendered={showLanguageSearchResults} 
+                    languageSearchResults={languageSearchResults}
                     handleSelect={handleSelectLanguage}
-                    // TODO: does this work?
-                    onBlur={handleLanguageSearchResultsFocusOut}
+                    setShowLanguageSearchResults={() => setShowLanguageSearchResults(false)}
                 />
             </SearchBar>
 
             {/* Toggle button */}
             <Button 
-                className="toggleBlockSettingsButton transition" 
+                className="toggleBlockSettingsButton transition ms-1" 
                 style={{backgroundColor: isShowBlockSettings ? "var(--codeGrey)" : "transparent"}}
                 title="Section settings"
                 disabled={areBlockSettingsDisabled}
-                onClick={toggleBlockSettings}
+                onClick={() => toggleBlockSettings()}
                 _hover={isShowBlockSettings ? {} : {backgroundColor: "buttonFace"}}
             >
                 <i className="fa-solid fa-ellipsis-vertical dontSelectText"></i>

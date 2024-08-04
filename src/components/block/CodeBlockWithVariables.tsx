@@ -6,17 +6,22 @@ import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import hljs from "highlight.js";
-import { getClipboardText, isBlank, log, setClipboardText } from "../../helpers/utils";
+import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, includesIgnoreCase, isBlank, log, setClipboardText } from "../../helpers/utils";
 import sanitize from "sanitize-html";
-import { VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_START_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
+import { VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_START_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
 import { AppContext } from "../App";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
+import HelperProps from "../../abstract/HelperProps";
+import { NoteInput } from "../../abstract/entites/NoteInput";
+import { BlockContainerContext } from "./BlockContainer";
+import parse from 'html-react-parser';
 import { DefaultBlockContext } from "./DefaultBlock";
 
 
-interface Props extends DefaultProps {
+interface Props extends HelperProps {
 
+    noteInput: NoteInput
 }
 
 
@@ -24,22 +29,41 @@ interface Props extends DefaultProps {
  * Component containing block with the less complex code editor but including variable inputs that are considered by the copy button.
  * 
  * @since 0.0.1
+ * 
  */
-export default function CodeBlockWithVariables({...props}: Props) {
+// IDEA:
+    // switch between higlighting styles (settings)
+    // disable highlighting option (settings (?))
+export default function CodeBlockWithVariables({
+    noteInput,
+    disabled,
+    onBlur, 
+    ...props
+}: Props) {
 
     const [isFullScreen, setIsFullScreen] = useState(false);
+    const [inputDivValue, setInputDivValue] = useState<any>()
     
-    const inputDivRef = useRef(null);
     const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
 
+    const [isParsing, setIsParsing] = useState(false);
+
+    const [hasComponentRendered, sethasComponentRendered] = useState(false);
+    
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeBlockWithVariables");
     
+    const inputDivRef = useRef(null);
+
     const { 
         isKeyPressed, 
         toggleAppOverlay, 
         isAppOverlayVisible, 
         getAppOverlayZIndex
     } = useContext(AppContext);
+
+    const { numBlocksParsing, setNumBlocksParsing } = useContext(BlockContainerContext);
+
+    const { codeBlockWithVariablesLanguage, setBlockOverlayVisible } = useContext(DefaultBlockContext);
 
     const { animateCopyIcon } = useContext(DefaultCodeBlockContext);
 
@@ -49,6 +73,10 @@ export default function CodeBlockWithVariables({...props}: Props) {
     
     useEffect(() => {
         setInputDivJQuery($(inputDivRef.current!));
+
+        setInputDivValue(parse(sanitize(noteInput.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
+
+        sethasComponentRendered(true);
         
     }, []);
 
@@ -68,16 +96,24 @@ export default function CodeBlockWithVariables({...props}: Props) {
             // deactivate full screen on overlay click
             deactivateFullScreen();
 
-    }, [isAppOverlayVisible])
+    }, [isAppOverlayVisible]);
+
+
+    useEffect(() => {
+        updateNumBlocksParsing();
+
+    }, [isParsing]);
+
+
+    useEffect(() => {
+        handleLanguageChange();
+
+    }, [codeBlockWithVariablesLanguage])
     
     
     // TODO: 
-        // switch between higlighting styles (settings)
-        // disable highlighting option (settings (?))
-        // language select
         // consider max input size
             // use db max size
-
 
     /**
      * @param text any text
@@ -85,77 +121,112 @@ export default function CodeBlockWithVariables({...props}: Props) {
      */
     function highlightAndSanitizeDefault(text: string): string {
 
-        return sanitize(hljs.highlightAuto(text).value, DEFAULT_HTML_SANTIZER_OPTIONS);
+        let highlightedText;
+        if (isAutoDetectLanguage())
+            highlightedText= hljs.highlightAuto(text).value;
+
+        else
+            highlightedText= hljs.highlight(text, { language: codeBlockWithVariablesLanguage }).value;
+
+        return sanitize(highlightedText, DEFAULT_HTML_SANTIZER_OPTIONS);
     }
 
 
     /**
-     * Highlight inner content of input. Also add ```<input>```s if necessary.
+     * Highlight inner content of input. Also add ```<input>```s if necessary. 
+     * 
+     * Will update input divs html.
+     * 
+     * @return the highlighted inner html
      */
-    function highlightInputDivContent(): void {
-        
-        const inputDiv = $(inputDivRef.current!);
-        const inputChildren = inputDiv.children();
+    async function highlightInputDivContent(): Promise<string> {
 
-        // case: first line is not a node
-        const firstLine = getFirstInputDivContentLine();
-        let highlightedHtmlString = "";
+        setIsParsing(true);
+        setBlockOverlayVisible(true);
 
-        // case: first line with inputs
-        if (includesVariableInputSequence(firstLine))
-            highlightedHtmlString += "<div>" + highlightAndSanitizeWithVariableInputs(firstLine);
+        const highlightPromise = await new Promise<string>((res, rej) => {
+            setTimeout(() => {
+                const inputDiv = $(inputDivRef.current!);
+                const inputChildren = inputDiv.children();
 
-        // case: first line with text only
-        else if (!isBlank(firstLine))
-            highlightedHtmlString += "<div>" + highlightAndSanitizeDefault(getFirstInputDivContentLine());
+                // case: first line is not a node
+                const firstLine = getFirstInputDivContentLine();
+                let highlightedHtmlString = "";
 
-        if (!isBlank(firstLine))
-            highlightedHtmlString += "</div>";
+                // case: first line with inputs
+                if (includesVariableInputSequence(firstLine))
+                    highlightedHtmlString += "<div>" + highlightAndSanitizeWithVariableInputs(firstLine);
 
-        // iterate lines after first line
-        Array.from(inputChildren).forEach(child => {
-            let innerText = child.innerText;
-            const innerHtml = child.innerHTML;
+                // case: first line with text only
+                else if (!isBlank(firstLine))
+                    highlightedHtmlString += "<div>" + highlightAndSanitizeDefault(getFirstInputDivContentLine());
 
-            // clean up special chars
-            innerText = cleanUpSpecialChars(innerText);
-            
-            highlightedHtmlString += "<div>";
+                if (!isBlank(firstLine))
+                    highlightedHtmlString += "</div>";
 
-            // case: line with inputs
-            if (includesVariableInputSequence(innerText)) 
-                highlightedHtmlString += highlightAndSanitizeWithVariableInputs(innerText);
-                
-            // case: empty line
-            else if (innerHtml === "<br>") 
-                highlightedHtmlString += "<br>";
+                // iterate lines after first line
+                Array.from(inputChildren).forEach(child => {
+                    let innerText = child.innerText;
+                    const innerHtml = child.innerHTML;
 
-            // case: line with text only
-            else if (!isBlank(innerText))
-                highlightedHtmlString += highlightAndSanitizeDefault(innerText);
+                    // clean up special chars
+                    innerText = cleanUpSpecialChars(innerText);
+                    
+                    highlightedHtmlString += "<div>";
 
-            highlightedHtmlString += "</div>";
+                    // case: line with inputs
+                    if (includesVariableInputSequence(innerText)) 
+                        highlightedHtmlString += highlightAndSanitizeWithVariableInputs(innerText);
+                        
+                    // case: empty line
+                    else if (innerHtml === "<br>")
+                        highlightedHtmlString += "<br>";
+
+                    // case: line with text only
+                    else if (!isBlank(innerText))
+                        highlightedHtmlString += highlightAndSanitizeDefault(innerText);
+
+                    highlightedHtmlString += "</div>";
+                });
+
+                inputDiv.html(highlightedHtmlString);
+
+                res("highlightedHtmlString"); 
+            }, 100); // wait for state to update
         });
 
-        inputDiv.html(highlightedHtmlString);
+        setIsParsing(false);
+        setBlockOverlayVisible(false);
+
+        updateAppUser();
+
+        return highlightPromise;
     }
 
 
     /**
      * Remove highlighting of inputDiv content and parse ```<input>```s to inputVariableSequences.
      */
-    function unHighlightInputDivContent(): void {
+    async function unHighlightInputDivContent(): Promise<string> {
 
-        const inputDiv = $(inputDivRef.current!);
-        const inputHtml = inputDiv.html();
+        const unHighlightedContent = await new Promise<string>((res, rej) => {
+            setTimeout(() => {
+                const inputDiv = $(inputDivRef.current!);
+                const inputHtml = inputDiv.html();
 
-        // remove highlights
-        let sanitizedInputHtml = sanitizeForInputDiv(inputHtml);
+                // remove highlights
+                let sanitizedInputHtml = sanitizeForInputDiv(inputHtml);
 
-        // convert inputs
-        sanitizedInputHtml = parseVariableInputToVariableInputSequence(sanitizedInputHtml);
+                // convert inputs
+                sanitizedInputHtml = parseVariableInputToVariableInputSequence(sanitizedInputHtml);
 
-        inputDiv.html(sanitizedInputHtml);
+                inputDiv.html(sanitizedInputHtml);
+                
+                res(sanitizedInputHtml);
+            }, 10); // wait for states to update
+        });
+
+        return unHighlightedContent;
     }
 
 
@@ -178,22 +249,6 @@ export default function CodeBlockWithVariables({...props}: Props) {
         }
 
         return inputHtml;
-    }
-
-
-    /**
-     * @param text string to clean up. Wont be altered
-     * @returns same text string but with some special chars replaced
-     */
-    function cleanUpSpecialChars(text: string): string {
-
-        let cleanHtml = text;
-        cleanHtml = cleanHtml.replaceAll("&amp;", "&");
-        cleanHtml = cleanHtml.replaceAll("&lt;", "<");
-        cleanHtml = cleanHtml.replaceAll("&gt;", ">");
-        cleanHtml = cleanHtml.replaceAll("&nbsp;", " ");
-
-        return cleanHtml;
     }
 
 
@@ -274,13 +329,34 @@ export default function CodeBlockWithVariables({...props}: Props) {
 
 
     /**
-     * @param placeholder to use for the ```<input>```. Default is {@link VARIABLE_INPUT_DEFAULT_PLACEHOLDER}.
+     * Input will always be as wide as given ```placeholder``` text. Uses the default placeholder if given ```placeholder``` is blank.
      * 
+     * @param placeholder to use for the ```<input>```. Default is {@link VARIABLE_INPUT_DEFAULT_PLACEHOLDER}.
      * @returns ```<input>``` tag as string with a few attributes
      */
     function getDefaultVariableInput(placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER): string {
 
-        return `<input type="text" class="variableInput" placeholder="${placeholder}" />`;
+        // case: invalid placeholder
+        if (isBlank(placeholder))
+            placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER;
+
+        const inputWidth = getDefaultVariableInputWidth(placeholder);
+
+        return `<input type="text" style="width: ${inputWidth}px" class="variableInput" placeholder="${placeholder}" />`;
+    }
+
+
+    /**
+     * @param placeholder of input
+     * @returns the width of a variableInput as if the ```placeholder``` was it's value and the width was 'fit-content'
+     */
+    function getDefaultVariableInputWidth(placeholder: string): number {
+        
+        const placeholderWidth = getTextWidth(placeholder, getCssConstant("variableInputFontSize"), getCssConstant("variableInputFontFamily"));
+        const variableInputPadding = getCSSValueAsNumber(getCssConstant("variableInputPaddingLeftRight"), 2) * 2;
+        const variableInputBorderWidth = getCSSValueAsNumber(getCssConstant("variableInputBorderWidth"), 2) * 2;
+
+        return placeholderWidth + variableInputPadding + variableInputBorderWidth;
     }
     
     
@@ -403,22 +479,64 @@ export default function CodeBlockWithVariables({...props}: Props) {
 
         return values;
     }
+    
+
+    /**
+     * Increase the ```numBlocksParsing``` by 1 if block is currently parsing, or else decrease it by 1 
+     * (but never go below 0).
+     */
+    function updateNumBlocksParsing(): void {
+
+        if (isParsing)
+            setNumBlocksParsing(numBlocksParsing + 1);
+        
+        else if (numBlocksParsing > 0)
+            setNumBlocksParsing(numBlocksParsing - 1);
+    }
+
+
+    /**
+     * @returns ```true``` if input div contains the placeholder, else ```false```
+     */
+    function hasPlaceholder(): boolean {
+
+        return $(inputDivRef.current!).children().first().is(".placeholderInput");
+    }
+
+
+    /**
+     * Set all noteInput fields for this block.
+     */
+    function updateAppUser(): void {
+
+        // value
+        noteInput.value = $(inputDivRef.current!).html();
+
+        // programmingLanguage
+        noteInput.programmingLanguage = codeBlockWithVariablesLanguage;
+    }
 
 
     function handleFocus(event): void {
 
-        if (event.target.className !== "variableInput")
+        if (event.target.className !== "variableInput" && !hasPlaceholder())
             unHighlightInputDivContent();
     }
-    
-    
-    function handleBlur(event): void {
-        
-        const variableInputs = $(".variableInput");
 
-        // case: focus was not on a variable input
-        if (!variableInputs.length || !variableInputs.has(":focus"))
-            highlightInputDivContent();
+
+    async function handleBlur(event): Promise<void> {
+
+        if (disabled)
+            return;
+
+        if (onBlur)
+            onBlur(event);
+
+        const variableInputs = $(".variableInput");
+        
+        // case: focus was not on a variable input or the placeholder textarea
+        if ((!variableInputs.length || !variableInputs.has(":focus")) && !hasPlaceholder())
+            await highlightInputDivContent();
     }
 
 
@@ -603,6 +721,26 @@ export default function CodeBlockWithVariables({...props}: Props) {
     }
 
 
+    async function handleLanguageChange(): Promise<void> {
+
+        // case: called on load
+        if (!hasComponentRendered)
+            return;
+
+        await unHighlightInputDivContent();
+
+        highlightInputDivContent();
+
+        updateAppUser();
+    }
+
+
+    function isAutoDetectLanguage(): boolean {
+
+        return codeBlockWithVariablesLanguage === CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE;
+    }
+
+
     return (
         <Flex 
             id={id} 
@@ -616,16 +754,19 @@ export default function CodeBlockWithVariables({...props}: Props) {
                 onClick={handleInputDivContainerClick}
             >
                 <code>
+                    {/* dont use a placeholder because of conflicts with vairableInputs */}
                     <ContentEditableDiv 
                         className="inputDiv fullWidth" 
                         ref={inputDivRef} 
-                        spellCheck={false} 
+                        spellCheck={false}
+                        onKeyDownCapture={handleKeyDownCapture}
                         onKeyDown={handleKeyDown} 
                         onKeyUp={handleKeyUp}
-                        onKeyDownCapture={handleKeyDownCapture}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
-                    /> 
+                    >
+                        { inputDivValue }
+                    </ContentEditableDiv> 
                 </code>
             </pre>
 

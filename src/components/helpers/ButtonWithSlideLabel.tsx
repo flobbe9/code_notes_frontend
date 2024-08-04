@@ -1,12 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
-import "../../assets/styles/ButtonSlideLabel.scss"; 
+import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import "../../assets/styles/ButtonWithSlideLabel.scss"; 
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Button from "./Button";
+import HelperProps from "../../abstract/HelperProps";
 
 
-interface Props extends DefaultProps {
+interface Props extends HelperProps {
     /** The text inside the button that will be slide toggled on hover */
-    label: string
+    label: string,
+
+    onClickPromise?: (event?) => Promise<any>,
 }
 
 
@@ -15,13 +18,18 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function ButtonSlideLabel({label, title, ...props}: Props) {
+export default forwardRef(function ButtonWithSlideLabel(
+    {label, title, onClickPromise, ...props}: Props,
+    ref: Ref<HTMLElement>) {
 
     const [initialBlockButtonLabelWidth, setInitialBlockButtonLabelWidth] = useState<string | number>();
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ButtonSlideLabel");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ButtonWithSlideLabel");
 
     const componentRef = useRef(null);
+
+
+    useImperativeHandle(ref, () => componentRef.current!, []);
 
 
     useEffect(() => {
@@ -94,6 +102,7 @@ export default function ButtonSlideLabel({label, title, ...props}: Props) {
             title={title}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onClickPromise={onClickPromise}
             ref={componentRef}
             {...otherProps}
         >
@@ -104,4 +113,4 @@ export default function ButtonSlideLabel({label, title, ...props}: Props) {
             </span>
         </Button>
     )
-}
+})

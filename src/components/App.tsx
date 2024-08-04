@@ -7,14 +7,18 @@ import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
 import useKeyPress from '../hooks/useKeyPress';
 import Overlay from './helpers/Overlay';
+import { AppUser } from '../abstract/entites/AppUser';
+import { AppUserRole } from '../abstract/AppUserRole';
+import { NoteInputType } from '../abstract/NoteInputType';
 
 
 /**
  * @since 0.0.1
  */
+// TODO: consider changing the component names
 export default function App() {
 
-    // TODO appUser state
+    const [appUser, setAppUser] = useState<AppUser>(mockAppUser);
 
     const [toastSummary, setToastSummary] = useState("");
     const [toastMessage, setToastMessage] = useState("");
@@ -33,6 +37,9 @@ export default function App() {
     const toastSlideDuration = 400;
 
     const context = {
+        appUser,
+        setAppUser, 
+
         toast,
         moveToast,
 
@@ -52,7 +59,6 @@ export default function App() {
 
     
     useEffect(() => {
-
         window.addEventListener("keydown", handleWindowKeyDown);
         window.addEventListener("resize", handleWindowResize);
 
@@ -97,23 +103,33 @@ export default function App() {
 
 
     /**
-     * Show toast or hide it if ```hideToast``` is ```true```.
+     * Show toast or hide it if ```hideToast``` is ```true```. Has a 100 milliseconds delay.
      * 
      * @param hideToast if true, toast will definitely by hidden regardless of it's state before. Default is ```false```
      */
-    function moveToast(hideToast = false): void {
+    async function moveToast(hideToast = false): Promise<void> {
 
         const toast = $(toastRef.current!);
 
-        // space between window bottom and toast bottom
-        let toastHeight = 30;
+        // space between toast and window bottom
+        let targetBottom = 30;
+
+        // toast height with message
+        const currentToastHeight = getCSSValueAsNumber(toast.css("height"), 2);
 
         // case: hide
         if (hideToast) 
-            // set to negative toast height to make sure it's completely hidden
-            toastHeight = -getCSSValueAsNumber(toast.css("height"), 2);
+            // make sure toast is completely hidden
+            targetBottom = -currentToastHeight;
 
-        toast.animate({bottom: toastHeight}, {duration: toastSlideDuration, "easing": "easeOutSine"});
+        // case: show
+        else 
+            // move toast back to start pos
+            toast.css("bottom", -currentToastHeight);
+
+        // wait for css to complete
+        setTimeout(() => 
+            toast.animate({bottom: targetBottom}, {duration: toastSlideDuration, easing: "easeOutSine"}), 100);
     }
     
 
@@ -185,6 +201,7 @@ export default function App() {
                         id="App"
                         isOverlayVisible={isAppOverlayVisible} 
                         setIsOverlayVisible={setIsAppOverlayVisible} 
+                        fitParent={false}
                     />
 
                     <NavBar />
@@ -213,6 +230,9 @@ export default function App() {
 
 
 export const AppContext = createContext({
+    appUser: new AppUser(),
+    setAppUser: (appUser: AppUser) => {},
+
     toast: (summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number) => {},
     moveToast: (hideToast = false, screenTime?: number) => {},
 
@@ -227,3 +247,66 @@ export const AppContext = createContext({
     isAppOverlayVisible: false,
     getAppOverlayZIndex: () => {return 10 as number}
 });
+
+
+const mockAppUser: AppUser = {
+    id: 3,
+    email: "user@user.com",
+    password: "$2a$10$e4k/4uTWn/fnWA8KEYs/Zu.W1b4OWK82rXgwpZsvFhPPbFaYjZlBi",
+    role: AppUserRole.USER,
+    tags: [
+      {
+        id: 14,
+        name: "tag14"
+      }
+    ],
+    notes: [
+      {
+        id: 20,
+        title: "note20",
+        noteInputs: [
+            {
+                // value: "const x = 3;",
+                value: "const x = 3;\n\nadsf",
+                type: NoteInputType.CODE,
+                programmingLanguage: "_plaintext"
+            }
+        ],
+        tags: []
+      },
+      {
+        id: 19,
+        title: "note19",
+        noteInputs: [
+            {
+                value: "some <code>code</code>",
+                type: NoteInputType.PLAIN_TEXT
+            }
+        ],
+        tags: []
+      },
+      {
+        id: 18,
+        title: "note18",
+        noteInputs: [
+            {
+                value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
+                type: NoteInputType.CODE_WITH_VARIABLES,
+                programmingLanguage: "_auto"
+            },
+            {
+                value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
+                type: NoteInputType.CODE_WITH_VARIABLES,
+                programmingLanguage: "_auto"
+            }
+        ],
+        tags: [
+          {
+            id: 14,
+            name: "tag14"
+          }
+        ]
+      }
+    ],
+    csrfToken: null
+  }

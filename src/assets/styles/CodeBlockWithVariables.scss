@@ -2,6 +2,10 @@
 
 :root {
     --codeBlockWithVariablesMinHeight: 20vh;
+    --variableInputFontFamily: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --variableInputFontSize: 14px;
+    --variableInputPaddingLeftRight: 7px;
+    --variableInputBorderWidth: 2px;
 }
 
 .CodeBlockWithVariables {
@@ -12,15 +16,16 @@
 
     .inputDivContainer {
         margin: 0;
-
+        
         code {
             height: 100%;
             display: block;
         }
-
+        
         .inputDiv {
             margin: 0;
             max-height: var(--codeBlockWithVariablesMinHeight);
+            min-height: 41px;
             overflow: auto;
             padding: 10px 10px;
             white-space: pre-wrap;
@@ -32,16 +37,17 @@
             }
 
             &:has(.variableInput) {
-                padding: 5px 10px;
+                padding: 7px 10px;
             }
 
             .variableInput {
-                border: 2px solid transparent;
+                border: var(--variableInputBorderWidth) solid transparent;
                 border-radius: var(--borderRadius);
+                font-family: var(--variableInputFontFamily);
+                font-size: var(--variableInputFontSize);
+                line-height: 1em;
                 margin: 0 2px;
-                padding: 3px 7px;
-                // barely includes default placeholder
-                width: 123px;
+                padding: 3px var(--variableInputPaddingLeftRight);
 
                 &:focus {
                     border-color: var(--accentColor);

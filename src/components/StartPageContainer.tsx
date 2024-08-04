@@ -20,8 +20,6 @@ interface Props extends DefaultProps {
  */
 export default function StartPageContainer({children, ...props}: Props) {
 
-    // TODO: notes state
-
     const [isShowSideBar, setIsShowSideBar] = useState(false);
     const [startPageSidebarWidth, setStartPageSideBarWidth] = useState<string>();
     const [startPageContentWidth, setStartPageContentWidth] = useState<string>();
@@ -65,14 +63,8 @@ export default function StartPageContainer({children, ...props}: Props) {
     return (
         <StartPageContainerContext.Provider value={context} {...props}>
             <Flex flexWrap="nowrap">
-                {
-                    // pass tags
-                }
                 <StartPageSideBar />
 
-                {
-                    // pass notes
-                }
                 <StartPageContent style={{width: startPageContentWidth}} />
             </Flex>
 

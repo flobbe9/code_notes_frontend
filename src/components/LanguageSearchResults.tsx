@@ -1,18 +1,21 @@
-import React, { useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "../assets/styles/LanguageSearchResults.scss";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
-import { moveCursor } from "../helpers/utils";
+import { log, moveCursor, toUpperCaseFirstChar } from "../helpers/utils";
 import HelperDiv from "./helpers/HelperDiv";
 import HelperProps from "../abstract/HelperProps";
 import { getRandomString } from './../helpers/utils';
+import HiddenInput from "./helpers/HiddenInput";
 
 
 interface Props extends HelperProps {
 
-    possibleSearchResults: string[],
+    languageSearchResults: string[],
 
     /** Executed on result select */
-    handleSelect: (language: string) => void
+    handleSelect: (language: string) => void,
+
+    setShowLanguageSearchResults: (isRendered: boolean) => void
 }
 
 
@@ -21,68 +24,164 @@ interface Props extends HelperProps {
  */
 export default function LanguageSearchResults({
     rendered = false,
-    possibleSearchResults = [],
+    languageSearchResults = [],
+    setShowLanguageSearchResults,
     handleSelect,
     ...props
 }: Props) {
 
+    const [searchResultElements, setSearchResultElements] = useState<JSX.Element[]>([]);
+
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "LanguageSearchResults");
 
     const componentRef = useRef(null);
+    const hiddenCheckboxRef = useRef(null);
 
-    const inputRef = useRef(null);
 
-    // TODO
-        // pass list
-        // default value = selected element
-        // add option "none"
-        // on search result select
-            // set input value
-            // hide search results
-        // on empty search
-            // show all possible results
-        // go through with arrows instead with tabs
-            // on key down
-                // prevent default (scroll)
-                // if next input is present
-                    // focus next input
-                // else
-                    // focus first input
-            // on key up
-                // prevent default (scroll)
-                // if prev input is present
-                    // focus prev input
-                // else
-                    // focus last input
-            // tab should move on
-            // shift tab should focus search input
-        // on focus out
+    useEffect(() => {
+        setSearchResultElements(mapResults());
 
-    function handleFocus(event): void {
+    }, [languageSearchResults])
+
+
+    function handleSearchResultFocus(event): void {
 
         // prevent input text select on focus
         moveCursor($(event.target), 0);
+
+        // set searcbar value to result value
+        getSearchBar().prop("value", event.target.value)
     }
 
 
-    function handleKeyDown(event): void {
+    function handleSearchResultBlur(event): void {
 
+        if (!isArrowKeyPressed())
+            setShowLanguageSearchResults(false);
+    }
+
+
+    function handleSearchResultKeyDown(event, searchResult: string): void {
+
+        // toggle checkbox
+        const keyName = event.key;
+        
+        if (keyName === "ArrowDown")
+            handleArrowDown(event);
+
+        else if (keyName === "ArrowUp") 
+            handleArrowUp(event);
+
+        else if (keyName === "Enter")
+            handleSelect(searchResult);
+    }
+
+
+    function handleSearchResultKeyUp(event): void {
+
+        setArrowKeyPressed(false);
+    }
+
+
+    function handleArrowDown(event): void {
+
+        event.preventDefault();
+
+        setArrowKeyPressed(true);
+
+        $(event.target).next().trigger("focus");
+    }
+    
+
+    function handleArrowUp(event): void {
+
+        const focusedInput = $(event.target);
+        const prevResult = focusedInput.prev();
+
+        event.preventDefault();
+
+        setArrowKeyPressed(true);
+
+        // case: is first result
+        if (!prevResult.length) 
+            getSearchBar().trigger("focus");
+        
+        else
+            prevResult.trigger("focus");
+    }
+
+
+    function handleSearchResultMouseDown(event, searchResult: string): void {
+
+        handleSelect(searchResult);
     }
 
 
     function mapResults(): JSX.Element[] {
+        
+        // case: no results
+        if (!languageSearchResults.length)
+            return [
+                <input 
+                    className="searchResultInput" 
+                    spellCheck={false}
+                    tabIndex={-1}
+                    key={getRandomString()}
+                    value="No results..."
+                    disabled
+                />
+            ];
 
-        return possibleSearchResults.map(result => {
+        return languageSearchResults.map(searchResult => {
+            const upperCaseSearchResult = toUpperCaseFirstChar(searchResult);
+
             return <input 
-                className="searchResult" 
-                readOnly 
-                value={result}
-                onFocus={handleFocus}
+                className="searchResultInput" 
+                spellCheck={false}
+                value={upperCaseSearchResult}
                 tabIndex={-1}
+                title={upperCaseSearchResult}
                 key={getRandomString()}
-                onClick={() => handleSelect(result)}
+                onKeyDown={(event) => handleSearchResultKeyDown(event, upperCaseSearchResult)}
+                onKeyUp={handleSearchResultKeyUp}
+                onFocus={handleSearchResultFocus}
+                onBlur={handleSearchResultBlur}
+                onMouseDown={(event) => handleSearchResultMouseDown(event, upperCaseSearchResult)}
+                onChange={() => {}} // prevent console error
             />
         })
+    }
+
+
+    /**
+     * Serves as pseudo state setter because react states are too slow for this purpose. Indicates whether an
+     * arrow key (up or down) is currently in "keydown" mode or not
+     * 
+     * @param keyPressed whether an arrow key is pressed or not
+     */
+    function setArrowKeyPressed(keyPressed: boolean): void {
+
+        $(hiddenCheckboxRef.current!).prop("checked", keyPressed)
+    }
+
+
+    /**
+     * Serves as pseudo state  because react states are too slow for this purpose. 
+     * 
+     * @reutrn ```true``` if an arrow key (up or down) is currently in "keydown" mode or not
+     */
+    function isArrowKeyPressed(): boolean {
+        
+        return $(hiddenCheckboxRef.current!).prop("checked")
+    }
+
+
+    /**
+     * @returns the language searchbar for this component
+     */
+    function getSearchBar(): JQuery {
+
+        return $(componentRef.current!).parents(".languageSearchBar").find(".searchInput");
     }
 
 
@@ -95,9 +194,12 @@ export default function LanguageSearchResults({
             rendered={rendered}
             {...otherProps}
         >
-            {mapResults()}
-                
+            {searchResultElements}
+
             {children}
+                
+            {/* Is arrow key pressed "state" */}
+            <HiddenInput ref={hiddenCheckboxRef} type="checkbox" tabIndex={-1} />
         </HelperDiv>
     )
 }

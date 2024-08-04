@@ -128,3 +128,9 @@
         @include focusOutline($color);
     }
 }
+
+@mixin flexCenter() {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}

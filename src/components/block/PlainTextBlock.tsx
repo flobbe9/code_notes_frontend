@@ -1,31 +1,53 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../assets/styles/PlainTextBlock.scss";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import Flex from "../helpers/Flex";
-import { getClipboardText, isBlank, log, setClipboardText } from "../../helpers/utils";
+import { cleanUpSpecialChars, getClipboardText, isBlank, log, setClipboardText } from "../../helpers/utils";
 import sanitize from "sanitize-html";
 import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
 import { AppContext } from "../App";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
+import { NoteInput } from "../../abstract/entites/NoteInput";
+import { BlockContainerContext } from "./BlockContainer";
+import HelperProps from "../../abstract/HelperProps";
+import parse from 'html-react-parser';
+import { DefaultBlockContext } from "./DefaultBlock";
 
 
-interface Props extends DefaultProps {
+interface Props extends HelperProps {
 
+    noteInput: NoteInput
 }
 
 
 /**
  * @since 0.0.1
  */
-export default function PlainTextBlock({...props}: Props) {
+// TODO: 
+    // add something like a tutorial note with highlighted text 
+        // on account creation?
+        // if app user has no plain text notes at all && on create
+
+export default function PlainTextBlock({
+    noteInput,
+    disabled,
+    onFocus,
+    onBlur,
+    onKeyUp,
+    ...props}: Props) {
+    
+    const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
+    const [parsing, setParsing] = useState(false);
+    const [inputDivValue, setInputDivValue] = useState<any>()
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextBlock");
 
     const { isKeyPressed } = useContext(AppContext);
+    const { numBlocksParsing, setNumBlocksParsing } = useContext(BlockContainerContext);
+    const { setBlockOverlayVisible } = useContext(DefaultBlockContext);
 
     const inputDivRef = useRef(null);
-    const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
 
     
     useInitialStyles(inputDivJQuery, [["max-width", "width"]], 100);
@@ -34,20 +56,39 @@ export default function PlainTextBlock({...props}: Props) {
     useEffect(() => {
         setInputDivJQuery($(inputDivRef.current!));
 
+        setInputDivValue(parse(sanitize(noteInput.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
+
     }, []);
 
 
+    useEffect(() => {
+        updateNumBlocksParsing();
+
+    }, [parsing]);
+
+
     function handleFocus(event): void {
+        
+        if (onFocus)
+            onFocus(event);
 
         // convert <code> sequences to ```
         $(inputDivRef.current!).html(parseCodeHtmlToCodeText());
     }
 
 
-    function handleBlur(event): void {
+    async function handleBlur(event): Promise<void> {
 
-        // convert ``` sequences to <code>
-        $(inputDivRef.current!).html(sanitize(parseCodeTextToCodeHtml(), DEFAULT_HTML_SANTIZER_OPTIONS));
+        if (onBlur)
+            onBlur(event);
+
+        const inputDiv = $(inputDivRef.current!);
+
+        // case: no placeholder present
+        if (!isBlank(inputDiv.text())) {
+            const parsedText = await parseCodeTextToCodeHtml();
+            inputDiv.html(parsedText);
+        }
     }
 
 
@@ -59,31 +100,54 @@ export default function PlainTextBlock({...props}: Props) {
      * 
      * @returns parsed inner html of inputDiv
      */
-    function parseCodeTextToCodeHtml(): string {
+    async function parseCodeTextToCodeHtml(): Promise<string> {
 
-        const inputDiv = $(inputDivRef.current!);
-        const inputText = inputDiv.html();
-        const inputTextArray = inputText.split("```");
-    
-        // case: too short to have code blocks or no code blocks at all
-        if (inputText.length <= 6 || inputTextArray.length <= 2)
-            return inputText;
-    
-        let inputHtmlString = "";
-    
-        inputTextArray.forEach((text, i) => {
-            const isEvenIndex = i % 2 === 0;
-    
-            // case: not inside a code block
-            if (i === 0 || i === inputTextArray.length - 1 || isEvenIndex)
-                inputHtmlString += text;
-    
-            // case: inside a code block
-            else if (!isEvenIndex)
-                inputHtmlString += "<code>" + text + "</code>";
-        })
-    
-        return inputHtmlString;
+        // notify parsing process has started (should not take long here)
+        setParsing(true);
+        setBlockOverlayVisible(true);
+
+        const parsedText = await new Promise<string>((res, rej) => {
+            setTimeout(() => {
+                const inputDiv = $(inputDivRef.current!);
+                const inputText = inputDiv.html();
+                const inputTextArray = inputText.split("```");
+            
+                // case: too short to have code blocks or no code blocks at all
+                if (inputText.length <= 6 || inputTextArray.length <= 2) {
+                    res(inputText);
+                    return;
+                }
+                    
+                let inputHtmlString = "";
+            
+                inputTextArray.forEach((text, i) => {
+                    const isEvenIndex = i % 2 === 0;
+            
+                    // case: not inside a code block
+                    if (i === 0 || i === inputTextArray.length - 1 || isEvenIndex)
+                        inputHtmlString += text;
+            
+                    // case: inside a code block
+                    else if (!isEvenIndex)
+                        inputHtmlString += "<code>" + text + "</code>";
+                })
+
+                res(inputHtmlString);
+            }, 1000); // wait for states to update
+        });
+
+        // sanitize
+        const sanitizedInputDivValue = sanitize(parsedText, DEFAULT_HTML_SANTIZER_OPTIONS);
+        
+        updateAppUser();
+        
+        setTimeout(() => {
+            setParsing(false);
+            setBlockOverlayVisible(false);
+
+        }, 1); // states wont update correctly without this
+
+        return sanitizedInputDivValue;
     }
 
 
@@ -158,29 +222,48 @@ export default function PlainTextBlock({...props}: Props) {
 
     function handleKeyUp(event): void {
 
-        const inputDiv = $(inputDivRef.current!);
+        if (disabled)
+            return;
+
+        if (onKeyUp)
+            onKeyUp(event);
+
         const keyName = event.key;
 
-        // case: paste
-        if ((isKeyPressed("Control") && keyName === "v")) 
-            inputDiv.html(sanitizeChildAttributes());
+        if (keyName === "Backspace" || keyName === "Delete")
+            cleanUpEmptyInputDiv(event);
     }
-    
-    
+
+
+    function updateAppUser(): void {
+
+        noteInput.value = $(inputDivRef.current!).html();
+    }
+
+
     /**
-     * @param dirtyHtml string to sanitize. Default is ```inputDiv.html()```
-     * @return sanitized inner html of inputDiv. Does not change the inputDivs's html
+     * Increase the ```numBlocksParsing``` by 1 if block is currently parsing, or else decrease it by 1 
+     * (but never go below 0).
      */
-    function sanitizeChildAttributes(dirtyHtml?: string): string {
+    function updateNumBlocksParsing(): void {
+
+        if (parsing)
+            setNumBlocksParsing(numBlocksParsing + 1);
+        
+        else if (numBlocksParsing > 0)
+            setNumBlocksParsing(numBlocksParsing - 1);
+    }
+
+
+    function cleanUpEmptyInputDiv(event): void {
 
         const inputDiv = $(inputDivRef.current!);
-
-        const sanitizedInputDiv = sanitize(dirtyHtml || inputDiv.html(), {
-            // remove all attributes
-            allowedAttributes: {}
-        });
-
-        return sanitizedInputDiv;
+        const inputBreaks = inputDiv.find("br");
+        
+        // case: no content left
+        if (isBlank(inputDiv.text()) && inputBreaks.length <= 1)
+            // clean up empty tags
+            inputDiv.html("");
     }
 
 
@@ -196,13 +279,14 @@ export default function PlainTextBlock({...props}: Props) {
             <ContentEditableDiv 
                 className="plainTextInput fullWidth" 
                 spellCheck={false} 
+                placeholder="Plain text..."
                 ref={inputDivRef}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                onKeyUp={handleKeyUp}
                 onKeyDownCapture={handleKeyDownCapture}
+                onKeyUp={handleKeyUp}
             >
-                Plain text with some <code>code...</code>
+                { inputDivValue }
             </ContentEditableDiv>
 
             {children}

@@ -23,4 +23,19 @@
             transition: var(--transitionTimeFast);
         }
     }
+
+    .blockOverlay {
+        .overlayBackground {
+            border-radius: var(--borderRadius);
+        }
+
+        .overlayChildrenContainer {
+            @include flexCenter();
+
+            .fa-circle-notch {
+                color: white;
+                font-size: 1.1em;
+            }
+        }
+    }
 }

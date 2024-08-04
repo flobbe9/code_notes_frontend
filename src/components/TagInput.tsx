@@ -4,10 +4,13 @@ import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import { log } from "../helpers/utils";
+import { Tag } from "../abstract/entites/Tag";
 
 
 interface Props extends DefaultProps {
 
+    // TODO: does optional make sense?
+    tag?: Tag
 }
 
 
@@ -15,7 +18,7 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 // TODO: implement max length 50
-export default function TagInput({...props}: Props) {
+export default function TagInput({tag, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagInput");
 
@@ -43,6 +46,13 @@ export default function TagInput({...props}: Props) {
     }
 
 
+    function handleChange(event): void {
+
+        if (tag)
+            tag.name = $(inputRef.current!).prop("value");
+    }
+
+
     return (
         <Flex 
             id={id} 
@@ -55,10 +65,12 @@ export default function TagInput({...props}: Props) {
                 type="text" 
                 className="tagInput"
                 placeholder="Tag..."
-                onKeyDown={handleKeyDown}
                 title="Tag"
                 spellCheck={false}
+                defaultValue={tag?.name || ""}
                 ref={inputRef}
+                onKeyDown={handleKeyDown}
+                onChange={handleChange}
             />
 
             <Button className="tagInputDeleteButton flexCenter hover" title="Delete tag">

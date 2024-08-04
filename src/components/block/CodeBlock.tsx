@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../assets/styles/CodeBlock.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { Editor } from "@monaco-editor/react";
-import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, log, setClipboardText } from "../../helpers/utils";
+import { getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, log, setClipboardText } from "../../helpers/utils";
 import { DefaultBlockContext } from "./DefaultBlock";
 import { AppContext } from "../App";
 import Button from "../helpers/Button";
@@ -11,10 +11,12 @@ import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
 import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
 import { StartPageContainerContext } from "../StartPageContainer";
+import { NoteInput } from "../../abstract/entites/NoteInput";
 
 
 interface Props extends DefaultProps {
 
+    noteInput: NoteInput
 }
 
 
@@ -28,11 +30,12 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-// TODO: 
+// IDEA: 
     // change theme (settings)
         // adjust some css classes
     // toggle minimap ? (settings)
-export default function CodeBlock({...props}: Props) {
+// TODO: width not working because fetch takes too long
+export default function CodeBlock({noteInput, ...props}: Props) {
 
     /** Height of one line of the monaco vscode editor in px */
     const editorLineHeight = 19; // px
@@ -49,6 +52,7 @@ export default function CodeBlock({...props}: Props) {
     const [editorWidth, setEditorWidth] = useState("100%");
     const [editorTransition, setEditorTransition] = useState(0);
     const [numEditorLines, setNumEditorLines] = useState(1);
+    const [editorValue, setEditorValue] = useState(noteInput.value);
 
     const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -143,7 +147,13 @@ export default function CodeBlock({...props}: Props) {
         setAreBlockSettingsDisabled(false);
 
 
-    }, [isEditorMounted])
+    }, [isEditorMounted]);
+
+
+    useEffect(() => {
+        updateAppUser();
+
+    }, [codeBlockLanguage]);
 
 
     useWindowResizeCallback(handleWindowResize);
@@ -153,6 +163,25 @@ export default function CodeBlock({...props}: Props) {
 
         if (!isFullScreen)
             setTimeout(() => setNumEditorLines(getNumLines(value)), 5);
+
+        updateAppUser();
+    }
+
+
+    /**
+     * Set ```noteInput``` values using this block.
+     * 
+     * @param editorValue the current text in the editor
+     */
+    function updateAppUser(): void {
+
+        const editorValue = getCurrentEditorValue();
+
+        // value
+        noteInput.value = editorValue;
+
+        // programmingLanguage
+        noteInput.programmingLanguage = codeBlockLanguage;
     }
 
 
@@ -504,6 +533,20 @@ export default function CodeBlock({...props}: Props) {
     }
 
 
+    /**
+     * @returns the current value of the editor (taken from the textarea element inside) or a blank string if has not mounted yet
+     */
+    function getCurrentEditorValue(): string {
+
+        if (!isEditorMounted)
+            return "";
+
+        const textArea = $(componentRef.current!).find("textarea.inputarea");
+
+        return textArea.prop("value");
+    }
+
+
     return (
         <Flex 
             id={id} 
@@ -513,7 +556,7 @@ export default function CodeBlock({...props}: Props) {
             flexWrap="nowrap"
             {...otherProps}
         >
-            <Flex className="fullWidth" style={{backgroundColor: "var(--vsCodeBlack)"}} flexWrap="nowrap">
+            <Flex className="fullWidth editorContainer" flexWrap="nowrap">
                 {/* Editor */}
                 <div className="fullWidth">
                     <Editor 
@@ -522,6 +565,7 @@ export default function CodeBlock({...props}: Props) {
                         width={"98%"}
                         language={codeBlockLanguage.toLowerCase()}
                         theme="vs-dark"
+                        defaultValue={editorValue}
                         onChange={handleChange}
                         onMount={handleEditorMount}
                     />

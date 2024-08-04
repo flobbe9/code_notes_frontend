@@ -1,7 +1,13 @@
 @import "./global/functions.scss";
 
 .PlainTextBlock {
+    border: 2px solid var(--codeGrey);
+    border-right: none;
+    border-radius: var(--borderRadius);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
     height: 100%;
+    padding: 5px 3px;
 
     .plainTextInput {
         max-height: 20vh;

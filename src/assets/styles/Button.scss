@@ -5,6 +5,10 @@
     border-radius: var(--borderRadius);
     padding: 10px 15px;
 
+    .buttonContentContainer {
+        min-height: 24px; // the height of the rotating circle icon
+    }
+
     @include hoverCursor();
     @include buttonFocus();
 }

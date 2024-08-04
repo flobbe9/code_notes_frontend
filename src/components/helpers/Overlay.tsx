@@ -15,7 +15,15 @@ interface Props extends HelperProps {
     hideOnEscape?: boolean,
 
     isOverlayVisible: boolean,
-    setIsOverlayVisible: (isVisible: boolean) => void
+    setIsOverlayVisible: (isVisible: boolean) => void,
+
+    /** Indicates whether the overlay should only cover the it's parent. Will only work if parent has a relative position. Default is ```true``` */
+    fitParent?: boolean,
+
+    /** The duration in millis that the overlay fades in. Default is 200 */
+    fadeInDuration?: number,
+    /** The duration in millis that the overlay fades out. Default is 200 */
+    fadeOutDuration?: number
 }
 
 
@@ -30,6 +38,9 @@ export default forwardRef(function Overlay(
         hideOnEscape = false,
         isOverlayVisible,
         setIsOverlayVisible,
+        fitParent = true,
+        fadeInDuration = 200,
+        fadeOutDuration = 200,
         onClick,
         onKeyDown,
         ...props
@@ -40,6 +51,10 @@ export default forwardRef(function Overlay(
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Overlay");
 
     const componentRef = useRef(null);
+    const backgroundRef = useRef(null);
+    const childrenRef = useRef(null);
+
+
     useImperativeHandle(ref, () => componentRef.current!, []);
 
 
@@ -61,15 +76,28 @@ export default forwardRef(function Overlay(
     function hideOverlay(): void {
 
         const overlay = $(componentRef.current!);
+        const background = $(backgroundRef.current!);
+        const children = $(childrenRef.current!);
 
         setIsOverlayVisible(false);
 
-        overlay.animate(
+        // hide children
+        children.animate(
+            {
+            opacity: 0
+            },
+            fadeOutDuration,
+            "swing"
+        )
+
+        // hide background
+        background.animate(
             {
                 opacity: 0,
             },
-            200,
+            fadeOutDuration,
             "swing",
+            // hide component
             () => overlay.hide()
         );
 
@@ -79,14 +107,29 @@ export default forwardRef(function Overlay(
     function showOverlay(): void {
 
         const overlay = $(componentRef.current!);
+        const background = $(backgroundRef.current!);
+        const children = $(childrenRef.current!);
 
         setIsOverlayVisible(true);
 
+        // show component
         overlay.show();
 
-        overlay.animate({
-            opacity: 0.3
-        });
+        // show background
+        background.animate(
+            {
+                opacity: 0.3
+            },
+            fadeInDuration
+        );
+
+        // show children
+        children.animate(
+            {
+                opacity: 1
+            },
+            fadeInDuration
+        )
     }
 
 
@@ -130,12 +173,16 @@ export default forwardRef(function Overlay(
         <HelperDiv
             id={id} 
             className={className}
-            style={style}
+            style={{
+                ...style,
+                position: fitParent ? "absolute" : "fixed"
+            }}
             ref={componentRef}
             onClick={handleClick}
             {...otherProps}
         >
-            {children}
+            <div className="overlayBackground" ref={backgroundRef}></div>
+            <div className="overlayChildrenContainer" ref={childrenRef}>{children}</div>
         </HelperDiv>
     )
 })

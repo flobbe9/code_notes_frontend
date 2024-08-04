@@ -3,15 +3,16 @@ import "../../assets/styles/DefaultBlock.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
-import BlockSwitch from "./BlockSwitch";
-import SearchBar from "../helpers/SearchBar";
-import LanguageSearchResults from "../LanguageSearchResults";
 import { log } from "../../helpers/utils";
 import BlockSettings from "./BlockSettings";
+import { NoteInput } from "../../abstract/entites/NoteInput";
+import Overlay from "../helpers/Overlay";
+import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
 
 
 interface Props extends DefaultProps {
 
+    noteInput: NoteInput
 }
 
 
@@ -22,14 +23,15 @@ interface Props extends DefaultProps {
  *  
  * @since 0.0.1
  */
-export default function DefaultBlock({...props}: Props) {
+export default function DefaultBlock({noteInput, ...props}: Props) {
 
     const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
     const [areBlockSettingsDisabled, setAreBlockSettingsDisabled] = useState(false);
 
-    // codeblock language state
-    const [codeBlockLanguage, setCodeBlockLanguage] = useState("");
-    // code block with vars language
+    const [codeBlockLanguage, setCodeBlockLanguage] = useState(noteInput.programmingLanguage || CODE_BLOCK_DEFAULT_LANGUAGE);
+    const [codeBlockWithVariablesLanguage, setCodeBlockcodeBlockWithVariablesLanguage] = useState(noteInput.programmingLanguage || CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE);
+
+    const [blockOverlayVisible, setBlockOverlayVisible] = useState(false);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultBlock");
 
@@ -42,12 +44,14 @@ export default function DefaultBlock({...props}: Props) {
         setAreBlockSettingsDisabled,
 
         codeBlockLanguage, 
-        setCodeBlockLanguage
-    }
+        setCodeBlockLanguage,
 
-    // TODO:
-        // drag and drop?
-        // pass block type in here
+        codeBlockWithVariablesLanguage, 
+        setCodeBlockcodeBlockWithVariablesLanguage,
+
+        blockOverlayVisible,
+        setBlockOverlayVisible
+    }
 
 
     return (
@@ -60,6 +64,7 @@ export default function DefaultBlock({...props}: Props) {
                 verticalAlign="start"
                 horizontalAlign="center"
                 ref={componentRef}
+                draggable
                 {...otherProps}
             >
                 <Flex className="blockContent fullWidth" flexWrap="nowrap">
@@ -75,11 +80,20 @@ export default function DefaultBlock({...props}: Props) {
                 </Flex>
 
                 {/* Settings */}
-                {/* TODO: pass block type
-                            make block type enum
-                */}
-                <BlockSettings areBlockSettingsDisabled={areBlockSettingsDisabled} />
+                <BlockSettings noteInput={noteInput} areBlockSettingsDisabled={areBlockSettingsDisabled} />
+
+                {/* Overlay */}
+                <Overlay 
+                    className="blockOverlay flexCenter" 
+                    hideOnClick={false}
+                    fadeInDuration={0}
+                    isOverlayVisible={blockOverlayVisible} 
+                    setIsOverlayVisible={setBlockOverlayVisible}
+                >
+                    <i className={"fa-solid fa-circle-notch rotating"}></i>
+                </Overlay>
             </Flex>
+
         </DefaultBlockContext.Provider>
     )
 }
@@ -92,5 +106,11 @@ export const DefaultBlockContext = createContext({
     setAreBlockSettingsDisabled: (areDisabled: boolean) => {},
 
     codeBlockLanguage: "",
-    setCodeBlockLanguage: (language: string) => {}
+    setCodeBlockLanguage: (language: string) => {},
+
+    codeBlockWithVariablesLanguage: "", 
+    setCodeBlockcodeBlockWithVariablesLanguage: (language: string) => {},
+
+    blockOverlayVisible: false,
+    setBlockOverlayVisible: (isVisible: boolean) => {}
 });

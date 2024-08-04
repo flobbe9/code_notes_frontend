@@ -7,6 +7,7 @@ import { getRandomString, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import Flex from "./helpers/Flex";
 import Button from "./helpers/Button";
+import { Note } from "../abstract/entites/Note";
 
 
 interface Props extends DefaultProps {
@@ -19,17 +20,24 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
+// TODO: 
+    // what to display while there's no notes
 export default function StartPageContent({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageContent", true);
 
-    const { isKeyPressed } = useContext(AppContext);
+    const { appUser, isKeyPressed } = useContext(AppContext);
+
+    const [notes, setNotes] = useState<Note[] | null | undefined>(appUser.notes);
+    const [blockContainers, setBlockContainers] = useState<JSX.Element[]>();
 
     const searchInputRef = useRef(null);
 
 
     useEffect(() => {
         $(window).on("keydown", handleKeyDown);
+
+        setBlockContainers(mapNotesToJsx());
 
         return () => {
             $(window).off("keydown", handleKeyDown);
@@ -46,6 +54,17 @@ export default function StartPageContent({...props}: Props) {
         }
     }
 
+
+    function mapNotesToJsx(): JSX.Element[] {
+
+        // case: null
+        if (!notes)
+            return [];
+
+        return notes.map(note => 
+            <BlockContainer note={note} key={getRandomString()} />);
+    }
+
     
     return (
         <div 
@@ -54,37 +73,27 @@ export default function StartPageContent({...props}: Props) {
             style={style}
             {...otherProps}
         >
-            <Flex className="mb-4 mt-3" flexWrap="nowrap" verticalAlign="center">
-                {/* Search bar */}
+            <div className="mb-5 mt-3">
+                {/* SearchBar */}
                 <SearchBar 
                     className="fullWidth" 
-                    placeHolder="Search for title, tag or note text" 
+                    placeHolder="Search for note Title, note Tag or note Text" 
                     title="Search notes (Ctrl+Shift+F)"
                     ref={searchInputRef}
                     _focus={{borderColor: "var(--accentColor)"}}
                 />
 
-                {/* Add block container */}
-                <Button className="addBlockContainerButton hover ms-2">
+                {/* New Note Button */}
+                <Button className="addBlockContainerButton hover mt-2 fullWidth" title="New note">
                     <i className="fa-solid fa-plus me-1"></i>
                     <span>New Note</span>
                 </Button>
-            </Flex>
+            </div>
 
-            {/* List of blockContainers */}
-            {testBlockContainers}
+            {/* BlockContainers */}
+            {blockContainers}
 
             {children}
         </div>
     )
 }
-
-
-const testBlockContainers = [
-    <BlockContainer key={getRandomString()} />,
-    <BlockContainer key={getRandomString()} />,
-    <BlockContainer key={getRandomString()} />,
-    <BlockContainer key={getRandomString()} />,
-    <BlockContainer key={getRandomString()} />,
-    <BlockContainer key={getRandomString()} />
-]

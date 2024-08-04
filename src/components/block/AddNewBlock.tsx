@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import "../../assets/styles/AddNewBlock.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import { log } from "../../helpers/utils";
-import ButtonSlideLabel from "../helpers/ButtonSlideLabel";
+import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
+import { Note } from "../../abstract/entites/Note";
+import { BlockContainerContext } from "./BlockContainer";
 
 
 interface Props extends DefaultProps {
@@ -20,6 +22,8 @@ export default function AddNewBlock({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewBlock");
 
+    const { note } = useContext(BlockContainerContext);
+
 
     return (
         <Flex 
@@ -30,25 +34,29 @@ export default function AddNewBlock({...props}: Props) {
             {...otherProps}
         >
             <div className="col-4 ps-2 pe-2">
-                <ButtonSlideLabel className="fullWidth hover" label="Plain Text" title="Add plain text section">
+                <ButtonWithSlideLabel 
+                    className="fullWidth hover" 
+                    label="Plain Text" 
+                    title="Add plain text section"
+                >
                     <i className="fa-solid fa-plus me-2"></i>
                     <i className="fa-solid fa-align-left"></i>
-                </ButtonSlideLabel>
+                </ButtonWithSlideLabel>
             </div>
 
             <div className="col-4 ps-2 pe-2">
-                <ButtonSlideLabel className="fullWidth hover" label="Code" title="Add code section">
+                <ButtonWithSlideLabel className="fullWidth hover" label="Code" title="Add code section">
                     <i className="fa-solid fa-plus me-2"></i>
                     <i className="fa-solid fa-code"></i>
-                </ButtonSlideLabel>
+                </ButtonWithSlideLabel>
             </div>
 
             <div className="col-4 ps-2 pe-2">
-                <ButtonSlideLabel className="fullWidth hover" label="Code with Variables" title="Add code with variables section">
+                <ButtonWithSlideLabel className="fullWidth hover" label="Code with Variables" title="Add code with variables section">
                     <i className="fa-solid fa-plus me-2"></i>
                     <i className="fa-solid fa-dollar-sign"></i>
                     <span className="curlyBraces">&#123;&#125;</span> 
-                </ButtonSlideLabel>
+                </ButtonWithSlideLabel>
             </div>
                 
             {children}
