@@ -63,6 +63,8 @@ export default function CodeBlock({noteInput, ...props}: Props) {
         getAppOverlayZIndex 
     } = useContext(AppContext);
 
+    const { isShowSideBar, getStartPageSideBarWidth } = useContext(StartPageContainerContext);
+
     const { 
         isShowBlockSettings, 
         areBlockSettingsDisabled, 
@@ -71,8 +73,6 @@ export default function CodeBlock({noteInput, ...props}: Props) {
     } = useContext(DefaultBlockContext);
 
     const { animateCopyIcon } = useContext(DefaultCodeBlockContext);
-
-    const { isShowSideBar } = useContext(StartPageContainerContext);
 
     const { isMobileWidth, isTabletWidth } = getDeviceWidth();
 
@@ -306,12 +306,12 @@ export default function CodeBlock({noteInput, ...props}: Props) {
      */
     function handleToggleSideBar(): void {
 
-        setEditorTransition(0);
+        setEditorTransition(isShowSideBar ? 0 : BLOCK_SETTINGS_ANIMATION_DURATION + 10);
 
         // case: show side bar
         if (isShowSideBar) {
             const fullEditorWidth = updateFullEditorWidth();
-            const sideBarWidth = getSideBarWidth();
+            const sideBarWidth = getStartPageSideBarWidth();
 
             setEditorWidth(fullEditorWidth - sideBarWidth + "px");
         
@@ -332,12 +332,8 @@ export default function CodeBlock({noteInput, ...props}: Props) {
             { width: editorWidth },
             editorTransition,
             "swing",
-            () => {
-                // wait for other animations to finish, even though editor is done
-                setTimeout(() => {
-                    getOuterEditorContainer().css("width", "98%")
-                }, 500);
-            }
+            () => setTimeout(() => 
+                getOuterEditorContainer().css("width", "98%"), 300) // wait for possible sidebar animations to finish, even though editor is done
         )
     }
 
@@ -516,20 +512,6 @@ export default function CodeBlock({noteInput, ...props}: Props) {
         const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
         
         return (isTabletWidth ? 0 : blockSwitchWidth) + languageSearchBarWidth;
-    }
-
-
-    /**
-     * @returns the width of the expanded side bart, not including the toggle button and considering
-     *          mobile mode.
-     */
-    function getSideBarWidth(): number {
-
-        // if is mobile
-        if (isMobileWidth) 
-            return $(window).width()! * 0.3; // startPageSideBarWidthWidthMobile = 30vw
-        
-        return getCSSValueAsNumber(getCssConstant("startPageSideBarWidth"), 2);
     }
 
 

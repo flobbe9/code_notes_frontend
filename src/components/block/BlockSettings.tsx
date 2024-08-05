@@ -107,6 +107,9 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
         const languageSearchBar = $(componentRef.current!).find(".languageSearchBar");
         const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
 
+        if (!hide)
+            languageSearchBar.css("position", "relative");
+
         // fake "toggle slide"
         languageSearchBar.animate(
             {
@@ -115,7 +118,8 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
                 zIndex: hide ? -1 : 1
             }, 
             BLOCK_SETTINGS_ANIMATION_DURATION,
-            "swing"
+            "swing",
+            () => languageSearchBar.css("position", (hide ? "absolute" : "relative"))
         )
     }
 

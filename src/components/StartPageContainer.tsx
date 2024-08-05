@@ -3,7 +3,7 @@ import DefaultProps from "../abstract/DefaultProps";
 import StartPageContent from "./StartPageContent";
 import StartPageSideBar from "./StartPageSideBar";
 import Flex from "./helpers/Flex";
-import { getCSSValueAsNumber, isBlank, log } from "../helpers/utils";
+import { getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, log } from "../helpers/utils";
 import { AppContext } from "./App";
 
 
@@ -21,42 +21,68 @@ interface Props extends DefaultProps {
 export default function StartPageContainer({children, ...props}: Props) {
 
     const [isShowSideBar, setIsShowSideBar] = useState(false);
-    const [startPageSidebarWidth, setStartPageSideBarWidth] = useState<string>();
-    const [startPageContentWidth, setStartPageContentWidth] = useState<string>();
 
-    const { windowSize } = useContext(AppContext);
+    const { windowSize, getDeviceWidth } = useContext(AppContext);
+    const { isMobileWidth } = getDeviceWidth();
 
     const context = {
         isShowSideBar, 
         setIsShowSideBar,
-        setStartPageSideBarWidth
+
+        getStartPageSideBarWidth
     }
 
 
     useEffect(() => {
         updateStartPageContentWidth();
 
-    }, [startPageSidebarWidth, windowSize]);
+    }, [isShowSideBar, windowSize]);
 
 
+
+        // TODO: do this on window size change too (?)
     function updateStartPageContentWidth(): void {
 
-        setStartPageContentWidth(calculateStartPageContentWidth());
+        const startPageContent = $("#StartPageContent");
+        const startPageContentWidth = calculateStartPageContentWidth();
+
+        if (isNumberFalsy(startPageContentWidth))
+            return;
+
+        startPageContent.animate(
+            {
+                width: startPageContentWidth
+            },
+            100
+        );
     }
 
 
-    function calculateStartPageContentWidth(): string | undefined {
+    function calculateStartPageContentWidth(): number | undefined {
 
         const windowWidth = $("#App").innerWidth();
 
         // case: sidebar not rendered yet
-        if (isBlank(startPageSidebarWidth) || isBlank(windowWidth?.toString()))
+        if (isBlank(windowWidth?.toString()))
             return;
         
         const windowWidthNumber = getCSSValueAsNumber(windowWidth!, 2);
-        const sideBarWidthNumber = getCSSValueAsNumber(startPageSidebarWidth!, 0);
+        const sideBarWidthNumber = getStartPageSideBarWidth();
 
-        return (windowWidthNumber - sideBarWidthNumber) + "px";
+        return isShowSideBar ? windowWidthNumber - sideBarWidthNumber :
+                               windowWidthNumber + sideBarWidthNumber;
+    }
+
+
+    /**
+     * @returns the width of the expanded side bart, not including the toggle button and considering mobile mode.
+     */
+    function getStartPageSideBarWidth(): number {
+
+        if (isMobileWidth) 
+            return $(window).width()! * 0.3;
+
+        return getCSSValueAsNumber(getCssConstant("startPageSideBarWidth"), 2);
     }
 
 
@@ -65,7 +91,7 @@ export default function StartPageContainer({children, ...props}: Props) {
             <Flex flexWrap="nowrap">
                 <StartPageSideBar />
 
-                <StartPageContent style={{width: startPageContentWidth}} />
+                <StartPageContent />
             </Flex>
 
             {children}
@@ -77,5 +103,6 @@ export default function StartPageContainer({children, ...props}: Props) {
 export const StartPageContainerContext = createContext({
     isShowSideBar: false, 
     setIsShowSideBar: (isShow: boolean) => {},
-    setStartPageSideBarWidth: (width: string | undefined) => {}
+
+    getStartPageSideBarWidth: () => {return 0 as number}
 });

@@ -1912,4 +1912,4 @@ export const CODE_BLOCK_WITH_VARIABLES_LANGUAGES: ProgrammingLanguage[] = [
 
 // Other
 /** Time the block settings slide animation takes (in ms). */
-export const BLOCK_SETTINGS_ANIMATION_DURATION = 300;
+export const BLOCK_SETTINGS_ANIMATION_DURATION = 100;

@@ -532,10 +532,11 @@ export default function CodeBlockWithVariables({
         if (onBlur)
             onBlur(event);
 
-        const variableInputs = $(".variableInput");
+        const variableInputs = $(inputDivRef.current!).find(".variableInput");
         
         // case: focus was not on a variable input or the placeholder textarea
-        if ((!variableInputs.length || !variableInputs.has(":focus")) && !hasPlaceholder())
+        // TODO: focus condition does not work
+        if ((!variableInputs.length || !variableInputs.has(":focus").length) && !hasPlaceholder())
             await highlightInputDivContent();
     }
 

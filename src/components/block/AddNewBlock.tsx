@@ -6,6 +6,8 @@ import { log } from "../../helpers/utils";
 import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
 import { Note } from "../../abstract/entites/Note";
 import { BlockContainerContext } from "./BlockContainer";
+import { NoteInput } from "../../abstract/entites/NoteInput";
+import { NoteInputType } from "../../abstract/NoteInputType";
 
 
 interface Props extends DefaultProps {
@@ -25,6 +27,20 @@ export default function AddNewBlock({...props}: Props) {
     const { note } = useContext(BlockContainerContext);
 
 
+    function handleAddPlainTextBlock(event): void {
+         
+        if (!note.noteInputs)
+            return; // TODO
+
+        const newPlainTextBlock: NoteInput = {
+            value: "Default value",
+            type: NoteInputType.PLAIN_TEXT
+        }
+
+        note.noteInputs = [...note.noteInputs, newPlainTextBlock]
+    }
+ 
+
     return (
         <Flex 
             id={id} 
@@ -38,6 +54,7 @@ export default function AddNewBlock({...props}: Props) {
                     className="fullWidth hover" 
                     label="Plain Text" 
                     title="Add plain text section"
+                    onClick={handleAddPlainTextBlock}
                 >
                     <i className="fa-solid fa-plus me-2"></i>
                     <i className="fa-solid fa-align-left"></i>

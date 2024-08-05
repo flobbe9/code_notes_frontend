@@ -33,11 +33,11 @@ export default forwardRef(function ButtonWithSlideLabel(
 
 
     useEffect(() => {
-
         // wait for adjacent elements to render as well
         setTimeout(() => {
             setInitialBlockButtonLabelWidth(getBlockButtonLabelWidth());
         }, 200);
+        
     }, []);
 
 

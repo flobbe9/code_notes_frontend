@@ -56,7 +56,8 @@ export default forwardRef(function Button({
 
     useImperativeHandle(ref, () => componentRef.current!, []);
 
-    useInitialStyles(componentJQuery, [["min-width", "width"]], 200);
+    // TODO
+    // useInitialStyles(componentJQuery, [["min-width", "width"]], 200);
 
 
     useEffect(() => {

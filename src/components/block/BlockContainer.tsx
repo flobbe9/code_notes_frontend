@@ -20,7 +20,8 @@ import { AppContext } from "../App";
 
 interface Props extends DefaultProps {
 
-    note: Note
+    note: Note,
+    setNotes: (notes: Note[]) => void
 }
 
 
@@ -30,7 +31,7 @@ interface Props extends DefaultProps {
  */
 // TODO: 
     // confirm leave if not saved
-export default function BlockContainer({note, ...props}: Props) {
+export default function BlockContainer({note, setNotes, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainer");
 
@@ -42,6 +43,7 @@ export default function BlockContainer({note, ...props}: Props) {
      * Number of blocks that are currently parsing or highlighting their values. Indicates whether the save() function should wait
      * for block values or not.
      */
+    // TODO: replace timeouts with checkbox solution?
     const [numBlocksParsing, setNumBlocksParsing] = useState(0);
 
     const { toast } = useContext(AppContext);
@@ -67,7 +69,7 @@ export default function BlockContainer({note, ...props}: Props) {
         if (isReadyToSave())
             $(saveButtonRef.current!).trigger("click");
 
-    }, [numBlocksParsing])
+    }, [numBlocksParsing]);
 
 
     function mapBlocksToJsx(): JSX.Element[] {

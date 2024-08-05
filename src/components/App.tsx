@@ -270,7 +270,12 @@ const mockAppUser: AppUser = {
                 value: "const x = 3;\n\nadsf",
                 type: NoteInputType.CODE,
                 programmingLanguage: "_plaintext"
-            }
+            },
+            {
+                value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
+                type: NoteInputType.CODE_WITH_VARIABLES,
+                programmingLanguage: "_auto"
+            },
         ],
         tags: []
       },
@@ -281,7 +286,12 @@ const mockAppUser: AppUser = {
             {
                 value: "some <code>code</code>",
                 type: NoteInputType.PLAIN_TEXT
-            }
+            },
+            {
+                value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
+                type: NoteInputType.CODE_WITH_VARIABLES,
+                programmingLanguage: "_auto"
+            },
         ],
         tags: []
       },

@@ -62,7 +62,7 @@ export default function StartPageContent({...props}: Props) {
             return [];
 
         return notes.map(note => 
-            <BlockContainer note={note} key={getRandomString()} />);
+            <BlockContainer note={note} setNotes={setNotes} key={getRandomString()} />);
     }
 
     

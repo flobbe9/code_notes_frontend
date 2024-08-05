@@ -9,6 +9,7 @@ import { AppContext } from "./App";
 import StartPageSideBarTagList from "./StartPageSideBarTagList";
 import { StartPageContainerContext } from "./StartPageContainer";
 import Button from "./helpers/Button";
+import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../helpers/constants";
 
 
 interface Props extends DefaultProps {
@@ -30,16 +31,11 @@ export default function StartPageSideBar({...props}: Props) {
     const tagFilterContainerRef = useRef(null);
 
     const { getDeviceWidth, isKeyPressed } = useContext(AppContext);
-    
-    const { 
-        setStartPageSideBarWidth,
-        setIsShowSideBar
-    } = useContext(StartPageContainerContext);
+    const { setIsShowSideBar } = useContext(StartPageContainerContext);
 
 
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
-        updateSideBarWidthState();
 
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
@@ -47,7 +43,7 @@ export default function StartPageSideBar({...props}: Props) {
     }, []);
 
 
-    function slideInTagFilterContainer(duration = 100, easing: JQueryEasing = "easeOutSine"): void {
+    function slideInTagFilterContainer(): void {
 
         setIsShowSideBar(true);
 
@@ -61,15 +57,13 @@ export default function StartPageSideBar({...props}: Props) {
                 paddingRight: getCssConstant("tagFilterContainerPadding"),
                 paddingLeft: getCssConstant("tagFilterContainerPadding"),
             },
-            duration,
-            easing,
-            // update sibarWidth
-            () => updateSideBarWidthState()
+            BLOCK_SETTINGS_ANIMATION_DURATION,
+            "easeOutSine",
         );
     }
 
 
-    function slideOutTagFilterContainer(duration = 100, easing: JQueryEasing = "easeInSine"): void {
+    function slideOutTagFilterContainer(): void {
 
         setIsShowSideBar(false);
 
@@ -81,12 +75,9 @@ export default function StartPageSideBar({...props}: Props) {
                 paddingRight: 0,
                 paddingLeft: 0
             },
-            duration,
-            easing,
-            () => {
-                tagFilterContainer.hide();
-                updateSideBarWidthState();
-            }
+            BLOCK_SETTINGS_ANIMATION_DURATION,
+            "easeInSine",
+            () => tagFilterContainer.hide()
         );
     }
 
@@ -119,13 +110,6 @@ export default function StartPageSideBar({...props}: Props) {
             event.preventDefault();
             toggleTagFilterContainer();
         }
-    }
-
-
-    // TODO: still necessary?
-    function updateSideBarWidthState(): void {
-
-        // setStartPageSideBarWidth($(componentRef.current!).outerWidth()?.toString())
     }
 
 
