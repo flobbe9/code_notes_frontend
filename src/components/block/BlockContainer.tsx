@@ -43,7 +43,6 @@ export default function BlockContainer({note, setNotes, ...props}: Props) {
      * Number of blocks that are currently parsing or highlighting their values. Indicates whether the save() function should wait
      * for block values or not.
      */
-    // TODO: replace timeouts with checkbox solution?
     const [numBlocksParsing, setNumBlocksParsing] = useState(0);
 
     const { toast } = useContext(AppContext);
@@ -55,17 +54,20 @@ export default function BlockContainer({note, setNotes, ...props}: Props) {
         note,
 
         numBlocksParsing, 
-        setNumBlocksParsing
+        setNumBlocksParsing,
+
+        updateBlocks
     }
 
 
     useEffect(() => {
-        setBlocks(mapBlocksToJsx());
+        updateBlocks();
 
     }, []);
 
 
     useEffect(() => {
+        // case: clicked save but was still parsing
         if (isReadyToSave())
             $(saveButtonRef.current!).trigger("click");
 
@@ -143,6 +145,15 @@ export default function BlockContainer({note, setNotes, ...props}: Props) {
     }
 
 
+    /**
+     * Map ```note.noteInputs``` to jsx elements and update ```blocks``` state.
+     */
+    function updateBlocks(): void {
+
+        setBlocks(mapBlocksToJsx());
+    }
+
+
     return (
         <BlockContainerContext.Provider value={context}>
             <div 
@@ -206,5 +217,7 @@ export const BlockContainerContext = createContext({
     note: new Note(),
 
     numBlocksParsing: 0, 
-    setNumBlocksParsing: (num: number) => {}
+    setNumBlocksParsing: (num: number) => {},
+
+    updateBlocks: () => {}
 })
