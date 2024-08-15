@@ -8,11 +8,15 @@ import BlockSettings from "./BlockSettings";
 import { NoteInput } from "../../abstract/entites/NoteInput";
 import Overlay from "../helpers/Overlay";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
+import { BlockContainerContext } from "./BlockContainer";
+import { AppContext } from "../App";
 
 
 interface Props extends DefaultProps {
 
-    noteInput: NoteInput
+    noteInput: NoteInput,
+
+    noteInputIndex: number
 }
 
 
@@ -23,7 +27,7 @@ interface Props extends DefaultProps {
  *  
  * @since 0.0.1
  */
-export default function DefaultBlock({noteInput, ...props}: Props) {
+export default function DefaultBlock({noteInput, noteInputIndex, ...props}: Props) {
 
     const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
     const [areBlockSettingsDisabled, setAreBlockSettingsDisabled] = useState(false);
@@ -36,6 +40,10 @@ export default function DefaultBlock({noteInput, ...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultBlock");
 
     const componentRef = useRef(null);
+
+    const { note, updateBlocks } = useContext(BlockContainerContext);
+
+    const { toast } = useContext(AppContext);
 
     const context = {
         isShowBlockSettings, 
@@ -51,6 +59,16 @@ export default function DefaultBlock({noteInput, ...props}: Props) {
 
         blockOverlayVisible,
         setBlockOverlayVisible
+    }
+
+
+    function deleteBlock(): void {
+
+        // TODO: confirm
+
+        note.noteInputs?.splice(noteInputIndex, 1);
+
+        updateBlocks();
     }
 
 
@@ -74,7 +92,11 @@ export default function DefaultBlock({noteInput, ...props}: Props) {
                     </div>
 
                     {/* Delete button */}
-                    <Button className="deleteBlockButton defaultBlockButton" title="Delete section">
+                    <Button 
+                        className="deleteBlockButton defaultBlockButton" 
+                        title="Delete section"
+                        onClick={deleteBlock}
+                    >
                         <i className="fa-solid fa-xmark"></i>
                     </Button>
                 </Flex>

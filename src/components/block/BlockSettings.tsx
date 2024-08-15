@@ -285,6 +285,7 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
                 placeHolder="Language..." 
                 ref={languageSearchBarRef}
                 title="Search programming language"
+                defaultValue={noteInput.programmingLanguage || ""}
                 tabIndex={isShowBlockSettings ? undefined : -1}
                 rendered={noteInput.type !== NoteInputType.PLAIN_TEXT}
                 onFocus={handleLanguageSearchFocus}

@@ -16,12 +16,14 @@ import { NoteInputType } from "../../abstract/NoteInputType";
 import { getRandomString, log } from './../../helpers/utils';
 import { NoteInput } from "../../abstract/entites/NoteInput";
 import { AppContext } from "../App";
+import { StartPageContentContext } from "../StartPageContent";
 
 
 interface Props extends DefaultProps {
 
     note: Note,
-    setNotes: (notes: Note[]) => void
+
+    noteIndex: number
 }
 
 
@@ -31,7 +33,7 @@ interface Props extends DefaultProps {
  */
 // TODO: 
     // confirm leave if not saved
-export default function BlockContainer({note, setNotes, ...props}: Props) {
+export default function BlockContainer({note, noteIndex, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainer");
 
@@ -45,7 +47,8 @@ export default function BlockContainer({note, setNotes, ...props}: Props) {
      */
     const [numBlocksParsing, setNumBlocksParsing] = useState(0);
 
-    const { toast } = useContext(AppContext);
+    const { toast, appUser } = useContext(AppContext);
+    const { updateBlockContainers } = useContext(StartPageContentContext);
 
     const componentRef = useRef(null);
     const saveButtonRef = useRef(null);
@@ -67,7 +70,7 @@ export default function BlockContainer({note, setNotes, ...props}: Props) {
 
 
     useEffect(() => {
-        // case: clicked save but was still parsing
+        // case: clicked save and has finished parsing
         if (isReadyToSave())
             $(saveButtonRef.current!).trigger("click");
 
@@ -79,31 +82,31 @@ export default function BlockContainer({note, setNotes, ...props}: Props) {
         if (!note.noteInputs)
             return [];
 
-        return note.noteInputs.map(noteInput =>
-            getBlockByNoteInputType(noteInput));
+        return note.noteInputs.map((noteInput, i) =>
+            getBlockByNoteInputType(noteInput, i));
     }
 
 
-    function getBlockByNoteInputType(noteInput: NoteInput): JSX.Element {
+    function getBlockByNoteInputType(noteInput: NoteInput, noteInputIndex: number): JSX.Element {
 
         switch (noteInput.type) {
             case NoteInputType.PLAIN_TEXT:
                 return (
-                    <DefaultBlock noteInput={noteInput} key={getRandomString()}>
+                    <DefaultBlock noteInput={noteInput} noteInputIndex={noteInputIndex} key={getRandomString()}>
                         <PlainTextBlock noteInput={noteInput} />
                     </DefaultBlock>
                     )
 
             case NoteInputType.CODE:
                 return (
-                    <DefaultCodeBlock noteInput={noteInput} key={getRandomString()}>
+                    <DefaultCodeBlock noteInput={noteInput} noteInputIndex={noteInputIndex} key={getRandomString()}>
                         <CodeBlock noteInput={noteInput} />
                     </DefaultCodeBlock>
                 )
 
             case NoteInputType.CODE_WITH_VARIABLES:
                 return (
-                    <DefaultCodeBlock noteInput={noteInput} key={getRandomString()}>
+                    <DefaultCodeBlock noteInput={noteInput} noteInputIndex={noteInputIndex} key={getRandomString()}>
                         <CodeBlockWithVariables noteInput={noteInput} />
                     </DefaultCodeBlock>
                 )
@@ -121,11 +124,11 @@ export default function BlockContainer({note, setNotes, ...props}: Props) {
         if (!isReadyToSave()) 
             return;
         
-        // TODO
         return new Promise((res, rej) => {
             setTimeout(() => {
                 toast("Save", "Successfully saved " + note.title, "success", 5000);
                 log(note);
+                log(appUser)
                 setAboutToSave(false);
                 res();
             }, 2000);
@@ -154,6 +157,15 @@ export default function BlockContainer({note, setNotes, ...props}: Props) {
     }
 
 
+    function deleteBlock(): void {
+
+        // TODO: confirm
+        appUser.notes?.splice(noteIndex, 1);
+
+        updateBlockContainers();
+    }
+
+
     return (
         <BlockContainerContext.Provider value={context}>
             <div 
@@ -174,37 +186,41 @@ export default function BlockContainer({note, setNotes, ...props}: Props) {
 
                     {/* Blocks */}
                     {blocks}
+                        
+                    <Flex className="footer mt-3 fullWidth" flexWrap="nowrap">
+                        {/* TODO: remove margin start from first button */}
+                        <AddNewBlock className="me-2 fullWidth" />
 
-                    <AddNewBlock className="mt-4" />
+                        {/* Delete */}
+                        <ButtonWithSlideLabel 
+                            className="me-2 hover transition" 
+                            label="Delete Note"
+                            title="Delete note" 
+                            style={{backgroundColor: "rgb(248, 141, 141)"}}
+                            onClick={deleteBlock}
+                        >
+                            <i className="fa-solid fa-trash"></i>
+                        </ButtonWithSlideLabel>
+
+                        {/* Save */}
+                        {
+                            // TODO: 
+                                // disable while not changed
+                                // button not wide enough for slide label
+                        }
+                        <ButtonWithSlideLabel 
+                            label="Save Note"
+                            className="hover saveNoteButton" 
+                            title="Save note"
+                            style={{backgroundColor: "rgb(141, 141, 248)"}}
+                            ref={saveButtonRef}
+                            onMouseDown={handleMouseDown}
+                            onClickPromise={handleSave}
+                        >
+                            <i className="fa-solid fa-floppy-disk"></i>
+                        </ButtonWithSlideLabel>
+                    </Flex>
                 </div>
-                    
-                <Flex className="footer mt-1 me-2" horizontalAlign="right">
-                    {/* Delete */}
-                    <ButtonWithSlideLabel 
-                        className="me-2 hover transition" 
-                        label="Delete Note"
-                        title="Delete note" 
-                        style={{backgroundColor: "rgb(248, 141, 141)"}}
-                    >
-                        <i className="fa-solid fa-trash"></i>
-                    </ButtonWithSlideLabel>
-
-                    {/* Save */}
-                    {
-                        // TODO: disable while not changed
-                    }
-                    <ButtonWithSlideLabel 
-                        label="Save Note"
-                        className="hover saveNoteButton" 
-                        title="Save note"
-                        style={{backgroundColor: "rgb(141, 141, 248)"}}
-                        ref={saveButtonRef}
-                        onMouseDown={handleMouseDown}
-                        onClickPromise={handleSave}
-                    >
-                        <i className="fa-solid fa-floppy-disk"></i>
-                    </ButtonWithSlideLabel>
-                </Flex>
 
                 {children}
             </div>

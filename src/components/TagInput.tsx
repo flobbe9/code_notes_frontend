@@ -6,6 +6,8 @@ import Flex from "./helpers/Flex";
 import { isBlank, log } from "../helpers/utils";
 import { Tag } from "../abstract/entites/Tag";
 import { BlockContainerTagListContext } from "./block/BlockContainerTagList";
+import { BlockContainerContext } from "./block/BlockContainer";
+import { AppContext } from "./App";
 
 
 interface Props extends DefaultProps {
@@ -19,7 +21,6 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-// TODO: implement max length 50
 export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
     const [tag, setTag] = useState(initialTag);
@@ -28,15 +29,18 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
     const inputRef = useRef(null);
 
+    const { toast } = useContext(AppContext);
+    const { note } = useContext(BlockContainerContext);
+
     const { 
         getTagElementIndex, 
         addTagElement,
         addTag, 
         removeTagElement,
         removeTag, 
-        getTagElementsLength, 
-        getTagsLength,
-        getNumBlankTagElements
+        getNumBlankTagElements,
+        tagElements,
+        tags
     } = useContext(BlockContainerTagListContext);
 
 
@@ -44,6 +48,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
         const keyName = event.key;
 
+        // TODO: does not work if text is longer than input and first char is out of view
         if (keyName === "Enter") 
             handleEnterKey(event);
     }
@@ -62,6 +67,10 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
 
     function handleBlur(event): void {
+
+        // case: duplicate tag
+        if (isDuplicateTagElement())
+            handleDuplicateTag();
 
         const numBlankTags = getNumBlankTagElements();
 
@@ -85,7 +94,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
         if (isContainedInNote() || isTagValueBlank())
             return;
         
-        const tag = {name: getTagInputValue()};
+        const tag = {name: getTagElementValue()};
 
         // add to note
         addTag(tag);
@@ -103,7 +112,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     }
 
 
-    function getTagInputValue(): string {
+    function getTagElementValue(): string {
 
         return $(inputRef.current!).prop("value");
     }
@@ -111,13 +120,13 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
     function isTagValueBlank(): boolean {
 
-        return isBlank(getTagInputValue());
+        return isBlank(getTagElementValue());
     }
 
 
     function isLastTagElement(): boolean {
 
-        return getTagElementIndex(propsKey) === getTagElementsLength() - 1;
+        return getTagElementIndex(propsKey) === tagElements.length - 1;
     }
 
 
@@ -128,7 +137,27 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
      */
     function isContainedInNote(): boolean {
 
-        return getTagElementIndex(propsKey) !== getTagsLength();
+        return getTagElementIndex(propsKey) !== note.tags.length;
+    }
+
+
+    function isDuplicateTagElement(): boolean {
+
+        const tagElementValue = getTagElementValue();
+
+        return !!tags.filter(tag => tag.name === tagElementValue).length && !isContainedInNote();
+    }
+
+
+    /**
+     * Clear tag input value and toast warn about duplicate tag.
+     */
+    function handleDuplicateTag(): void {
+
+        const tagValue = getTagElementValue();
+        $(inputRef.current!).val("");
+
+        toast("Duplicate Tag", "This note already has a tag with the name '" + tagValue + "'.", "warn", 7000);     
     }
 
 

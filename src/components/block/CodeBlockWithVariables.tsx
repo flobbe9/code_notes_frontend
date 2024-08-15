@@ -8,7 +8,7 @@ import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import hljs from "highlight.js";
 import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, includesIgnoreCase, isBlank, log, setClipboardText } from "../../helpers/utils";
 import sanitize from "sanitize-html";
-import { VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_START_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
+import { VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_START_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../helpers/constants";
 import { AppContext } from "../App";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
@@ -49,6 +49,8 @@ export default function CodeBlockWithVariables({
     const [isParsing, setIsParsing] = useState(false);
 
     const [hasComponentRendered, sethasComponentRendered] = useState(false);
+
+    const [inputHighlighted, setInputHighlighted] = useState(true);
     
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeBlockWithVariables");
     
@@ -191,9 +193,12 @@ export default function CodeBlockWithVariables({
 
                 inputDiv.html(highlightedHtmlString);
 
+                
                 res("highlightedHtmlString"); 
             }, 100); // wait for state to update
         });
+        
+        setInputHighlighted(true);
 
         setIsParsing(false);
         setBlockOverlayVisible(false);
@@ -221,6 +226,8 @@ export default function CodeBlockWithVariables({
                 sanitizedInputHtml = parseVariableInputToVariableInputSequence(sanitizedInputHtml);
 
                 inputDiv.html(sanitizedInputHtml);
+
+                setInputHighlighted(false);
                 
                 res(sanitizedInputHtml);
             }, 10); // wait for states to update
@@ -324,33 +331,15 @@ export default function CodeBlockWithVariables({
         if (openingSequenceStartIndex === -1 || openingSequenceEndIndex === -1)
             placeholder = "";
 
-        return getDefaultVariableInput(placeholder);
+        return getDefaultVariableInput(placeholder, getDefaultVariableInputWidth(placeholder));
     }
 
 
     /**
-     * Input will always be as wide as given ```placeholder``` text. Uses the default placeholder if given ```placeholder``` is blank.
-     * 
-     * @param placeholder to use for the ```<input>```. Default is {@link VARIABLE_INPUT_DEFAULT_PLACEHOLDER}.
-     * @returns ```<input>``` tag as string with a few attributes
-     */
-    function getDefaultVariableInput(placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER): string {
-
-        // case: invalid placeholder
-        if (isBlank(placeholder))
-            placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER;
-
-        const inputWidth = getDefaultVariableInputWidth(placeholder);
-
-        return `<input type="text" style="width: ${inputWidth}px" class="variableInput" placeholder="${placeholder}" />`;
-    }
-
-
-    /**
-     * @param placeholder of input
+     * @param placeholder of input. Default is {@link VARIABLE_INPUT_DEFAULT_PLACEHOLDER}
      * @returns the width of a variableInput as if the ```placeholder``` was it's value and the width was 'fit-content'
      */
-    function getDefaultVariableInputWidth(placeholder: string): number {
+    function getDefaultVariableInputWidth(placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER): number {
         
         const placeholderWidth = getTextWidth(placeholder, getCssConstant("variableInputFontSize"), getCssConstant("variableInputFontFamily"));
         const variableInputPadding = getCSSValueAsNumber(getCssConstant("variableInputPaddingLeftRight"), 2) * 2;
@@ -369,7 +358,7 @@ export default function CodeBlockWithVariables({
         const inputDivs = inputDiv.find("div")
         const lastDiv = inputDivs.length ? inputDivs.last() : inputDiv;
 
-        lastDiv.html(lastDiv.html() + getDefaultVariableInput());
+        lastDiv.html(lastDiv.html() + getDefaultVariableInput(VARIABLE_INPUT_DEFAULT_PLACEHOLDER, getDefaultVariableInputWidth()));
     }
 
 
@@ -532,11 +521,8 @@ export default function CodeBlockWithVariables({
         if (onBlur)
             onBlur(event);
 
-        const variableInputs = $(inputDivRef.current!).find(".variableInput");
-        
         // case: focus was not on a variable input or the placeholder textarea
-        // TODO: focus condition does not work
-        if ((!variableInputs.length || !variableInputs.has(":focus").length) && !hasPlaceholder())
+        if (!inputHighlighted && !hasPlaceholder())
             await highlightInputDivContent();
     }
 

@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import "../assets/styles/StartPageContent.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import BlockContainer from "./block/BlockContainer";
 import SearchBar from "./helpers/SearchBar";
-import { getRandomString, log } from "../helpers/utils";
+import { getRandomString, isArrayFalsy, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import Flex from "./helpers/Flex";
 import Button from "./helpers/Button";
@@ -28,16 +28,19 @@ export default function StartPageContent({...props}: Props) {
 
     const { appUser, isKeyPressed } = useContext(AppContext);
 
-    const [notes, setNotes] = useState<Note[] | null | undefined>(appUser.notes);
     const [blockContainers, setBlockContainers] = useState<JSX.Element[]>();
 
     const searchInputRef = useRef(null);
+
+    const context = {
+        updateBlockContainers
+    }
 
 
     useEffect(() => {
         $(window).on("keydown", handleKeyDown);
 
-        setBlockContainers(mapNotesToJsx());
+        updateBlockContainers();
 
         return () => {
             $(window).off("keydown", handleKeyDown);
@@ -55,45 +58,77 @@ export default function StartPageContent({...props}: Props) {
     }
 
 
+    function updateBlockContainers(): void {
+
+        setBlockContainers(mapNotesToJsx())
+    }
+
+
     function mapNotesToJsx(): JSX.Element[] {
 
         // case: null
-        if (!notes)
+        if (!appUser.notes)
             return [];
 
-        return notes.map(note => 
-            <BlockContainer note={note} setNotes={setNotes} key={getRandomString()} />);
+        return appUser.notes.map((note, i) => 
+            <BlockContainer note={note} noteIndex={i} key={getRandomString()} />);
+    }
+
+
+    function addBlockContainer(): void {
+
+        if (isArrayFalsy(appUser.notes))
+            appUser.notes = [];
+
+        const newNote = new Note();
+        newNote.title = "";
+
+        appUser.notes! = [newNote, ...appUser.notes!];
+
+        updateBlockContainers();
     }
 
     
     return (
-        <div 
-            id={id} 
-            className={className + " fullWidth"}
-            style={style}
-            {...otherProps}
-        >
-            <div className="mb-5 mt-3">
-                {/* SearchBar */}
-                <SearchBar 
-                    className="fullWidth" 
-                    placeHolder="Search for note Title, note Tag or note Text" 
-                    title="Search notes (Ctrl+Shift+F)"
-                    ref={searchInputRef}
-                    _focus={{borderColor: "var(--accentColor)"}}
-                />
+        <StartPageContentContext.Provider value={context}>
 
-                {/* New Note Button */}
-                <Button className="addBlockContainerButton hover mt-2 fullWidth" title="New note">
-                    <i className="fa-solid fa-plus me-1"></i>
-                    <span>New Note</span>
-                </Button>
+            <div 
+                id={id} 
+                className={className + " fullWidth"}
+                style={style}
+                {...otherProps}
+            >
+                <Flex className="mb-5 mt-3" flexWrap="nowrap" verticalAlign="center">
+                    {/* SearchBar */}
+                    <SearchBar 
+                        className="fullWidth me-4" 
+                        placeHolder="Search for note Title, note Tag or note Text" 
+                        title="Search notes (Ctrl+Shift+F)"
+                        ref={searchInputRef}
+                        _focus={{borderColor: "var(--accentColor)"}}
+                    />
+
+                    {/* New Note Button */}
+                    <Button 
+                        className="addBlockContainerButton hover" 
+                        title="New note" 
+                        onClick={addBlockContainer}
+                    >
+                        <i className="fa-solid fa-plus me-1"></i>
+                        <span>New Note</span>
+                    </Button>
+                </Flex>
+
+                {/* BlockContainers */}
+                {blockContainers}
+
+                {children}
             </div>
-
-            {/* BlockContainers */}
-            {blockContainers}
-
-            {children}
-        </div>
+        </StartPageContentContext.Provider>
     )
 }
+
+
+export const StartPageContentContext = createContext({
+    updateBlockContainers: () => {}
+})

@@ -24,7 +24,7 @@ interface Props extends HelperProps {
 /**
  * @since 0.0.1
  */
-// TODO: 
+// IDEA: 
     // add something like a tutorial note with highlighted text 
         // on account creation?
         // if app user has no plain text notes at all && on create
@@ -133,7 +133,7 @@ export default function PlainTextBlock({
                 })
 
                 res(inputHtmlString);
-            }, 1000); // wait for states to update
+            }, 100); // wait for states to update
         });
 
         // sanitize

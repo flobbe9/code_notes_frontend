@@ -8,14 +8,16 @@ import { NoteInput } from "../../abstract/entites/NoteInput";
 
 interface Props extends DefaultProps {
 
-    noteInput: NoteInput
+    noteInput: NoteInput,
+
+    noteInputIndex: number
 }
 
 
 /**
  * @since 0.0.1
  */
-export default function DefaultCodeBlock({noteInput, ...props}: Props) {
+export default function DefaultCodeBlock({noteInput, noteInputIndex, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultCodeBlock");
 
@@ -50,7 +52,7 @@ export default function DefaultCodeBlock({noteInput, ...props}: Props) {
     
     return (
         <DefaultCodeBlockContext.Provider value={context}>
-            <DefaultBlock noteInput={noteInput}>
+            <DefaultBlock noteInput={noteInput} noteInputIndex={noteInputIndex}>
                 <div     
                     id={id} 
                     className={className}

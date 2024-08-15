@@ -1,11 +1,5 @@
 @import "./global/functions.scss";
 
 .BlockContainer {
-    margin-bottom: 25px;
-    
-    .contentContainer {
-        border: 2px solid var(--codeGrey);
-        border-radius: var(--borderRadius);
-        padding: 5px;
-    }
+    margin-bottom: 65px;
 }

@@ -15,4 +15,9 @@ import { AbstractEntity } from "./AbstractEntity";
 export class Tag extends AbstractEntity {
 
     name: string;
+
+
+    public constructor() {
+        super(-1);
+    }
 }

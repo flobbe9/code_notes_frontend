@@ -6,8 +6,9 @@ import TagInput from "../TagInput";
 import Flex from "../helpers/Flex";
 import { Note } from "../../abstract/entites/Note";
 import { BlockContainerContext } from "./BlockContainer";
-import { getRandomString, isBlank, log } from './../../helpers/utils';
+import { getRandomString, isArrayFalsy, isBlank, log } from './../../helpers/utils';
 import { Tag } from "../../abstract/entites/Tag";
+import { AppContext } from "../App";
 
 
 interface Props extends DefaultProps {
@@ -20,6 +21,7 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
+// TODO: tag list hover moves with scrollbar
 export default function BlockContainerTagList({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainerTagList");
@@ -28,6 +30,7 @@ export default function BlockContainerTagList({...props}: Props) {
 
     const componentRef = useRef(null);
 
+    const { appUser } = useContext(AppContext);
     const { note } = useContext(BlockContainerContext);
 
     const context = {
@@ -36,9 +39,9 @@ export default function BlockContainerTagList({...props}: Props) {
         addTag,
         removeTagElement,
         removeTag,
-        getTagElementsLength,
-        getTagsLength,
-        getNumBlankTagElements
+        getNumBlankTagElements,
+        tagElements,
+        tags: note.tags
     }
 
 
@@ -80,7 +83,13 @@ export default function BlockContainerTagList({...props}: Props) {
      */
     function addTag(tag: Tag): void {
 
+        // add to note tags
         note.tags = [...note.tags, tag];
+
+        if (!appUser.tags)
+            appUser.tags = [];
+
+        appUser.tags.push(tag);
     }
 
 
@@ -104,15 +113,15 @@ export default function BlockContainerTagList({...props}: Props) {
      */
     function removeTagElement(key: string): void {
 
-        const tagToRemoveIndex = getTagElementIndex(key);
+        const tagElementToRemoveIndex = getTagElementIndex(key);
 
         // case: no tag with this key
-        if (tagToRemoveIndex === -1)
+        if (tagElementToRemoveIndex === -1)
             return;
 
         // remove tag
         const tagsState = tagElements;
-        tagsState.splice(tagToRemoveIndex, 1);
+        tagsState.splice(tagElementToRemoveIndex, 1);
 
         // update state
         setTagElements([...tagsState]);
@@ -126,7 +135,23 @@ export default function BlockContainerTagList({...props}: Props) {
      */
     function removeTag(index: number): void {
 
-        note.tags.splice(index, 1);
+        const tagToRemove = note.tags.splice(index, 1)[0];
+
+        removeTagFromAppUser(tagToRemove);
+    }
+
+
+    function removeTagFromAppUser(tag: Tag): void {
+
+        // case: falsy arg or appUser has no tags or no notes anyway
+        if (!tag || !appUser.tags || !appUser.notes)
+            return;
+
+        // case: tag is used somewhere else
+        if (appUser.isTagPresentInANote(tag))
+            return;
+                
+        appUser.removeTag(tag);
     }
     
 
@@ -154,18 +179,6 @@ export default function BlockContainerTagList({...props}: Props) {
     }
 
 
-    function getTagElementsLength(): number {
-
-        return tagElements.length;
-    }
-
-
-    function getTagsLength(): number {
-
-        return note.tags.length;
-    }
-
-
     function getNumBlankTagElements(): number {
 
         const renderedTagInputs = getTagInputElements();
@@ -183,14 +196,6 @@ export default function BlockContainerTagList({...props}: Props) {
 
         return $(componentRef.current!).find(".TagInput input");
     }
-
-
-    // remove tag from app user
-        // get index by key
-        // splice with index
-
-    // add tag
-        // append new tag with given name
 
 
     return (
@@ -219,7 +224,7 @@ export const BlockContainerTagListContext = createContext({
     addTag: (tag: Tag) => {},
     removeTagElement: (key: string) => {},
     removeTag: (index: number) => {},
-    getTagElementsLength: () => {return 0 as number},
-    getTagsLength: () => {return 0 as number},
     getNumBlankTagElements: () => {return 1 as number},
+    tagElements: [<></>],
+    tags: [new Tag()]
 })

@@ -185,6 +185,11 @@ export function isObjectFalsy(obj: object | null | undefined): boolean {
     return obj === undefined || obj === null || !Object.entries(obj).length;
 } 
 
+export function isArrayFalsy(array: any[] | null | undefined): boolean {
+
+    return array === undefined || array === null;
+} 
+
 /**
  * Indicates whether given ```str``` is falsy or not. Is not the same as {@code isBlank()}!
  * 

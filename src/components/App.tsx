@@ -10,12 +10,13 @@ import Overlay from './helpers/Overlay';
 import { AppUser } from '../abstract/entites/AppUser';
 import { AppUserRole } from '../abstract/AppUserRole';
 import { NoteInputType } from '../abstract/NoteInputType';
+import { Tag } from '../abstract/entites/Tag';
 
 
 /**
  * @since 0.0.1
  */
-// TODO: consider changing the component names
+// IDEA: consider changing the component names
 export default function App() {
 
     const [appUser, setAppUser] = useState<AppUser>(mockAppUser);
@@ -230,7 +231,7 @@ export default function App() {
 
 
 export const AppContext = createContext({
-    appUser: new AppUser(),
+    appUser: AppUser.getDefaultInstance(),
     setAppUser: (appUser: AppUser) => {},
 
     toast: (summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number) => {},
@@ -249,27 +250,25 @@ export const AppContext = createContext({
 });
 
 
-const mockAppUser: AppUser = {
-    id: 3,
-    email: "user@user.com",
-    password: "$2a$10$e4k/4uTWn/fnWA8KEYs/Zu.W1b4OWK82rXgwpZsvFhPPbFaYjZlBi",
-    role: AppUserRole.USER,
-    tags: [
-      {
-        id: 14,
-        name: "tag14"
-      }
+const mockAppUser: AppUser = new AppUser(
+    3,
+    "user@user.com",
+    "$2a$10$e4k/4uTWn/fnWA8KEYs/Zu.W1b4OWK82rXgwpZsvFhPPbFaYjZlBi",
+    AppUserRole.USER,
+    [
+        {
+          name: "tag14"
+        }
     ],
-    notes: [
+    [
       {
         id: 20,
         title: "note20",
         noteInputs: [
             {
-                // value: "const x = 3;",
-                value: "const x = 3;\n\nadsf",
+                value: "const x = 3;\n\nadsf\nasdf",
                 type: NoteInputType.CODE,
-                programmingLanguage: "_plaintext"
+                programmingLanguage: "Java"
             },
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
@@ -311,12 +310,11 @@ const mockAppUser: AppUser = {
             }
         ],
         tags: [
-          {
-            id: 14,
-            name: "tag14"
-          }
+            {
+                name: "tag14"
+            }
         ]
       }
     ],
-    csrfToken: null
-  }
+    null
+)

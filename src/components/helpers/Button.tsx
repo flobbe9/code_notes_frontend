@@ -56,8 +56,9 @@ export default forwardRef(function Button({
 
     useImperativeHandle(ref, () => componentRef.current!, []);
 
-    // TODO
-    // useInitialStyles(componentJQuery, [["min-width", "width"]], 200);
+    
+    // set min width for promise buttons
+    useInitialStyles(componentJQuery, (onClickPromise ? [["min-width", "width"]] : []), 200);
 
 
     useEffect(() => {
@@ -148,11 +149,11 @@ export default forwardRef(function Button({
     /**
      * Indicates whether to use the default disabled style or not.
      * 
-     * @returns ```true``` if ```disabled``` and ```_disabled``` style is falsy
+     * @returns ```true``` if ```isDisabled``` and ```_disabled``` style is falsy
      */
     function isDefaultDisabledStyle(): boolean {
 
-        return disabled && isObjectFalsy(_disabled);
+        return isDisabled && isObjectFalsy(_disabled);
     }
 
 

@@ -34,25 +34,24 @@ interface Props extends DefaultProps {
     // change theme (settings)
         // adjust some css classes
     // toggle minimap ? (settings)
-// TODO: width not working because fetch takes too long
 export default function CodeBlock({noteInput, ...props}: Props) {
 
     /** Height of one line of the monaco vscode editor in px */
     const editorLineHeight = 19; // px
 
-    /** Number of lines visible on render */
-    const initialNumLines = 3;
+    /** Min number of lines visible on render */
+    const minNumInitialLines = 3;
 
     const maxNumLines = 15;
 
     const [isEditorMounted, setIsEditorMounted] = useState(false);
-    const [editorHeight, setEditorHeight] = useState(getInitialEditorHeight());
     /** Refers to the editors width with collapsed block settings. Is updated on window resize. */
     const [fullEditorWidth, setFullEditorWidth] = useState<number>(NaN);
     const [editorWidth, setEditorWidth] = useState("100%");
     const [editorTransition, setEditorTransition] = useState(0);
     const [numEditorLines, setNumEditorLines] = useState(1);
     const [editorValue, setEditorValue] = useState(noteInput.value);
+    const [editorHeight, setEditorHeight] = useState(getInitialEditorHeight());
 
     const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -74,7 +73,7 @@ export default function CodeBlock({noteInput, ...props}: Props) {
 
     const { animateCopyIcon } = useContext(DefaultCodeBlockContext);
 
-    const { isMobileWidth, isTabletWidth } = getDeviceWidth();
+    const { isTabletWidth } = getDeviceWidth();
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeBlock");
 
@@ -85,6 +84,7 @@ export default function CodeBlock({noteInput, ...props}: Props) {
 
 
     useEffect(() => {
+        // log(noteInput.value)
         setAreBlockSettingsDisabled(true);
 
     }, []);
@@ -151,6 +151,9 @@ export default function CodeBlock({noteInput, ...props}: Props) {
 
 
     useEffect(() => {
+        if (!isEditorMounted)
+            return;
+
         updateAppUser();
 
     }, [codeBlockLanguage]);
@@ -162,7 +165,7 @@ export default function CodeBlock({noteInput, ...props}: Props) {
     function handleChange(value: string, event): void {
 
         if (!isFullScreen)
-            setTimeout(() => setNumEditorLines(getNumLines(value)), 5);
+            setTimeout(() => setNumEditorLines(getNumEditorValueLines(value)), 5);
 
         updateAppUser();
     }
@@ -187,9 +190,9 @@ export default function CodeBlock({noteInput, ...props}: Props) {
 
     /**
      * @param value complete content of the editor
-     * @returns the current number of lines inside the editor
+     * @returns the current number of lines of the editor value
      */
-    function getNumLines(value: string): number {
+    function getNumEditorValueLines(value: string): number {
 
         return value.split("\n").length;
     }
@@ -200,14 +203,14 @@ export default function CodeBlock({noteInput, ...props}: Props) {
      */
     function updateActualEditorHeight(): void {
 
-        const linesHeightComparison = compareEditorHeightToLinesHeight();
+        const editorLinesHeightComparison = compareEditorHeightToLinesHeight();
 
         // increase editor height if possible
-        if (linesHeightComparison === -1 && !isMaxEditorHeight())
+        if (editorLinesHeightComparison === -1 && !isMaxEditorHeight())
             handleAddLine();
         
         // decrease editor height if possible
-        else if (linesHeightComparison === 1 && !isMinEditorHeight())
+        else if (editorLinesHeightComparison === 1 && !isMinEditorHeight())
             handleRemoveLine();
     }
 
@@ -221,8 +224,8 @@ export default function CodeBlock({noteInput, ...props}: Props) {
      */
     function compareEditorHeightToLinesHeight(): number {
 
-        const linesHeight = getLinesHeight();
-        const heightDifference = editorHeight - linesHeight - (1 * editorLineHeight);
+        const totalEditorLinesHeight = getTotalEditorLinesHeight();
+        const heightDifference = editorHeight - totalEditorLinesHeight - (1 * editorLineHeight);
 
         // dont devide by 0
         if (heightDifference === 0)
@@ -235,7 +238,7 @@ export default function CodeBlock({noteInput, ...props}: Props) {
     /**
      * @returns the total height of all lines inside the editor
      */
-    function getLinesHeight(): number {
+    function getTotalEditorLinesHeight(): number {
 
         return numEditorLines * editorLineHeight;
 
@@ -258,9 +261,20 @@ export default function CodeBlock({noteInput, ...props}: Props) {
     }
 
 
+    /**
+     * 
+     * @returns the initial height of the editor depending on the initial number of lines of the ```editorValue``` and ```minNumInitialLines```
+     */
     function getInitialEditorHeight(): number {
 
-        return initialNumLines * editorLineHeight;
+        let numEditorValueLines = getNumEditorValueLines(editorValue);
+
+        if (numEditorValueLines < minNumInitialLines)
+            numEditorValueLines = minNumInitialLines;
+
+        numEditorValueLines++;
+
+        return numEditorValueLines * editorLineHeight;
     }
 
 
@@ -272,7 +286,7 @@ export default function CodeBlock({noteInput, ...props}: Props) {
 
     function isMinEditorHeight(): boolean {
 
-        return editorHeight === getInitialEditorHeight();
+        return editorHeight === minNumInitialLines * editorLineHeight;
     }
 
 

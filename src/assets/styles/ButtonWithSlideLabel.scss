@@ -4,6 +4,7 @@
     .addBlockButtonLabelContainer {
         line-height: 1;
         opacity: 0;
+        overflow: hidden;
         position: absolute;
         right: 0;
         text-wrap: nowrap;

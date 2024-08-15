@@ -1,6 +1,7 @@
 import sanitize from "sanitize-html";
 import { Env } from "../abstract/Env";
 import { ProgrammingLanguage } from "../abstract/ProgrammingLanguage";
+import { isBlank } from "./utils";
 
 // App
 export const ENV: Env = process.env.NODE_ENV as Env;
@@ -1909,6 +1910,23 @@ export const CODE_BLOCK_WITH_VARIABLES_LANGUAGES: ProgrammingLanguage[] = [
         ]
     },
 ]
+
+/**
+ * Input will always be as wide as given ```placeholder``` text. Uses the default placeholder if given ```placeholder``` is blank.
+ * 
+ * @param placeholder to use for the ```<input>```. Default is {@link VARIABLE_INPUT_DEFAULT_PLACEHOLDER}
+ * @param inputWidth width of input (in px). Should fit the placeholder's text. Default is 120px
+ * @returns ```<input>``` tag as string with a few attributes
+ */
+export function getDefaultVariableInput(placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER, inputWidth = 120): string {
+
+    // case: invalid placeholder
+    if (isBlank(placeholder))
+        placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER;
+
+    return `<input type="text" style="width: ${inputWidth}px" class="variableInput" placeholder="${placeholder}" />`;
+}
+
 
 // Other
 /** Time the block settings slide animation takes (in ms). */

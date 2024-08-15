@@ -5,5 +5,11 @@
  */
 export abstract class AbstractEntity {
 
-    id?: number;
+    id?: number | null;
+
+
+    public constructor(id: number | null) {
+        
+        this.id = id;
+    }
 }

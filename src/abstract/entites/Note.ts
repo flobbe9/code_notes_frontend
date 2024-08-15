@@ -17,4 +17,9 @@ export class Note extends AbstractEntity {
     noteInputs: NoteInput[] | null;
 
     tags: Tag[];
+
+
+    constructor() {
+        super(null);
+    }
 }
