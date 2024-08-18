@@ -2,8 +2,10 @@
 
 .BlockContainerTitle {
     .titleInput {
+        background-color: transparent;
         border: none;
         border-bottom: 2px solid var(--codeGrey);
+        color: var(--codeGrey);
         font-size: 1.6em;
         width: 100%;
 

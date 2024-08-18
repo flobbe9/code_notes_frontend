@@ -17,6 +17,7 @@ import { NoteInput } from "../../abstract/entites/NoteInput";
 import { BlockContainerContext } from "./BlockContainer";
 import parse from 'html-react-parser';
 import { DefaultBlockContext } from "./DefaultBlock";
+import BlockSettings from "./BlockSettings";
 
 
 interface Props extends HelperProps {
@@ -34,6 +35,8 @@ interface Props extends HelperProps {
 // IDEA:
     // switch between higlighting styles (settings)
     // disable highlighting option (settings (?))
+// TODO: 
+    // highlight style sometimes chooses black (?)
 export default function CodeBlockWithVariables({
     noteInput,
     disabled,
@@ -41,7 +44,6 @@ export default function CodeBlockWithVariables({
     ...props
 }: Props) {
 
-    const [isFullScreen, setIsFullScreen] = useState(false);
     const [inputDivValue, setInputDivValue] = useState<any>()
     
     const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
@@ -58,16 +60,21 @@ export default function CodeBlockWithVariables({
 
     const { 
         isKeyPressed, 
-        toggleAppOverlay, 
-        isAppOverlayVisible, 
         getAppOverlayZIndex
     } = useContext(AppContext);
 
     const { numBlocksParsing, setNumBlocksParsing } = useContext(BlockContainerContext);
 
-    const { codeBlockWithVariablesLanguage, setBlockOverlayVisible } = useContext(DefaultBlockContext);
-
-    const { animateCopyIcon } = useContext(DefaultCodeBlockContext);
+    const { 
+        codeBlockWithVariablesLanguage, 
+        setBlockOverlayVisible, 
+        areBlockSettingsDisabled, 
+        animateCopyIcon,
+        setActivateFullScreenStyles,
+        setDeactivateFullScreenStyles,
+        toggleFullScreen,
+        isFullScreen
+    } = useContext(DefaultBlockContext);
 
 
     useInitialStyles(inputDivJQuery, [["max-width", "width"]], 100);
@@ -79,26 +86,11 @@ export default function CodeBlockWithVariables({
         setInputDivValue(parse(sanitize(noteInput.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
 
         sethasComponentRendered(true);
+
+        setActivateFullScreenStyles(() => {return activateFullScreenStyles});
+        setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
         
     }, []);
-
-
-    useEffect(() => {
-        $(window).on("keydown", handleGlobalKeyDown);
-
-        return () => {
-            $(window).off("keydown", handleGlobalKeyDown);
-        }
-
-    }, [isFullScreen, isAppOverlayVisible]);
-
-
-    useEffect(() => {
-        if (!isAppOverlayVisible && isFullScreen)
-            // deactivate full screen on overlay click
-            deactivateFullScreen();
-
-    }, [isAppOverlayVisible]);
 
 
     useEffect(() => {
@@ -355,10 +347,23 @@ export default function CodeBlockWithVariables({
     function appendVariableInput(): void {
 
         const inputDiv = $(inputDivRef.current!);
-        const inputDivs = inputDiv.find("div")
-        const lastDiv = inputDivs.length ? inputDivs.last() : inputDiv;
+        const inputDivChildDivs = inputDiv.find("div")
+        const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.last() : inputDiv;
 
-        lastDiv.html(lastDiv.html() + getDefaultVariableInput(VARIABLE_INPUT_DEFAULT_PLACEHOLDER, getDefaultVariableInputWidth()));
+        lastChildDiv.html(lastChildDiv.html() + getDefaultVariableInput(VARIABLE_INPUT_DEFAULT_PLACEHOLDER, getDefaultVariableInputWidth()));
+    }
+
+        
+    /**
+     * Appends a default ```$[[VARIABL_NAME]]``` sequence to the end of the inputDiv.
+     */
+    function appendVariableInputSequence(): void {
+
+        const inputDiv = $(inputDivRef.current!);
+        const inputDivChildDivs = inputDiv.find("div")
+        const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.last() : inputDiv;
+
+        lastChildDiv.html(lastChildDiv.html() + VARIABLE_INPUT_START_SEQUENCE + VARIABLE_INPUT_DEFAULT_PLACEHOLDER + VARIABLE_INPUT_END_SEQUENCE);
     }
 
 
@@ -506,10 +511,10 @@ export default function CodeBlockWithVariables({
     }
 
 
-    function handleFocus(event): void {
+    async function handleFocus(event): Promise<void> {
 
         if (event.target.className !== "variableInput" && !hasPlaceholder())
-            unHighlightInputDivContent();
+            await unHighlightInputDivContent();
     }
 
 
@@ -525,47 +530,21 @@ export default function CodeBlockWithVariables({
         if (!inputHighlighted && !hasPlaceholder())
             await highlightInputDivContent();
     }
+    
 
-
-    function handleKeyDown(event): void {
-
-        const inputDiv = $(inputDivRef.current!);
-        const keyName = (event.key as string);
-
-        // case: Ctrl + Shift + v
-        if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
-            event.preventDefault();
-            inputDiv.trigger("blur");
-            appendVariableInput();
-        }
-    }
-
-
-    function handleKeyDownCapture(event): void {
+    async function handleKeyDownCapture(event): Promise<void> {
 
         const keyName = event.key;
-
-        if (keyName === "Control")
+        
+        if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
+            event.preventDefault();
+            appendVariableInputSequence();
+            
+        } else if (keyName === "Control")
             sanitizeAndUpdateClipboardText();
     }
 
-
-    function handleGlobalKeyDown(event): void {
-
-        const keyName = event.key;
-
-        if (keyName === "Escape") 
-            handleEscape(event);
-    }
-
-
-    function handleEscape(event): void {
-
-        if (isFullScreen)
-            deactivateFullScreen();
-    }
-
-        
+ 
     function handleKeyUp(event): void {
 
         const keyName = event.key;
@@ -606,52 +585,20 @@ export default function CodeBlockWithVariables({
     }
 
 
-    function toggleFullScreen(event): void {
-
-        if (isFullScreen)
-            deactivateFullScreen();
-        else
-            activateFullscreen();
-    }
-
-
-    function activateFullscreen(): void {
-
-        activateFullScreenStyles();
-
-        setIsFullScreen(true);
-
-        toggleAppOverlay();
-
-        $(inputDivRef.current!).trigger("focus");
-    }
-
-
-    function deactivateFullScreen() {
-
-        deactivateFullScreenStyles();
-
-        setIsFullScreen(false);
-
-        if (isAppOverlayVisible)
-            toggleAppOverlay();
-    }
-    
-
     function activateFullScreenStyles(): void {
 
         const inputDiv = $(inputDivRef.current!);
-        const blockContent = inputDiv.parents(".blockContent");
+        const defaultCodeBlock = inputDiv.parents(".DefaultCodeBlock");
         const inputDivContainer = inputDiv.parents(".inputDivContainer");
 
         const appOverlayZIndex = getAppOverlayZIndex();
 
-        blockContent.css({
+        defaultCodeBlock.css({
             position: "fixed",
             zIndex: appOverlayZIndex + 1
         });
 
-        blockContent.animate({
+        defaultCodeBlock.animate({
             top: "90px",
             width: "90vw"
         });
@@ -669,17 +616,17 @@ export default function CodeBlockWithVariables({
     function deactivateFullScreenStyles(): void {
 
         const inputDiv = $(inputDivRef.current!);
-        const blockContent = inputDiv.parents(".blockContent");
+        const defaultCodeBlock = inputDiv.parents(".DefaultCodeBlock");
         const inputDivContainer = inputDiv.parents(".inputDivContainer");
         
         // move up just a little bit
-        blockContent.css({
+        defaultCodeBlock.css({
             position: "relative",
             top: "30px",
         });
         
         // resize quickly
-        blockContent.css({
+        defaultCodeBlock.css({
             width: "100%"
         });
         inputDivContainer.css({
@@ -690,7 +637,7 @@ export default function CodeBlockWithVariables({
         })
 
         // animate to start pos
-        blockContent.animate(
+        defaultCodeBlock.animate(
             {
                 top: 0,
             },
@@ -698,7 +645,7 @@ export default function CodeBlockWithVariables({
             "swing", 
             () => {
                 // reset to initial styles
-                blockContent.css({
+                defaultCodeBlock.css({
                     position: "static",
                     top: "auto",
                     zIndex: 0
@@ -728,10 +675,16 @@ export default function CodeBlockWithVariables({
     }
 
 
+    function handleAppendVariableButtonClick(event): void {
+
+        appendVariableInput();
+    }
+
+
     return (
         <Flex 
             id={id} 
-            className={className + " fullWidth"}
+            className={className + " fullWidth " + (isFullScreen && "fullScreen")}
             style={style}
             flexWrap="nowrap"
             {...otherProps}
@@ -747,7 +700,6 @@ export default function CodeBlockWithVariables({
                         ref={inputDivRef} 
                         spellCheck={false}
                         onKeyDownCapture={handleKeyDownCapture}
-                        onKeyDown={handleKeyDown} 
                         onKeyUp={handleKeyUp}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
@@ -758,9 +710,36 @@ export default function CodeBlockWithVariables({
             </pre>
 
             <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
+                {/* Copy */}
+                <Button
+                    className="defaultBlockButton copyButton"
+                    title="Copy with variables"
+                    disabled={areBlockSettingsDisabled}
+                    onClick={handleCopyClick}
+                >
+                    <i className="fa-solid fa-copy"></i>
+                    <i className="fa-solid fa-copy"></i>
+                </Button>
+
+                {/* Block Settings */}
+                <BlockSettings noteInput={noteInput} areBlockSettingsDisabled={areBlockSettingsDisabled} />
+
+                {/* Add variable */}
+                {/* 
+                    TODO: 
+                        does not work if focus was on input
+                */}
+                <Button 
+                    className="appendVariableButton defaultBlockButton" 
+                    title="Append variable (Ctrl + Shift + V)"
+                    onClick={handleAppendVariableButtonClick}
+                >
+                    <i className="fa-solid fa-dollar-sign"></i>
+                </Button>
+                
                 {/* Fullscreen */}
                 <Button 
-                    className="fullScreenButton"
+                    className="fullScreenButton defaultBlockButton"
                     title={isFullScreen ? "Normal screen" : "Fullscreen"}
                     onClick={toggleFullScreen}
                 >
@@ -768,26 +747,6 @@ export default function CodeBlockWithVariables({
                         <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
                         <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
                     }
-                </Button>
-
-                {/* Add variable */}
-                <Button 
-                    className="addVariableButton defaultBlockButton hover flexCenter fullHeight" 
-                    title="Append variable (Ctrl + Shift + V)"
-                    onClick={appendVariableInput}
-                >
-                    <i className="fa-solid fa-plus me-2"></i>
-                    <i className="fa-solid fa-dollar-sign"></i>
-                </Button>
-
-                {/* Copy */}
-                <Button
-                    className="defaultBlockButton hover copyButton fullHeight"
-                    title="Copy with variables"
-                    onClick={handleCopyClick}
-                >
-                    <i className="fa-solid fa-copy"></i>
-                    <i className="fa-solid fa-copy"></i>
                 </Button>
             </Flex>
             

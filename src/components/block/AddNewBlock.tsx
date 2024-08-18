@@ -24,7 +24,7 @@ export default function AddNewBlock({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewBlock");
 
-    const { note, updateBlocks, numBlocksParsing } = useContext(BlockContainerContext);
+    const { note, blocks, setBlocks, numBlocksParsing, getBlockByNoteInputType } = useContext(BlockContainerContext);
 
 
     function handleAddPlainTextBlock(event): void {
@@ -38,11 +38,7 @@ export default function AddNewBlock({...props}: Props) {
             type: NoteInputType.PLAIN_TEXT
         }
 
-        // update app user
-        note.noteInputs = [...note.noteInputs, newPlainTextBlock]
-
-        // render block
-        updateBlocks();
+        appendNoteInput(newPlainTextBlock);
     }
 
 
@@ -59,11 +55,7 @@ export default function AddNewBlock({...props}: Props) {
             programmingLanguage: CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE
         }
 
-        // update app user
-        note.noteInputs = [...note.noteInputs, newCodeBlockWithVariables]
-
-        // render block
-        updateBlocks();        
+        appendNoteInput(newCodeBlockWithVariables);
     }
 
  
@@ -74,17 +66,33 @@ export default function AddNewBlock({...props}: Props) {
             note.noteInputs = [];
  
         const newCodeBlock: NoteInput = {
-            // TODO: make this a constant
-            value: "This works like a VSCode editor. Click the 3 dots on the right to change the programming language.",
+            value: "",
             type: NoteInputType.CODE,
             programmingLanguage: CODE_BLOCK_DEFAULT_LANGUAGE
         }
 
-        // update app user
-        note.noteInputs = [...note.noteInputs, newCodeBlock]
+        appendNoteInput(newCodeBlock);        
+    }
 
-        // render block
-        updateBlocks();        
+
+    /**
+     * Appends a new ```noteInput``` and given ```noteInputEntity``` to their corresponding states.
+     * 
+     * @param noteInputEntity to add
+     */
+    function appendNoteInput(noteInputEntity: NoteInput): void {
+
+        if (!note.noteInputs)
+            return;
+    
+        // update app user
+        note.noteInputs = [...note.noteInputs, noteInputEntity];
+
+        // update noteInputs
+        let newNoteInputs = blocks;
+        const newNoteInput = getBlockByNoteInputType(noteInputEntity);
+        newNoteInputs = [...newNoteInputs, newNoteInput];
+        setBlocks(newNoteInputs);
     }
  
 
@@ -98,7 +106,7 @@ export default function AddNewBlock({...props}: Props) {
         >
             <div className="col-4 pe-2">
                 <ButtonWithSlideLabel 
-                    className="fullWidth hover" 
+                    className="fullWidth addPlainTextBlockButton" 
                     label="Plain Text" 
                     title="Add plain text section"
                     disabled={numBlocksParsing > 0}
@@ -111,7 +119,7 @@ export default function AddNewBlock({...props}: Props) {
 
             <div className="col-4 pe-2">
                 <ButtonWithSlideLabel 
-                    className="fullWidth hover" 
+                    className="fullWidth addCodeBlockButton" 
                     label="Code" 
                     title="Add code section"
                     disabled={numBlocksParsing > 0}
@@ -122,9 +130,9 @@ export default function AddNewBlock({...props}: Props) {
                 </ButtonWithSlideLabel>
             </div>
 
-            <div className="col-4 pe-2">
+            <div className="col-4">
                 <ButtonWithSlideLabel 
-                    className="fullWidth hover" 
+                    className="fullWidth addCodeBlockWithVariablesButton" 
                     label="Code with Variables" 
                     title="Add code with variables section"
                     disabled={numBlocksParsing > 0}

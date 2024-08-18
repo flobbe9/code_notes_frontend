@@ -148,14 +148,14 @@ export default forwardRef(function SearchBar(
             />
 
             {/* X icon */}
-            <Button 
+            {/* <Button 
                 className="clearSearchValueButton" 
                 disabled={disabled} 
                 onClick={handleXIconClick}
                 title="Clear search"
             >
                 <i className="fa-solid fa-xmark m-1" style={_xIcon}></i>
-            </Button>
+            </Button> */}
             {children}
         </Flex>
     )

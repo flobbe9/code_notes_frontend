@@ -1,26 +1,53 @@
 @import "./global/functions.scss";
 
 .DefaultBlock {
+    border-left: 2px solid transparent;
     margin: 5px 0;
+    padding-left: 2px;
     position: relative;
-    
+    transition: border var(--transitionTime);
+
+    // case: hover or focus on code block with vars
+    &:has(.PlainTextBlock:hover), &:has(.ContentEditableDiv:focus) {
+        border-color: var(--plainTextBlockColor);
+    }
+
+    // case: hover or focus on code block
+    &:has(.CodeBlock:hover), &:has(.vsCodeEditor textarea:focus) {
+        border-color: var(--codeBlockColor);
+    }
+
+    // case: hover or focus on plain text
+    &:has(.CodeBlockWithVariables:hover), &:has(.ContentEditableDiv:focus) {
+        border-color: var(--codeBlockWithVariablesColor);
+    }
+
     .blockContent {
         border-radius: var(--borderRadius);
 
-        .deleteBlockButton {
-            background-color: var(--codeGrey);
-            border-radius: var(--borderRadius);
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
+        .defaultBlockButton {
+            background-color: var(--vsCodeBlack);
+            color: var(--codeGrey);
+            padding: 0 0.7rem;
+            transition: var(--transitionTime);
 
-            &:hover {
-                background-color: rgb(184, 184, 184);
+            @include customHover {
+                color: white;
             }
         }
 
-        .defaultBlockButton {
-            padding: 0.5rem 0.5rem;
-            transition: var(--transitionTimeFast);
+        .deleteBlockButton {
+            height: unset;
+        }
+
+        .copyButton {
+            .fa-copy {
+                position: absolute;
+            }
+        }
+
+        .fullScreenButton {
+            padding: 0 0.2rem;
         }
     }
 

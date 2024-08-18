@@ -1,23 +1,33 @@
 @import "./global/functions.scss";
 
 .PlainTextBlock {
-    border: 2px solid var(--codeGrey);
+    background-color: var(--vsCodeBlack);
     border-right: none;
     border-radius: var(--borderRadius);
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    height: 100%;
-    padding: 5px 3px;
+
+    &.fullScreen {
+        border-radius: var(--borderRadius); // for full screen mode
+        box-shadow: 2px 2px 15px 2px var(--codeGrey);
+        padding: 15px;
+    }
 
     .plainTextInput {
+        color: white;
+        font-size: 0.8em;
         max-height: 20vh;
         overflow: auto;
+        padding: 1px 0;
         white-space: pre-wrap;
+
+        &:has(code) {
+            padding: 0;
+        }
 
         @include scrollBar();
 
         &:focus {
-            // letter-spacing: 1px;
             outline: none;
         }
         
@@ -26,7 +36,7 @@
             border-radius: var(--codeBorderRadius);
             color: black;;
             font-size: 1em;
-            padding: 3px 7px;
+            padding: 1px 7px 1px 6px;
         }
     }
 }

@@ -13,6 +13,8 @@ import { BlockContainerContext } from "./BlockContainer";
 import HelperProps from "../../abstract/HelperProps";
 import parse from 'html-react-parser';
 import { DefaultBlockContext } from "./DefaultBlock";
+import Button from "../helpers/Button";
+import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
 
 
 interface Props extends HelperProps {
@@ -24,10 +26,11 @@ interface Props extends HelperProps {
 /**
  * @since 0.0.1
  */
-// IDEA: 
+// TODO: 
     // add something like a tutorial note with highlighted text 
         // on account creation?
         // if app user has no plain text notes at all && on create
+    // dont add any default text
 
 export default function PlainTextBlock({
     noteInput,
@@ -43,9 +46,20 @@ export default function PlainTextBlock({
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextBlock");
 
-    const { isKeyPressed } = useContext(AppContext);
+    const { 
+        getAppOverlayZIndex
+    } = useContext(AppContext);
+
     const { numBlocksParsing, setNumBlocksParsing } = useContext(BlockContainerContext);
-    const { setBlockOverlayVisible } = useContext(DefaultBlockContext);
+    
+    const { 
+        setBlockOverlayVisible, 
+        animateCopyIcon,
+        setActivateFullScreenStyles,
+        setDeactivateFullScreenStyles,
+        toggleFullScreen,
+        isFullScreen
+    } = useContext(DefaultBlockContext);
 
     const inputDivRef = useRef(null);
 
@@ -57,6 +71,9 @@ export default function PlainTextBlock({
         setInputDivJQuery($(inputDivRef.current!));
 
         setInputDivValue(parse(sanitize(noteInput.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
+
+        setActivateFullScreenStyles(() => {return activateFullScreenStyles});
+        setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
 
     }, []);
 
@@ -267,12 +284,91 @@ export default function PlainTextBlock({
     }
 
 
+    async function handleCopyClick(event): Promise<void> {
+
+        animateCopyIcon();
+
+        setClipboardText(getInputDivValueWithoutAnyHightlights());
+    }
+
+
+    /**
+     * @returns the input div's inner html without the ```<code>``` or ``` highlights.
+     */
+    function getInputDivValueWithoutAnyHightlights(): string {
+
+        const inputDiv = $(inputDivRef.current!);
+        let inputDivHtml = inputDiv.html();
+
+        inputDivHtml = inputDivHtml.replaceAll("<code>", "");
+        inputDivHtml = inputDivHtml.replaceAll("</code>", "");
+
+        return inputDivHtml;
+    }
+
+
+    function activateFullScreenStyles(): void {
+
+        const inputDiv = $(inputDivRef.current!);
+        const plainTextBlock = inputDiv.parents(".PlainTextBlock");
+
+        const appOverlayZIndex = getAppOverlayZIndex();
+
+        plainTextBlock.css({
+            position: "fixed",
+            zIndex: appOverlayZIndex + 1
+        });
+
+        plainTextBlock.animate({
+            height: "80vh",
+            top: "90px",
+            width: "90vw"
+        });
+    }
+
+
+    function deactivateFullScreenStyles(): void {
+
+        const inputDiv = $(inputDivRef.current!);
+        const plainTextBlock = inputDiv.parents(".PlainTextBlock");
+        
+        // move up just a little bit
+        plainTextBlock.css({
+            height: "unset",
+            position: "relative",
+            top: "30px",
+        });
+        
+        // resize quickly
+        plainTextBlock.css({
+            width: "100%"
+        });
+
+        // animate to start pos
+        plainTextBlock.animate(
+            {
+                top: 0,
+            },
+            300,
+            "swing", 
+            () => {
+                // reset to initial styles
+                plainTextBlock.css({
+                    position: "static",
+                    top: "auto",
+                    zIndex: 0
+                });
+            }
+        )
+    }
+
+
     return (
         <Flex 
             id={id} 
-            className={className}
+            className={className + "" + (isFullScreen && " fullScreen")}
             style={style}
-            verticalAlign="center"
+            verticalAlign="start"
             flexWrap="nowrap"
             {...otherProps}
         >
@@ -286,8 +382,31 @@ export default function PlainTextBlock({
                 onKeyDownCapture={handleKeyDownCapture}
                 onKeyUp={handleKeyUp}
             >
-                { inputDivValue }
+                {inputDivValue}
             </ContentEditableDiv>
+
+            {/* Copy button */}
+            <Button
+                className="defaultBlockButton copyButton"
+                disabled={parsing}
+                title="Copy"
+                onClick={handleCopyClick}
+            >
+                <i className="fa-solid fa-copy"></i>
+                <i className="fa-solid fa-copy"></i>
+            </Button>
+
+            {/* Fullscreen */}
+            <Button 
+                className="fullScreenButton defaultBlockButton ms-2"
+                title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                onClick={toggleFullScreen}
+            >
+                {isFullScreen ?
+                    <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                    <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                }
+            </Button>
 
             {children}
         </Flex>

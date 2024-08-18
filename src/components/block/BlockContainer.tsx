@@ -13,7 +13,7 @@ import AddNewBlock from "./AddNewBlock";
 import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
 import { Note } from "../../abstract/entites/Note";
 import { NoteInputType } from "../../abstract/NoteInputType";
-import { getRandomString, log } from './../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, log } from './../../helpers/utils';
 import { NoteInput } from "../../abstract/entites/NoteInput";
 import { AppContext } from "../App";
 import { StartPageContentContext } from "../StartPageContent";
@@ -23,7 +23,7 @@ interface Props extends DefaultProps {
 
     note: Note,
 
-    noteIndex: number
+    propsKey: string
 }
 
 
@@ -33,11 +33,11 @@ interface Props extends DefaultProps {
  */
 // TODO: 
     // confirm leave if not saved
-export default function BlockContainer({note, noteIndex, ...props}: Props) {
+export default function BlockContainer({note, propsKey, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainer");
 
-    const [blocks, setBlocks] = useState<JSX.Element[]>();
+    const [blocks, setBlocks] = useState<JSX.Element[]>([]);
 
     const [aboutToSave, setAboutToSave] = useState(false);
 
@@ -48,7 +48,7 @@ export default function BlockContainer({note, noteIndex, ...props}: Props) {
     const [numBlocksParsing, setNumBlocksParsing] = useState(0);
 
     const { toast, appUser } = useContext(AppContext);
-    const { updateBlockContainers } = useContext(StartPageContentContext);
+    const { blockContainers, setBlockContainers } = useContext(StartPageContentContext);
 
     const componentRef = useRef(null);
     const saveButtonRef = useRef(null);
@@ -59,12 +59,15 @@ export default function BlockContainer({note, noteIndex, ...props}: Props) {
         numBlocksParsing, 
         setNumBlocksParsing,
 
-        updateBlocks
+        blocks, 
+        setBlocks,
+
+        getBlockByNoteInputType
     }
 
 
     useEffect(() => {
-        updateBlocks();
+        setBlocks(mapBlocksToJsx());
 
     }, []);
 
@@ -83,30 +86,31 @@ export default function BlockContainer({note, noteIndex, ...props}: Props) {
             return [];
 
         return note.noteInputs.map((noteInput, i) =>
-            getBlockByNoteInputType(noteInput, i));
+            getBlockByNoteInputType(noteInput));
     }
 
 
-    function getBlockByNoteInputType(noteInput: NoteInput, noteInputIndex: number): JSX.Element {
+    function getBlockByNoteInputType(noteInput: NoteInput): JSX.Element {
 
+        const key = getRandomString();
         switch (noteInput.type) {
             case NoteInputType.PLAIN_TEXT:
                 return (
-                    <DefaultBlock noteInput={noteInput} noteInputIndex={noteInputIndex} key={getRandomString()}>
+                    <DefaultBlock noteInput={noteInput} propsKey={key} key={key}>
                         <PlainTextBlock noteInput={noteInput} />
                     </DefaultBlock>
                     )
 
             case NoteInputType.CODE:
                 return (
-                    <DefaultCodeBlock noteInput={noteInput} noteInputIndex={noteInputIndex} key={getRandomString()}>
+                    <DefaultCodeBlock noteInput={noteInput} propsKey={key} key={key}>
                         <CodeBlock noteInput={noteInput} />
                     </DefaultCodeBlock>
                 )
 
             case NoteInputType.CODE_WITH_VARIABLES:
                 return (
-                    <DefaultCodeBlock noteInput={noteInput} noteInputIndex={noteInputIndex} key={getRandomString()}>
+                    <DefaultCodeBlock noteInput={noteInput} propsKey={key} key={key}>
                         <CodeBlockWithVariables noteInput={noteInput} />
                     </DefaultCodeBlock>
                 )
@@ -123,6 +127,9 @@ export default function BlockContainer({note, noteIndex, ...props}: Props) {
         // case: still parsing
         if (!isReadyToSave()) 
             return;
+
+        // TODO: validate
+            // not more than 50_000 chars
         
         return new Promise((res, rej) => {
             setTimeout(() => {
@@ -148,23 +155,26 @@ export default function BlockContainer({note, noteIndex, ...props}: Props) {
     }
 
 
-    /**
-     * Map ```note.noteInputs``` to jsx elements and update ```blocks``` state.
-     */
-    function updateBlocks(): void {
+    function handleDeleteBlockClick(event): void {
 
-        setBlocks(mapBlocksToJsx());
+        // TODO: confirm
+        deleteBlock();
     }
 
 
     function deleteBlock(): void {
 
-        // TODO: confirm
+        const noteIndex = getJsxElementIndexByKey(blockContainers, propsKey);
+
+        // update appUser
         appUser.notes?.splice(noteIndex, 1);
 
-        updateBlockContainers();
+        // update notes
+        const newNotes = blockContainers;
+        newNotes.splice(noteIndex, 1);
+        setBlockContainers([...newNotes]);
     }
-
+        
 
     return (
         <BlockContainerContext.Provider value={context}>
@@ -187,40 +197,32 @@ export default function BlockContainer({note, noteIndex, ...props}: Props) {
                     {/* Blocks */}
                     {blocks}
                         
-                    <Flex className="footer mt-3 fullWidth" flexWrap="nowrap">
-                        {/* TODO: remove margin start from first button */}
-                        <AddNewBlock className="me-2 fullWidth" />
-
-                        {/* Delete */}
-                        <ButtonWithSlideLabel 
-                            className="me-2 hover transition" 
-                            label="Delete Note"
-                            title="Delete note" 
-                            style={{backgroundColor: "rgb(248, 141, 141)"}}
-                            onClick={deleteBlock}
-                        >
-                            <i className="fa-solid fa-trash"></i>
-                        </ButtonWithSlideLabel>
-
-                        {/* Save */}
-                        {
-                            // TODO: 
-                                // disable while not changed
-                                // button not wide enough for slide label
-                        }
-                        <ButtonWithSlideLabel 
-                            label="Save Note"
-                            className="hover saveNoteButton" 
-                            title="Save note"
-                            style={{backgroundColor: "rgb(141, 141, 248)"}}
-                            ref={saveButtonRef}
-                            onMouseDown={handleMouseDown}
-                            onClickPromise={handleSave}
-                        >
-                            <i className="fa-solid fa-floppy-disk"></i>
-                        </ButtonWithSlideLabel>
-                    </Flex>
+                    <AddNewBlock className="mt-2 fullWidth" />
                 </div>
+
+                <Flex className="mt-4" horizontalAlign="right">
+                    {/* Delete */}
+                    <ButtonWithSlideLabel 
+                        className="me-4 transition deleteNoteButton" 
+                        label="Delete Note"
+                        title="Delete note" 
+                        onClick={handleDeleteBlockClick}
+                    >
+                        <i className="fa-solid fa-trash"></i>
+                    </ButtonWithSlideLabel>
+
+                    {/* Save */}
+                    <ButtonWithSlideLabel 
+                        label="Save Note"
+                        className="saveNoteButton saveNoteButton" 
+                        title="Save note"
+                        ref={saveButtonRef}
+                        onMouseDown={handleMouseDown}
+                        onClickPromise={handleSave}
+                    >
+                        <i className="fa-solid fa-floppy-disk"></i>
+                    </ButtonWithSlideLabel>
+                </Flex>
 
                 {children}
             </div>
@@ -235,5 +237,7 @@ export const BlockContainerContext = createContext({
     numBlocksParsing: 0, 
     setNumBlocksParsing: (num: number) => {},
 
-    updateBlocks: () => {}
+    blocks: [<></>],
+    setBlocks: (blocks: JSX.Element[]) => {},
+    getBlockByNoteInputType: (noteInput: NoteInput) => {return <></>}
 })

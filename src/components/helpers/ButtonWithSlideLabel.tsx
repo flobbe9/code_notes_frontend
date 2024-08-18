@@ -48,6 +48,7 @@ export default forwardRef(function ButtonWithSlideLabel(
         // prepare for animation
         buttonLabelElement.css("position", "relative");
         buttonLabelElement.css("width", "0");
+        buttonLabelElement.css("zIndex", "1");
 
         buttonLabelElement.stop();
 
@@ -56,7 +57,6 @@ export default forwardRef(function ButtonWithSlideLabel(
             {
                 opacity: 1,
                 width: initialBlockButtonLabelWidth,
-                zIndex: 0
             },
             300
         )
@@ -74,13 +74,13 @@ export default forwardRef(function ButtonWithSlideLabel(
             {
                 opacity: 0,
                 width: 0,
-                zIndex: -1
             },
             300,
             "easeOutSine",
             // reset label style
             () => {
                 buttonLabelElement.css("position", "absolute");
+                buttonLabelElement.css("zIndex", "-1");
                 buttonLabelElement.css("width", initialBlockButtonLabelWidth || "");        
             }
         )

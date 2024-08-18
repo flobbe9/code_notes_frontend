@@ -3,11 +3,12 @@ import "../assets/styles/TagInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
-import { isBlank, log } from "../helpers/utils";
+import { isBlank, isEventKeyTakingUpSpace, log } from "../helpers/utils";
 import { Tag } from "../abstract/entites/Tag";
 import { BlockContainerTagListContext } from "./block/BlockContainerTagList";
 import { BlockContainerContext } from "./block/BlockContainer";
 import { AppContext } from "./App";
+import { MAX_TAG_INPUT_VALUE_LENGTH } from "../helpers/constants";
 
 
 interface Props extends DefaultProps {
@@ -29,7 +30,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
     const inputRef = useRef(null);
 
-    const { toast } = useContext(AppContext);
+    const { toast, isControlKeyPressed } = useContext(AppContext);
     const { note } = useContext(BlockContainerContext);
 
     const { 
@@ -47,16 +48,22 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     function handleKeyDown(event): void {
 
         const keyName = event.key;
+        log(isControlKeyPressed())
 
         // TODO: does not work if text is longer than input and first char is out of view
         if (keyName === "Enter") 
             handleEnterKey(event);
+
+        // TODO: consider paste, continue here
+        else if (isEventKeyTakingUpSpace(keyName, false) && !isControlKeyPressed() && isTagValueTooLong(event))
+            handleTagValueTooLong(event);
     }
-    
+
     
     function handleEnterKey(event): void {
 
-        $(inputRef.current!).trigger("blur")
+        event.preventDefault();
+        $(inputRef.current!).trigger("blur");
     }
 
 
@@ -158,6 +165,52 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
         $(inputRef.current!).val("");
 
         toast("Duplicate Tag", "This note already has a tag with the name '" + tagValue + "'.", "warn", 7000);     
+    }
+
+
+    /**
+     * @param event the key down event (assuming that the key has not yet been added to the input value)
+     * @returns ```true``` if the tag input's value is longer thatn {@link MAX_TAG_INPUT_VALUE_LENGTH}
+     */
+    function isTagValueTooLong(event): boolean {
+
+        const tagInput = $(inputRef.current!);
+        const tagInputValue = tagInput.prop("value") + event.key;
+
+        return tagInputValue.length > MAX_TAG_INPUT_VALUE_LENGTH;
+    }
+
+
+    /**
+     * Prevent given key event and toast warn about text length.
+     * 
+     * @param event the key event that triggered this method
+     */
+    function handleTagValueTooLong(event: Event): void {
+
+        event.preventDefault();
+
+        toggleTagInvalid();
+
+        toast("Tag name too long", "A tag name cannot have more than " + MAX_TAG_INPUT_VALUE_LENGTH + " characters.", "warn", 7000);
+    }
+
+
+    /**
+     * Add the "invalidTag" class to this input for given ```duration```.
+     * 
+     * @param duration the time in ms to keep the "invalidTag" class before removing it again
+     */
+    function toggleTagInvalid(duration = 300): void {
+
+        // get element
+        const tagInput = $(inputRef.current!);
+
+        tagInput.addClass("invalidTag");
+
+        setTimeout(() => {
+            tagInput.removeClass("invalidTag");
+        }, duration);
     }
 
 

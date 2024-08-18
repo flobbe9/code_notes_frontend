@@ -1,35 +1,62 @@
 .CodeBlock {
+    background-color: var(--vsCodeBlack);
+    
+    &.fullScreen {
+        border-radius: var(--borderRadius); // for full screen mode
+        padding: 15px;
+    }
+    
     .editorContainer {
-        background-color: var(--vsCodeBlack);
-        border-radius: var(--codeBorderRadius);
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-
-        .fullScreenButton {
-            color: white;
-        }
-        
         // = <Editor /> tag
         section {
+            background-color: var(--vsCodeBlack);
+            color: white;
+
             .vsCodeEditor {
-                background-color: var(--vsCodeBlack);
                 margin: 3px;
                 
-                .minimap {
-                    display: none;
-                }
-                
-                // line number container
-                .margin {
-                }
-                
-                .lines-content {
-                    // line container
-                    .view-lines {
+                .overflow-guard {
+                    background-color: var(--vsCodeBlack);
+
+                    // line number container
+                    .margin {
+                        display: none;
+                        background-color: var(--vsCodeBlack);
+                        left: -20px;
                         
-                        .view-line {
-                            
+                        .margin-view-overlays, .current-line.current-line-margin-both {
+                            left: -10px;
                         }
+                    }
+
+                    .decorationsOverviewRuler {
+                        display: none !important;
+
+                    }
+
+                    .iPadShowKeyboard {
+                        display: none;
+                    }
+                    
+                    .monaco-scrollable-element.editor-scrollable {
+                        left: 0 !important;
+                    }
+                    
+                    .lines-content {
+                        background-color: var(--vsCodeBlack);
+
+                        // line container
+                        .view-lines {
+
+                            // line
+                            .view-line {
+                                
+                            }
+                        }
+                    }
+                    
+                    .minimap {
+                        display: none;
                     }
                 }
             }

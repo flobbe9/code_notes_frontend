@@ -81,6 +81,10 @@ export const CONSOLE_MESSAGES_TO_AVOID: (string | number)[] = [
 ];
 
 
+// Tags
+export const MAX_TAG_INPUT_VALUE_LENGTH = 255;
+
+
 // CodeBlockWithVariables
 export const VARIABLE_INPUT_SEQUENCE_REGEX = /^.*\$\[\[.*\]\].*$/;
 export const VARIABLE_INPUT_DEFAULT_PLACEHOLDER = "VARIABLE_NAME";
@@ -1930,4 +1934,4 @@ export function getDefaultVariableInput(placeholder = VARIABLE_INPUT_DEFAULT_PLA
 
 // Other
 /** Time the block settings slide animation takes (in ms). */
-export const BLOCK_SETTINGS_ANIMATION_DURATION = 100;
+export const BLOCK_SETTINGS_ANIMATION_DURATION = 150;

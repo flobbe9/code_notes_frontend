@@ -2,17 +2,15 @@
 
 .TagInput {
     $containerWidth: 130px;
-    $borderRadius: 3px;
+    $borderRadius: var(--tagBorderRadius);
 
-    background-color: rgb(235, 235, 235);
-    border: 2px solid white;
+    border: 2px solid var(--codeGrey);
     border-radius: $borderRadius;
     margin-right: 0.5em;
     min-width: $containerWidth;
     width: $containerWidth;
     
     &:has(.tagInput:focus) {
-        background-color: white;
         border: 2px solid var(--accentColor);
         
         .tagInputDeleteButton {
@@ -20,29 +18,42 @@
         }
     }
     
+    // case: has no delete button
+    &:has(.tagInputDeleteButton[hidden]) {
+        .tagInput {
+            border-top-right-radius: $borderRadius;
+            border-bottom-right-radius: $borderRadius;
+        }
+    }
+
+    &:has(.invalidTag) {
+        border-color: red !important;
+    }
+
     .tagInput {
-        background-color: rgb(235, 235, 235);
+        background-color: transparent;
         border: none;
+        color: var(--codeGrey);
         padding: 0px 7px;
         width: 100%;
         
         @include placeholder {
             @include dontSelectText();
+            color: grey;
         }
         
         &:focus {
-            background-color: white;
             outline: none;
             width: $containerWidth - 4px; // 4px = (2 * borderWidth)
         }
     }
 
     .tagInputDeleteButton {
-        background-color: rgb(150, 150, 150);
-        
+        background-color: transparent;
         border-radius: $borderRadius;
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
+        color: var(--codeGrey);
 
         padding: 0.3rem 0.3rem;
         transition: var(--transitionTimeFast);

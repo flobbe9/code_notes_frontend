@@ -1,47 +1,9 @@
 @import "./global/functions.scss";
 
 .DefaultCodeBlock {
-    background-color: white;
-    border: 2px solid var(--codeGrey);
-    border-right: none;
-    border-radius: var(--codeBorderRadius);
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    padding: 2px;
-    
-    .copyButton {
-        background-color: rgb(230, 230, 230);
-        border-radius: 0;
-        border-top-right-radius: var(--borderRadius);
-        border-bottom-right-radius: var(--borderRadius);
-        min-height: 2em;
-        padding: 0.5rem 1rem !important;
+    border-radius: var(--borderRadius);
 
-        .fa-copy {
-            position: absolute;
-        }
-    }
-
-    .fullScreenButton {
-        background-color: transparent;
-        font-size: 0.9em;
-        height: 2em;
-        padding: 5px;
-        width: 2em;
-
-        @include customHover {
-            .fa-solid {
-                font-size: 1.5em;
-            }
-        }
-
-        .buttonContentContainer {
-            height: 100%;
-            width: 100%;
-
-            .fa-solid {
-                transition: var(--transitionTime);
-            }
-        }
+    &:has(.fullScreen) {
+        box-shadow: 2px 2px 15px 2px var(--codeGrey);
     }
 }

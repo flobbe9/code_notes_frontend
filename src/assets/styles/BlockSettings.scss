@@ -22,13 +22,17 @@
         width: 0;
         z-index: -1;
 
+        .searchInput {
+            color: white;
+        }
+
         .clearSearchValueButton {
             display: none;
         }
     }
 
-    .toggleBlockSettingsButton {
+    .toggleLanguageSearchBarButton {
         background-color: transparent;
-        padding: 0.5rem 1rem;
+        padding: 0 10px 0 0.3rem;
     }
 }

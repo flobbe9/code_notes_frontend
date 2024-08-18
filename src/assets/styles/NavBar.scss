@@ -1,7 +1,12 @@
 .NavBar {
-    background-color: var(--matBlack);
+    background-color: var(--matBlue);
     color: white;
     min-height: 66px;
+
+    .iconLabel {
+        font-size: 1.2em;
+        color: var(--accentColor);
+    }
 
     code {
         color: white;

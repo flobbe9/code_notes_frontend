@@ -68,33 +68,33 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
     }, []);
 
 
-    /**
-     * Slide toggle the block switch.
-     * 
-     * @param hide whether to hide the block switch regardles of it's current state
-     */
-    function toggleBlockSwitch(hide = isShowBlockSettings): void {
+    // /**
+    //  * Slide toggle the block switch.
+    //  * 
+    //  * @param hide whether to hide the block switch regardles of it's current state
+    //  */
+    // function toggleBlockSwitch(hide = isShowBlockSettings): void {
 
-        const blockSwitch = $(blockSwitchRef.current!);
+    //     const blockSwitch = $(blockSwitchRef.current!);
 
-        // case: show block settings
-        if (!hide)
-            // radio buttons back to static
-            blockSwitch.children(".RadioButton").css("position", "static");
+    //     // case: show block settings
+    //     if (!hide)
+    //         // radio buttons back to static
+    //         blockSwitch.children(".RadioButton").css("position", "static");
 
-        // fake "toggle slide"
-        blockSwitch.animate(
-            {
-                width: hide ? 0 : getCssConstant("blockSwitchWidth"),
-                opacity: hide ? 0 : 1,
-                zIndex: hide ? -1 : 0
-            }, 
-            BLOCK_SETTINGS_ANIMATION_DURATION,
-            "swing",
-            // radio buttons to absolute so they dont widen the container width
-            () => blockSwitch.children(".RadioButton").css("position", (hide ? "absolute" : "static"))
-        )
-    }
+    //     // fake "toggle slide"
+    //     blockSwitch.animate(
+    //         {
+    //             width: hide ? 0 : getCssConstant("blockSwitchWidth"),
+    //             opacity: hide ? 0 : 1,
+    //             zIndex: hide ? -1 : 0
+    //         }, 
+    //         BLOCK_SETTINGS_ANIMATION_DURATION,
+    //         "swing",
+    //         // radio buttons to absolute so they dont widen the container width
+    //         () => blockSwitch.children(".RadioButton").css("position", (hide ? "absolute" : "static"))
+    //     )
+    // }
 
 
     /**
@@ -107,19 +107,23 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
         const languageSearchBar = $(componentRef.current!).find(".languageSearchBar");
         const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
 
-        if (!hide)
+        if (!hide) {
             languageSearchBar.css("position", "relative");
+            languageSearchBar.css("zIndex", 1);
+        }
 
         // fake "toggle slide"
         languageSearchBar.animate(
             {
                 width: hide ? 0 : languageSearchBarWidth,
                 opacity: hide ? 0 : 1,
-                zIndex: hide ? -1 : 1
             }, 
             BLOCK_SETTINGS_ANIMATION_DURATION,
             "swing",
-            () => languageSearchBar.css("position", (hide ? "absolute" : "relative"))
+            () => {
+                languageSearchBar.css("position", (hide ? "absolute" : "relative"));
+                languageSearchBar.css("zIndex", hide ? -1 : 1);
+            }
         )
     }
 
@@ -133,7 +137,7 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
 
         setIsShowBlockSettings(!hide);
 
-        toggleBlockSwitch(hide);
+        // toggleBlockSwitch(hide);
         toggleLanguageSearchBar(hide);
     }
 
@@ -271,17 +275,13 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
             className={className}
             style={style}
             verticalAlign="start"
-            horizontalAlign={isTabletWidth ? "right" : "center"}
-            // wrap for mobile view
-            flexWrap={isTabletWidth && isShowBlockSettings ? "wrap" : "nowrap"}
+            flexWrap={"nowrap"}
             ref={componentRef}
             {...otherProps}
         >
-            <BlockSwitch className="" ref={blockSwitchRef} tabIndex={isShowBlockSettings ? 0 : -1} />
-
             {/* Search Language */}
             <SearchBar 
-                className={"languageSearchBar " + (isShowBlockSettings ? "ms-1 me-1" : "")}
+                className={"languageSearchBar " + (isShowBlockSettings ? "ms-3" : "")}
                 placeHolder="Language..." 
                 ref={languageSearchBarRef}
                 title="Search programming language"
@@ -303,16 +303,14 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
                 />
             </SearchBar>
 
-            {/* Toggle button */}
+            {/* Programming Language button */}
             <Button 
-                className="toggleBlockSettingsButton transition ms-1" 
-                style={{backgroundColor: isShowBlockSettings ? "var(--codeGrey)" : "transparent"}}
-                title="Section settings"
+                className="toggleLanguageSearchBarButton defaultBlockButton transition ms-1" 
+                title="Programming Language"
                 disabled={areBlockSettingsDisabled}
                 onClick={() => toggleBlockSettings()}
-                _hover={isShowBlockSettings ? {} : {backgroundColor: "buttonFace"}}
             >
-                <i className="fa-solid fa-ellipsis-vertical dontSelectText"></i>
+                <i className="fa-solid fa-globe dontSelectText"></i>
             </Button>
                 
             {children}

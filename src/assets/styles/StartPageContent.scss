@@ -1,14 +1,18 @@
+@import "./global/functions.scss";
+
 .StartPageContent {
     padding: 0 5px;
 
     .addBlockContainerButton {
-        background-color: rgb(52, 116, 255);
-        color: white;
+        background-color: var(--vsCodeBlackLight);
+        color: rgb(52, 116, 255);
         height: fit-content;
         text-wrap: nowrap;
+    }
 
-        &:focus {
-            outline-color: black;
-        }
+    #SearchBarStartPage {
+        border: 2px solid var(--vsCodeBlackLight);
+        background-color: transparent;
+        border-radius: var(--borderRadius);
     }
 }

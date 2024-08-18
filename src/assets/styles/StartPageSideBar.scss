@@ -12,13 +12,14 @@
     min-height: 100vh;
     
     .toolBar {
-        background-color: var(--matBlueLight);
+        background-color: var(--matBlue);
         color: white;
         padding: 0.5rem;
         
         .toolBarToggleButton {
             background-color: transparent;
             color: white;
+            
             margin-top: 10px;
             padding: 0.5rem;
 
@@ -29,7 +30,7 @@
     }
     
     .tagFilterContainer {
-        background-color: var(--matBlue);
+        background-color: var(--matBlueLight);
         border-radius: var(--borderRadius);
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;

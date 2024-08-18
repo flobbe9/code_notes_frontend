@@ -12,6 +12,7 @@ import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
 import { StartPageContainerContext } from "../StartPageContainer";
 import { NoteInput } from "../../abstract/entites/NoteInput";
+import BlockSettings from "./BlockSettings";
 
 
 interface Props extends DefaultProps {
@@ -51,14 +52,9 @@ export default function CodeBlock({noteInput, ...props}: Props) {
     const [editorTransition, setEditorTransition] = useState(0);
     const [numEditorLines, setNumEditorLines] = useState(1);
     const [editorValue, setEditorValue] = useState(noteInput.value);
-    const [editorHeight, setEditorHeight] = useState(getInitialEditorHeight());
-
-    const [isFullScreen, setIsFullScreen] = useState(false);
+    const [editorHeight, setEditorHeight] = useState(0);
 
     const { 
-        getDeviceWidth, 
-        toggleAppOverlay, 
-        isAppOverlayVisible, 
         getAppOverlayZIndex 
     } = useContext(AppContext);
 
@@ -68,12 +64,13 @@ export default function CodeBlock({noteInput, ...props}: Props) {
         isShowBlockSettings, 
         areBlockSettingsDisabled, 
         setAreBlockSettingsDisabled, 
-        codeBlockLanguage
+        codeBlockLanguage,
+        animateCopyIcon,
+        setActivateFullScreenStyles,
+        setDeactivateFullScreenStyles,
+        toggleFullScreen,
+        isFullScreen
     } = useContext(DefaultBlockContext);
-
-    const { animateCopyIcon } = useContext(DefaultCodeBlockContext);
-
-    const { isTabletWidth } = getDeviceWidth();
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeBlock");
 
@@ -84,8 +81,10 @@ export default function CodeBlock({noteInput, ...props}: Props) {
 
 
     useEffect(() => {
-        // log(noteInput.value)
         setAreBlockSettingsDisabled(true);
+        updateFullScreenSetterStates();
+
+        setEditorHeight(getInitialEditorHeight());
 
     }, []);
 
@@ -93,6 +92,8 @@ export default function CodeBlock({noteInput, ...props}: Props) {
     useEffect(() => {
         if (isEditorMounted)
             updateActualEditorHeight();
+
+        updateFullScreenSetterStates();
 
     }, [editorHeight, numEditorLines]);
 
@@ -120,24 +121,6 @@ export default function CodeBlock({noteInput, ...props}: Props) {
     }, [isShowSideBar]);
 
     
-    useEffect(() => {
-        $(window).on("keydown", handleGlobalKeyDown);
-
-        return () => {
-            $(window).off("keydown", handleGlobalKeyDown);
-        }
-
-    }, [isFullScreen, isAppOverlayVisible]);
-
-
-    useEffect(() => {
-        // deactivate full screen on overlay click
-        if (!isAppOverlayVisible && isFullScreen) 
-            deactivateFullScreen();
-
-    }, [isAppOverlayVisible]);
-
-
     useEffect(() => {
         if (!isEditorMounted)
             return;
@@ -185,6 +168,13 @@ export default function CodeBlock({noteInput, ...props}: Props) {
 
         // programmingLanguage
         noteInput.programmingLanguage = codeBlockLanguage;
+    }
+
+
+    function updateFullScreenSetterStates(): void {
+
+        setActivateFullScreenStyles(() => {return activateFullScreenStyles});
+        setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
     }
 
 
@@ -399,106 +389,65 @@ export default function CodeBlock({noteInput, ...props}: Props) {
 
         return newFullEditorWidth;
     }
-
-    
-
-    function toggleFullScreen(event): void {
-
-        if (isFullScreen)
-            deactivateFullScreen();
-        else
-            activateFullscreen();
-    }
-
-
-    function activateFullscreen(): void {
-
-        activateFullScreenStyles();
-
-        setIsFullScreen(true);
-
-        toggleAppOverlay();
-
-        $(editorRef.current!).trigger("focus");
-    }
-
-
-    function deactivateFullScreen() {
-
-        deactivateFullScreenStyles();
-
-        setIsFullScreen(false);
-
-        if (isAppOverlayVisible)
-            toggleAppOverlay();
-    }
-
-    
-    function handleGlobalKeyDown(event): void {
-
-        const keyName = event.key;
-
-        if (keyName === "Escape") 
-            handleEscape(event);
-    }
-
-
-    function handleEscape(event): void {
-
-        if (isFullScreen)
-            deactivateFullScreen();
-    }
     
 
     function activateFullScreenStyles(): void {
 
         const editor = getOuterEditorContainer();
-        const blockContent = editor.parents(".blockContent");
+        const defaultCodeBlock = editor.parents(".DefaultCodeBlock");
 
         const appOverlayZIndex = getAppOverlayZIndex();
         
-        blockContent.animate(
+        defaultCodeBlock.animate(
             { width: "90vw" },
             100,
             "swing",
-            () => editor.css({
-                width: "100%"
-            })
+            () => {
+                editor.css({
+                    width: "100%"
+                });
+                updateFullEditorWidth();
+            }
         );
 
-        blockContent.css({
-            position: "fixed",
+        defaultCodeBlock.css({
+            position: "fixed", // hardcoded in css
             zIndex: appOverlayZIndex + 1
         });
 
-        blockContent.animate({top: "90px"}, 300);
+        defaultCodeBlock.animate({top: "90px"}, 300);
 
         editor.animate({height: "80vh"});
+
+        $(editorRef.current!).trigger("focus");
     }
 
 
     function deactivateFullScreenStyles(): void {
 
         const editor = getOuterEditorContainer();
-        const blockContent = editor.parents(".blockContent");
+        const defaultCodeBlock = editor.parents(".DefaultCodeBlock");
         
         // move up just a little bit
-        blockContent.css({
+        defaultCodeBlock.css({
             position: "relative",
             top: "30px",
         });
         
         // resize quickly
-        blockContent.css({
+        defaultCodeBlock.css({
             width: "100%"
         });
+        updateFullEditorWidth();
+        updateActualEditorWidth();
+
         editor.css({
             height: editorHeight,
             width: isShowBlockSettings ? editorWidth : fullEditorWidth
         });
 
         // animate to start pos
-        blockContent.animate(
+        defaultCodeBlock.animate(
             {
                 top: 0,
             },
@@ -506,7 +455,7 @@ export default function CodeBlock({noteInput, ...props}: Props) {
             "swing", 
             () => {
                 // reset to initial styles
-                blockContent.css({
+                defaultCodeBlock.css({
                     position: "static",
                     top: "auto",
                     zIndex: 0
@@ -522,10 +471,9 @@ export default function CodeBlock({noteInput, ...props}: Props) {
      */
     function getBlockSettingsWidth(): number {
 
-        const blockSwitchWidth = getCSSValueAsNumber(getCssConstant("blockSwitchWidth"), 2);
         const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
         
-        return (isTabletWidth ? 0 : blockSwitchWidth) + languageSearchBarWidth;
+        return languageSearchBarWidth;
     }
 
 
@@ -546,53 +494,54 @@ export default function CodeBlock({noteInput, ...props}: Props) {
     return (
         <Flex 
             id={id} 
-            className={className + " fullWidth"}
+            className={className + " fullWidth " + (isFullScreen && "fullScreen")}
             style={style}
             ref={componentRef}
             flexWrap="nowrap"
+            verticalAlign="start"
             {...otherProps}
         >
-            <Flex className="fullWidth editorContainer" flexWrap="nowrap">
-                {/* Editor */}
-                <div className="fullWidth">
-                    <Editor 
-                        className="vsCodeEditor" 
-                        height={editorHeight} 
-                        width={"98%"}
-                        language={codeBlockLanguage.toLowerCase()}
-                        theme="vs-dark"
-                        defaultValue={editorValue}
-                        onChange={handleChange}
-                        onMount={handleEditorMount}
-                    />
-                </div>
-
-                {/* Fullscreen button */}
-                <div style={{position: "relative"}}>
-                    <Button 
-                        className={"fullScreenButton"}
-                        title={isFullScreen ? "Normal screen" : "Fullscreen"}
-                        disabled={areBlockSettingsDisabled}
-                        ref={fullScreenButtonRef}
-                        onClick={toggleFullScreen}
-                    >
-                        {isFullScreen ?
-                            <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
-                            <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
-                        }
-                    </Button>
-                </div>
-            </Flex>
+            {/* Editor */}
+            <div className="fullWidth editorContainer">
+                <Editor 
+                    className="vsCodeEditor" 
+                    height={editorHeight} 
+                    width={"98%"}
+                    language={codeBlockLanguage.toLowerCase()}
+                    theme="vs-dark"
+                    defaultValue={editorValue}
+                    onChange={handleChange}
+                    onMount={handleEditorMount}
+                />
+            </div>
 
             {/* Copy button */}
             <Button
-                className="defaultBlockButton hover copyButton fullHeight"
+                className="defaultBlockButton copyButton"
                 title="Copy"
+                disabled={areBlockSettingsDisabled}
                 ref={copyButtonRef}
                 onClick={handleCopyClick}
             >
                 <i className="fa-solid fa-copy"></i>
                 <i className="fa-solid fa-copy"></i>
+            </Button>
+
+            {/* Block Settings */}
+            <BlockSettings noteInput={noteInput} areBlockSettingsDisabled={areBlockSettingsDisabled} />
+
+            {/* Fullscreen button */}
+            <Button 
+                className={"fullScreenButton defaultBlockButton"}
+                title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                disabled={areBlockSettingsDisabled}
+                ref={fullScreenButtonRef}
+                onClick={toggleFullScreen}
+            >
+                {isFullScreen ?
+                    <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                    <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                }
             </Button>
                 
             {children}

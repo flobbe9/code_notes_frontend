@@ -22,6 +22,7 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 // TODO: tag list hover moves with scrollbar
+// TODO: new block container wont add new tags
 export default function BlockContainerTagList({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainerTagList");

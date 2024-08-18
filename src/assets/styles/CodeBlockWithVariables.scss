@@ -3,16 +3,22 @@
 :root {
     --codeBlockWithVariablesMinHeight: 20vh;
     --variableInputFontFamily: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --variableInputFontSize: 14px;
-    --variableInputPaddingLeftRight: 7px;
+    --variableInputFontSize: 1em;
+    --variableInputPaddingLeftRight: 0px;
     --variableInputBorderWidth: 2px;
 }
 
 .CodeBlockWithVariables {
-    background-color: var(--codeGrey);
-    border-radius: var(--codeBorderRadius);
-    border-top-right-radius: 0;
+    background-color: var(--vsCodeBlack);
+    border-radius: var(--borderRadius);
     border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    color: white;
+    
+    &.fullScreen {
+        border-radius: var(--borderRadius); // for full screen mode
+        padding: 15px;
+    }
 
     .inputDivContainer {
         margin: 0;
@@ -23,11 +29,13 @@
         }
         
         .inputDiv {
+            border-left: 2px solid transparent;
             margin: 0;
             max-height: var(--codeBlockWithVariablesMinHeight);
             min-height: 41px;
             overflow: auto;
-            padding: 10px 10px;
+            padding: 10px 0;
+            transition: border var(--transitionTime);
             white-space: pre-wrap;
 
             @include scrollBar();
@@ -36,18 +44,15 @@
                 outline: none;
             }
 
-            &:has(.variableInput) {
-                padding: 7px 10px;
-            }
-
             .variableInput {
+                background-color: var(--codeGreyLight);
                 border: var(--variableInputBorderWidth) solid transparent;
                 border-radius: var(--borderRadius);
                 font-family: var(--variableInputFontFamily);
                 font-size: var(--variableInputFontSize);
                 line-height: 1em;
                 margin: 0 2px;
-                padding: 3px var(--variableInputPaddingLeftRight);
+                padding: 0px var(--variableInputPaddingLeftRight);
 
                 &:focus {
                     border-color: var(--accentColor);
@@ -57,37 +62,15 @@
                 &:not(:focus) {
                     @include customHover {
                         @include hover();
-                        cursor: text !important;
+                        cursor: pointer !important;
                     }
                 }
             }
         }
     }
 
-    .addVariableButton {
-        background-color: rgb(192, 192, 192);
-        background-color: white;
-        border-radius: 0;
-        color: black;
-        text-wrap: nowrap;
-        padding: 0.3rem 0.5rem !important;
-
-        .fa-plus {
-            background-color: white;
-            border-radius: 100%;
-            padding: 3px;
-        }
-
-        .fa-dollar-sign {
-            color: rgb(153, 255, 0);
-            color: black;
-        }
-
-        .curlyBraces {
-            color: rgb(42, 110, 255);
-            color: black;
-            margin-left: 2px;
-            font-weight: bold;
-        }
+    .appendVariableButton {
+        padding-left: 0.6rem !important;
+        padding-right: 0.8rem !important;
     }
 }

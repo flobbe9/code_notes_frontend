@@ -18,6 +18,11 @@
     width: var(--languageSearchBarWidth);
     z-index: 1;
 
+    // case: focus
+    &:focus, &:has(.searchResultInput:focus) {
+        border-color: var(--accentColor)
+    }
+
     @include scrollBar();
 
     .searchResultInput {

@@ -1,5 +1,5 @@
 import React from "react";
-import "./../assets/styles/NavBar.css";
+import "./../assets/styles/NavBar.scss";
 import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
 import Flex from "./helpers/Flex";
 import Link from "./helpers/CustomLink"
@@ -35,7 +35,7 @@ export default function NavBar({...props}: Props) {
                         <img src="/img/favicon.ico" alt="favicon" className="invertColor" height={45} />
 
                         {/* Label */}
-                        <div className="ms-3" style={{fontSize: "1.2em"}}>
+                        <div className="ms-3 iconLabel">
                             <span><code>Code</code></span>
                             <span style={{fontFamily: "noteFont"}}> Notes</span>
                         </div>

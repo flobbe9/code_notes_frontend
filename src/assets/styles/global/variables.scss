@@ -1,14 +1,19 @@
 :root {
     --accentColor: orange;
     --accentColor2: #6993f3;
-    --codeBorderRadius: 10px;
+    --codeBorderRadius: 20px;
+    --plainTextBlockColor: white;
+    --codeBlockColor: rgb(172, 0, 172);
+    --codeBlockWithVariablesColor: turquoise;
     --borderRadius: 3px;
+    --tagBorderRadius: 1px;
     --codeGrey: rgb(212, 212, 212);
+    --codeGreyLight: rgb(231, 231, 231);
     --matBlue: rgb(21, 1, 70);
     --matBlueLight: rgb(31, 4, 94);
-    --matBlack: rgb(49, 49, 49);
     --testBorder: 1px solid black;
     --transitionTime: 0.2s;
     --transitionTimeFast: 0.1s;
     --vsCodeBlack: #1d1e1f;
+    --vsCodeBlackLight: #3a3a3a;
 }

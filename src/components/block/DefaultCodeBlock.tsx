@@ -4,55 +4,34 @@ import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps"
 import DefaultBlock from "./DefaultBlock";
 import Flex from "../helpers/Flex";
 import { NoteInput } from "../../abstract/entites/NoteInput";
+import { log } from "../../helpers/utils";
 
 
 interface Props extends DefaultProps {
 
     noteInput: NoteInput,
 
-    noteInputIndex: number
+    propsKey: string
 }
 
 
 /**
  * @since 0.0.1
  */
-export default function DefaultCodeBlock({noteInput, noteInputIndex, ...props}: Props) {
+export default function DefaultCodeBlock({noteInput, propsKey, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultCodeBlock");
 
     const componentRef = useRef(null);
 
     const context = {
-        animateCopyIcon
+        
     }
-
-
-    /**
-     * Animate the icon of the "copy" button.
-     */
-    function animateCopyIcon(): void {
-
-        const copyIcon = $(componentRef.current!).find(".copyButton .fa-copy").first();
-
-        copyIcon.animate(
-            {
-                opacity: 0,
-                fontSize: "3em"
-            },
-            400,
-            "easeOutSine",
-            () => {
-                copyIcon.css("opacity", 1);
-                copyIcon.css("fontSize", "1em");
-            }
-        );
-    } 
 
     
     return (
         <DefaultCodeBlockContext.Provider value={context}>
-            <DefaultBlock noteInput={noteInput} noteInputIndex={noteInputIndex}>
+            <DefaultBlock noteInput={noteInput} propsKey={propsKey}>
                 <div     
                     id={id} 
                     className={className}
@@ -72,5 +51,4 @@ export default function DefaultCodeBlock({noteInput, noteInputIndex, ...props}: 
 
 
 export const DefaultCodeBlockContext = createContext({
-    animateCopyIcon: () => {}
 });

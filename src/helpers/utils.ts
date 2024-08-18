@@ -1134,3 +1134,21 @@ export function toUpperCaseFirstChar(str: string): string {
 
     return str.charAt(0).toUpperCase() + str.substring(1);
 }
+
+
+/**
+ * @param array the array with jsx elements to look in
+ * @param key the key of the element to search in given ```array```
+ * @returns the index of the element with given ```key``` in given ```array``` or -1
+ */
+export function getJsxElementIndexByKey(array: JSX.Element[], key: string): number {
+
+    if (isArrayFalsy(array) || !array.length || isBlank(key))
+        return -1;
+
+    for (let i = 0; i < array.length; i++) 
+        if (array[i].key === key) 
+            return i;
+
+    return -1;
+}

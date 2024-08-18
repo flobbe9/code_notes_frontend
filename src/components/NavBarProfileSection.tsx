@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import "./../assets/styles/NavBarProfileSection.css";
+import "./../assets/styles/NavBarProfileSection.scss";
 import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
 import Link from "./helpers/CustomLink";
 import Button from "./helpers/Button";
@@ -56,9 +56,9 @@ export default function NavBarProfileSection({...props}: Props) {
                                     {/* Register */}
                                     <Button 
                                         id="Register" 
-                                        className="me-5 transition" 
+                                        className="me-4 transition" 
+                                        tabIndex={-1}
                                         _hover={{backgroundColor: "white"}} 
-                                        {...{tabIndex: -1}}
                                     >
                                         <Link to="/register" id="Register" className="whiteLink">
                                             Create Account

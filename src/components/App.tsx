@@ -17,6 +17,9 @@ import { Tag } from '../abstract/entites/Tag';
  * @since 0.0.1
  */
 // IDEA: consider changing the component names
+// TODO:
+    // search
+    // replace parsing states with checkbox states
 export default function App() {
 
     const [appUser, setAppUser] = useState<AppUser>(mockAppUser);
@@ -32,7 +35,7 @@ export default function App() {
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    const { isKeyPressed } = useKeyPress();
+    const { isKeyPressed, isControlKeyPressed } = useKeyPress();
 
     /** Time the toast popup takes to slide up and down in ms. */
     const toastSlideDuration = 400;
@@ -50,6 +53,7 @@ export default function App() {
         isLoggedIn,
 
         isKeyPressed,
+        isControlKeyPressed,
 
         toggleAppOverlay,
         isAppOverlayVisible,
@@ -243,6 +247,7 @@ export const AppContext = createContext({
     isLoggedIn: false,
 
     isKeyPressed: (keyName: string): boolean => {return false},
+    isControlKeyPressed: () => {return false as boolean},
 
     toggleAppOverlay: () => {},
     isAppOverlayVisible: false,

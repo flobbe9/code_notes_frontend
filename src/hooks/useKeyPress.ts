@@ -107,5 +107,23 @@ export default function useKeyPress(checkAllKeys = false) {
     }
 
 
-    return { isKeyPressed };
+    /**
+     * @returns ```true``` if the list of pressed keys contains at least one "control" kind of key (that is a key that
+     *          doesn't take up or removes any space, e.g. "Shift" or "Control")
+     */
+    function isControlKeyPressed(): boolean {
+
+        // iterate
+        const keysToIgnore = new Set(["Space", "Enter", "Backspace", "Delete"]);
+
+        for (const pressedKey of pressedKeys) 
+            // case: key name is longer than 1 char but not contained in ignore list
+            if (!keysToIgnore.has(pressedKey) && pressedKey.length > 1)
+                return true;
+        
+        return false;
+    }
+
+
+    return { isKeyPressed, isControlKeyPressed };
 }

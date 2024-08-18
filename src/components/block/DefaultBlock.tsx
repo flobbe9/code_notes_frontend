@@ -3,7 +3,7 @@ import "../../assets/styles/DefaultBlock.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
-import { log } from "../../helpers/utils";
+import { getJsxElementIndexByKey, log } from "../../helpers/utils";
 import BlockSettings from "./BlockSettings";
 import { NoteInput } from "../../abstract/entites/NoteInput";
 import Overlay from "../helpers/Overlay";
@@ -16,7 +16,7 @@ interface Props extends DefaultProps {
 
     noteInput: NoteInput,
 
-    noteInputIndex: number
+    propsKey: string
 }
 
 
@@ -27,10 +27,14 @@ interface Props extends DefaultProps {
  *  
  * @since 0.0.1
  */
-export default function DefaultBlock({noteInput, noteInputIndex, ...props}: Props) {
+export default function DefaultBlock({noteInput, propsKey, ...props}: Props) {
 
     const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
     const [areBlockSettingsDisabled, setAreBlockSettingsDisabled] = useState(false);
+
+    const [isFullScreen, setIsFullScreen] = useState(false);
+    const [activateFullScreenStyles, setActivateFullScreenStyles] = useState<Function>(() => {});
+    const [deactivateFullScreenStyles, setDeactivateFullScreenStyles] = useState<Function>(() => {});
 
     const [codeBlockLanguage, setCodeBlockLanguage] = useState(noteInput.programmingLanguage || CODE_BLOCK_DEFAULT_LANGUAGE);
     const [codeBlockWithVariablesLanguage, setCodeBlockcodeBlockWithVariablesLanguage] = useState(noteInput.programmingLanguage || CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE);
@@ -41,9 +45,12 @@ export default function DefaultBlock({noteInput, noteInputIndex, ...props}: Prop
 
     const componentRef = useRef(null);
 
-    const { note, updateBlocks } = useContext(BlockContainerContext);
+    const {
+        toggleAppOverlay, 
+        isAppOverlayVisible, 
+    } = useContext(AppContext);
 
-    const { toast } = useContext(AppContext);
+    const { note, blocks, setBlocks } = useContext(BlockContainerContext);
 
     const context = {
         isShowBlockSettings, 
@@ -58,17 +65,123 @@ export default function DefaultBlock({noteInput, noteInputIndex, ...props}: Prop
         setCodeBlockcodeBlockWithVariablesLanguage,
 
         blockOverlayVisible,
-        setBlockOverlayVisible
+        setBlockOverlayVisible,
+
+        animateCopyIcon,
+
+        isFullScreen,
+        setActivateFullScreenStyles,
+        setDeactivateFullScreenStyles,
+        toggleFullScreen
     }
 
 
-    function deleteBlock(): void {
+    useEffect(() => {
+        $(window).on("keydown", handleGlobalKeyDown);
+
+        return () => {
+            $(window).off("keydown", handleGlobalKeyDown);
+        }
+
+    }, [isFullScreen, isAppOverlayVisible]);
+
+
+    useEffect(() => {
+        // deactivate full screen on overlay click
+        if (!isAppOverlayVisible && isFullScreen) 
+            deactivateFullScreen();
+
+    }, [isAppOverlayVisible]);
+
+
+    function handleDeleteNote(event): void {
 
         // TODO: confirm
 
+        deleteNote();
+    }
+
+
+
+    function deleteNote(): void {
+
+        const noteInputIndex = getJsxElementIndexByKey(blocks, propsKey);
+
+        // update app user
         note.noteInputs?.splice(noteInputIndex, 1);
 
-        updateBlocks();
+        // update noteInputs
+        const newNoteInputs = blocks;
+        newNoteInputs.splice(noteInputIndex, 1);
+        setBlocks([...newNoteInputs]);
+    }
+
+
+    /**
+     * Animate the icon of the "copy" button.
+     */
+    function animateCopyIcon(): void {
+
+        const copyIcon = $(componentRef.current!).find(".copyButton .fa-copy").first();
+
+        copyIcon.animate(
+            {
+                opacity: 0,
+                fontSize: "3em"
+            },
+            400,
+            "easeOutSine",
+            () => {
+                copyIcon.css("opacity", 1);
+                copyIcon.css("fontSize", "1em");
+            }
+        );
+    } 
+
+
+    function toggleFullScreen(event): void {
+
+        if (isFullScreen)
+            deactivateFullScreen();
+        else
+            activateFullscreen();
+    }
+
+
+    function activateFullscreen(): void {
+
+        activateFullScreenStyles();
+
+        setIsFullScreen(true);
+
+        toggleAppOverlay();
+    }
+
+
+    function deactivateFullScreen() {
+
+        deactivateFullScreenStyles();
+
+        setIsFullScreen(false);
+
+        if (isAppOverlayVisible)
+            toggleAppOverlay();
+    }
+
+    
+    function handleGlobalKeyDown(event): void {
+
+        const keyName = event.key;
+
+        if (keyName === "Escape") 
+            handleEscape(event);
+    }
+
+
+    function handleEscape(event): void {
+
+        if (isFullScreen)
+            deactivateFullScreen();
     }
 
 
@@ -82,10 +195,9 @@ export default function DefaultBlock({noteInput, noteInputIndex, ...props}: Prop
                 verticalAlign="start"
                 horizontalAlign="center"
                 ref={componentRef}
-                draggable
                 {...otherProps}
             >
-                <Flex className="blockContent fullWidth" flexWrap="nowrap">
+                <Flex className="blockContent fullWidth" flexWrap="nowrap" verticalAlign="start">
                     {/* Block */}
                     <div className="defaultBlockChildren fullWidth">
                         {children}
@@ -93,16 +205,14 @@ export default function DefaultBlock({noteInput, noteInputIndex, ...props}: Prop
 
                     {/* Delete button */}
                     <Button 
-                        className="deleteBlockButton defaultBlockButton" 
+                        className="deleteNoteButton defaultBlockButton" 
                         title="Delete section"
-                        onClick={deleteBlock}
+                        onClick={handleDeleteNote}
                     >
-                        <i className="fa-solid fa-xmark"></i>
+                        <i className="fa-solid fa-xmark fa-lg"></i>
+                        {/* <i className="fa-solid fa-trash"></i> */}
                     </Button>
                 </Flex>
-
-                {/* Settings */}
-                <BlockSettings noteInput={noteInput} areBlockSettingsDisabled={areBlockSettingsDisabled} />
 
                 {/* Overlay */}
                 <Overlay 
@@ -134,5 +244,12 @@ export const DefaultBlockContext = createContext({
     setCodeBlockcodeBlockWithVariablesLanguage: (language: string) => {},
 
     blockOverlayVisible: false,
-    setBlockOverlayVisible: (isVisible: boolean) => {}
+    setBlockOverlayVisible: (isVisible: boolean) => {},
+
+    animateCopyIcon: () => {},
+
+    isFullScreen: false as boolean,
+    setActivateFullScreenStyles: ({} as Function),
+    setDeactivateFullScreenStyles: ({} as Function),
+    toggleFullScreen: (event) => {}
 });
