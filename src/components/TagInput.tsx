@@ -54,7 +54,6 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
         if (keyName === "Enter") 
             handleEnterKey(event);
 
-        // TODO: consider paste, continue here
         else if (isEventKeyTakingUpSpace(keyName, false) && !isControlKeyPressed() && isTagValueTooLong(event))
             handleTagValueTooLong(event);
     }

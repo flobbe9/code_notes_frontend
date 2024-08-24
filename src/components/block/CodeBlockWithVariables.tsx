@@ -11,7 +11,6 @@ import sanitize from "sanitize-html";
 import { VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_START_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../helpers/constants";
 import { AppContext } from "../App";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
-import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
 import HelperProps from "../../abstract/HelperProps";
 import { NoteInput } from "../../abstract/entites/NoteInput";
 import { BlockContainerContext } from "./BlockContainer";

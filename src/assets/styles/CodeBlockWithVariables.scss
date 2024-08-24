@@ -52,6 +52,7 @@
                 font-size: var(--variableInputFontSize);
                 line-height: 1em;
                 margin: 0 2px;
+                min-width: 50px;
                 padding: 0px var(--variableInputPaddingLeftRight);
 
                 &:focus {

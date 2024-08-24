@@ -129,7 +129,8 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
             return;
 
         // TODO: validate
-            // not more than 50_000 chars
+            // not more than 50_000 chars in noteinput
+            // not more than 255 chars in tag inputs
         
         return new Promise((res, rej) => {
             setTimeout(() => {
