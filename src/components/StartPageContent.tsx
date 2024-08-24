@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import "../assets/styles/StartPageContent.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import BlockContainer from "./block/BlockContainer";
+import Note from "./noteInput/Note";
 import SearchBar from "./helpers/SearchBar";
 import { getRandomString, isArrayFalsy, log } from "../helpers/utils";
 import { AppContext } from "./App";
@@ -29,20 +29,20 @@ export default function StartPageContent({...props}: Props) {
 
     const { appUserEntity, isKeyPressed } = useContext(AppContext);
 
-    const [blockContainers, setBlockContainers] = useState<JSX.Element[]>([]);
+    const [notes, setNotes] = useState<JSX.Element[]>([]);
 
     const searchInputRef = useRef(null);
 
     const context = {
-        blockContainers,
-        setBlockContainers
+        notes,
+        setNotes
     }
 
 
     useEffect(() => {
         $(window).on("keydown", handleKeyDown);
 
-        setBlockContainers(mapNoteEntitiesToJsx());
+        setNotes(mapNoteEntitiesToJsx());
 
         return () => {
             $(window).off("keydown", handleKeyDown);
@@ -88,17 +88,17 @@ export default function StartPageContent({...props}: Props) {
         // 
         appUserEntity.notes! = [newNoteEntity, ...appUserEntity.notes!];
 
-        let newNotes = blockContainers;
+        let newNotes = notes;
         newNotes = [newNote, ...newNotes];
 
-        setBlockContainers(newNotes);
+        setNotes(newNotes);
     }
 
 
     function getNoteByNoteEntity(noteEntity: NoteEntity): JSX.Element {
 
         const key = getRandomString();
-        return <BlockContainer note={noteEntity} key={key} propsKey={key} />
+        return <Note note={noteEntity} key={key} propsKey={key} />
     }
 
 
@@ -127,7 +127,7 @@ export default function StartPageContent({...props}: Props) {
                 <Flex className="mt-2 mb-5" horizontalAlign="right">
                     {/* New Note Button */}
                     <ButtonWithSlideLabel 
-                        className="addBlockContainerButton" 
+                        className="addNoteButton" 
                         label="New note"
                         onClick={prependNote}
                         >
@@ -135,8 +135,8 @@ export default function StartPageContent({...props}: Props) {
                     </ButtonWithSlideLabel>
                 </Flex>
 
-                {/* BlockContainers */}
-                {blockContainers}
+                {/* Notes */}
+                {notes}
 
                 {children}
             </div>
@@ -146,6 +146,6 @@ export default function StartPageContent({...props}: Props) {
 
 
 export const StartPageContentContext = createContext({
-    blockContainers: [<></>],
-    setBlockContainers: (blockContainers: JSX.Element[]) => {}
+    notes: [<></>],
+    setNotes: (notes: JSX.Element[]) => {}
 })

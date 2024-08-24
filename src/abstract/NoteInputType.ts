@@ -1,9 +1,9 @@
 /**
- * Enum defining the type an ```AbstractBlock``` can have. Dont change the order!
+ * Enum defining the type an ```AbstractNoteInput``` can have. Dont change the order!
  * 
  * @since 0.0.1
  */
-export enum NoteInputEntityType {
+export enum NoteInputType {
 
     PLAIN_TEXT,
 

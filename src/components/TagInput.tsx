@@ -5,8 +5,8 @@ import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import { isBlank, isEventKeyTakingUpSpace, log } from "../helpers/utils";
 import { TagEntity } from "../abstract/entites/TagEntity";
-import { BlockContainerTagListContext } from "./block/BlockContainerTagList";
-import { BlockContainerContext } from "./block/BlockContainer";
+import { NoteTagListContext } from "./noteInput/NoteTagList";
+import { NoteContext } from "./noteInput/Note";
 import { AppContext } from "./App";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../helpers/constants";
 
@@ -31,7 +31,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     const inputRef = useRef(null);
 
     const { toast, isControlKeyPressed } = useContext(AppContext);
-    const { note } = useContext(BlockContainerContext);
+    const { note } = useContext(NoteContext);
 
     const { 
         getTagElementIndex, 
@@ -42,7 +42,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
         getNumBlankTagElements,
         tagElements,
         tags
-    } = useContext(BlockContainerTagListContext);
+    } = useContext(NoteTagListContext);
 
 
     function handleKeyDown(event): void {

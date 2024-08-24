@@ -1,8 +1,8 @@
 import React, { useContext, useRef } from "react";
-import "../../assets/styles/BlockContainerTitle.scss";
+import "../../assets/styles/NoteTitle.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { Note } from "../../abstract/entites/NoteEntity";
-import { BlockContainerContext } from "./BlockContainer";
+import { NoteContext } from "./Note";
 
 
 interface Props extends DefaultProps {
@@ -11,16 +11,16 @@ interface Props extends DefaultProps {
 
 
 /**
- * Container component for what is referred to as "Note" for the user. Contains list of blocks, the block title,
- * the block tags etc. 
+ * Container component for what is referred to as "Note" for the user. Contains list of noteInputs, the noteInput title,
+ * the noteInput tags etc. 
  * 
  * @since 0.0.1
  */
-export default function BlockContainerTitle({...props}: Props) {
+export default function NoteTitle({...props}: Props) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainerTitle");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteTitle");
 
-    const { note } = useContext(BlockContainerContext);
+    const { note } = useContext(NoteContext);
 
     const inputRef = useRef(null);
 

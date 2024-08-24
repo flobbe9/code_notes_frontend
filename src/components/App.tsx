@@ -9,7 +9,7 @@ import useKeyPress from '../hooks/useKeyPress';
 import Overlay from './helpers/Overlay';
 import { AppUserEntity } from '../abstract/entites/AppUserEntityEntity';
 import { AppUserRole } from '../abstract/AppUserRole';
-import { NoteInputEntityType } from '../abstract/NoteInputEntityType';
+import { NoteInputType } from '../abstract/NoteInputType';
 import { Tag } from '../abstract/entites/TagEntity';
 
 
@@ -272,12 +272,12 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
         noteInputEntitys: [
             {
                 value: "const x = 3;\n\nadsf\nasdf",
-                type: NoteInputEntityType.CODE,
+                type: NoteInputType.CODE,
                 programmingLanguage: "Java"
             },
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputEntityType.CODE_WITH_VARIABLES,
+                type: NoteInputType.CODE_WITH_VARIABLES,
                 programmingLanguage: "_auto"
             },
         ],
@@ -289,11 +289,11 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
         noteInputEntitys: [
             {
                 value: "some <code>code</code>",
-                type: NoteInputEntityType.PLAIN_TEXT
+                type: NoteInputType.PLAIN_TEXT
             },
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputEntityType.CODE_WITH_VARIABLES,
+                type: NoteInputType.CODE_WITH_VARIABLES,
                 programmingLanguage: "_auto"
             },
         ],
@@ -305,12 +305,12 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
         noteInputEntitys: [
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputEntityType.CODE_WITH_VARIABLES,
+                type: NoteInputType.CODE_WITH_VARIABLES,
                 programmingLanguage: "_auto"
             },
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputEntityType.CODE_WITH_VARIABLES,
+                type: NoteInputType.CODE_WITH_VARIABLES,
                 programmingLanguage: "_auto"
             }
         ],

@@ -1,31 +1,31 @@
 @import "./global/functions.scss";
 
-.DefaultBlock {
+.DefaultNoteInput {
     border-left: 2px solid transparent;
     margin: 5px 0;
     padding-left: 2px;
     position: relative;
     transition: border var(--transitionTime);
 
-    // case: hover or focus on code block with vars
-    &:has(.PlainTextBlock:hover), &:has(.ContentEditableDiv:focus) {
-        border-color: var(--plainTextBlockColor);
+    // case: hover or focus on code noteInput with vars
+    &:has(.PlainTextNoteInput:hover), &:has(.ContentEditableDiv:focus) {
+        border-color: var(--plainTextNoteInputColor);
     }
 
-    // case: hover or focus on code block
-    &:has(.CodeBlock:hover), &:has(.vsCodeEditor textarea:focus) {
-        border-color: var(--codeBlockColor);
+    // case: hover or focus on code noteInput
+    &:has(.CodeNoteInput:hover), &:has(.vsCodeEditor textarea:focus) {
+        border-color: var(--codeNoteInputColor);
     }
 
     // case: hover or focus on plain text
-    &:has(.CodeBlockWithVariables:hover), &:has(.ContentEditableDiv:focus) {
-        border-color: var(--codeBlockWithVariablesColor);
+    &:has(.CodeNoteInputWithVariables:hover), &:has(.ContentEditableDiv:focus) {
+        border-color: var(--codeNoteInputWithVariablesColor);
     }
 
-    .blockContent {
+    .noteInputContent {
         border-radius: var(--borderRadius);
 
-        .defaultBlockButton {
+        .defaultNoteInputButton {
             background-color: var(--vsCodeBlack);
             color: var(--codeGrey);
             padding: 0 0.7rem;
@@ -36,7 +36,7 @@
             }
         }
 
-        .deleteBlockButton {
+        .deleteNoteInputButton {
             height: unset;
         }
 
@@ -51,7 +51,7 @@
         }
     }
 
-    .blockOverlay {
+    .noteInputOverlay {
         .overlayBackground {
             border-radius: var(--borderRadius);
         }

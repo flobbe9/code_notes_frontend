@@ -1,7 +1,7 @@
 import React, { createContext, useRef } from "react";
-import "../../assets/styles/DefaultCodeBlock.scss";
+import "../../assets/styles/DefaultCodeNoteInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import DefaultBlock from "./DefaultBlock";
+import DefaultNoteInput from "./DefaultNoteInput";
 import Flex from "../helpers/Flex";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { log } from "../../helpers/utils";
@@ -18,9 +18,9 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-export default function DefaultCodeBlock({noteInputEntity, propsKey, ...props}: Props) {
+export default function DefaultCodeNoteInput({noteInputEntity, propsKey, ...props}: Props) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultCodeBlock");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultCodeNoteInput");
 
     const componentRef = useRef(null);
 
@@ -30,8 +30,8 @@ export default function DefaultCodeBlock({noteInputEntity, propsKey, ...props}: 
 
     
     return (
-        <DefaultCodeBlockContext.Provider value={context}>
-            <DefaultBlock noteInputEntity={noteInputEntity} propsKey={propsKey}>
+        <DefaultCodeNoteInputContext.Provider value={context}>
+            <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={propsKey}>
                 <div     
                     id={id} 
                     className={className}
@@ -40,15 +40,15 @@ export default function DefaultCodeBlock({noteInputEntity, propsKey, ...props}: 
                     {...otherProps}
                 >
                     <Flex flexWrap="nowrap">
-                        {/* CodeBlock */}
+                        {/* CodeNoteInput */}
                         {children}
                     </Flex>
                 </div>
-            </DefaultBlock>
-        </DefaultCodeBlockContext.Provider>
+            </DefaultNoteInput>
+        </DefaultCodeNoteInputContext.Provider>
     )
 }
 
 
-export const DefaultCodeBlockContext = createContext({
+export const DefaultCodeNoteInputContext = createContext({
 });

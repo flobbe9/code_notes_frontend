@@ -1,12 +1,12 @@
 import React, { useContext } from "react";
-import "../../assets/styles/AddNewBlock.scss";
+import "../../assets/styles/AddNewNoteInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import { log } from "../../helpers/utils";
 import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
-import { BlockContainerContext } from "./BlockContainer";
+import { NoteContext } from "./Note";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { NoteInputEntityType } from "../../abstract/NoteInputEntityType";
+import { NoteInputType } from "../../abstract/NoteInputType";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER } from "../../helpers/constants";
 
 
@@ -16,62 +16,62 @@ interface Props extends DefaultProps {
 
 
 /**
- * Container component with buttons that add a new block to a block container.
+ * Container component with buttons that add a new noteInput to a noteInput container.
  * 
  * @since 0.0.1
  */
-export default function AddNewBlock({...props}: Props) {
+export default function AddNewNoteInput({...props}: Props) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewBlock");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInput");
 
-    const { note, blocks, setBlocks, numBlocksParsing, getBlockByNoteInputEntityType } = useContext(BlockContainerContext);
+    const { note, noteInputs, setNoteInputs, numNoteInputsParsing, getNoteInputByNoteInputType } = useContext(NoteContext);
 
 
-    function handleAddPlainTextBlock(event): void {
+    function handleAddPlainTextNoteInput(event): void {
          
-        // case: not blocks yet
+        // case: not noteInputs yet
         if (!note.noteInputEntitys)
             note.noteInputEntitys = [];
  
-        const newPlainTextBlock: NoteInputEntity = {
+        const newPlainTextNoteInput: NoteInputEntity = {
             value: "Plain text and some <code>code...</code>",
-            type: NoteInputEntityType.PLAIN_TEXT
+            type: NoteInputType.PLAIN_TEXT
         }
 
-        appendNoteInputEntity(newPlainTextBlock);
+        appendNoteInputEntity(newPlainTextNoteInput);
     }
 
 
-    function handleAddCodeBlockWithVariables(event): void {
+    function handleAddCodeNoteInputWithVariables(event): void {
 
-        // case: not blocks yet
+        // case: not noteInputs yet
         if (!note.noteInputEntitys)
             note.noteInputEntitys = [];
  
-        const newCodeBlockWithVariables: NoteInputEntity = {
+        const newCodeNoteInputWithVariables: NoteInputEntity = {
             // TODO: make this a constant
             value: "Some code and a variable x = " + getDefaultVariableInput() + ". Click the 3 dots on the right to change the programming language.",
-            type: NoteInputEntityType.CODE_WITH_VARIABLES,
+            type: NoteInputType.CODE_WITH_VARIABLES,
             programmingLanguage: CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE
         }
 
-        appendNoteInputEntity(newCodeBlockWithVariables);
+        appendNoteInputEntity(newCodeNoteInputWithVariables);
     }
 
  
-    function handleAddCodeBlock(event): void {
+    function handleAddCodeNoteInput(event): void {
 
-        // case: not blocks yet
+        // case: not noteInputs yet
         if (!note.noteInputEntitys)
             note.noteInputEntitys = [];
  
-        const newCodeBlock: NoteInputEntity = {
+        const newCodeNoteInput: NoteInputEntity = {
             value: "",
-            type: NoteInputEntityType.CODE,
+            type: NoteInputType.CODE,
             programmingLanguage: CODE_BLOCK_DEFAULT_LANGUAGE
         }
 
-        appendNoteInputEntity(newCodeBlock);        
+        appendNoteInputEntity(newCodeNoteInput);        
     }
 
 
@@ -89,10 +89,10 @@ export default function AddNewBlock({...props}: Props) {
         note.noteInputEntitys = [...note.noteInputEntitys, noteInputEntityEntity];
 
         // update noteInputEntitys
-        let newNoteInputEntitys = blocks;
-        const newNoteInputEntity = getBlockByNoteInputEntityType(noteInputEntityEntity);
+        let newNoteInputEntitys = noteInputs;
+        const newNoteInputEntity = getNoteInputByNoteInputType(noteInputEntityEntity);
         newNoteInputEntitys = [...newNoteInputEntitys, newNoteInputEntity];
-        setBlocks(newNoteInputEntitys);
+        setNoteInputs(newNoteInputEntitys);
     }
  
 
@@ -106,11 +106,11 @@ export default function AddNewBlock({...props}: Props) {
         >
             <div className="col-4 pe-2">
                 <ButtonWithSlideLabel 
-                    className="fullWidth addPlainTextBlockButton" 
+                    className="fullWidth addPlainTextNoteInputButton" 
                     label="Plain Text" 
                     title="Add plain text section"
-                    disabled={numBlocksParsing > 0}
-                    onClick={handleAddPlainTextBlock}
+                    disabled={numNoteInputsParsing > 0}
+                    onClick={handleAddPlainTextNoteInput}
                 >
                     <i className="fa-solid fa-plus me-2"></i>
                     <i className="fa-solid fa-align-left"></i>
@@ -119,11 +119,11 @@ export default function AddNewBlock({...props}: Props) {
 
             <div className="col-4 pe-2">
                 <ButtonWithSlideLabel 
-                    className="fullWidth addCodeBlockButton" 
+                    className="fullWidth addCodeNoteInputButton" 
                     label="Code" 
                     title="Add code section"
-                    disabled={numBlocksParsing > 0}
-                    onClick={handleAddCodeBlock}
+                    disabled={numNoteInputsParsing > 0}
+                    onClick={handleAddCodeNoteInput}
                 >
                     <i className="fa-solid fa-plus me-2"></i>
                     <i className="fa-solid fa-code"></i>
@@ -132,11 +132,11 @@ export default function AddNewBlock({...props}: Props) {
 
             <div className="col-4">
                 <ButtonWithSlideLabel 
-                    className="fullWidth addCodeBlockWithVariablesButton" 
+                    className="fullWidth addCodeNoteInputWithVariablesButton" 
                     label="Code with Variables" 
                     title="Add code with variables section"
-                    disabled={numBlocksParsing > 0}
-                    onClick={handleAddCodeBlockWithVariables}
+                    disabled={numNoteInputsParsing > 0}
+                    onClick={handleAddCodeNoteInputWithVariables}
                 >
                     <i className="fa-solid fa-plus me-2"></i>
                     <i className="fa-solid fa-dollar-sign"></i>

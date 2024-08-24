@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/CodeBlockWithVariables.scss";
+import "../../assets/styles/CodeNoteInputWithVariables.scss";
 import 'highlight.js/styles/github.css';
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
@@ -13,10 +13,10 @@ import { AppContext } from "../App";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 import HelperProps from "../../abstract/HelperProps";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { BlockContainerContext } from "./BlockContainer";
+import { NoteContext } from "./Note";
 import parse from 'html-react-parser';
-import { DefaultBlockContext } from "./DefaultBlock";
-import BlockSettings from "./BlockSettings";
+import { DefaultNoteInputContext } from "./DefaultNoteInput";
+import NoteInputSettings from "./NoteInputSettings";
 
 
 interface Props extends HelperProps {
@@ -26,7 +26,7 @@ interface Props extends HelperProps {
 
 
 /**
- * Component containing block with the less complex code editor but including variable inputs that are considered by the copy button.
+ * Component containing noteInput with the less complex code editor but including variable inputs that are considered by the copy button.
  * 
  * @since 0.0.1
  * 
@@ -36,7 +36,7 @@ interface Props extends HelperProps {
     // disable highlighting option (settings (?))
 // TODO: 
     // highlight style sometimes chooses black (?)
-export default function CodeBlockWithVariables({
+export default function CodeNoteInputWithVariables({
     noteInputEntity,
     disabled,
     onBlur, 
@@ -53,7 +53,7 @@ export default function CodeBlockWithVariables({
 
     const [inputHighlighted, setInputHighlighted] = useState(true);
     
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeBlockWithVariables");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeNoteInputWithVariables");
     
     const inputDivRef = useRef(null);
 
@@ -62,18 +62,18 @@ export default function CodeBlockWithVariables({
         getAppOverlayZIndex
     } = useContext(AppContext);
 
-    const { numBlocksParsing, setNumBlocksParsing } = useContext(BlockContainerContext);
+    const { numNoteInputsParsing, setNumNoteInputsParsing } = useContext(NoteContext);
 
     const { 
-        codeBlockWithVariablesLanguage, 
-        setBlockOverlayVisible, 
-        areBlockSettingsDisabled, 
+        codeNoteInputWithVariablesLanguage, 
+        setNoteInputOverlayVisible, 
+        areNoteInputSettingsDisabled, 
         animateCopyIcon,
         setActivateFullScreenStyles,
         setDeactivateFullScreenStyles,
         toggleFullScreen,
         isFullScreen
-    } = useContext(DefaultBlockContext);
+    } = useContext(DefaultNoteInputContext);
 
 
     useInitialStyles(inputDivJQuery, [["max-width", "width"]], 100);
@@ -93,7 +93,7 @@ export default function CodeBlockWithVariables({
 
 
     useEffect(() => {
-        updateNumBlocksParsing();
+        updateNumNoteInputsParsing();
 
     }, [isParsing]);
 
@@ -101,7 +101,7 @@ export default function CodeBlockWithVariables({
     useEffect(() => {
         handleLanguageChange();
 
-    }, [codeBlockWithVariablesLanguage])
+    }, [codeNoteInputWithVariablesLanguage])
     
     
     // TODO: 
@@ -119,7 +119,7 @@ export default function CodeBlockWithVariables({
             highlightedText= hljs.highlightAuto(text).value;
 
         else
-            highlightedText= hljs.highlight(text, { language: codeBlockWithVariablesLanguage }).value;
+            highlightedText= hljs.highlight(text, { language: codeNoteInputWithVariablesLanguage }).value;
 
         return sanitize(highlightedText, DEFAULT_HTML_SANTIZER_OPTIONS);
     }
@@ -135,7 +135,7 @@ export default function CodeBlockWithVariables({
     async function highlightInputDivContent(): Promise<string> {
 
         setIsParsing(true);
-        setBlockOverlayVisible(true);
+        setNoteInputOverlayVisible(true);
 
         const highlightPromise = await new Promise<string>((res, rej) => {
             setTimeout(() => {
@@ -192,7 +192,7 @@ export default function CodeBlockWithVariables({
         setInputHighlighted(true);
 
         setIsParsing(false);
-        setBlockOverlayVisible(false);
+        setNoteInputOverlayVisible(false);
 
         updateAppUserEntity();
 
@@ -475,16 +475,16 @@ export default function CodeBlockWithVariables({
     
 
     /**
-     * Increase the ```numBlocksParsing``` by 1 if block is currently parsing, or else decrease it by 1 
+     * Increase the ```numNoteInputsParsing``` by 1 if noteInput is currently parsing, or else decrease it by 1 
      * (but never go below 0).
      */
-    function updateNumBlocksParsing(): void {
+    function updateNumNoteInputsParsing(): void {
 
         if (isParsing)
-            setNumBlocksParsing(numBlocksParsing + 1);
+            setNumNoteInputsParsing(numNoteInputsParsing + 1);
         
-        else if (numBlocksParsing > 0)
-            setNumBlocksParsing(numBlocksParsing - 1);
+        else if (numNoteInputsParsing > 0)
+            setNumNoteInputsParsing(numNoteInputsParsing - 1);
     }
 
 
@@ -498,7 +498,7 @@ export default function CodeBlockWithVariables({
 
 
     /**
-     * Set all noteInputEntity fields for this block.
+     * Set all noteInputEntity fields for this noteInput.
      */
     function updateAppUserEntity(): void {
 
@@ -506,7 +506,7 @@ export default function CodeBlockWithVariables({
         noteInputEntity.value = $(inputDivRef.current!).html();
 
         // programmingLanguage
-        noteInputEntity.programmingLanguage = codeBlockWithVariablesLanguage;
+        noteInputEntity.programmingLanguage = codeNoteInputWithVariablesLanguage;
     }
 
 
@@ -587,17 +587,17 @@ export default function CodeBlockWithVariables({
     function activateFullScreenStyles(): void {
 
         const inputDiv = $(inputDivRef.current!);
-        const defaultCodeBlock = inputDiv.parents(".DefaultCodeBlock");
+        const defaultCodeNoteInput = inputDiv.parents(".DefaultCodeNoteInput");
         const inputDivContainer = inputDiv.parents(".inputDivContainer");
 
         const appOverlayZIndex = getAppOverlayZIndex();
 
-        defaultCodeBlock.css({
+        defaultCodeNoteInput.css({
             position: "fixed",
             zIndex: appOverlayZIndex + 1
         });
 
-        defaultCodeBlock.animate({
+        defaultCodeNoteInput.animate({
             top: "90px",
             width: "90vw"
         });
@@ -615,28 +615,28 @@ export default function CodeBlockWithVariables({
     function deactivateFullScreenStyles(): void {
 
         const inputDiv = $(inputDivRef.current!);
-        const defaultCodeBlock = inputDiv.parents(".DefaultCodeBlock");
+        const defaultCodeNoteInput = inputDiv.parents(".DefaultCodeNoteInput");
         const inputDivContainer = inputDiv.parents(".inputDivContainer");
         
         // move up just a little bit
-        defaultCodeBlock.css({
+        defaultCodeNoteInput.css({
             position: "relative",
             top: "30px",
         });
         
         // resize quickly
-        defaultCodeBlock.css({
+        defaultCodeNoteInput.css({
             width: "100%"
         });
         inputDivContainer.css({
             height: "100%"
         });
         inputDiv.css({
-            maxHeight: "var(--codeBlockWithVariablesMinHeight)"
+            maxHeight: "var(--codeNoteInputWithVariablesMinHeight)"
         })
 
         // animate to start pos
-        defaultCodeBlock.animate(
+        defaultCodeNoteInput.animate(
             {
                 top: 0,
             },
@@ -644,7 +644,7 @@ export default function CodeBlockWithVariables({
             "swing", 
             () => {
                 // reset to initial styles
-                defaultCodeBlock.css({
+                defaultCodeNoteInput.css({
                     position: "static",
                     top: "auto",
                     zIndex: 0
@@ -670,7 +670,7 @@ export default function CodeBlockWithVariables({
 
     function isAutoDetectLanguage(): boolean {
 
-        return codeBlockWithVariablesLanguage === CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE;
+        return codeNoteInputWithVariablesLanguage === CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE;
     }
 
 
@@ -711,17 +711,17 @@ export default function CodeBlockWithVariables({
             <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
                 {/* Copy */}
                 <Button
-                    className="defaultBlockButton copyButton"
+                    className="defaultNoteInputButton copyButton"
                     title="Copy with variables"
-                    disabled={areBlockSettingsDisabled}
+                    disabled={areNoteInputSettingsDisabled}
                     onClick={handleCopyClick}
                 >
                     <i className="fa-solid fa-copy"></i>
                     <i className="fa-solid fa-copy"></i>
                 </Button>
 
-                {/* Block Settings */}
-                <BlockSettings noteInputEntity={noteInputEntity} areBlockSettingsDisabled={areBlockSettingsDisabled} />
+                {/* NoteInput Settings */}
+                <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
 
                 {/* Add variable */}
                 {/* 
@@ -729,7 +729,7 @@ export default function CodeBlockWithVariables({
                         does not work if focus was on input
                 */}
                 <Button 
-                    className="appendVariableButton defaultBlockButton" 
+                    className="appendVariableButton defaultNoteInputButton" 
                     title="Append variable (Ctrl + Shift + V)"
                     onClick={handleAppendVariableButtonClick}
                 >
@@ -738,7 +738,7 @@ export default function CodeBlockWithVariables({
                 
                 {/* Fullscreen */}
                 <Button 
-                    className="fullScreenButton defaultBlockButton"
+                    className="fullScreenButton defaultNoteInputButton"
                     title={isFullScreen ? "Normal screen" : "Fullscreen"}
                     onClick={toggleFullScreen}
                 >

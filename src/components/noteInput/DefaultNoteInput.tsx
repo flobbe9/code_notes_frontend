@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/DefaultBlock.scss";
+import "../../assets/styles/DefaultNoteInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
 import { getJsxElementIndexByKey, log } from "../../helpers/utils";
-import BlockSettings from "./BlockSettings";
+import NoteInputSettings from "./NoteInputSettings";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import Overlay from "../helpers/Overlay";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
-import { BlockContainerContext } from "./BlockContainer";
+import { NoteContext } from "./Note";
 import { AppContext } from "../App";
 
 
@@ -21,27 +21,27 @@ interface Props extends DefaultProps {
 
 
 /**
- * Parent component for any block component. Defines some default behaviour and styling for all blocks.
+ * Parent component for any noteInput component. Defines some default behaviour and styling for all noteInputs.
  * 
  * Is referred to as "Section" for the user.
  *  
  * @since 0.0.1
  */
-export default function DefaultBlock({noteInputEntity, propsKey, ...props}: Props) {
+export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: Props) {
 
-    const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
-    const [areBlockSettingsDisabled, setAreBlockSettingsDisabled] = useState(false);
+    const [isShowNoteInputSettings, setIsShowNoteInputSettings] = useState(false);
+    const [areNoteInputSettingsDisabled, setAreNoteInputSettingsDisabled] = useState(false);
 
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [activateFullScreenStyles, setActivateFullScreenStyles] = useState<Function>(() => {});
     const [deactivateFullScreenStyles, setDeactivateFullScreenStyles] = useState<Function>(() => {});
 
-    const [codeBlockLanguage, setCodeBlockLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_DEFAULT_LANGUAGE);
-    const [codeBlockWithVariablesLanguage, setCodeBlockcodeBlockWithVariablesLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE);
+    const [codeNoteInputLanguage, setCodeNoteInputLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_DEFAULT_LANGUAGE);
+    const [codeNoteInputWithVariablesLanguage, setCodeNoteInputcodeNoteInputWithVariablesLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE);
 
-    const [blockOverlayVisible, setBlockOverlayVisible] = useState(false);
+    const [noteInputOverlayVisible, setNoteInputOverlayVisible] = useState(false);
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultBlock");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultNoteInput");
 
     const componentRef = useRef(null);
 
@@ -50,22 +50,22 @@ export default function DefaultBlock({noteInputEntity, propsKey, ...props}: Prop
         isAppOverlayVisible, 
     } = useContext(AppContext);
 
-    const { note, blocks, setBlocks } = useContext(BlockContainerContext);
+    const { note, noteInputs, setNoteInputs } = useContext(NoteContext);
 
     const context = {
-        isShowBlockSettings, 
-        setIsShowBlockSettings,
-        areBlockSettingsDisabled,
-        setAreBlockSettingsDisabled,
+        isShowNoteInputSettings, 
+        setIsShowNoteInputSettings,
+        areNoteInputSettingsDisabled,
+        setAreNoteInputSettingsDisabled,
 
-        codeBlockLanguage, 
-        setCodeBlockLanguage,
+        codeNoteInputLanguage, 
+        setCodeNoteInputLanguage,
 
-        codeBlockWithVariablesLanguage, 
-        setCodeBlockcodeBlockWithVariablesLanguage,
+        codeNoteInputWithVariablesLanguage, 
+        setCodeNoteInputcodeNoteInputWithVariablesLanguage,
 
-        blockOverlayVisible,
-        setBlockOverlayVisible,
+        noteInputOverlayVisible,
+        setNoteInputOverlayVisible,
 
         animateCopyIcon,
 
@@ -105,15 +105,15 @@ export default function DefaultBlock({noteInputEntity, propsKey, ...props}: Prop
 
     function deleteNote(): void {
 
-        const noteInputEntityIndex = getJsxElementIndexByKey(blocks, propsKey);
+        const noteInputEntityIndex = getJsxElementIndexByKey(noteInputs, propsKey);
 
         // update app user
         note.noteInputEntitys?.splice(noteInputEntityIndex, 1);
 
         // update noteInputEntitys
-        const newNoteInputEntitys = blocks;
+        const newNoteInputEntitys = noteInputs;
         newNoteInputEntitys.splice(noteInputEntityIndex, 1);
-        setBlocks([...newNoteInputEntitys]);
+        setNoteInputs([...newNoteInputEntitys]);
     }
 
 
@@ -186,7 +186,7 @@ export default function DefaultBlock({noteInputEntity, propsKey, ...props}: Prop
 
 
     return (
-        <DefaultBlockContext.Provider value={context}>
+        <DefaultNoteInputContext.Provider value={context}>
             <Flex 
                 id={id} 
                 className={className}
@@ -197,15 +197,15 @@ export default function DefaultBlock({noteInputEntity, propsKey, ...props}: Prop
                 ref={componentRef}
                 {...otherProps}
             >
-                <Flex className="blockContent fullWidth" flexWrap="nowrap" verticalAlign="start">
-                    {/* Block */}
-                    <div className="defaultBlockChildren fullWidth">
+                <Flex className="noteInputContent fullWidth" flexWrap="nowrap" verticalAlign="start">
+                    {/* NoteInput */}
+                    <div className="defaultNoteInputChildren fullWidth">
                         {children}
                     </div>
 
                     {/* Delete button */}
                     <Button 
-                        className="deleteNoteButton defaultBlockButton" 
+                        className="deleteNoteButton defaultNoteInputButton" 
                         title="Delete section"
                         onClick={handleDeleteNote}
                     >
@@ -216,35 +216,35 @@ export default function DefaultBlock({noteInputEntity, propsKey, ...props}: Prop
 
                 {/* Overlay */}
                 <Overlay 
-                    className="blockOverlay flexCenter" 
+                    className="noteInputOverlay flexCenter" 
                     hideOnClick={false}
                     fadeInDuration={0}
-                    isOverlayVisible={blockOverlayVisible} 
-                    setIsOverlayVisible={setBlockOverlayVisible}
+                    isOverlayVisible={noteInputOverlayVisible} 
+                    setIsOverlayVisible={setNoteInputOverlayVisible}
                 >
                     <i className={"fa-solid fa-circle-notch rotating"}></i>
                 </Overlay>
             </Flex>
 
-        </DefaultBlockContext.Provider>
+        </DefaultNoteInputContext.Provider>
     )
 }
 
 
-export const DefaultBlockContext = createContext({
-    isShowBlockSettings: false,
-    setIsShowBlockSettings: (isShow: boolean) => {},
-    areBlockSettingsDisabled: false,
-    setAreBlockSettingsDisabled: (areDisabled: boolean) => {},
+export const DefaultNoteInputContext = createContext({
+    isShowNoteInputSettings: false,
+    setIsShowNoteInputSettings: (isShow: boolean) => {},
+    areNoteInputSettingsDisabled: false,
+    setAreNoteInputSettingsDisabled: (areDisabled: boolean) => {},
 
-    codeBlockLanguage: "",
-    setCodeBlockLanguage: (language: string) => {},
+    codeNoteInputLanguage: "",
+    setCodeNoteInputLanguage: (language: string) => {},
 
-    codeBlockWithVariablesLanguage: "", 
-    setCodeBlockcodeBlockWithVariablesLanguage: (language: string) => {},
+    codeNoteInputWithVariablesLanguage: "", 
+    setCodeNoteInputcodeNoteInputWithVariablesLanguage: (language: string) => {},
 
-    blockOverlayVisible: false,
-    setBlockOverlayVisible: (isVisible: boolean) => {},
+    noteInputOverlayVisible: false,
+    setNoteInputOverlayVisible: (isVisible: boolean) => {},
 
     animateCopyIcon: () => {},
 

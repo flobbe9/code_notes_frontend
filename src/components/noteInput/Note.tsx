@@ -1,19 +1,19 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/BlockContainer.scss";
+import "../../assets/styles/Note.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import DefaultBlock from "./DefaultBlock";
-import DefaultCodeBlock from "./DefaultCodeBlock";
-import CodeBlock from "./CodeBlock";
-import PlainTextBlock from "./PlainTextBlock";
-import CodeBlockWithVariables from "./CodeBlockWithVariables";
-import BlockContainerTagList from "./BlockContainerTagList";
+import DefaultNoteInput from "./DefaultNoteInput";
+import DefaultCodeNoteInput from "./DefaultCodeNoteInput";
+import CodeNoteInput from "./CodeNoteInput";
+import PlainTextNoteInput from "./PlainTextNoteInput";
+import CodeNoteInputWithVariables from "./CodeNoteInputWithVariables";
+import NoteTagList from "./NoteTagList";
 import Flex from "../helpers/Flex";
-import BlockContainerTitle from "./BlockContainerTitle";
-import AddNewBlock from "./AddNewBlock";
+import NoteTitle from "./NoteTitle";
+import AddNewNoteInput from "./AddNewNoteInput";
 import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
-import { Note } from "../../abstract/entites/NoteEntity";
-import { NoteInputEntityType } from "../../abstract/NoteInputEntityType";
-import { getJsxElementIndexByKey, getRandomString, log } from './../../helpers/utils';
+import { NoteEntity } from "../../abstract/entites/NoteEntity";
+import { NoteInputType } from "../../abstract/NoteInputType";
+import { getJsxElementIndexByKey, getRandomString, log } from '../../helpers/utils';
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { AppContext } from "../App";
 import { StartPageContentContext } from "../StartPageContent";
@@ -21,34 +21,34 @@ import { StartPageContentContext } from "../StartPageContent";
 
 interface Props extends DefaultProps {
 
-    note: Note,
+    note: NoteEntity,
 
     propsKey: string
 }
 
 
 /**
- * Container containing a list of different ```Block``` components.
+ * Container containing a list of different ```NoteInput``` components.
  * @since 0.0.1
  */
 // TODO: 
     // confirm leave if not saved
-export default function BlockContainer({note, propsKey, ...props}: Props) {
+export default function Note({note, propsKey, ...props}: Props) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainer");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Note");
 
-    const [blocks, setBlocks] = useState<JSX.Element[]>([]);
+    const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
     const [aboutToSave, setAboutToSave] = useState(false);
 
     /** 
-     * Number of blocks that are currently parsing or highlighting their values. Indicates whether the save() function should wait
-     * for block values or not.
+     * Number of noteInputs that are currently parsing or highlighting their values. Indicates whether the save() function should wait
+     * for noteInput values or not.
      */
-    const [numBlocksParsing, setNumBlocksParsing] = useState(0);
+    const [numNoteInputsParsing, setNumNoteInputsParsing] = useState(0);
 
     const { toast, appUserEntity } = useContext(AppContext);
-    const { blockContainers, setBlockContainers } = useContext(StartPageContentContext);
+    const { notes, setNotes } = useContext(StartPageContentContext);
 
     const componentRef = useRef(null);
     const saveButtonRef = useRef(null);
@@ -56,18 +56,18 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
     const context = {
         note,
 
-        numBlocksParsing, 
-        setNumBlocksParsing,
+        numNoteInputsParsing, 
+        setNumNoteInputsParsing,
 
-        blocks, 
-        setBlocks,
+        noteInputs, 
+        setNoteInputs,
 
-        getBlockByNoteInputEntityType
+        getNoteInputByNoteInputType
     }
 
 
     useEffect(() => {
-        setBlocks(mapBlocksToJsx());
+        setNoteInputs(mapNoteInputsToJsx());
 
     }, []);
 
@@ -77,42 +77,42 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
         if (isReadyToSave())
             $(saveButtonRef.current!).trigger("click");
 
-    }, [numBlocksParsing]);
+    }, [numNoteInputsParsing]);
 
 
-    function mapBlocksToJsx(): JSX.Element[] {
+    function mapNoteInputsToJsx(): JSX.Element[] {
 
         if (!note.noteInputEntitys)
             return [];
 
         return note.noteInputEntitys.map((noteInputEntity, i) =>
-            getBlockByNoteInputEntityType(noteInputEntity));
+            getNoteInputByNoteInputType(noteInputEntity));
     }
 
 
-    function getBlockByNoteInputEntityType(noteInputEntity: NoteInputEntity): JSX.Element {
+    function getNoteInputByNoteInputType(noteInputEntity: NoteInputEntity): JSX.Element {
 
         const key = getRandomString();
         switch (noteInputEntity.type) {
-            case NoteInputEntityType.PLAIN_TEXT:
+            case NoteInputType.PLAIN_TEXT:
                 return (
-                    <DefaultBlock noteInputEntity={noteInputEntity} propsKey={key} key={key}>
-                        <PlainTextBlock noteInputEntity={noteInputEntity} />
-                    </DefaultBlock>
+                    <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                        <PlainTextNoteInput noteInputEntity={noteInputEntity} />
+                    </DefaultNoteInput>
                     )
 
-            case NoteInputEntityType.CODE:
+            case NoteInputType.CODE:
                 return (
-                    <DefaultCodeBlock noteInputEntity={noteInputEntity} propsKey={key} key={key}>
-                        <CodeBlock noteInputEntity={noteInputEntity} />
-                    </DefaultCodeBlock>
+                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                        <CodeNoteInput noteInputEntity={noteInputEntity} />
+                    </DefaultCodeNoteInput>
                 )
 
-            case NoteInputEntityType.CODE_WITH_VARIABLES:
+            case NoteInputType.CODE_WITH_VARIABLES:
                 return (
-                    <DefaultCodeBlock noteInputEntity={noteInputEntity} propsKey={key} key={key}>
-                        <CodeBlockWithVariables noteInputEntity={noteInputEntity} />
-                    </DefaultCodeBlock>
+                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                        <CodeNoteInputWithVariables noteInputEntity={noteInputEntity} />
+                    </DefaultCodeNoteInput>
                 )
 
             // should not happen
@@ -152,33 +152,33 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
 
     function isReadyToSave(): boolean {
 
-        return aboutToSave && numBlocksParsing === 0
+        return aboutToSave && numNoteInputsParsing === 0
     }
 
 
-    function handleDeleteBlockClick(event): void {
+    function handleDeleteNoteInputClick(event): void {
 
         // TODO: confirm
-        deleteBlock();
+        deleteNoteInput();
     }
 
 
-    function deleteBlock(): void {
+    function deleteNoteInput(): void {
 
-        const noteIndex = getJsxElementIndexByKey(blockContainers, propsKey);
+        const noteIndex = getJsxElementIndexByKey(notes, propsKey);
 
         // update appUserEntity
         appUserEntity.notes?.splice(noteIndex, 1);
 
         // update notes
-        const newNotes = blockContainers;
+        const newNotes = notes;
         newNotes.splice(noteIndex, 1);
-        setBlockContainers([...newNotes]);
+        setNotes([...newNotes]);
     }
         
 
     return (
-        <BlockContainerContext.Provider value={context}>
+        <NoteContext.Provider value={context}>
             <div 
                 id={id} 
                 className={className}
@@ -189,16 +189,16 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
                 <div className="contentContainer">
                     <Flex className="fullWidth mb-4" flexWrap="nowrap">
                         {/* Title */}
-                        <BlockContainerTitle className="me-1 col-6" />
+                        <NoteTitle className="me-1 col-6" />
 
                         {/* Tags */}
-                        <BlockContainerTagList className="col-6" />
+                        <NoteTagList className="col-6" />
                     </Flex>
 
-                    {/* Blocks */}
-                    {blocks}
+                    {/* NoteInputs */}
+                    {noteInputs}
                         
-                    <AddNewBlock className="mt-2 fullWidth" />
+                    <AddNewNoteInput className="mt-2 fullWidth" />
                 </div>
 
                 <Flex className="mt-4" horizontalAlign="right">
@@ -207,7 +207,7 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
                         className="me-4 transition deleteNoteButton" 
                         label="Delete Note"
                         title="Delete note" 
-                        onClick={handleDeleteBlockClick}
+                        onClick={handleDeleteNoteInputClick}
                     >
                         <i className="fa-solid fa-trash"></i>
                     </ButtonWithSlideLabel>
@@ -227,18 +227,18 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
 
                 {children}
             </div>
-        </BlockContainerContext.Provider>
+        </NoteContext.Provider>
     )
 }
 
 
-export const BlockContainerContext = createContext({
-    note: new Note(),
+export const NoteContext = createContext({
+    note: new NoteEntity(),
 
-    numBlocksParsing: 0, 
-    setNumBlocksParsing: (num: number) => {},
+    numNoteInputsParsing: 0, 
+    setNumNoteInputsParsing: (num: number) => {},
 
-    blocks: [<></>],
-    setBlocks: (blocks: JSX.Element[]) => {},
-    getBlockByNoteInputEntityType: (noteInputEntity: NoteInputEntity) => {return <></>}
+    noteInputs: [<></>],
+    setNoteInputs: (noteInputs: JSX.Element[]) => {},
+    getNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity) => {return <></>}
 })

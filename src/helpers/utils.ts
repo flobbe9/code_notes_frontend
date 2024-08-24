@@ -779,7 +779,7 @@ export function confirmNavigateCallback(currentPath: string, callback?: () => an
 
 
 /**
- * Call given callback function inside try catch block and return ```null``` if error is caught.
+ * Call given callback function inside try catch noteInput and return ```null``` if error is caught.
  * 
  * @param callback function without params that is called inside try catch
  * @param debug if true the error will be logged. Default is false
@@ -800,7 +800,7 @@ export function tryCatchReturnNull(callback: () => any, debug = false): any {
 
 
 /**
- * Call given callback function inside try catch block and return nothing if error is caught.
+ * Call given callback function inside try catch noteInput and return nothing if error is caught.
  * 
  * @param callback function without params that is called inside try catch
  * @param debug if true the error will be logged. Default is false
@@ -990,7 +990,7 @@ export function parseCSSStringToJson(cssString: string): CSSProperties {
  * Parse given html string and retrieve some attribs.
  * 
  * @param dirtyHtml unsafe html to parse
- * @returns some attributes of the innerHtml of the core/columns block
+ * @returns some attributes of the innerHtml of the core/columns noteInput
  */
 export function getHTMLStringAttribs(dirtyHtml: string): {className: string, id: string, style: string} {
 

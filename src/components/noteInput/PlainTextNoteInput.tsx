@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/PlainTextBlock.scss";
+import "../../assets/styles/PlainTextNoteInput.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import Flex from "../helpers/Flex";
@@ -9,12 +9,12 @@ import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
 import { AppContext } from "../App";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { BlockContainerContext } from "./BlockContainer";
+import { NoteContext } from "./Note";
 import HelperProps from "../../abstract/HelperProps";
 import parse from 'html-react-parser';
-import { DefaultBlockContext } from "./DefaultBlock";
+import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import Button from "../helpers/Button";
-import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
+import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
 
 
 interface Props extends HelperProps {
@@ -32,7 +32,7 @@ interface Props extends HelperProps {
         // if app user has no plain text notes at all && on create
     // dont add any default text
 
-export default function PlainTextBlock({
+export default function PlainTextNoteInput({
     noteInputEntity,
     disabled,
     onFocus,
@@ -44,22 +44,22 @@ export default function PlainTextBlock({
     const [parsing, setParsing] = useState(false);
     const [inputDivValue, setInputDivValue] = useState<any>()
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextBlock");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
 
     const { 
         getAppOverlayZIndex
     } = useContext(AppContext);
 
-    const { numBlocksParsing, setNumBlocksParsing } = useContext(BlockContainerContext);
+    const { numNoteInputsParsing, setNumNoteInputsParsing } = useContext(NoteContext);
     
     const { 
-        setBlockOverlayVisible, 
+        setNoteInputOverlayVisible, 
         animateCopyIcon,
         setActivateFullScreenStyles,
         setDeactivateFullScreenStyles,
         toggleFullScreen,
         isFullScreen
-    } = useContext(DefaultBlockContext);
+    } = useContext(DefaultNoteInputContext);
 
     const inputDivRef = useRef(null);
 
@@ -79,7 +79,7 @@ export default function PlainTextBlock({
 
 
     useEffect(() => {
-        updateNumBlocksParsing();
+        updateNumNoteInputsParsing();
 
     }, [parsing]);
 
@@ -121,7 +121,7 @@ export default function PlainTextBlock({
 
         // notify parsing process has started (should not take long here)
         setParsing(true);
-        setBlockOverlayVisible(true);
+        setNoteInputOverlayVisible(true);
 
         const parsedText = await new Promise<string>((res, rej) => {
             setTimeout(() => {
@@ -129,7 +129,7 @@ export default function PlainTextBlock({
                 const inputText = inputDiv.html();
                 const inputTextArray = inputText.split("```");
             
-                // case: too short to have code blocks or no code blocks at all
+                // case: too short to have code noteInputs or no code noteInputs at all
                 if (inputText.length <= 6 || inputTextArray.length <= 2) {
                     res(inputText);
                     return;
@@ -140,11 +140,11 @@ export default function PlainTextBlock({
                 inputTextArray.forEach((text, i) => {
                     const isEvenIndex = i % 2 === 0;
             
-                    // case: not inside a code block
+                    // case: not inside a code noteInput
                     if (i === 0 || i === inputTextArray.length - 1 || isEvenIndex)
                         inputHtmlString += text;
             
-                    // case: inside a code block
+                    // case: inside a code noteInput
                     else if (!isEvenIndex)
                         inputHtmlString += "<code>" + text + "</code>";
                 })
@@ -160,7 +160,7 @@ export default function PlainTextBlock({
         
         setTimeout(() => {
             setParsing(false);
-            setBlockOverlayVisible(false);
+            setNoteInputOverlayVisible(false);
 
         }, 1); // states wont update correctly without this
 
@@ -259,16 +259,16 @@ export default function PlainTextBlock({
 
 
     /**
-     * Increase the ```numBlocksParsing``` by 1 if block is currently parsing, or else decrease it by 1 
+     * Increase the ```numNoteInputsParsing``` by 1 if noteInput is currently parsing, or else decrease it by 1 
      * (but never go below 0).
      */
-    function updateNumBlocksParsing(): void {
+    function updateNumNoteInputsParsing(): void {
 
         if (parsing)
-            setNumBlocksParsing(numBlocksParsing + 1);
+            setNumNoteInputsParsing(numNoteInputsParsing + 1);
         
-        else if (numBlocksParsing > 0)
-            setNumBlocksParsing(numBlocksParsing - 1);
+        else if (numNoteInputsParsing > 0)
+            setNumNoteInputsParsing(numNoteInputsParsing - 1);
     }
 
 
@@ -310,16 +310,16 @@ export default function PlainTextBlock({
     function activateFullScreenStyles(): void {
 
         const inputDiv = $(inputDivRef.current!);
-        const plainTextBlock = inputDiv.parents(".PlainTextBlock");
+        const plainTextNoteInput = inputDiv.parents(".PlainTextNoteInput");
 
         const appOverlayZIndex = getAppOverlayZIndex();
 
-        plainTextBlock.css({
+        plainTextNoteInput.css({
             position: "fixed",
             zIndex: appOverlayZIndex + 1
         });
 
-        plainTextBlock.animate({
+        plainTextNoteInput.animate({
             height: "80vh",
             top: "90px",
             width: "90vw"
@@ -330,22 +330,22 @@ export default function PlainTextBlock({
     function deactivateFullScreenStyles(): void {
 
         const inputDiv = $(inputDivRef.current!);
-        const plainTextBlock = inputDiv.parents(".PlainTextBlock");
+        const plainTextNoteInput = inputDiv.parents(".PlainTextNoteInput");
         
         // move up just a little bit
-        plainTextBlock.css({
+        plainTextNoteInput.css({
             height: "unset",
             position: "relative",
             top: "30px",
         });
         
         // resize quickly
-        plainTextBlock.css({
+        plainTextNoteInput.css({
             width: "100%"
         });
 
         // animate to start pos
-        plainTextBlock.animate(
+        plainTextNoteInput.animate(
             {
                 top: 0,
             },
@@ -353,7 +353,7 @@ export default function PlainTextBlock({
             "swing", 
             () => {
                 // reset to initial styles
-                plainTextBlock.css({
+                plainTextNoteInput.css({
                     position: "static",
                     top: "auto",
                     zIndex: 0
@@ -387,7 +387,7 @@ export default function PlainTextBlock({
 
             {/* Copy button */}
             <Button
-                className="defaultBlockButton copyButton"
+                className="defaultNoteInputButton copyButton"
                 disabled={parsing}
                 title="Copy"
                 onClick={handleCopyClick}
@@ -398,7 +398,7 @@ export default function PlainTextBlock({
 
             {/* Fullscreen */}
             <Button 
-                className="fullScreenButton defaultBlockButton ms-2"
+                className="fullScreenButton defaultNoteInputButton ms-2"
                 title={isFullScreen ? "Normal screen" : "Fullscreen"}
                 onClick={toggleFullScreen}
             >

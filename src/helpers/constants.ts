@@ -85,14 +85,14 @@ export const CONSOLE_MESSAGES_TO_AVOID: (string | number)[] = [
 export const MAX_TAG_INPUT_VALUE_LENGTH = 255;
 
 
-// CodeBlockWithVariables
+// CodeNoteInputWithVariables
 export const VARIABLE_INPUT_SEQUENCE_REGEX = /^.*\$\[\[.*\]\].*$/;
 export const VARIABLE_INPUT_DEFAULT_PLACEHOLDER = "VARIABLE_NAME";
 export const VARIABLE_INPUT_START_SEQUENCE = "$[[";
 export const VARIABLE_INPUT_END_SEQUENCE = "]]";
 
 
-// CodeBlock
+// CodeNoteInput
 export const CODE_BLOCK_DEFAULT_LANGUAGE = "_plaintext";
 export const CODE_BLOCK_LANGUAGES: ProgrammingLanguage[] = [
     {
@@ -761,7 +761,7 @@ export const CODE_BLOCK_LANGUAGES: ProgrammingLanguage[] = [
 ]
 
 
-// CodeBlockWithVariables
+// CodeNoteInputWithVariables
 export const CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE = "_auto";
 export const CODE_BLOCK_WITH_VARIABLES_LANGUAGES: ProgrammingLanguage[] = [
     {
@@ -1933,5 +1933,5 @@ export function getDefaultVariableInput(placeholder = VARIABLE_INPUT_DEFAULT_PLA
 
 
 // Other
-/** Time the block settings slide animation takes (in ms). */
+/** Time the noteInput settings slide animation takes (in ms). */
 export const BLOCK_SETTINGS_ANIMATION_DURATION = 150;

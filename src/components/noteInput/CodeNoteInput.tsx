@@ -1,18 +1,18 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/CodeBlock.scss";
+import "../../assets/styles/CodeNoteInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { Editor } from "@monaco-editor/react";
 import { getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, log, setClipboardText } from "../../helpers/utils";
-import { DefaultBlockContext } from "./DefaultBlock";
+import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { AppContext } from "../App";
 import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
-import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
+import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
 import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
 import { StartPageContainerContext } from "../StartPageContainer";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import BlockSettings from "./BlockSettings";
+import NoteInputSettings from "./NoteInputSettings";
 
 
 interface Props extends DefaultProps {
@@ -22,11 +22,11 @@ interface Props extends DefaultProps {
 
 
 /**
- * Component containing the block with the complex code editor (vscode).
+ * Component containing the noteInput with the complex code editor (vscode).
  * 
  * Width:
  * 
- * The editors width is animated on "toggle block settings" using "px" as unit. In any non-dynamic state the width unit must
+ * The editors width is animated on "toggle noteInput settings" using "px" as unit. In any non-dynamic state the width unit must
  * be "%" for it to adapt to window resize.
  * 
  * @since 0.0.1
@@ -35,7 +35,7 @@ interface Props extends DefaultProps {
     // change theme (settings)
         // adjust some css classes
     // toggle minimap ? (settings)
-export default function CodeBlock({noteInputEntity, ...props}: Props) {
+export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     /** Height of one line of the monaco vscode editor in px */
     const editorLineHeight = 19; // px
@@ -46,7 +46,7 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
     const maxNumLines = 15;
 
     const [isEditorMounted, setIsEditorMounted] = useState(false);
-    /** Refers to the editors width with collapsed block settings. Is updated on window resize. */
+    /** Refers to the editors width with collapsed noteInput settings. Is updated on window resize. */
     const [fullEditorWidth, setFullEditorWidth] = useState<number>(NaN);
     const [editorWidth, setEditorWidth] = useState("100%");
     const [editorTransition, setEditorTransition] = useState(0);
@@ -61,18 +61,18 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
     const { isShowSideBar, getStartPageSideBarWidth } = useContext(StartPageContainerContext);
 
     const { 
-        isShowBlockSettings, 
-        areBlockSettingsDisabled, 
-        setAreBlockSettingsDisabled, 
-        codeBlockLanguage,
+        isShowNoteInputSettings, 
+        areNoteInputSettingsDisabled, 
+        setAreNoteInputSettingsDisabled, 
+        codeNoteInputLanguage,
         animateCopyIcon,
         setActivateFullScreenStyles,
         setDeactivateFullScreenStyles,
         toggleFullScreen,
         isFullScreen
-    } = useContext(DefaultBlockContext);
+    } = useContext(DefaultNoteInputContext);
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeBlock");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeNoteInput");
 
     const componentRef = useRef(null);
     const editorRef = useRef(null);
@@ -81,7 +81,7 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
 
 
     useEffect(() => {
-        setAreBlockSettingsDisabled(true);
+        setAreNoteInputSettingsDisabled(true);
         updateFullScreenSetterStates();
 
         setEditorHeight(getInitialEditorHeight());
@@ -108,9 +108,9 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
     useEffect(() => {
         // case: init width has ben set
         if (!isNumberFalsy(fullEditorWidth))
-            handleToggleBlockSettings();
+            handleToggleNoteInputSettings();
 
-    }, [isShowBlockSettings]);
+    }, [isShowNoteInputSettings]);
 
 
     useEffect(() => {
@@ -127,7 +127,7 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
         
         updateFullEditorWidth();
 
-        setAreBlockSettingsDisabled(false);
+        setAreNoteInputSettingsDisabled(false);
 
 
     }, [isEditorMounted]);
@@ -139,7 +139,7 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
 
         updateAppUserEntity();
 
-    }, [codeBlockLanguage]);
+    }, [codeNoteInputLanguage]);
 
 
     useWindowResizeCallback(handleWindowResize);
@@ -155,7 +155,7 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
 
 
     /**
-     * Set ```noteInputEntity``` values using this block.
+     * Set ```noteInputEntity``` values using this noteInput.
      * 
      * @param editorValue the current text in the editor
      */
@@ -167,7 +167,7 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
         noteInputEntity.value = editorValue;
 
         // programmingLanguage
-        noteInputEntity.programmingLanguage = codeBlockLanguage;
+        noteInputEntity.programmingLanguage = codeNoteInputLanguage;
     }
 
 
@@ -281,23 +281,23 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
 
 
     /**
-     * Increase or decrease the editors width by the ```<BlockSettings>``` width depending on whether the block settings are visible or not.
+     * Increase or decrease the editors width by the ```<NoteInputSettings>``` width depending on whether the noteInput settings are visible or not.
      */
-    function handleToggleBlockSettings(): void {
+    function handleToggleNoteInputSettings(): void {
 
-        // case: show block settings
-        if (isShowBlockSettings) {
+        // case: show noteInput settings
+        if (isShowNoteInputSettings) {
             const fullEditorWidth = updateFullEditorWidth();
-            const blockSettingsWidth = getBlockSettingsWidth();
-            const randomOffset = 3; // is a wild guess, depneds on the block settings' width and margin etc
+            const noteInputSettingsWidth = getNoteInputSettingsWidth();
+            const randomOffset = 3; // is a wild guess, depneds on the noteInput settings' width and margin etc
 
             // if mobile use only language search bar width, since settings will wrap
-            const newEditorWidth = fullEditorWidth - blockSettingsWidth + randomOffset; 
+            const newEditorWidth = fullEditorWidth - noteInputSettingsWidth + randomOffset; 
 
             setEditorTransition(0);
             setEditorWidth(newEditorWidth + "px");
         
-        // case: hide block settings
+        // case: hide noteInput settings
         } else {
             setEditorTransition(BLOCK_SETTINGS_ANIMATION_DURATION);
             setEditorWidth(fullEditorWidth + "px");
@@ -319,7 +319,7 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
 
             setEditorWidth(fullEditorWidth - sideBarWidth + "px");
         
-        // case: hide block settings
+        // case: hide noteInput settings
         } else
             setEditorWidth(fullEditorWidth + "px");
     }
@@ -344,8 +344,8 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
 
     function handleWindowResize(): void {
 
-        if (isShowBlockSettings)
-            setFullEditorWidth(getOuterEditorContainer().width()! - getBlockSettingsWidth());
+        if (isShowNoteInputSettings)
+            setFullEditorWidth(getOuterEditorContainer().width()! - getNoteInputSettingsWidth());
 
         else
             updateFullEditorWidth();
@@ -394,11 +394,11 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
     function activateFullScreenStyles(): void {
 
         const editor = getOuterEditorContainer();
-        const defaultCodeBlock = editor.parents(".DefaultCodeBlock");
+        const defaultCodeNoteInput = editor.parents(".DefaultCodeNoteInput");
 
         const appOverlayZIndex = getAppOverlayZIndex();
         
-        defaultCodeBlock.animate(
+        defaultCodeNoteInput.animate(
             { width: "90vw" },
             100,
             "swing",
@@ -410,12 +410,12 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
             }
         );
 
-        defaultCodeBlock.css({
+        defaultCodeNoteInput.css({
             position: "fixed", // hardcoded in css
             zIndex: appOverlayZIndex + 1
         });
 
-        defaultCodeBlock.animate({top: "90px"}, 300);
+        defaultCodeNoteInput.animate({top: "90px"}, 300);
 
         editor.animate({height: "80vh"});
 
@@ -426,16 +426,16 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
     function deactivateFullScreenStyles(): void {
 
         const editor = getOuterEditorContainer();
-        const defaultCodeBlock = editor.parents(".DefaultCodeBlock");
+        const defaultCodeNoteInput = editor.parents(".DefaultCodeNoteInput");
         
         // move up just a little bit
-        defaultCodeBlock.css({
+        defaultCodeNoteInput.css({
             position: "relative",
             top: "30px",
         });
         
         // resize quickly
-        defaultCodeBlock.css({
+        defaultCodeNoteInput.css({
             width: "100%"
         });
         updateFullEditorWidth();
@@ -443,11 +443,11 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
 
         editor.css({
             height: editorHeight,
-            width: isShowBlockSettings ? editorWidth : fullEditorWidth
+            width: isShowNoteInputSettings ? editorWidth : fullEditorWidth
         });
 
         // animate to start pos
-        defaultCodeBlock.animate(
+        defaultCodeNoteInput.animate(
             {
                 top: 0,
             },
@@ -455,7 +455,7 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
             "swing", 
             () => {
                 // reset to initial styles
-                defaultCodeBlock.css({
+                defaultCodeNoteInput.css({
                     position: "static",
                     top: "auto",
                     zIndex: 0
@@ -466,10 +466,10 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
 
 
     /**
-     * @returns the width of the expanded block settings, not including the toggle button and considering
+     * @returns the width of the expanded noteInput settings, not including the toggle button and considering
      *          mobile mode.
      */
-    function getBlockSettingsWidth(): number {
+    function getNoteInputSettingsWidth(): number {
 
         const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
         
@@ -507,7 +507,7 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
                     className="vsCodeEditor" 
                     height={editorHeight} 
                     width={"98%"}
-                    language={codeBlockLanguage.toLowerCase()}
+                    language={codeNoteInputLanguage.toLowerCase()}
                     theme="vs-dark"
                     defaultValue={editorValue}
                     onChange={handleChange}
@@ -517,9 +517,9 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
 
             {/* Copy button */}
             <Button
-                className="defaultBlockButton copyButton"
+                className="defaultNoteInputButton copyButton"
                 title="Copy"
-                disabled={areBlockSettingsDisabled}
+                disabled={areNoteInputSettingsDisabled}
                 ref={copyButtonRef}
                 onClick={handleCopyClick}
             >
@@ -527,14 +527,14 @@ export default function CodeBlock({noteInputEntity, ...props}: Props) {
                 <i className="fa-solid fa-copy"></i>
             </Button>
 
-            {/* Block Settings */}
-            <BlockSettings noteInputEntity={noteInputEntity} areBlockSettingsDisabled={areBlockSettingsDisabled} />
+            {/* NoteInput Settings */}
+            <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
 
             {/* Fullscreen button */}
             <Button 
-                className={"fullScreenButton defaultBlockButton"}
+                className={"fullScreenButton defaultNoteInputButton"}
                 title={isFullScreen ? "Normal screen" : "Fullscreen"}
-                disabled={areBlockSettingsDisabled}
+                disabled={areNoteInputSettingsDisabled}
                 ref={fullScreenButtonRef}
                 onClick={toggleFullScreen}
             >

@@ -142,7 +142,7 @@ export default function Sanitized({
                 )
             }
 
-            {/* InnerBlocks */}
+            {/* InnerNoteInputs */}
             {children}
         </>
     )

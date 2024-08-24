@@ -26,7 +26,7 @@
         }
     }
 
-    &:has(.invalidTag) {
+    &:has(.invalidInput) {
         border-color: red !important;
     }
 

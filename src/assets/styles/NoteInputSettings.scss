@@ -1,9 +1,9 @@
 :root {
-    --blockSwitchWidth: 136px;
+    --noteInputSwitchWidth: 136px;
 }
 
-.BlockSettings {
-    .BlockSwitch {
+.NoteInputSettings {
+    .NoteInputSwitch {
         // pseudo hidden to use fake "toggle slide". dont change "display" here because of <Flex>
         opacity: 0;
         width: 0;

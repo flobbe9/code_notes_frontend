@@ -1,14 +1,14 @@
 @import "./global/functions.scss";
 
 :root {
-    --codeBlockWithVariablesMinHeight: 20vh;
+    --codeNoteInputWithVariablesMinHeight: 20vh;
     --variableInputFontFamily: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --variableInputFontSize: 1em;
     --variableInputPaddingLeftRight: 0px;
     --variableInputBorderWidth: 2px;
 }
 
-.CodeBlockWithVariables {
+.CodeNoteInputWithVariables {
     background-color: var(--vsCodeBlack);
     border-radius: var(--borderRadius);
     border-bottom-right-radius: 0;
@@ -25,13 +25,13 @@
         
         code {
             height: 100%;
-            display: block;
+            display: noteInput;
         }
         
         .inputDiv {
             border-left: 2px solid transparent;
             margin: 0;
-            max-height: var(--codeBlockWithVariablesMinHeight);
+            max-height: var(--codeNoteInputWithVariablesMinHeight);
             min-height: 41px;
             overflow: auto;
             padding: 10px 0;

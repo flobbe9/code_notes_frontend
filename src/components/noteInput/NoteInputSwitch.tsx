@@ -1,5 +1,5 @@
 import React, { forwardRef, Ref, useState } from "react";
-import "../../assets/styles/BlockSwitch.scss";
+import "../../assets/styles/NoteInputSwitch.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import RadioButton from "../helpers/RadioButton";
@@ -13,11 +13,11 @@ interface Props extends HelperProps {
 
 
 /**
- * Component with radio buttons to switch block types.
+ * Component with radio buttons to switch noteInput types.
  * 
  * @since 0.0.1
  */
-export default forwardRef(function BlockSwitch({
+export default forwardRef(function NoteInputSwitch({
     title = "",
     rendered,
     tabIndex,
@@ -27,7 +27,7 @@ export default forwardRef(function BlockSwitch({
     
     const [checkedRadioIndex, setCheckedRadioIndex] = useState(0);
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockSwitch");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteInputSwitch");
 
     const radioGroup = getRandomString();
 
@@ -43,7 +43,7 @@ export default forwardRef(function BlockSwitch({
             _hover={_hover}
             {...otherProps}
         >
-            {/* TextBlock switch */}
+            {/* TextNoteInput switch */}
             <RadioButton 
                 className="switchButton"
                 radioGroup={radioGroup} 
@@ -58,7 +58,7 @@ export default forwardRef(function BlockSwitch({
                 <i className="fa-solid fa-align-left"></i>
             </RadioButton>
 
-            {/* CodeBlock switch */}
+            {/* CodeNoteInput switch */}
             <RadioButton
                 className="switchButton"
                 radioGroup={radioGroup} 
@@ -73,7 +73,7 @@ export default forwardRef(function BlockSwitch({
                 <i className="fa-solid fa-code"></i>
             </RadioButton>
 
-            {/* CodBlockWithVariable switch */}
+            {/* CodNoteInputWithVariable switch */}
             <RadioButton
                 className="switchButton"
                 radioGroup={radioGroup} 

@@ -22,7 +22,7 @@ export default forwardRef(function ButtonWithSlideLabel(
     {label, title, onClickPromise, ...props}: Props,
     ref: Ref<HTMLElement>) {
 
-    const [initialBlockButtonLabelWidth, setInitialBlockButtonLabelWidth] = useState<string | number>();
+    const [initialNoteInputButtonLabelWidth, setInitialNoteInputButtonLabelWidth] = useState<string | number>();
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ButtonWithSlideLabel");
 
@@ -35,7 +35,7 @@ export default forwardRef(function ButtonWithSlideLabel(
     useEffect(() => {
         // wait for adjacent elements to render as well
         setTimeout(() => {
-            setInitialBlockButtonLabelWidth(getBlockButtonLabelWidth());
+            setInitialNoteInputButtonLabelWidth(getNoteInputButtonLabelWidth());
         }, 200);
         
     }, []);
@@ -43,7 +43,7 @@ export default forwardRef(function ButtonWithSlideLabel(
 
     function handleMouseEnter(event): void {
 
-        const buttonLabelElement = $(event.target).find(".addBlockButtonLabelContainer");
+        const buttonLabelElement = $(event.target).find(".addNoteInputButtonLabelContainer");
 
         // prepare for animation
         buttonLabelElement.css("position", "relative");
@@ -56,7 +56,7 @@ export default forwardRef(function ButtonWithSlideLabel(
         buttonLabelElement.animate(
             {
                 opacity: 1,
-                width: initialBlockButtonLabelWidth,
+                width: initialNoteInputButtonLabelWidth,
             },
             300
         )
@@ -65,7 +65,7 @@ export default forwardRef(function ButtonWithSlideLabel(
 
     function handleMouseLeave(event): void {
 
-        const buttonLabelElement = $(event.target).find(".addBlockButtonLabelContainer");
+        const buttonLabelElement = $(event.target).find(".addNoteInputButtonLabelContainer");
 
         buttonLabelElement.stop();
 
@@ -81,15 +81,15 @@ export default forwardRef(function ButtonWithSlideLabel(
             () => {
                 buttonLabelElement.css("position", "absolute");
                 buttonLabelElement.css("zIndex", "-1");
-                buttonLabelElement.css("width", initialBlockButtonLabelWidth || "");        
+                buttonLabelElement.css("width", initialNoteInputButtonLabelWidth || "");        
             }
         )
     }
 
 
-    function getBlockButtonLabelWidth(): string | number | undefined {
+    function getNoteInputButtonLabelWidth(): string | number | undefined {
 
-        const buttonLabelElement = $(componentRef.current!).find(".addBlockButtonLabelContainer");
+        const buttonLabelElement = $(componentRef.current!).find(".addNoteInputButtonLabelContainer");
         return buttonLabelElement.outerWidth();
     }
     
@@ -108,8 +108,8 @@ export default forwardRef(function ButtonWithSlideLabel(
         >
             {children}
 
-            <span className="addBlockButtonLabelContainer">
-                <span className="addBlockButtonLabel">{label}</span>
+            <span className="addNoteInputButtonLabelContainer">
+                <span className="addNoteInputButtonLabel">{label}</span>
             </span>
         </Button>
     )

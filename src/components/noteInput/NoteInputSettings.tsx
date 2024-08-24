@@ -1,35 +1,35 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/BlockSettings.scss";
+import "../../assets/styles/NoteInputSettings.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
 import SearchBar from "../helpers/SearchBar";
 import LanguageSearchResults from "../LanguageSearchResults";
-import BlockSwitch from "./BlockSwitch";
+import NoteInputSwitch from "./NoteInputSwitch";
 import { getCssConstant, getCSSValueAsNumber, includesIgnoreCase, includesIgnoreCaseTrim, isEmpty, isEventKeyTakingUpSpace, log } from "../../helpers/utils";
 import { AppContext } from "../App";
 import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES } from "../../helpers/constants";
-import { DefaultBlockContext } from "./DefaultBlock";
+import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { NoteInputEntityType } from "../../abstract/NoteInputEntityType";
+import { NoteInputType } from "../../abstract/NoteInputType";
 import { ProgrammingLanguage } from "../../abstract/ProgrammingLanguage";
 
 
 interface Props extends DefaultProps {
 
     /** Applies to the toggle button. Default should be ```false``` */
-    areBlockSettingsDisabled: boolean,
+    areNoteInputSettingsDisabled: boolean,
 
     noteInputEntity: NoteInputEntity
 }
 
 
 /**
- * Component containing the language searchbar and block switch for one block.
+ * Component containing the language searchbar and noteInput switch for one noteInput.
  * 
  * @since 0.0.1
  */
-export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled, ...props}: Props) {
+export default function NoteInputSettings({noteInputEntity, areNoteInputSettingsDisabled, ...props}: Props) {
     
     const [showLanguageSearchResults, setShowLanguageSearchResults] = useState(false);
     
@@ -39,18 +39,18 @@ export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled
     const [languageSearchResults, setLanguageSearchResults] = useState<string[]>(mapLanguageNames(allLanguageSearchResults));
 
     const { 
-        isShowBlockSettings, 
-        setIsShowBlockSettings,
+        isShowNoteInputSettings, 
+        setIsShowNoteInputSettings,
 
-        setCodeBlockLanguage,
-        setCodeBlockcodeBlockWithVariablesLanguage
+        setCodeNoteInputLanguage,
+        setCodeNoteInputcodeNoteInputWithVariablesLanguage
         
-    } = useContext(DefaultBlockContext);
+    } = useContext(DefaultNoteInputContext);
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockSettings");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteInputSettings");
 
     const componentRef = useRef(null);
-    const blockSwitchRef = useRef(null);
+    const noteInputSwitchRef = useRef(null);
     const languageSearchBarRef = useRef(null);
 
     // IDEA: make custom colors and pass them to buttons as border color
@@ -60,7 +60,7 @@ export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled
 
 
     useEffect(() => {
-        const allLanguageSearchResults = getAllLanguagesByBlockType();
+        const allLanguageSearchResults = getAllLanguagesByNoteInputType();
 
         setAllLanguageResults(allLanguageSearchResults);
         setLanguageSearchResults(mapLanguageNames(allLanguageSearchResults));
@@ -69,30 +69,30 @@ export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled
 
 
     // /**
-    //  * Slide toggle the block switch.
+    //  * Slide toggle the noteInput switch.
     //  * 
-    //  * @param hide whether to hide the block switch regardles of it's current state
+    //  * @param hide whether to hide the noteInput switch regardles of it's current state
     //  */
-    // function toggleBlockSwitch(hide = isShowBlockSettings): void {
+    // function toggleNoteInputSwitch(hide = isShowNoteInputSettings): void {
 
-    //     const blockSwitch = $(blockSwitchRef.current!);
+    //     const noteInputSwitch = $(noteInputSwitchRef.current!);
 
-    //     // case: show block settings
+    //     // case: show noteInput settings
     //     if (!hide)
     //         // radio buttons back to static
-    //         blockSwitch.children(".RadioButton").css("position", "static");
+    //         noteInputSwitch.children(".RadioButton").css("position", "static");
 
     //     // fake "toggle slide"
-    //     blockSwitch.animate(
+    //     noteInputSwitch.animate(
     //         {
-    //             width: hide ? 0 : getCssConstant("blockSwitchWidth"),
+    //             width: hide ? 0 : getCssConstant("noteInputSwitchWidth"),
     //             opacity: hide ? 0 : 1,
     //             zIndex: hide ? -1 : 0
     //         }, 
     //         BLOCK_SETTINGS_ANIMATION_DURATION,
     //         "swing",
     //         // radio buttons to absolute so they dont widen the container width
-    //         () => blockSwitch.children(".RadioButton").css("position", (hide ? "absolute" : "static"))
+    //         () => noteInputSwitch.children(".RadioButton").css("position", (hide ? "absolute" : "static"))
     //     )
     // }
 
@@ -102,7 +102,7 @@ export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled
      * 
      * @param hide whether to hide the searchbar regardles of it's current state
      */
-    function toggleLanguageSearchBar(hide = isShowBlockSettings): void {
+    function toggleLanguageSearchBar(hide = isShowNoteInputSettings): void {
 
         const languageSearchBar = $(componentRef.current!).find(".languageSearchBar");
         const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
@@ -131,13 +131,13 @@ export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled
     /**
      * Slide toggle this component except the toggle button.
      * 
-     * @param hide whether to hide the block settings regardles of their current state
+     * @param hide whether to hide the noteInput settings regardles of their current state
      */
-    function toggleBlockSettings(hide = isShowBlockSettings): void {
+    function toggleNoteInputSettings(hide = isShowNoteInputSettings): void {
 
-        setIsShowBlockSettings(!hide);
+        setIsShowNoteInputSettings(!hide);
 
-        // toggleBlockSwitch(hide);
+        // toggleNoteInputSwitch(hide);
         toggleLanguageSearchBar(hide);
     }
 
@@ -178,17 +178,17 @@ export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled
     function handleSelectLanguage(language: string): void {
 
         // update language state
-        if (noteInputEntity.type === NoteInputEntityType.CODE)
-            setCodeBlockLanguage(language);
+        if (noteInputEntity.type === NoteInputType.CODE)
+            setCodeNoteInputLanguage(language);
 
-        else if (noteInputEntity.type === NoteInputEntityType.CODE_WITH_VARIABLES)
-            setCodeBlockcodeBlockWithVariablesLanguage(language);
+        else if (noteInputEntity.type === NoteInputType.CODE_WITH_VARIABLES)
+            setCodeNoteInputcodeNoteInputWithVariablesLanguage(language);
 
         // hide result box
         setShowLanguageSearchResults(false);
 
         // hide settings
-        toggleBlockSettings(true);
+        toggleNoteInputSettings(true);
 
         // set searchbar value to selected language
         $(languageSearchBarRef.current!).prop("value", language);
@@ -227,14 +227,14 @@ export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled
 
 
     /**
-     * @returns the complete list of available programming languages for current block type
+     * @returns the complete list of available programming languages for current noteInput type
      */
-    function getAllLanguagesByBlockType(): ProgrammingLanguage[] {
+    function getAllLanguagesByNoteInputType(): ProgrammingLanguage[] {
 
-        if (noteInputEntity.type === NoteInputEntityType.CODE)
+        if (noteInputEntity.type === NoteInputType.CODE)
             return CODE_BLOCK_LANGUAGES;
 
-        if (noteInputEntity.type === NoteInputEntityType.CODE_WITH_VARIABLES)
+        if (noteInputEntity.type === NoteInputType.CODE_WITH_VARIABLES)
             return CODE_BLOCK_WITH_VARIABLES_LANGUAGES;
 
         return [];
@@ -281,13 +281,13 @@ export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled
         >
             {/* Search Language */}
             <SearchBar 
-                className={"languageSearchBar " + (isShowBlockSettings ? "ms-3" : "")}
+                className={"languageSearchBar " + (isShowNoteInputSettings ? "ms-3" : "")}
                 placeHolder="Language..." 
                 ref={languageSearchBarRef}
                 title="Search programming language"
                 defaultValue={noteInputEntity.programmingLanguage || ""}
-                tabIndex={isShowBlockSettings ? undefined : -1}
-                rendered={noteInputEntity.type !== NoteInputEntityType.PLAIN_TEXT}
+                tabIndex={isShowNoteInputSettings ? undefined : -1}
+                rendered={noteInputEntity.type !== NoteInputType.PLAIN_TEXT}
                 onFocus={handleLanguageSearchFocus}
                 onBlur={handleLanguageSearchBlur}
                 onKeyDown={handleLanguageSearchKeyDown}
@@ -305,10 +305,10 @@ export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled
 
             {/* Programming Language button */}
             <Button 
-                className="toggleLanguageSearchBarButton defaultBlockButton transition ms-1" 
+                className="toggleLanguageSearchBarButton defaultNoteInputButton transition ms-1" 
                 title="Programming Language"
-                disabled={areBlockSettingsDisabled}
-                onClick={() => toggleBlockSettings()}
+                disabled={areNoteInputSettingsDisabled}
+                onClick={() => toggleNoteInputSettings()}
             >
                 <i className="fa-solid fa-globe dontSelectText"></i>
             </Button>

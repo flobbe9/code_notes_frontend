@@ -1,6 +1,6 @@
 @import "./global/functions.scss";
 
-.DefaultCodeBlock {
+.DefaultCodeNoteInput {
     border-radius: var(--borderRadius);
 
     &:has(.fullScreen) {
