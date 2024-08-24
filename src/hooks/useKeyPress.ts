@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { isStringFalsy, log, logWarn } from "../helpers/utils";
+import { useState } from "react";
+import { isStringFalsy, logWarn } from "../helpers/utils";
 
 
 /**
@@ -13,17 +13,6 @@ export default function useKeyPress(checkAllKeys = false) {
 
     /** List of key names (```event.key```) that are currently pressed */
     const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
-
-
-    useEffect(() => {
-        window.addEventListener("keyup", handleKeyUp);
-        window.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            window.removeEventListener("keyup", handleKeyUp);
-            window.removeEventListener("keydown", handleKeyDown);
-        }
-    }, []);
 
 
     function addPressedKey(keyName: string): void {
@@ -52,8 +41,8 @@ export default function useKeyPress(checkAllKeys = false) {
     }
 
 
-    function handleKeyDown(event): void {
-        
+    function handleKeyDownUseKeyPress(event): void {
+
         const keyName = event.key;
 
         if (!isKeyConsideredForList(keyName))
@@ -63,7 +52,7 @@ export default function useKeyPress(checkAllKeys = false) {
     }
 
 
-    function handleKeyUp(event): void {
+    function handleKeyUpUseKeyPress(event): void {
 
         const keyName = event.key;
 
@@ -125,5 +114,10 @@ export default function useKeyPress(checkAllKeys = false) {
     }
 
 
-    return { isKeyPressed, isControlKeyPressed };
+    return { 
+        isKeyPressed, 
+        isControlKeyPressed, 
+        handleKeyDownUseKeyPress,
+        handleKeyUpUseKeyPress
+    };
 }

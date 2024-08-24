@@ -39,7 +39,6 @@ interface Props extends DefaultProps {
  */
 // TODO: 
     // confirm leave if not saved
-    // replace "section" ?
 export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Note");

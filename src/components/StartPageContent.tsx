@@ -6,9 +6,8 @@ import SearchBar from "./helpers/SearchBar";
 import { getRandomString, isArrayFalsy, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import Flex from "./helpers/Flex";
-import Button from "./helpers/Button";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
-import ButtonWithSlideLabel from "./helpers/ButtonWithSlideLabel";
+import AddNewNoteButton from "./AddNewNoteButton";
 
 
 interface Props extends DefaultProps {
@@ -126,13 +125,7 @@ export default function StartPageContent({...props}: Props) {
 
                 <Flex className="mt-2 mb-5" horizontalAlign="right">
                     {/* New Note Button */}
-                    <ButtonWithSlideLabel 
-                        className="addNoteButton" 
-                        label="New note"
-                        onClick={prependNote}
-                        >
-                        <i className="fa-solid fa-plus"></i>
-                    </ButtonWithSlideLabel>
+                    <AddNewNoteButton onClick={prependNote} />
                 </Flex>
 
                 {/* Notes */}

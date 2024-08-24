@@ -39,8 +39,6 @@ export default function StartPageContainer({children, ...props}: Props) {
     }, [isShowSideBar, windowSize]);
 
 
-
-        // TODO: do this on window size change too (?)
     function updateStartPageContentWidth(): void {
 
         const startPageContent = $("#StartPageContent");

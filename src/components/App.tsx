@@ -20,7 +20,6 @@ import { TagEntity } from '../abstract/entites/TagEntity';
 // TODO:
     // search
     // replace parsing states with checkbox states
-    // adjust usekeypress
 export default function App() {
 
     const [appUserEntity, setAppUserEntity] = useState<AppUserEntity>(mockAppUserEntity);
@@ -36,7 +35,7 @@ export default function App() {
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    const { isKeyPressed, isControlKeyPressed } = useKeyPress();
+    const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress();
 
     /** Time the toast popup takes to slide up and down in ms. */
     const toastSlideDuration = 400;
@@ -65,14 +64,13 @@ export default function App() {
 
     
     useEffect(() => {
-        window.addEventListener("keydown", handleWindowKeyDown);
+        window.addEventListener("keydown", handleWindowKeyDown)
         window.addEventListener("resize", handleWindowResize);
 
         return () => {
             window.removeEventListener("keydown", handleWindowKeyDown);
             window.removeEventListener("resize", handleWindowResize);
         }
-
     }, []);
 
 
@@ -202,7 +200,7 @@ export default function App() {
     return (
         <AppContext.Provider value={context}>
             <BrowserRouter>
-                <div id="App" className="App">
+                <div id="App" className="App" onKeyDownCapture={handleKeyDownUseKeyPress} onKeyUp={handleKeyUpUseKeyPress}>
                     <Overlay 
                         id="App"
                         isOverlayVisible={isAppOverlayVisible} 
@@ -267,60 +265,60 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
         }
     ],
     [
-      {
-        id: 20,
-        title: "note20",
-        noteInputs: [
-            {
-                value: "const x = 3;\n\nadsf\nasdf",
-                type: NoteInputType.CODE,
-                programmingLanguage: "Java"
-            },
-            {
-                value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputType.CODE_WITH_VARIABLES,
-                programmingLanguage: "_auto"
-            },
-        ],
-        tags: []
-      },
-      {
-        id: 19,
-        title: "note19",
-        noteInputs: [
-            {
-                value: "some <code>code</code>",
-                type: NoteInputType.PLAIN_TEXT
-            },
-            {
-                value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputType.CODE_WITH_VARIABLES,
-                programmingLanguage: "_auto"
-            },
-        ],
-        tags: []
-      },
-      {
-        id: 18,
-        title: "note18",
-        noteInputs: [
-            {
-                value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputType.CODE_WITH_VARIABLES,
-                programmingLanguage: "_auto"
-            },
-            {
-                value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputType.CODE_WITH_VARIABLES,
-                programmingLanguage: "_auto"
-            }
-        ],
-        tags: [
-            {
-                name: "tag14"
-            }
-        ]
-      }
+    //   {
+    //     id: 20,
+    //     title: "note20",
+    //     noteInputs: [
+    //         {
+    //             value: "const x = 3;\n\nadsf\nasdf",
+    //             type: NoteInputType.CODE,
+    //             programmingLanguage: "Java"
+    //         },
+    //         {
+    //             value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
+    //             type: NoteInputType.CODE_WITH_VARIABLES,
+    //             programmingLanguage: "_auto"
+    //         },
+    //     ],
+    //     tags: []
+    //   },
+    //   {
+    //     id: 19,
+    //     title: "note19",
+    //     noteInputs: [
+    //         {
+    //             value: "some <code>code</code>",
+    //             type: NoteInputType.PLAIN_TEXT
+    //         },
+    //         {
+    //             value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
+    //             type: NoteInputType.CODE_WITH_VARIABLES,
+    //             programmingLanguage: "_auto"
+    //         },
+    //     ],
+    //     tags: []
+    //   },
+    //   {
+    //     id: 18,
+    //     title: "note18",
+    //     noteInputs: [
+    //         {
+    //             value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
+    //             type: NoteInputType.CODE_WITH_VARIABLES,
+    //             programmingLanguage: "_auto"
+    //         },
+    //         {
+    //             value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
+    //             type: NoteInputType.CODE_WITH_VARIABLES,
+    //             programmingLanguage: "_auto"
+    //         }
+    //     ],
+    //     tags: [
+    //         {
+    //             name: "tag14"
+    //         }
+    //     ]
+    //   }
     ],
     null
 )
