@@ -49,7 +49,6 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
         const keyName = event.key;
 
-        // TODO: does not work if text is longer than input and first char is out of view
         if (keyName === "Enter") 
             handleEnterKey(event);
 

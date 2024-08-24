@@ -95,7 +95,9 @@ export const CODE_BLOCK_LANGUAGES: ProgrammingLanguage[] = [
         name: "_plaintext",
         aliases: [
             "Plain Text",
-            "text"
+            "text",
+            "none",
+            "normal",
         ]
     },
     {
@@ -1539,7 +1541,9 @@ export const CODE_BLOCK_WITH_VARIABLES_LANGUAGES: ProgrammingLanguage[] = [
         aliases: [
             "plaintext",
             "txt",
-            "text"
+            "text",
+            "normal",
+            "none"
         ]
     },
     {

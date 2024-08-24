@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../assets/styles/CodeNoteInputWithVariables.scss";
-import 'highlight.js/styles/github.css';
+import "../../assets/styles/highlightJs/vs.css";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
@@ -34,8 +34,6 @@ interface Props extends HelperProps {
 // IDEA:
     // switch between higlighting styles (settings)
     // disable highlighting option (settings (?))
-// TODO: 
-    // highlight style sometimes chooses black (?)
 export default function CodeNoteInputWithVariables({
     noteInputEntity,
     disabled,

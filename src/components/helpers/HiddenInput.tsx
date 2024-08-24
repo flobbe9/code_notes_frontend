@@ -6,7 +6,8 @@ import HelperProps from "../../abstract/HelperProps";
 
 interface Props extends HelperProps {
 
-    type: HTMLInputTypeAttribute,
+    /** Default is "text" */
+    type?: HTMLInputTypeAttribute,
     /** Default is "" */
     name?: string,
     /** Default is ```true``` */
@@ -25,7 +26,7 @@ interface Props extends HelperProps {
  */
 export default forwardRef(function HiddenInput(
     {
-        type,
+        type = "text",
         name = "",
         rendered = true,
         disabled = false,

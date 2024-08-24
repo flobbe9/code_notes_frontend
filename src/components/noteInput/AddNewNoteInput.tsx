@@ -8,6 +8,9 @@ import { NoteContext } from "./Note";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { NoteInputType } from "../../abstract/NoteInputType";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER } from "../../helpers/constants";
+import { StartPageContentContext } from "../StartPageContent";
+import { AppContext } from "../App";
+import { StartPageContainerContext } from "../StartPageContainer";
 
 
 interface Props extends DefaultProps {
@@ -24,46 +27,80 @@ export default function AddNewNoteInput({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInput");
 
-    const { note, noteInputs, setNoteInputs, numNoteInputsParsing, getNoteInputByNoteInputType } = useContext(NoteContext);
+    const { appUserEntity } = useContext(AppContext);
+
+    const { noteEntity, noteInputs, setNoteInputs, numNoteInputsParsing, getNoteInputByNoteInputType } = useContext(NoteContext);
 
 
     function handleAddPlainTextNoteInput(event): void {
          
         // case: not noteInputs yet
-        if (!note.noteInputs)
-            note.noteInputs = [];
- 
-        const newPlainTextNoteInput: NoteInputEntity = {
-            value: "Plain text and some <code>code...</code>",
-            type: NoteInputType.PLAIN_TEXT
-        }
+        if (!noteEntity.noteInputs)
+            noteEntity.noteInputs = [];
 
-        appendNoteInputEntity(newPlainTextNoteInput);
+        appendNoteInputEntity(getNewNoteInputEntityPlainText());
     }
 
 
     function handleAddCodeNoteInputWithVariables(event): void {
 
         // case: not noteInputs yet
-        if (!note.noteInputs)
-            note.noteInputs = [];
+        if (!noteEntity.noteInputs)
+            noteEntity.noteInputs = [];
  
-        const newCodeNoteInputWithVariables: NoteInputEntity = {
-            // TODO: make this a constant
-            value: "Some code and a variable x = " + getDefaultVariableInput() + ". Click the 3 dots on the right to change the programming language.",
+        appendNoteInputEntity(getNewNoteInputEntityWithVariables());
+    }
+
+    
+    function getNewNoteInputEntityPlainText(): NoteInputEntity {
+
+        let value = "";
+
+        // case: is first note and first noteInput with variables
+        if ((appUserEntity.notes || []).length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.PLAIN_TEXT))
+            // add tutorial text
+            value = "Plain text and some <code>code...</code>";
+
+        return {
+            value: value,
+            type: NoteInputType.PLAIN_TEXT
+        }
+    }
+
+
+    function getNewNoteInputEntityWithVariables(): NoteInputEntity {
+
+        let value = "";
+
+        // case: is first note and first noteInput with variables
+        if ((appUserEntity.notes || []).length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.CODE_WITH_VARIABLES))
+            // add tutorial text
+            value = "Some code and a variable x = " + getDefaultVariableInput() + ". Change the programming language on the right.";
+
+        return {
+            value: value,
             type: NoteInputType.CODE_WITH_VARIABLES,
             programmingLanguage: CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE
         }
+    }
 
-        appendNoteInputEntity(newCodeNoteInputWithVariables);
+
+    /**
+     * @param noteInputType note input type to look for
+     * @returns ```true``` if this ```noteEntity``` has at least one noteInput with given type
+     */
+    function hasNoteEntityNoteInputOfType(noteInputType: NoteInputType): boolean {
+
+        return !!noteEntity.noteInputs?.find(noteInputEntity => 
+            noteInputEntity.type === noteInputType);
     }
 
  
     function handleAddCodeNoteInput(event): void {
 
         // case: not noteInputs yet
-        if (!note.noteInputs)
-            note.noteInputs = [];
+        if (!noteEntity.noteInputs)
+            noteEntity.noteInputs = [];
  
         const newCodeNoteInput: NoteInputEntity = {
             value: "",
@@ -82,11 +119,11 @@ export default function AddNewNoteInput({...props}: Props) {
      */
     function appendNoteInputEntity(noteInputEntityEntity: NoteInputEntity): void {
 
-        if (!note.noteInputs)
+        if (!noteEntity.noteInputs)
             return;
     
         // update app user
-        note.noteInputs = [...note.noteInputs, noteInputEntityEntity];
+        noteEntity.noteInputs = [...noteEntity.noteInputs, noteInputEntityEntity];
 
         // update noteInputEntitys
         let newNoteInputEntitys = noteInputs;

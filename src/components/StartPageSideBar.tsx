@@ -23,8 +23,6 @@ interface Props extends DefaultProps {
 // IDEA: filter icon
 export default function StartPageSideBar({...props}: Props) {
 
-    // TODO: tags state
-
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
 
     const componentRef = useRef(null);
@@ -141,8 +139,6 @@ export default function StartPageSideBar({...props}: Props) {
                     />
 
                     {/* Reset tag filters */}
-                    {/* TODO: disable if no tags selected */}
-                    {/* TODO: add functionality */}
                     <Flex className="mt-3" horizontalAlign="right">
                         <Button className="resetButton hover" title="Reset tag filter">
                             Reset   

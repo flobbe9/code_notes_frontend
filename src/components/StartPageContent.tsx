@@ -20,8 +20,6 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-// TODO: 
-    // what to display while there's no notes
 export default function StartPageContent({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageContent", true);
