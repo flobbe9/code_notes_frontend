@@ -385,17 +385,6 @@ export default function PlainTextNoteInput({
                 {inputDivValue}
             </ContentEditableDiv>
 
-            {/* Copy button */}
-            <Button
-                className="defaultNoteInputButton copyButton"
-                disabled={parsing}
-                title="Copy"
-                onClick={handleCopyClick}
-            >
-                <i className="fa-solid fa-copy"></i>
-                <i className="fa-solid fa-copy"></i>
-            </Button>
-
             {/* Fullscreen */}
             <Button 
                 className="fullScreenButton defaultNoteInputButton ms-2"
@@ -406,6 +395,17 @@ export default function PlainTextNoteInput({
                     <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
                     <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
                 }
+            </Button>
+
+            {/* Copy button */}
+            <Button
+                className="defaultNoteInputButton copyButton"
+                disabled={parsing}
+                title="Copy"
+                onClick={handleCopyClick}
+            >
+                <i className="fa-solid fa-copy"></i>
+                <i className="fa-solid fa-copy"></i>
             </Button>
 
             {children}

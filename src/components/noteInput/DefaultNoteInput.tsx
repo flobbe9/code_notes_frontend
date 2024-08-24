@@ -50,7 +50,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         isAppOverlayVisible, 
     } = useContext(AppContext);
 
-    const { note, noteInputs, setNoteInputs } = useContext(NoteContext);
+    const { noteEntity, noteInputs, setNoteInputs } = useContext(NoteContext);
 
     const context = {
         isShowNoteInputSettings, 
@@ -108,7 +108,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         const noteInputEntityIndex = getJsxElementIndexByKey(noteInputs, propsKey);
 
         // update app user
-        note.noteInputEntitys?.splice(noteInputEntityIndex, 1);
+        noteEntity.noteInputs?.splice(noteInputEntityIndex, 1);
 
         // update noteInputEntitys
         const newNoteInputEntitys = noteInputs;
@@ -210,7 +210,6 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
                         onClick={handleDeleteNote}
                     >
                         <i className="fa-solid fa-xmark fa-lg"></i>
-                        {/* <i className="fa-solid fa-trash"></i> */}
                     </Button>
                 </Flex>
 

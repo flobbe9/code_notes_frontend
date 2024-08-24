@@ -17,11 +17,15 @@ import { getJsxElementIndexByKey, getRandomString, log } from '../../helpers/uti
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { AppContext } from "../App";
 import { StartPageContentContext } from "../StartPageContent";
+import { MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
+import { TagEntityService } from './../../abstract/services/TagEntityService';
+import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityService";
+import { NoteEntityService } from './../../abstract/services/NoteEntityService';
 
 
 interface Props extends DefaultProps {
 
-    note: NoteEntity,
+    noteEntity: NoteEntity,
 
     propsKey: string
 }
@@ -29,11 +33,14 @@ interface Props extends DefaultProps {
 
 /**
  * Container containing a list of different ```NoteInput``` components.
+ * 
+ * @parent ```<StartPageContent>```
  * @since 0.0.1
  */
 // TODO: 
     // confirm leave if not saved
-export default function Note({note, propsKey, ...props}: Props) {
+    // replace "section" ?
+export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Note");
 
@@ -54,7 +61,7 @@ export default function Note({note, propsKey, ...props}: Props) {
     const saveButtonRef = useRef(null);
 
     const context = {
-        note,
+        noteEntity,
 
         numNoteInputsParsing, 
         setNumNoteInputsParsing,
@@ -82,10 +89,10 @@ export default function Note({note, propsKey, ...props}: Props) {
 
     function mapNoteInputsToJsx(): JSX.Element[] {
 
-        if (!note.noteInputEntitys)
+        if (!noteEntity.noteInputs)
             return [];
 
-        return note.noteInputEntitys.map((noteInputEntity, i) =>
+        return noteEntity.noteInputs.map((noteInputEntity, i) =>
             getNoteInputByNoteInputType(noteInputEntity));
     }
 
@@ -128,14 +135,14 @@ export default function Note({note, propsKey, ...props}: Props) {
         if (!isReadyToSave()) 
             return;
 
-        // TODO: validate
-            // not more than 50_000 chars in noteinput
-            // not more than 255 chars in tag inputs
-        
+        // case: invalid input
+        if (!isNoteValid())
+            return;
+
         return new Promise((res, rej) => {
             setTimeout(() => {
-                toast("Save", "Successfully saved " + note.title, "success", 5000);
-                log(note);
+                toast("Save", "Successfully saved note", "success", 5000);
+                log(noteEntity);
                 log(appUserEntity)
                 setAboutToSave(false);
                 res();
@@ -174,6 +181,41 @@ export default function Note({note, propsKey, ...props}: Props) {
         const newNotes = notes;
         newNotes.splice(noteIndex, 1);
         setNotes([...newNotes]);
+    }
+
+
+    /**
+     * Validate and handle invalid note parts.
+     * 
+     * @returns ```false``` if at least one part of this ```noteEntity``` is invalid
+     */
+    function isNoteValid(): boolean {
+
+        const noteEntityService = new NoteEntityService(noteEntity);
+        const tagEntityService = new TagEntityService(noteEntity.tags);
+        const noteInputEntityService = new NoteInputEntityService(noteEntity.noteInputs);
+
+        return noteEntityService.isEntityValid(handleNoteEntityInvalid) &&
+               tagEntityService.areEntitiesValid(handleTagEntityInvalid) && 
+               noteInputEntityService.areEntitiesValid(handleNoteInputEntityInvalid);
+    }
+
+
+    function handleTagEntityInvalid(i: number): void {
+
+        toast(`Tag ${i + 1} invalid`, `Tags cannot be longer than ${MAX_TAG_INPUT_VALUE_LENGTH} characters.`, "warn");
+    }
+
+
+    function handleNoteInputEntityInvalid(i: number): void {
+
+        toast("Note section invalid", `The content of note section number ${i + 1} is too long. Please shorten it a bit.`, "warn");
+    }
+
+
+    function handleNoteEntityInvalid(): void {
+
+        toast("Note title invalid", `The note title cannot be longer than ${MAX_NOTE_TITLE_VALUE_LENGTH} characters.`, "warn");
     }
         
 
@@ -233,7 +275,7 @@ export default function Note({note, propsKey, ...props}: Props) {
 
 
 export const NoteContext = createContext({
-    note: new NoteEntity(),
+    noteEntity: new NoteEntity(),
 
     numNoteInputsParsing: 0, 
     setNumNoteInputsParsing: (num: number) => {},

@@ -30,8 +30,8 @@ export default function AddNewNoteInput({...props}: Props) {
     function handleAddPlainTextNoteInput(event): void {
          
         // case: not noteInputs yet
-        if (!note.noteInputEntitys)
-            note.noteInputEntitys = [];
+        if (!note.noteInputs)
+            note.noteInputs = [];
  
         const newPlainTextNoteInput: NoteInputEntity = {
             value: "Plain text and some <code>code...</code>",
@@ -45,8 +45,8 @@ export default function AddNewNoteInput({...props}: Props) {
     function handleAddCodeNoteInputWithVariables(event): void {
 
         // case: not noteInputs yet
-        if (!note.noteInputEntitys)
-            note.noteInputEntitys = [];
+        if (!note.noteInputs)
+            note.noteInputs = [];
  
         const newCodeNoteInputWithVariables: NoteInputEntity = {
             // TODO: make this a constant
@@ -62,8 +62,8 @@ export default function AddNewNoteInput({...props}: Props) {
     function handleAddCodeNoteInput(event): void {
 
         // case: not noteInputs yet
-        if (!note.noteInputEntitys)
-            note.noteInputEntitys = [];
+        if (!note.noteInputs)
+            note.noteInputs = [];
  
         const newCodeNoteInput: NoteInputEntity = {
             value: "",
@@ -82,11 +82,11 @@ export default function AddNewNoteInput({...props}: Props) {
      */
     function appendNoteInputEntity(noteInputEntityEntity: NoteInputEntity): void {
 
-        if (!note.noteInputEntitys)
+        if (!note.noteInputs)
             return;
     
         // update app user
-        note.noteInputEntitys = [...note.noteInputEntitys, noteInputEntityEntity];
+        note.noteInputs = [...note.noteInputs, noteInputEntityEntity];
 
         // update noteInputEntitys
         let newNoteInputEntitys = noteInputs;

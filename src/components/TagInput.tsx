@@ -8,7 +8,7 @@ import { TagEntity } from "../abstract/entites/TagEntity";
 import { NoteTagListContext } from "./noteInput/NoteTagList";
 import { NoteContext } from "./noteInput/Note";
 import { AppContext } from "./App";
-import { MAX_TAG_INPUT_VALUE_LENGTH } from "../helpers/constants";
+import { INVALID_INPUT_CLASS_NAME, MAX_TAG_INPUT_VALUE_LENGTH } from "../helpers/constants";
 
 
 interface Props extends DefaultProps {
@@ -31,7 +31,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     const inputRef = useRef(null);
 
     const { toast, isControlKeyPressed } = useContext(AppContext);
-    const { note } = useContext(NoteContext);
+    const { noteEntity } = useContext(NoteContext);
 
     const { 
         getTagElementIndex, 
@@ -48,7 +48,6 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     function handleKeyDown(event): void {
 
         const keyName = event.key;
-        log(isControlKeyPressed())
 
         // TODO: does not work if text is longer than input and first char is out of view
         if (keyName === "Enter") 
@@ -93,7 +92,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
 
     /**
-     * Add current tag to ```note.tags``` if not present and update ```tag``` state
+     * Add current tag to ```noteEntity.tags``` if not present and update ```tag``` state
      */
     function handleNewTag(): void {
 
@@ -137,13 +136,16 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
 
     /**
-     * Indicates whether this tag input has an entry in ```note.tags```.
+     * Indicates whether this tag input has an entry in ```noteEntity.tags```.
      * 
-     * @returns true if this tag input's index does not exceed ```note.tags.length```
+     * @returns true if this tag input's index does not exceed ```noteEntity.tags.length```
      */
     function isContainedInNote(): boolean {
 
-        return getTagElementIndex(propsKey) !== note.tags.length;
+        if (!noteEntity.tags)
+            return false;
+
+        return getTagElementIndex(propsKey) !== noteEntity.tags.length;
     }
 
 
@@ -151,7 +153,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
         const tagElementValue = getTagElementValue();
 
-        return !!tags.filter(tag => tag.name === tagElementValue).length && !isContainedInNote();
+        return !!tags!.filter(tag => tag.name === tagElementValue).length && !isContainedInNote();
     }
 
 
@@ -169,7 +171,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
     /**
      * @param event the key down event (assuming that the key has not yet been added to the input value)
-     * @returns ```true``` if the tag input's value is longer thatn {@link MAX_TAG_INPUT_VALUE_LENGTH}
+     * @returns ```true``` if the tag input's value is longer than {@link MAX_TAG_INPUT_VALUE_LENGTH}
      */
     function isTagValueTooLong(event): boolean {
 
@@ -196,19 +198,19 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
 
     /**
-     * Add the "invalidTag" class to this input for given ```duration```.
+     * Add the {@link INVALID_INPUT_CLASS_NAME} class to this input for given ```duration```.
      * 
-     * @param duration the time in ms to keep the "invalidTag" class before removing it again
+     * @param duration the time in ms to keep the {@link INVALID_INPUT_CLASS_NAME} class before removing it again
      */
     function toggleTagInvalid(duration = 300): void {
 
         // get element
         const tagInput = $(inputRef.current!);
 
-        tagInput.addClass("invalidTag");
+        tagInput.addClass(INVALID_INPUT_CLASS_NAME);
 
         setTimeout(() => {
-            tagInput.removeClass("invalidTag");
+            tagInput.removeClass(INVALID_INPUT_CLASS_NAME);
         }, duration);
     }
 

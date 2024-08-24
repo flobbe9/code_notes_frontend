@@ -98,7 +98,7 @@ export default function StartPageContent({...props}: Props) {
     function getNoteByNoteEntity(noteEntity: NoteEntity): JSX.Element {
 
         const key = getRandomString();
-        return <Note note={noteEntity} key={key} propsKey={key} />
+        return <Note noteEntity={noteEntity} key={key} propsKey={key} />
     }
 
 

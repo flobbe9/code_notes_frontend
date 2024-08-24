@@ -515,18 +515,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
                 />
             </div>
 
-            {/* Copy button */}
-            <Button
-                className="defaultNoteInputButton copyButton"
-                title="Copy"
-                disabled={areNoteInputSettingsDisabled}
-                ref={copyButtonRef}
-                onClick={handleCopyClick}
-            >
-                <i className="fa-solid fa-copy"></i>
-                <i className="fa-solid fa-copy"></i>
-            </Button>
-
             {/* NoteInput Settings */}
             <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
 
@@ -542,6 +530,18 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
                     <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
                     <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
                 }
+            </Button>
+            
+            {/* Copy button */}
+            <Button
+                className="defaultNoteInputButton copyButton"
+                title="Copy"
+                disabled={areNoteInputSettingsDisabled}
+                ref={copyButtonRef}
+                onClick={handleCopyClick}
+            >
+                <i className="fa-solid fa-copy"></i>
+                <i className="fa-solid fa-copy"></i>
             </Button>
                 
             {children}

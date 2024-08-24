@@ -7,10 +7,10 @@ import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
 import useKeyPress from '../hooks/useKeyPress';
 import Overlay from './helpers/Overlay';
-import { AppUserEntity } from '../abstract/entites/AppUserEntityEntity';
+import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { AppUserRole } from '../abstract/AppUserRole';
 import { NoteInputType } from '../abstract/NoteInputType';
-import { Tag } from '../abstract/entites/TagEntity';
+import { TagEntity } from '../abstract/entites/TagEntity';
 
 
 /**
@@ -20,6 +20,7 @@ import { Tag } from '../abstract/entites/TagEntity';
 // TODO:
     // search
     // replace parsing states with checkbox states
+    // adjust usekeypress
 export default function App() {
 
     const [appUserEntity, setAppUserEntity] = useState<AppUserEntity>(mockAppUserEntity);
@@ -269,7 +270,7 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
       {
         id: 20,
         title: "note20",
-        noteInputEntitys: [
+        noteInputs: [
             {
                 value: "const x = 3;\n\nadsf\nasdf",
                 type: NoteInputType.CODE,
@@ -286,7 +287,7 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
       {
         id: 19,
         title: "note19",
-        noteInputEntitys: [
+        noteInputs: [
             {
                 value: "some <code>code</code>",
                 type: NoteInputType.PLAIN_TEXT
@@ -302,7 +303,7 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
       {
         id: 18,
         title: "note18",
-        noteInputEntitys: [
+        noteInputs: [
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
                 type: NoteInputType.CODE_WITH_VARIABLES,

@@ -19,6 +19,7 @@
     "sanitize-html": "^2.13.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "7.21.11",
     "@types/crypto-js": "^4.2.2",
     "@types/jquery": "^3.5.29",
     "@types/react": "^18.2.48",

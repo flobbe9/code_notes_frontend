@@ -32,7 +32,7 @@ export default function NoteTagList({...props}: Props) {
     const componentRef = useRef(null);
 
     const { appUserEntity } = useContext(AppContext);
-    const { note } = useContext(NoteContext);
+    const { noteEntity } = useContext(NoteContext);
 
     const context = {
         getTagElementIndex,
@@ -42,7 +42,7 @@ export default function NoteTagList({...props}: Props) {
         removeTag,
         getNumBlankTagElements,
         tagElements,
-        tags: note.tags
+        tags: noteEntity.tags
     }
 
 
@@ -55,10 +55,10 @@ export default function NoteTagList({...props}: Props) {
     function mapTagsToJsx(): JSX.Element[] {
 
         // case: note has no tags
-        if (!note.tags || !note.tags.length) 
+        if (!noteEntity.tags || !noteEntity.tags.length) 
             return [getNewTagElement()];
 
-        const tagElements = note.tags.map(tag => {
+        const tagElements = noteEntity.tags.map(tag => {
             const key = getRandomString();    
             return <TagInput initialTag={tag} key={key} propsKey={key} />;
         });
@@ -80,12 +80,12 @@ export default function NoteTagList({...props}: Props) {
 
 
     /**
-     * @param tag to add to ```note.tags```
+     * @param tag to add to ```noteEntity.tags```
      */
     function addTag(tag: TagEntity): void {
 
         // add to note tags
-        note.tags = [...note.tags, tag];
+        noteEntity.tags = [...(noteEntity.tags || []), tag];
 
         if (!appUserEntity.tags)
             appUserEntity.tags = [];
@@ -130,29 +130,29 @@ export default function NoteTagList({...props}: Props) {
 
 
     /**
-     * Removes tag at given ```index``` from ```note.tags```.
+     * Removes tag at given ```index``` from ```noteEntity.tags```.
      * 
      * @param index of the tag to remove
      */
     function removeTag(index: number): void {
 
-        const tagToRemove = note.tags.splice(index, 1)[0];
+        const tagToRemove = noteEntity.tags!.splice(index, 1)[0];
 
         removeTagFromAppUserEntityEntity(tagToRemove);
     }
 
 
-    function removeTagFromAppUserEntityEntity(tag: TagEntity): void {
+    function removeTagFromAppUserEntityEntity(tagEntity: TagEntity): void {
 
-        // case: falsy arg or appUserEntity has no tags or no notes anyway
-        if (!tag || !appUserEntity.tags || !appUserEntity.notes)
+        // case: falsy arg or appUserEntity has no tagEntities or no notes anyway
+        if (!tagEntity || !appUserEntity.tags || !appUserEntity.notes)
             return;
 
-        // case: tag is used somewhere else
-        if (appUserEntity.isTagPresentInANote(tag))
+        // case: tagEntity is used somewhere else
+        if (appUserEntity.isTagEntityPresentInANote(tagEntity))
             return;
                 
-        appUserEntity.removeTag(tag);
+        appUserEntity.removeTagEntity(tagEntity);
     }
     
 
@@ -227,5 +227,5 @@ export const NoteTagListContext = createContext({
     removeTag: (index: number) => {},
     getNumBlankTagElements: () => {return 1 as number},
     tagElements: [<></>],
-    tags: [new TagEntity()]
+    tags: [new TagEntity()] as (TagEntity[] | null)
 })

@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../assets/styles/CodeNoteInputWithVariables.scss";
 import 'highlight.js/styles/github.css';
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import hljs from "highlight.js";
-import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, includesIgnoreCase, isBlank, log, setClipboardText } from "../../helpers/utils";
+import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, setClipboardText } from "../../helpers/utils";
 import sanitize from "sanitize-html";
 import { VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_START_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../helpers/constants";
 import { AppContext } from "../App";
@@ -709,17 +709,6 @@ export default function CodeNoteInputWithVariables({
             </pre>
 
             <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
-                {/* Copy */}
-                <Button
-                    className="defaultNoteInputButton copyButton"
-                    title="Copy with variables"
-                    disabled={areNoteInputSettingsDisabled}
-                    onClick={handleCopyClick}
-                >
-                    <i className="fa-solid fa-copy"></i>
-                    <i className="fa-solid fa-copy"></i>
-                </Button>
-
                 {/* NoteInput Settings */}
                 <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
 
@@ -746,6 +735,17 @@ export default function CodeNoteInputWithVariables({
                         <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
                         <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
                     }
+                </Button>
+                
+                {/* Copy */}
+                <Button
+                    className="defaultNoteInputButton copyButton"
+                    title="Copy with variables"
+                    disabled={areNoteInputSettingsDisabled}
+                    onClick={handleCopyClick}
+                >
+                    <i className="fa-solid fa-copy"></i>
+                    <i className="fa-solid fa-copy"></i>
                 </Button>
             </Flex>
             
