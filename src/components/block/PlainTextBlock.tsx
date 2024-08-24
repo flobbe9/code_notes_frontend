@@ -8,7 +8,7 @@ import sanitize from "sanitize-html";
 import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
 import { AppContext } from "../App";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
-import { NoteInput } from "../../abstract/entites/NoteInput";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { BlockContainerContext } from "./BlockContainer";
 import HelperProps from "../../abstract/HelperProps";
 import parse from 'html-react-parser';
@@ -19,7 +19,7 @@ import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
 
 interface Props extends HelperProps {
 
-    noteInput: NoteInput
+    noteInputEntity: NoteInputEntity
 }
 
 
@@ -33,7 +33,7 @@ interface Props extends HelperProps {
     // dont add any default text
 
 export default function PlainTextBlock({
-    noteInput,
+    noteInputEntity,
     disabled,
     onFocus,
     onBlur,
@@ -70,7 +70,7 @@ export default function PlainTextBlock({
     useEffect(() => {
         setInputDivJQuery($(inputDivRef.current!));
 
-        setInputDivValue(parse(sanitize(noteInput.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
+        setInputDivValue(parse(sanitize(noteInputEntity.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
 
         setActivateFullScreenStyles(() => {return activateFullScreenStyles});
         setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
@@ -156,7 +156,7 @@ export default function PlainTextBlock({
         // sanitize
         const sanitizedInputDivValue = sanitize(parsedText, DEFAULT_HTML_SANTIZER_OPTIONS);
         
-        updateAppUser();
+        updateAppUserEntity();
         
         setTimeout(() => {
             setParsing(false);
@@ -252,9 +252,9 @@ export default function PlainTextBlock({
     }
 
 
-    function updateAppUser(): void {
+    function updateAppUserEntity(): void {
 
-        noteInput.value = $(inputDivRef.current!).html();
+        noteInputEntity.value = $(inputDivRef.current!).html();
     }
 
 

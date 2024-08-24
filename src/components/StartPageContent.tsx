@@ -7,7 +7,7 @@ import { getRandomString, isArrayFalsy, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import Flex from "./helpers/Flex";
 import Button from "./helpers/Button";
-import { Note } from "../abstract/entites/Note";
+import { NoteEntity } from "../abstract/entites/NoteEntity";
 import ButtonWithSlideLabel from "./helpers/ButtonWithSlideLabel";
 
 
@@ -27,7 +27,7 @@ export default function StartPageContent({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageContent", true);
 
-    const { appUser, isKeyPressed } = useContext(AppContext);
+    const { appUserEntity, isKeyPressed } = useContext(AppContext);
 
     const [blockContainers, setBlockContainers] = useState<JSX.Element[]>([]);
 
@@ -62,10 +62,10 @@ export default function StartPageContent({...props}: Props) {
 
     function mapNoteEntitiesToJsx(): JSX.Element[] {
 
-        if (!appUser.notes)
+        if (!appUserEntity.notes)
             return [];
 
-        return appUser.notes.map(note => 
+        return appUserEntity.notes.map(note => 
             getNoteByNoteEntity(note));
     }
 
@@ -75,18 +75,18 @@ export default function StartPageContent({...props}: Props) {
      */
     function prependNote(): void {
 
-        if (isArrayFalsy(appUser.notes))
-            appUser.notes = [];
+        if (isArrayFalsy(appUserEntity.notes))
+            appUserEntity.notes = [];
 
         // create new note
-        const newNoteEntity = new Note();
+        const newNoteEntity = new NoteEntity();
         newNoteEntity.title = "";
 
         // create new note entity
         const newNote = getNoteByNoteEntity(newNoteEntity);
 
         // 
-        appUser.notes! = [newNoteEntity, ...appUser.notes!];
+        appUserEntity.notes! = [newNoteEntity, ...appUserEntity.notes!];
 
         let newNotes = blockContainers;
         newNotes = [newNote, ...newNotes];
@@ -95,7 +95,7 @@ export default function StartPageContent({...props}: Props) {
     }
 
 
-    function getNoteByNoteEntity(noteEntity: Note): JSX.Element {
+    function getNoteByNoteEntity(noteEntity: NoteEntity): JSX.Element {
 
         const key = getRandomString();
         return <BlockContainer note={noteEntity} key={key} propsKey={key} />

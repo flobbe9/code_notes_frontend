@@ -10,8 +10,8 @@ import { getCssConstant, getCSSValueAsNumber, includesIgnoreCase, includesIgnore
 import { AppContext } from "../App";
 import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES } from "../../helpers/constants";
 import { DefaultBlockContext } from "./DefaultBlock";
-import { NoteInput } from "../../abstract/entites/NoteInput";
-import { NoteInputType } from "../../abstract/NoteInputType";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
+import { NoteInputEntityType } from "../../abstract/NoteInputEntityType";
 import { ProgrammingLanguage } from "../../abstract/ProgrammingLanguage";
 
 
@@ -20,7 +20,7 @@ interface Props extends DefaultProps {
     /** Applies to the toggle button. Default should be ```false``` */
     areBlockSettingsDisabled: boolean,
 
-    noteInput: NoteInput
+    noteInputEntity: NoteInputEntity
 }
 
 
@@ -29,7 +29,7 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...props}: Props) {
+export default function BlockSettings({noteInputEntity, areBlockSettingsDisabled, ...props}: Props) {
     
     const [showLanguageSearchResults, setShowLanguageSearchResults] = useState(false);
     
@@ -178,10 +178,10 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
     function handleSelectLanguage(language: string): void {
 
         // update language state
-        if (noteInput.type === NoteInputType.CODE)
+        if (noteInputEntity.type === NoteInputEntityType.CODE)
             setCodeBlockLanguage(language);
 
-        else if (noteInput.type === NoteInputType.CODE_WITH_VARIABLES)
+        else if (noteInputEntity.type === NoteInputEntityType.CODE_WITH_VARIABLES)
             setCodeBlockcodeBlockWithVariablesLanguage(language);
 
         // hide result box
@@ -231,10 +231,10 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
      */
     function getAllLanguagesByBlockType(): ProgrammingLanguage[] {
 
-        if (noteInput.type === NoteInputType.CODE)
+        if (noteInputEntity.type === NoteInputEntityType.CODE)
             return CODE_BLOCK_LANGUAGES;
 
-        if (noteInput.type === NoteInputType.CODE_WITH_VARIABLES)
+        if (noteInputEntity.type === NoteInputEntityType.CODE_WITH_VARIABLES)
             return CODE_BLOCK_WITH_VARIABLES_LANGUAGES;
 
         return [];
@@ -285,9 +285,9 @@ export default function BlockSettings({noteInput, areBlockSettingsDisabled, ...p
                 placeHolder="Language..." 
                 ref={languageSearchBarRef}
                 title="Search programming language"
-                defaultValue={noteInput.programmingLanguage || ""}
+                defaultValue={noteInputEntity.programmingLanguage || ""}
                 tabIndex={isShowBlockSettings ? undefined : -1}
-                rendered={noteInput.type !== NoteInputType.PLAIN_TEXT}
+                rendered={noteInputEntity.type !== NoteInputEntityType.PLAIN_TEXT}
                 onFocus={handleLanguageSearchFocus}
                 onBlur={handleLanguageSearchBlur}
                 onKeyDown={handleLanguageSearchKeyDown}

@@ -5,7 +5,7 @@ import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
 import { getJsxElementIndexByKey, log } from "../../helpers/utils";
 import BlockSettings from "./BlockSettings";
-import { NoteInput } from "../../abstract/entites/NoteInput";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import Overlay from "../helpers/Overlay";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
 import { BlockContainerContext } from "./BlockContainer";
@@ -14,7 +14,7 @@ import { AppContext } from "../App";
 
 interface Props extends DefaultProps {
 
-    noteInput: NoteInput,
+    noteInputEntity: NoteInputEntity,
 
     propsKey: string
 }
@@ -27,7 +27,7 @@ interface Props extends DefaultProps {
  *  
  * @since 0.0.1
  */
-export default function DefaultBlock({noteInput, propsKey, ...props}: Props) {
+export default function DefaultBlock({noteInputEntity, propsKey, ...props}: Props) {
 
     const [isShowBlockSettings, setIsShowBlockSettings] = useState(false);
     const [areBlockSettingsDisabled, setAreBlockSettingsDisabled] = useState(false);
@@ -36,8 +36,8 @@ export default function DefaultBlock({noteInput, propsKey, ...props}: Props) {
     const [activateFullScreenStyles, setActivateFullScreenStyles] = useState<Function>(() => {});
     const [deactivateFullScreenStyles, setDeactivateFullScreenStyles] = useState<Function>(() => {});
 
-    const [codeBlockLanguage, setCodeBlockLanguage] = useState(noteInput.programmingLanguage || CODE_BLOCK_DEFAULT_LANGUAGE);
-    const [codeBlockWithVariablesLanguage, setCodeBlockcodeBlockWithVariablesLanguage] = useState(noteInput.programmingLanguage || CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE);
+    const [codeBlockLanguage, setCodeBlockLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_DEFAULT_LANGUAGE);
+    const [codeBlockWithVariablesLanguage, setCodeBlockcodeBlockWithVariablesLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE);
 
     const [blockOverlayVisible, setBlockOverlayVisible] = useState(false);
 
@@ -105,15 +105,15 @@ export default function DefaultBlock({noteInput, propsKey, ...props}: Props) {
 
     function deleteNote(): void {
 
-        const noteInputIndex = getJsxElementIndexByKey(blocks, propsKey);
+        const noteInputEntityIndex = getJsxElementIndexByKey(blocks, propsKey);
 
         // update app user
-        note.noteInputs?.splice(noteInputIndex, 1);
+        note.noteInputEntitys?.splice(noteInputEntityIndex, 1);
 
-        // update noteInputs
-        const newNoteInputs = blocks;
-        newNoteInputs.splice(noteInputIndex, 1);
-        setBlocks([...newNoteInputs]);
+        // update noteInputEntitys
+        const newNoteInputEntitys = blocks;
+        newNoteInputEntitys.splice(noteInputEntityIndex, 1);
+        setBlocks([...newNoteInputEntitys]);
     }
 
 

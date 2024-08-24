@@ -1,6 +1,6 @@
 import { AbstractEntity } from "./AbstractEntity";
-import { NoteInput } from "./NoteInput";
-import { Tag } from "./Tag";
+import { NoteInputEntity } from "./NoteInputEntity";
+import { TagEntity } from "./TagEntity";
 
 
 /**
@@ -10,13 +10,13 @@ import { Tag } from "./Tag";
  * 
  * @since 0.0.1
  */
-export class Note extends AbstractEntity {
+export class NoteEntity extends AbstractEntity {
 
     title: string;
 
-    noteInputs: NoteInput[] | null;
+    noteInputEntitys: NoteInputEntity[] | null;
 
-    tags: Tag[];
+    tags: TagEntity[];
 
 
     constructor() {

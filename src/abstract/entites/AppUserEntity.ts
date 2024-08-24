@@ -1,7 +1,7 @@
 import { AppUserRole } from "../AppUserRole";
 import { AbstractEntity } from "./AbstractEntity";
-import { Note } from "./Note";
-import { Tag } from "./Tag";
+import { NoteEntity } from "./NoteEntity";
+import { TagEntity } from "./TagEntity";
 
 
 /**
@@ -9,7 +9,7 @@ import { Tag } from "./Tag";
  * 
  * @since 0.0.1
  */
-export class AppUser extends AbstractEntity {
+export class AppUserEntity extends AbstractEntity {
 
     email: string;
 
@@ -17,9 +17,9 @@ export class AppUser extends AbstractEntity {
 
     role: AppUserRole;
 
-    tags?: Tag[] | null;
+    tags?: TagEntity[] | null;
 
-    notes?: Note[] | null;
+    notes?: NoteEntity[] | null;
 
     csrfToken?: string | null;
 
@@ -29,8 +29,8 @@ export class AppUser extends AbstractEntity {
         email: string, 
         password: string, 
         role: AppUserRole, 
-        tags: Tag[] | null, 
-        notes: Note[] | null,
+        tags: TagEntity[] | null, 
+        notes: NoteEntity[] | null,
         csrfToken: string | null
     ) {
         super(id);
@@ -48,7 +48,7 @@ export class AppUser extends AbstractEntity {
      * 
      * @param tag to remove 
      */
-    public removeTag(tag: Tag): void {
+    public removeTagEntity(tag: TagEntity): void {
 
         if (!tag || !this.tags)
             return;
@@ -63,22 +63,22 @@ export class AppUser extends AbstractEntity {
      * @param tag to search
      * @returns ```true``` if given tag is present at least in one note of ```this.notes```, else ```false```
      */
-    public isTagPresentInANote(tag: Tag): boolean {
+    public isTagEntityPresentInANote(tag: TagEntity): boolean {
 
         if (!tag || !this.notes)
             return false;
 
         return !!this.notes.find(note => 
-                    !!note.tags.find(noteTag => 
-                        tag.name === noteTag.name))
+                    !!note.tags.find(noteTagEntity => 
+                        tag.name === noteTagEntity.name))
     }
 
 
     /**
      * @returns instance with default values (mostly ```null```)
      */
-    public static getDefaultInstance(): AppUser {
+    public static getDefaultInstance(): AppUserEntity {
 
-        return new AppUser(-1, "", "", AppUserRole.USER, null, null, null);
+        return new AppUserEntity(-1, "", "", AppUserRole.USER, null, null, null);
     }
 }

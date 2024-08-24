@@ -11,10 +11,10 @@ import Flex from "../helpers/Flex";
 import BlockContainerTitle from "./BlockContainerTitle";
 import AddNewBlock from "./AddNewBlock";
 import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
-import { Note } from "../../abstract/entites/Note";
-import { NoteInputType } from "../../abstract/NoteInputType";
+import { Note } from "../../abstract/entites/NoteEntity";
+import { NoteInputEntityType } from "../../abstract/NoteInputEntityType";
 import { getJsxElementIndexByKey, getRandomString, log } from './../../helpers/utils';
-import { NoteInput } from "../../abstract/entites/NoteInput";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { AppContext } from "../App";
 import { StartPageContentContext } from "../StartPageContent";
 
@@ -47,7 +47,7 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
      */
     const [numBlocksParsing, setNumBlocksParsing] = useState(0);
 
-    const { toast, appUser } = useContext(AppContext);
+    const { toast, appUserEntity } = useContext(AppContext);
     const { blockContainers, setBlockContainers } = useContext(StartPageContentContext);
 
     const componentRef = useRef(null);
@@ -62,7 +62,7 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
         blocks, 
         setBlocks,
 
-        getBlockByNoteInputType
+        getBlockByNoteInputEntityType
     }
 
 
@@ -82,36 +82,36 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
 
     function mapBlocksToJsx(): JSX.Element[] {
 
-        if (!note.noteInputs)
+        if (!note.noteInputEntitys)
             return [];
 
-        return note.noteInputs.map((noteInput, i) =>
-            getBlockByNoteInputType(noteInput));
+        return note.noteInputEntitys.map((noteInputEntity, i) =>
+            getBlockByNoteInputEntityType(noteInputEntity));
     }
 
 
-    function getBlockByNoteInputType(noteInput: NoteInput): JSX.Element {
+    function getBlockByNoteInputEntityType(noteInputEntity: NoteInputEntity): JSX.Element {
 
         const key = getRandomString();
-        switch (noteInput.type) {
-            case NoteInputType.PLAIN_TEXT:
+        switch (noteInputEntity.type) {
+            case NoteInputEntityType.PLAIN_TEXT:
                 return (
-                    <DefaultBlock noteInput={noteInput} propsKey={key} key={key}>
-                        <PlainTextBlock noteInput={noteInput} />
+                    <DefaultBlock noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                        <PlainTextBlock noteInputEntity={noteInputEntity} />
                     </DefaultBlock>
                     )
 
-            case NoteInputType.CODE:
+            case NoteInputEntityType.CODE:
                 return (
-                    <DefaultCodeBlock noteInput={noteInput} propsKey={key} key={key}>
-                        <CodeBlock noteInput={noteInput} />
+                    <DefaultCodeBlock noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                        <CodeBlock noteInputEntity={noteInputEntity} />
                     </DefaultCodeBlock>
                 )
 
-            case NoteInputType.CODE_WITH_VARIABLES:
+            case NoteInputEntityType.CODE_WITH_VARIABLES:
                 return (
-                    <DefaultCodeBlock noteInput={noteInput} propsKey={key} key={key}>
-                        <CodeBlockWithVariables noteInput={noteInput} />
+                    <DefaultCodeBlock noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                        <CodeBlockWithVariables noteInputEntity={noteInputEntity} />
                     </DefaultCodeBlock>
                 )
 
@@ -136,7 +136,7 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
             setTimeout(() => {
                 toast("Save", "Successfully saved " + note.title, "success", 5000);
                 log(note);
-                log(appUser)
+                log(appUserEntity)
                 setAboutToSave(false);
                 res();
             }, 2000);
@@ -167,8 +167,8 @@ export default function BlockContainer({note, propsKey, ...props}: Props) {
 
         const noteIndex = getJsxElementIndexByKey(blockContainers, propsKey);
 
-        // update appUser
-        appUser.notes?.splice(noteIndex, 1);
+        // update appUserEntity
+        appUserEntity.notes?.splice(noteIndex, 1);
 
         // update notes
         const newNotes = blockContainers;
@@ -240,5 +240,5 @@ export const BlockContainerContext = createContext({
 
     blocks: [<></>],
     setBlocks: (blocks: JSX.Element[]) => {},
-    getBlockByNoteInputType: (noteInput: NoteInput) => {return <></>}
+    getBlockByNoteInputEntityType: (noteInputEntity: NoteInputEntity) => {return <></>}
 })

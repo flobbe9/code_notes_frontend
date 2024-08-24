@@ -1,13 +1,13 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/BlockContainerTagList.scss";
+import "../../assets/styles/NoteTagList.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperDiv from "../helpers/HelperDiv";
 import TagInput from "../TagInput";
 import Flex from "../helpers/Flex";
-import { Note } from "../../abstract/entites/NoteEntity";
-import { BlockContainerContext } from "./BlockContainer";
-import { getRandomString, isArrayFalsy, isBlank, log } from './../../helpers/utils';
-import { Tag } from "../../abstract/entites/TagEntity";
+import { NoteEntity } from "../../abstract/entites/NoteEntity";
+import { NoteContext } from "./Note";
+import { getRandomString, isArrayFalsy, isBlank, log } from '../../helpers/utils';
+import { TagEntity } from "../../abstract/entites/TagEntity";
 import { AppContext } from "../App";
 
 
@@ -17,22 +17,22 @@ interface Props extends DefaultProps {
 
 
 /**
- * "TagElement" is referred to as a ```<TagInput />```. "Tag" is referred to as a ```Tag```, e.g. inside ```note.tags```.
+ * "TagElement" is referred to as a ```<TagInput />```. "TagEntity" is referred to as a ```TagEntity```, e.g. inside ```note.tags```.
  * 
  * @since 0.0.1
  */
 // TODO: tag list hover moves with scrollbar
 // TODO: new block container wont add new tags
-export default function BlockContainerTagList({...props}: Props) {
+export default function NoteTagList({...props}: Props) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "BlockContainerTagList");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteTagList");
 
     const [tagElements, setTagElements] = useState<JSX.Element[]>([]);
 
     const componentRef = useRef(null);
 
     const { appUserEntity } = useContext(AppContext);
-    const { note } = useContext(BlockContainerContext);
+    const { note } = useContext(NoteContext);
 
     const context = {
         getTagElementIndex,
@@ -82,7 +82,7 @@ export default function BlockContainerTagList({...props}: Props) {
     /**
      * @param tag to add to ```note.tags```
      */
-    function addTag(tag: Tag): void {
+    function addTag(tag: TagEntity): void {
 
         // add to note tags
         note.tags = [...note.tags, tag];
@@ -138,11 +138,11 @@ export default function BlockContainerTagList({...props}: Props) {
 
         const tagToRemove = note.tags.splice(index, 1)[0];
 
-        removeTagFromAppUserEntity(tagToRemove);
+        removeTagFromAppUserEntityEntity(tagToRemove);
     }
 
 
-    function removeTagFromAppUserEntity(tag: Tag): void {
+    function removeTagFromAppUserEntityEntity(tag: TagEntity): void {
 
         // case: falsy arg or appUserEntity has no tags or no notes anyway
         if (!tag || !appUserEntity.tags || !appUserEntity.notes)
@@ -200,7 +200,7 @@ export default function BlockContainerTagList({...props}: Props) {
 
 
     return (
-        <BlockContainerTagListContext.Provider value={context}>
+        <NoteTagListContext.Provider value={context}>
             <HelperDiv
                 id={id} 
                 className={className}
@@ -214,18 +214,18 @@ export default function BlockContainerTagList({...props}: Props) {
 
                 {children}
             </HelperDiv>
-        </BlockContainerTagListContext.Provider>
+        </NoteTagListContext.Provider>
     )
 }
 
 
-export const BlockContainerTagListContext = createContext({
+export const NoteTagListContext = createContext({
     getTagElementIndex: (tag: string) => {return -1 as number},
     addTagElement: () => {},
-    addTag: (tag: Tag) => {},
+    addTag: (tag: TagEntity) => {},
     removeTagElement: (key: string) => {},
     removeTag: (index: number) => {},
     getNumBlankTagElements: () => {return 1 as number},
     tagElements: [<></>],
-    tags: [new Tag()]
+    tags: [new TagEntity()]
 })

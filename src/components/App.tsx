@@ -7,10 +7,10 @@ import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
 import useKeyPress from '../hooks/useKeyPress';
 import Overlay from './helpers/Overlay';
-import { AppUser } from '../abstract/entites/AppUser';
+import { AppUserEntity } from '../abstract/entites/AppUserEntityEntity';
 import { AppUserRole } from '../abstract/AppUserRole';
-import { NoteInputType } from '../abstract/NoteInputType';
-import { Tag } from '../abstract/entites/Tag';
+import { NoteInputEntityType } from '../abstract/NoteInputEntityType';
+import { Tag } from '../abstract/entites/TagEntity';
 
 
 /**
@@ -22,7 +22,7 @@ import { Tag } from '../abstract/entites/Tag';
     // replace parsing states with checkbox states
 export default function App() {
 
-    const [appUser, setAppUser] = useState<AppUser>(mockAppUser);
+    const [appUserEntity, setAppUserEntity] = useState<AppUserEntity>(mockAppUserEntity);
 
     const [toastSummary, setToastSummary] = useState("");
     const [toastMessage, setToastMessage] = useState("");
@@ -41,8 +41,8 @@ export default function App() {
     const toastSlideDuration = 400;
 
     const context = {
-        appUser,
-        setAppUser, 
+        appUserEntity,
+        setAppUserEntity, 
 
         toast,
         moveToast,
@@ -235,8 +235,8 @@ export default function App() {
 
 
 export const AppContext = createContext({
-    appUser: AppUser.getDefaultInstance(),
-    setAppUser: (appUser: AppUser) => {},
+    appUserEntity: AppUserEntity.getDefaultInstance(),
+    setAppUserEntity: (appUserEntity: AppUserEntity) => {},
 
     toast: (summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number) => {},
     moveToast: (hideToast = false, screenTime?: number) => {},
@@ -255,7 +255,7 @@ export const AppContext = createContext({
 });
 
 
-const mockAppUser: AppUser = new AppUser(
+const mockAppUserEntity: AppUserEntity = new AppUserEntity(
     3,
     "user@user.com",
     "$2a$10$e4k/4uTWn/fnWA8KEYs/Zu.W1b4OWK82rXgwpZsvFhPPbFaYjZlBi",
@@ -269,15 +269,15 @@ const mockAppUser: AppUser = new AppUser(
       {
         id: 20,
         title: "note20",
-        noteInputs: [
+        noteInputEntitys: [
             {
                 value: "const x = 3;\n\nadsf\nasdf",
-                type: NoteInputType.CODE,
+                type: NoteInputEntityType.CODE,
                 programmingLanguage: "Java"
             },
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputType.CODE_WITH_VARIABLES,
+                type: NoteInputEntityType.CODE_WITH_VARIABLES,
                 programmingLanguage: "_auto"
             },
         ],
@@ -286,14 +286,14 @@ const mockAppUser: AppUser = new AppUser(
       {
         id: 19,
         title: "note19",
-        noteInputs: [
+        noteInputEntitys: [
             {
                 value: "some <code>code</code>",
-                type: NoteInputType.PLAIN_TEXT
+                type: NoteInputEntityType.PLAIN_TEXT
             },
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputType.CODE_WITH_VARIABLES,
+                type: NoteInputEntityType.CODE_WITH_VARIABLES,
                 programmingLanguage: "_auto"
             },
         ],
@@ -302,15 +302,15 @@ const mockAppUser: AppUser = new AppUser(
       {
         id: 18,
         title: "note18",
-        noteInputs: [
+        noteInputEntitys: [
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputType.CODE_WITH_VARIABLES,
+                type: NoteInputEntityType.CODE_WITH_VARIABLES,
                 programmingLanguage: "_auto"
             },
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
-                type: NoteInputType.CODE_WITH_VARIABLES,
+                type: NoteInputEntityType.CODE_WITH_VARIABLES,
                 programmingLanguage: "_auto"
             }
         ],

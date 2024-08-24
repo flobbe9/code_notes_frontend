@@ -1,4 +1,4 @@
-import { NoteInputType } from "../NoteInputType";
+import { NoteInputEntityType } from "../NoteInputEntityType";
 import { AbstractEntity } from "./AbstractEntity";
 
 /**
@@ -8,11 +8,11 @@ import { AbstractEntity } from "./AbstractEntity";
  * 
  * @since 0.0.1
  */
-export class NoteInput extends AbstractEntity {
+export class NoteInputEntity extends AbstractEntity {
 
     value: string;
 
-    type: NoteInputType;
+    type: NoteInputEntityType;
 
     programmingLanguage?: string | null;
 }

@@ -12,7 +12,7 @@ import { VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_SEQUENCE_REGEX, VARI
 import { AppContext } from "../App";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 import HelperProps from "../../abstract/HelperProps";
-import { NoteInput } from "../../abstract/entites/NoteInput";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { BlockContainerContext } from "./BlockContainer";
 import parse from 'html-react-parser';
 import { DefaultBlockContext } from "./DefaultBlock";
@@ -21,7 +21,7 @@ import BlockSettings from "./BlockSettings";
 
 interface Props extends HelperProps {
 
-    noteInput: NoteInput
+    noteInputEntity: NoteInputEntity
 }
 
 
@@ -37,7 +37,7 @@ interface Props extends HelperProps {
 // TODO: 
     // highlight style sometimes chooses black (?)
 export default function CodeBlockWithVariables({
-    noteInput,
+    noteInputEntity,
     disabled,
     onBlur, 
     ...props
@@ -82,7 +82,7 @@ export default function CodeBlockWithVariables({
     useEffect(() => {
         setInputDivJQuery($(inputDivRef.current!));
 
-        setInputDivValue(parse(sanitize(noteInput.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
+        setInputDivValue(parse(sanitize(noteInputEntity.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
 
         sethasComponentRendered(true);
 
@@ -194,7 +194,7 @@ export default function CodeBlockWithVariables({
         setIsParsing(false);
         setBlockOverlayVisible(false);
 
-        updateAppUser();
+        updateAppUserEntity();
 
         return highlightPromise;
     }
@@ -498,15 +498,15 @@ export default function CodeBlockWithVariables({
 
 
     /**
-     * Set all noteInput fields for this block.
+     * Set all noteInputEntity fields for this block.
      */
-    function updateAppUser(): void {
+    function updateAppUserEntity(): void {
 
         // value
-        noteInput.value = $(inputDivRef.current!).html();
+        noteInputEntity.value = $(inputDivRef.current!).html();
 
         // programmingLanguage
-        noteInput.programmingLanguage = codeBlockWithVariablesLanguage;
+        noteInputEntity.programmingLanguage = codeBlockWithVariablesLanguage;
     }
 
 
@@ -664,7 +664,7 @@ export default function CodeBlockWithVariables({
 
         highlightInputDivContent();
 
-        updateAppUser();
+        updateAppUserEntity();
     }
 
 
@@ -721,7 +721,7 @@ export default function CodeBlockWithVariables({
                 </Button>
 
                 {/* Block Settings */}
-                <BlockSettings noteInput={noteInput} areBlockSettingsDisabled={areBlockSettingsDisabled} />
+                <BlockSettings noteInputEntity={noteInputEntity} areBlockSettingsDisabled={areBlockSettingsDisabled} />
 
                 {/* Add variable */}
                 {/* 

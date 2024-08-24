@@ -3,13 +3,13 @@ import "../../assets/styles/DefaultCodeBlock.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import DefaultBlock from "./DefaultBlock";
 import Flex from "../helpers/Flex";
-import { NoteInput } from "../../abstract/entites/NoteInput";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { log } from "../../helpers/utils";
 
 
 interface Props extends DefaultProps {
 
-    noteInput: NoteInput,
+    noteInputEntity: NoteInputEntity,
 
     propsKey: string
 }
@@ -18,7 +18,7 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-export default function DefaultCodeBlock({noteInput, propsKey, ...props}: Props) {
+export default function DefaultCodeBlock({noteInputEntity, propsKey, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultCodeBlock");
 
@@ -31,7 +31,7 @@ export default function DefaultCodeBlock({noteInput, propsKey, ...props}: Props)
     
     return (
         <DefaultCodeBlockContext.Provider value={context}>
-            <DefaultBlock noteInput={noteInput} propsKey={propsKey}>
+            <DefaultBlock noteInputEntity={noteInputEntity} propsKey={propsKey}>
                 <div     
                     id={id} 
                     className={className}

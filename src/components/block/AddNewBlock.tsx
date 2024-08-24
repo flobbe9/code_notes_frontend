@@ -5,8 +5,8 @@ import Flex from "../helpers/Flex";
 import { log } from "../../helpers/utils";
 import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
 import { BlockContainerContext } from "./BlockContainer";
-import { NoteInput } from "../../abstract/entites/NoteInput";
-import { NoteInputType } from "../../abstract/NoteInputType";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
+import { NoteInputEntityType } from "../../abstract/NoteInputEntityType";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER } from "../../helpers/constants";
 
 
@@ -24,75 +24,75 @@ export default function AddNewBlock({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewBlock");
 
-    const { note, blocks, setBlocks, numBlocksParsing, getBlockByNoteInputType } = useContext(BlockContainerContext);
+    const { note, blocks, setBlocks, numBlocksParsing, getBlockByNoteInputEntityType } = useContext(BlockContainerContext);
 
 
     function handleAddPlainTextBlock(event): void {
          
         // case: not blocks yet
-        if (!note.noteInputs)
-            note.noteInputs = [];
+        if (!note.noteInputEntitys)
+            note.noteInputEntitys = [];
  
-        const newPlainTextBlock: NoteInput = {
+        const newPlainTextBlock: NoteInputEntity = {
             value: "Plain text and some <code>code...</code>",
-            type: NoteInputType.PLAIN_TEXT
+            type: NoteInputEntityType.PLAIN_TEXT
         }
 
-        appendNoteInput(newPlainTextBlock);
+        appendNoteInputEntity(newPlainTextBlock);
     }
 
 
     function handleAddCodeBlockWithVariables(event): void {
 
         // case: not blocks yet
-        if (!note.noteInputs)
-            note.noteInputs = [];
+        if (!note.noteInputEntitys)
+            note.noteInputEntitys = [];
  
-        const newCodeBlockWithVariables: NoteInput = {
+        const newCodeBlockWithVariables: NoteInputEntity = {
             // TODO: make this a constant
             value: "Some code and a variable x = " + getDefaultVariableInput() + ". Click the 3 dots on the right to change the programming language.",
-            type: NoteInputType.CODE_WITH_VARIABLES,
+            type: NoteInputEntityType.CODE_WITH_VARIABLES,
             programmingLanguage: CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE
         }
 
-        appendNoteInput(newCodeBlockWithVariables);
+        appendNoteInputEntity(newCodeBlockWithVariables);
     }
 
  
     function handleAddCodeBlock(event): void {
 
         // case: not blocks yet
-        if (!note.noteInputs)
-            note.noteInputs = [];
+        if (!note.noteInputEntitys)
+            note.noteInputEntitys = [];
  
-        const newCodeBlock: NoteInput = {
+        const newCodeBlock: NoteInputEntity = {
             value: "",
-            type: NoteInputType.CODE,
+            type: NoteInputEntityType.CODE,
             programmingLanguage: CODE_BLOCK_DEFAULT_LANGUAGE
         }
 
-        appendNoteInput(newCodeBlock);        
+        appendNoteInputEntity(newCodeBlock);        
     }
 
 
     /**
-     * Appends a new ```noteInput``` and given ```noteInputEntity``` to their corresponding states.
+     * Appends a new ```noteInputEntity``` and given ```noteInputEntityEntity``` to their corresponding states.
      * 
-     * @param noteInputEntity to add
+     * @param noteInputEntityEntity to add
      */
-    function appendNoteInput(noteInputEntity: NoteInput): void {
+    function appendNoteInputEntity(noteInputEntityEntity: NoteInputEntity): void {
 
-        if (!note.noteInputs)
+        if (!note.noteInputEntitys)
             return;
     
         // update app user
-        note.noteInputs = [...note.noteInputs, noteInputEntity];
+        note.noteInputEntitys = [...note.noteInputEntitys, noteInputEntityEntity];
 
-        // update noteInputs
-        let newNoteInputs = blocks;
-        const newNoteInput = getBlockByNoteInputType(noteInputEntity);
-        newNoteInputs = [...newNoteInputs, newNoteInput];
-        setBlocks(newNoteInputs);
+        // update noteInputEntitys
+        let newNoteInputEntitys = blocks;
+        const newNoteInputEntity = getBlockByNoteInputEntityType(noteInputEntityEntity);
+        newNoteInputEntitys = [...newNoteInputEntitys, newNoteInputEntity];
+        setBlocks(newNoteInputEntitys);
     }
  
 

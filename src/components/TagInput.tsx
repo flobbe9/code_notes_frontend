@@ -4,7 +4,7 @@ import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import { isBlank, isEventKeyTakingUpSpace, log } from "../helpers/utils";
-import { Tag } from "../abstract/entites/Tag";
+import { TagEntity } from "../abstract/entites/TagEntity";
 import { BlockContainerTagListContext } from "./block/BlockContainerTagList";
 import { BlockContainerContext } from "./block/BlockContainer";
 import { AppContext } from "./App";
@@ -13,7 +13,7 @@ import { MAX_TAG_INPUT_VALUE_LENGTH } from "../helpers/constants";
 
 interface Props extends DefaultProps {
 
-    initialTag: Tag,
+    initialTag: TagEntity,
 
     propsKey: string
 }

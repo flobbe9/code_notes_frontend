@@ -1,7 +1,7 @@
 import React, { useContext, useRef } from "react";
 import "../../assets/styles/BlockContainerTitle.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { Note } from "../../abstract/entites/Note";
+import { Note } from "../../abstract/entites/NoteEntity";
 import { BlockContainerContext } from "./BlockContainer";
 
 

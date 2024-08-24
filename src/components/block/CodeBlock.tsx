@@ -11,13 +11,13 @@ import { DefaultCodeBlockContext } from "./DefaultCodeBlock";
 import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
 import { StartPageContainerContext } from "../StartPageContainer";
-import { NoteInput } from "../../abstract/entites/NoteInput";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import BlockSettings from "./BlockSettings";
 
 
 interface Props extends DefaultProps {
 
-    noteInput: NoteInput
+    noteInputEntity: NoteInputEntity
 }
 
 
@@ -35,7 +35,7 @@ interface Props extends DefaultProps {
     // change theme (settings)
         // adjust some css classes
     // toggle minimap ? (settings)
-export default function CodeBlock({noteInput, ...props}: Props) {
+export default function CodeBlock({noteInputEntity, ...props}: Props) {
 
     /** Height of one line of the monaco vscode editor in px */
     const editorLineHeight = 19; // px
@@ -51,7 +51,7 @@ export default function CodeBlock({noteInput, ...props}: Props) {
     const [editorWidth, setEditorWidth] = useState("100%");
     const [editorTransition, setEditorTransition] = useState(0);
     const [numEditorLines, setNumEditorLines] = useState(1);
-    const [editorValue, setEditorValue] = useState(noteInput.value);
+    const [editorValue, setEditorValue] = useState(noteInputEntity.value);
     const [editorHeight, setEditorHeight] = useState(0);
 
     const { 
@@ -137,7 +137,7 @@ export default function CodeBlock({noteInput, ...props}: Props) {
         if (!isEditorMounted)
             return;
 
-        updateAppUser();
+        updateAppUserEntity();
 
     }, [codeBlockLanguage]);
 
@@ -150,24 +150,24 @@ export default function CodeBlock({noteInput, ...props}: Props) {
         if (!isFullScreen)
             setTimeout(() => setNumEditorLines(getNumEditorValueLines(value)), 5);
 
-        updateAppUser();
+        updateAppUserEntity();
     }
 
 
     /**
-     * Set ```noteInput``` values using this block.
+     * Set ```noteInputEntity``` values using this block.
      * 
      * @param editorValue the current text in the editor
      */
-    function updateAppUser(): void {
+    function updateAppUserEntity(): void {
 
         const editorValue = getCurrentEditorValue();
 
         // value
-        noteInput.value = editorValue;
+        noteInputEntity.value = editorValue;
 
         // programmingLanguage
-        noteInput.programmingLanguage = codeBlockLanguage;
+        noteInputEntity.programmingLanguage = codeBlockLanguage;
     }
 
 
@@ -528,7 +528,7 @@ export default function CodeBlock({noteInput, ...props}: Props) {
             </Button>
 
             {/* Block Settings */}
-            <BlockSettings noteInput={noteInput} areBlockSettingsDisabled={areBlockSettingsDisabled} />
+            <BlockSettings noteInputEntity={noteInputEntity} areBlockSettingsDisabled={areBlockSettingsDisabled} />
 
             {/* Fullscreen button */}
             <Button 
