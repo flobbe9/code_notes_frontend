@@ -63,11 +63,13 @@ export default function App() {
 
     
     useEffect(() => {
-        window.addEventListener("keydown", handleWindowKeyDown)
+        window.addEventListener("keydown", handleWindowKeyDown);
+        window.addEventListener("keyup", handleWindowKeyUp);
         window.addEventListener("resize", handleWindowResize);
 
         return () => {
             window.removeEventListener("keydown", handleWindowKeyDown);
+            window.removeEventListener("keyup", handleWindowKeyUp);
             window.removeEventListener("resize", handleWindowResize);
         }
     }, []);
@@ -177,8 +179,16 @@ export default function App() {
 
         const key = event.key;
 
+        handleKeyDownUseKeyPress(event);
+
         if (key === "Escape")
             moveToast(true);
+    }
+
+
+    function handleWindowKeyUp(event): void {
+
+        handleKeyDownUseKeyPress(event);
     }
 
 
@@ -199,7 +209,7 @@ export default function App() {
     return (
         <AppContext.Provider value={context}>
             <BrowserRouter>
-                <div id="App" className="App" onKeyDownCapture={handleKeyDownUseKeyPress} onKeyUp={handleKeyUpUseKeyPress}>
+                <div id="App" className="App">
                     <Overlay 
                         id="App"
                         isOverlayVisible={isAppOverlayVisible} 

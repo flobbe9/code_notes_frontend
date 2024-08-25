@@ -4,11 +4,11 @@ import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps"
 import HelperDiv from "../helpers/HelperDiv";
 import TagInput from "../TagInput";
 import Flex from "../helpers/Flex";
-import { NoteEntity } from "../../abstract/entites/NoteEntity";
 import { NoteContext } from "./Note";
 import { getRandomString, isArrayFalsy, isBlank, log } from '../../helpers/utils';
 import { TagEntity } from "../../abstract/entites/TagEntity";
 import { AppContext } from "../App";
+import { StartPageContainerContext } from "../StartPageContainer";
 
 
 interface Props extends DefaultProps {
@@ -21,8 +21,6 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-// TODO: tag list hover moves with scrollbar
-// TODO: new noteInput container wont add new tags
 export default function NoteTagList({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteTagList");
@@ -32,17 +30,17 @@ export default function NoteTagList({...props}: Props) {
     const componentRef = useRef(null);
 
     const { appUserEntity } = useContext(AppContext);
+    const { updateSideBar } = useContext(StartPageContainerContext);
     const { noteEntity } = useContext(NoteContext);
 
     const context = {
         getTagElementIndex,
         addTagElement,
         addTag,
-        removeTagElement,
         removeTag,
         getNumBlankTagElements,
         tagElements,
-        tags: noteEntity.tags
+        noteTagEntities: noteEntity.tags
     }
 
 
@@ -80,17 +78,21 @@ export default function NoteTagList({...props}: Props) {
 
 
     /**
-     * @param tag to add to ```noteEntity.tags```
+     * @param tagEntity to add to ```noteEntity.tags``` and ```appUserEntity.tags```
      */
-    function addTag(tag: TagEntity): void {
+    function addTag(tagEntity: TagEntity): void {
 
-        // add to note tags
-        noteEntity.tags = [...(noteEntity.tags || []), tag];
+        if (!tagEntity)
+            return;
 
-        if (!appUserEntity.tags)
-            appUserEntity.tags = [];
+        // add to appUser first
+        appUserEntity.addTag(tagEntity);
 
-        appUserEntity.tags.push(tag);
+        // add to noteEntity
+        noteEntity.tags = [...(noteEntity.tags || []), tagEntity];
+
+        // notify sidebar
+        updateSideBar();
     }
 
 
@@ -101,7 +103,7 @@ export default function NoteTagList({...props}: Props) {
     function getNewTagElement(name = ""): JSX.Element {
 
         const key = getRandomString();    
-        const defaultTag = {name: ""};
+        const defaultTag = {name: name};
 
         return <TagInput initialTag={defaultTag} key={key} propsKey={key} />;
     }
@@ -112,17 +114,15 @@ export default function NoteTagList({...props}: Props) {
      * 
      * @param key of the tagInput to remove
      */
-    function removeTagElement(key: string): void {
-
-        const tagElementToRemoveIndex = getTagElementIndex(key);
+    function removeTagElement(index: number): void {
 
         // case: no tag with this key
-        if (tagElementToRemoveIndex === -1)
+        if (index === -1)
             return;
 
         // remove tag
         const tagsState = tagElements;
-        tagsState.splice(tagElementToRemoveIndex, 1);
+        tagsState.splice(index, 1);
 
         // update state
         setTagElements([...tagsState]);
@@ -139,6 +139,10 @@ export default function NoteTagList({...props}: Props) {
         const tagToRemove = noteEntity.tags!.splice(index, 1)[0];
 
         removeTagFromAppUserEntityEntity(tagToRemove);
+
+        removeTagElement(index);
+
+        updateSideBar();
     }
 
 
@@ -223,9 +227,8 @@ export const NoteTagListContext = createContext({
     getTagElementIndex: (tag: string) => {return -1 as number},
     addTagElement: () => {},
     addTag: (tag: TagEntity) => {},
-    removeTagElement: (key: string) => {},
     removeTag: (index: number) => {},
     getNumBlankTagElements: () => {return 1 as number},
     tagElements: [<></>],
-    tags: [new TagEntity()] as (TagEntity[] | null)
+    noteTagEntities: [new TagEntity()] as (TagEntity[] | null)
 })

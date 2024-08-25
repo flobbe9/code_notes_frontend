@@ -26,12 +26,6 @@ interface Props extends HelperProps {
 /**
  * @since 0.0.1
  */
-// TODO: 
-    // add something like a tutorial note with highlighted text 
-        // on account creation?
-        // if app user has no plain text notes at all && on create
-    // dont add any default text
-
 export default function PlainTextNoteInput({
     noteInputEntity,
     disabled,

@@ -18,9 +18,13 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
+// TODO: 
+    // continue here, notify sidebar when tags change
 export default function StartPageContainer({children, ...props}: Props) {
 
     const [isShowSideBar, setIsShowSideBar] = useState(false);
+    /** State that will trigger the sidebar to update some states if changed. ```undefined``` should stay the init value */
+    const [updateSideBarStates, setUpdateSideBarStates] = useState<boolean>();
 
     const { windowSize, getDeviceWidth } = useContext(AppContext);
     const { isMobileWidth } = getDeviceWidth();
@@ -29,14 +33,31 @@ export default function StartPageContainer({children, ...props}: Props) {
         isShowSideBar, 
         setIsShowSideBar,
 
+        updateSideBarStates, 
+        setUpdateSideBarStates,
+        updateSideBar,
+
         getStartPageSideBarWidth
     }
+
+
+    useEffect(() => {
+        // initialize sidebar states
+        updateSideBar();
+
+    }, []);
 
 
     useEffect(() => {
         updateStartPageContentWidth();
 
     }, [isShowSideBar, windowSize]);
+
+
+    function updateSideBar(): void {
+
+        setUpdateSideBarStates(!updateSideBarStates);
+    }
 
 
     function updateStartPageContentWidth(): void {
@@ -101,6 +122,10 @@ export default function StartPageContainer({children, ...props}: Props) {
 export const StartPageContainerContext = createContext({
     isShowSideBar: false, 
     setIsShowSideBar: (isShow: boolean) => {},
+
+    updateSideBarStates: true as (boolean | undefined), 
+    setUpdateSideBarStates: (update: boolean | undefined) => {},
+    updateSideBar: () => {},
 
     getStartPageSideBarWidth: () => {return 0 as number}
 });

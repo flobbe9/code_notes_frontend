@@ -37,11 +37,11 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
         getTagElementIndex, 
         addTagElement,
         addTag, 
-        removeTagElement,
+        // removeTagElement,
         removeTag, 
         getNumBlankTagElements,
         tagElements,
-        tags
+        noteTagEntities
     } = useContext(NoteTagListContext);
 
 
@@ -95,7 +95,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
      */
     function handleNewTag(): void {
 
-        if (isContainedInNote() || isTagValueBlank())
+        if (isTagElementContainedInNoteEntity() || isTagValueBlank())
             return;
         
         const tag = {name: getTagElementValue()};
@@ -111,8 +111,6 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     function handleRemoveTag(event): void {
         
         removeTag(getTagElementIndex(propsKey));
-
-        removeTagElement(propsKey);
     }
 
 
@@ -139,7 +137,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
      * 
      * @returns true if this tag input's index does not exceed ```noteEntity.tags.length```
      */
-    function isContainedInNote(): boolean {
+    function isTagElementContainedInNoteEntity(): boolean {
 
         if (!noteEntity.tags)
             return false;
@@ -150,9 +148,13 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
     function isDuplicateTagElement(): boolean {
 
+        if (!noteTagEntities)
+            return false;
+
         const tagElementValue = getTagElementValue();
 
-        return !!tags!.filter(tag => tag.name === tagElementValue).length && !isContainedInNote();
+        return !!noteTagEntities!.filter(tag => tag.name === tagElementValue).length && 
+               !isTagElementContainedInNoteEntity();
     }
 
 

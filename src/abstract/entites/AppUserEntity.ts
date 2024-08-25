@@ -1,3 +1,4 @@
+import { log } from "../../helpers/utils";
 import { AppUserRole } from "../AppUserRole";
 import { AbstractEntity } from "./AbstractEntity";
 import { NoteEntity } from "./NoteEntity";
@@ -44,6 +45,21 @@ export class AppUserEntity extends AbstractEntity {
 
 
     /**
+     * Adds given tag to ```this.tags```if not yet exists.
+     * 
+     * @param tagEntity to add to ```this.tags```
+     */
+    public addTag(tagEntity: TagEntity): void {
+
+        if (!this.tags)
+            this.tags = [];
+
+        if (!this.isTagEntityPresentInANote(tagEntity))
+            this.tags?.push(tagEntity);
+    }
+
+
+    /**
      * Remove given tag from ```this.tags```.
      * 
      * @param tag to remove 
@@ -68,9 +84,9 @@ export class AppUserEntity extends AbstractEntity {
         if (!tag || !this.notes)
             return false;
 
-        return !!this.notes.find(note => 
-                    !!note.tags.find(noteTagEntity => 
-                        tag.name === noteTagEntity.name))
+        return !!this.notes.find(noteEntity => 
+                    !!(noteEntity.tags || []).find(tagEntity => 
+                        tag.name === tagEntity.name))
     }
 
 

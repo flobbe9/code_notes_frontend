@@ -102,10 +102,6 @@ export default function CodeNoteInputWithVariables({
     }, [codeNoteInputWithVariablesLanguage])
     
     
-    // TODO: 
-        // consider max input size
-            // use db max size
-
     /**
      * @param text any text
      * @returns highlighted and then sanitized html string (using {@link DEFAULT_HTML_SANTIZER_OPTIONS})
@@ -711,10 +707,6 @@ export default function CodeNoteInputWithVariables({
                 <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
 
                 {/* Add variable */}
-                {/* 
-                    TODO: 
-                        does not work if focus was on input
-                */}
                 <Button 
                     className="appendVariableButton defaultNoteInputButton" 
                     title="Append variable (Ctrl + Shift + V)"

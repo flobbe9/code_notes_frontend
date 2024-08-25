@@ -32,7 +32,9 @@ export default function StartPageContent({...props}: Props) {
 
     const context = {
         notes,
-        setNotes
+        setNotes,
+
+        getNoteByNoteEntity
     }
 
 
@@ -67,31 +69,6 @@ export default function StartPageContent({...props}: Props) {
     }
 
 
-    /**
-     * Prepend both a new ```note``` and a new ```noteEntity``` to their corresponding states.
-     */
-    function prependNote(): void {
-
-        if (isArrayFalsy(appUserEntity.notes))
-            appUserEntity.notes = [];
-
-        // create new note
-        const newNoteEntity = new NoteEntity();
-        newNoteEntity.title = "";
-
-        // create new note entity
-        const newNote = getNoteByNoteEntity(newNoteEntity);
-
-        // 
-        appUserEntity.notes! = [newNoteEntity, ...appUserEntity.notes!];
-
-        let newNotes = notes;
-        newNotes = [newNote, ...newNotes];
-
-        setNotes(newNotes);
-    }
-
-
     function getNoteByNoteEntity(noteEntity: NoteEntity): JSX.Element {
 
         const key = getRandomString();
@@ -123,7 +100,7 @@ export default function StartPageContent({...props}: Props) {
 
                 <Flex className="mt-2 mb-5" horizontalAlign="right">
                     {/* New Note Button */}
-                    <AddNewNoteButton onClick={prependNote} />
+                    <AddNewNoteButton />
                 </Flex>
 
                 {/* Notes */}
@@ -138,5 +115,7 @@ export default function StartPageContent({...props}: Props) {
 
 export const StartPageContentContext = createContext({
     notes: [<></>],
-    setNotes: (notes: JSX.Element[]) => {}
+    setNotes: (notes: JSX.Element[]) => {},
+
+    getNoteByNoteEntity: (noteEntity: NoteEntity) => {return <></>}
 })
