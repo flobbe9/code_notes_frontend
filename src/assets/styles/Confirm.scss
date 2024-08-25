@@ -1,0 +1,12 @@
+.Confirm {
+    padding: 5px;
+
+    .confirmButton {
+        background-color: var(--matBlue);
+        color: white;
+    }
+
+    .cancelButton {
+        background-color: transparent;
+    }
+}

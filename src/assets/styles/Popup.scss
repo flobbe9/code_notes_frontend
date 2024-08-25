@@ -1,0 +1,21 @@
+.Popup {
+    display: none;
+    height: 100vh;
+    position: fixed;
+    width: 100vw;
+    z-index: var(--overlayZIndex);
+    
+    .popupContentContainer {
+        background-color: white;
+        border-radius: var(--borderRadius);
+        min-height: 200px;
+        min-width: 200px;
+        padding: 10px;
+        z-index: calc(var(--overlayZIndex) + 1);
+
+        .popupXButton {
+            background-color: transparent;
+            padding: 0;
+        }
+    }
+}

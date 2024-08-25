@@ -21,6 +21,7 @@ import { MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../h
 import { TagEntityService } from './../../abstract/services/TagEntityService';
 import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityService";
 import { NoteEntityService } from './../../abstract/services/NoteEntityService';
+import Confirm from "../helpers/Confirm";
 
 
 interface Props extends DefaultProps {
@@ -46,6 +47,8 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
     const [aboutToSave, setAboutToSave] = useState(false);
+
+    const { setIsPopupVisible, setPopupContent } = useContext(AppContext);
 
     /** 
      * Number of noteInputs that are currently parsing or highlighting their values. Indicates whether the save() function should wait
@@ -162,14 +165,23 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     }
 
 
-    function handleDeleteNoteInputClick(event): void {
+    function handleDeleteNoteClick(event): void {
 
-        // TODO: confirm
-        deleteNoteInput();
+        setPopupContent(
+            <Confirm
+                heading={<h3>Delete Note?</h3>}
+                message={`Are you sure you want to delete '${noteEntity.title}'?`}
+                onConfirm={event => {deleteNote(); setIsPopupVisible(false)}}
+                onCancel={event => setIsPopupVisible(false)}
+                style={{maxWidth: "50vw"}}
+            />
+        );
+
+        setIsPopupVisible(true);
     }
 
 
-    function deleteNoteInput(): void {
+    function deleteNote(): void {
 
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
 
@@ -180,6 +192,8 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         const newNotes = notes;
         newNotes.splice(noteIndex, 1);
         setNotes([...newNotes]);
+
+        // TODO: save appuser
     }
 
 
@@ -248,7 +262,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
                         className="me-4 transition deleteNoteButton" 
                         label="Delete Note"
                         title="Delete note" 
-                        onClick={handleDeleteNoteInputClick}
+                        onClick={handleDeleteNoteClick}
                     >
                         <i className="fa-solid fa-trash"></i>
                     </ButtonWithSlideLabel>

@@ -18,8 +18,6 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-// TODO: 
-    // continue here, notify sidebar when tags change
 export default function StartPageContainer({children, ...props}: Props) {
 
     const [isShowSideBar, setIsShowSideBar] = useState(false);

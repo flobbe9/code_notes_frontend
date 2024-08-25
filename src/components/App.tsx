@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useRef, useState } from 'react';
 import '../assets/styles/App.scss';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { getCSSValueAsNumber, isNumberFalsy, isStringFalsy, log, logWarn, stringToNumber } from '../helpers/utils';
+import { getCSSValueAsNumber, isNumberFalsy, stringToNumber } from '../helpers/utils';
 import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
 import useKeyPress from '../hooks/useKeyPress';
@@ -10,6 +10,7 @@ import Overlay from './helpers/Overlay';
 import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { AppUserRole } from '../abstract/AppUserRole';
 import { NoteInputType } from '../abstract/NoteInputType';
+import Popup from './helpers/Popup';
 
 
 /**
@@ -29,6 +30,11 @@ export default function App() {
     const [toastScreenTimeTimeout, setToastScreenTimeTimeout] = useState<NodeJS.Timeout>();
 
     const [isAppOverlayVisible, setIsAppOverlayVisible] = useState(false);
+    const [isAppOverlayHideOnClick, setIsAppOverlayHideOnClick] = useState(true);
+    const [isAppOverlayHideOnEscape, setIsAppOverlayHideOnEscape] = useState(true);
+
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    const [popupContent, setPopupContent] = useState<JSX.Element | JSX.Element[]>([]);
 
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
@@ -54,9 +60,16 @@ export default function App() {
         isKeyPressed,
         isControlKeyPressed,
 
-        toggleAppOverlay,
         isAppOverlayVisible,
-        getAppOverlayZIndex
+        setIsAppOverlayVisible,
+        isAppOverlayHideOnClick,
+        setIsAppOverlayHideOnClick,
+        setIsAppOverlayHideOnEscape,
+
+        isPopupVisible, 
+        setIsPopupVisible,
+        popupContent, 
+        setPopupContent
     }
 
     const toastRef = useRef(null);
@@ -188,7 +201,7 @@ export default function App() {
 
     function handleWindowKeyUp(event): void {
 
-        handleKeyDownUseKeyPress(event);
+        handleKeyUpUseKeyPress(event);
     }
 
 
@@ -214,8 +227,12 @@ export default function App() {
                         id="App"
                         isOverlayVisible={isAppOverlayVisible} 
                         setIsOverlayVisible={setIsAppOverlayVisible} 
+                        hideOnClick={isAppOverlayHideOnClick}
+                        hideOnEscape={isAppOverlayHideOnEscape}
                         fitParent={false}
                     />
+
+                    <Popup />
 
                     <NavBar />
 
@@ -257,9 +274,16 @@ export const AppContext = createContext({
     isKeyPressed: (keyName: string): boolean => {return false},
     isControlKeyPressed: () => {return false as boolean},
 
-    toggleAppOverlay: () => {},
     isAppOverlayVisible: false,
-    getAppOverlayZIndex: () => {return 10 as number}
+    setIsAppOverlayVisible: (isVisible: boolean) => {},
+    isAppOverlayHideOnClick: true,
+    setIsAppOverlayHideOnClick: (isHideOnClick: boolean) => {},
+    setIsAppOverlayHideOnEscape: (isHideOnEscape: boolean) => {},
+
+    isPopupVisible: false, 
+    setIsPopupVisible: (isVisible: boolean) => {},
+    popupContent: <></> as (JSX.Element | JSX.Element[]), 
+    setPopupContent: (content: JSX.Element | JSX.Element[]) => {}
 });
 
 
