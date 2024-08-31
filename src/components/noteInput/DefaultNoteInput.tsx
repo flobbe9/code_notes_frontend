@@ -45,12 +45,9 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     const componentRef = useRef(null);
 
-    const {
-        toggleAppOverlay, 
-        isAppOverlayVisible, 
-    } = useContext(AppContext);
+    const { isAppOverlayVisible, setIsAppOverlayVisible } = useContext(AppContext);
 
-    const { noteEntity, noteInputs, setNoteInputs } = useContext(NoteContext);
+    const { noteEntity, noteInputs, setNoteInputs, numNoteInputsParsing } = useContext(NoteContext);
 
     const context = {
         isShowNoteInputSettings, 
@@ -154,7 +151,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
         setIsFullScreen(true);
 
-        toggleAppOverlay();
+        setIsAppOverlayVisible(true);
     }
 
 
@@ -165,7 +162,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         setIsFullScreen(false);
 
         if (isAppOverlayVisible)
-            toggleAppOverlay();
+            setIsAppOverlayVisible(false);
     }
 
     

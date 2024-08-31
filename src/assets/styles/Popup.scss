@@ -1,6 +1,7 @@
 .Popup {
     display: none;
     height: 100vh;
+    overflow: auto;
     position: fixed;
     width: 100vw;
     z-index: var(--overlayZIndex);
@@ -8,14 +9,18 @@
     .popupContentContainer {
         background-color: white;
         border-radius: var(--borderRadius);
-        min-height: 200px;
-        min-width: 200px;
+        min-height: 100px;
+        min-width: 100px;
         padding: 10px;
         z-index: calc(var(--overlayZIndex) + 1);
 
         .popupXButton {
             background-color: transparent;
             padding: 0;
+        }
+
+        .popupContent {
+            padding: 10px;
         }
     }
 }

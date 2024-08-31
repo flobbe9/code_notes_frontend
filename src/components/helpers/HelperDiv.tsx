@@ -63,7 +63,7 @@ export default forwardRef(function HelperDiv(
     return (
         <div 
             id={id} 
-            className={className}
+            className={className + (rendered ? "" : " hidden")}
             style={{
                 ...style,
                 ...(isHover && !disabled ? _hover : {}),
@@ -71,7 +71,6 @@ export default forwardRef(function HelperDiv(
             ref={componentRef}
             title={title}
             onClick={handleClick}
-            hidden={!rendered}
             contentEditable={otherProps.contentEditable}
             {...otherProps}
         >

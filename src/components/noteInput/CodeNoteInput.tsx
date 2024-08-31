@@ -54,10 +54,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     const [editorValue, setEditorValue] = useState(noteInputEntity.value);
     const [editorHeight, setEditorHeight] = useState(0);
 
-    const { 
-        getAppOverlayZIndex 
-    } = useContext(AppContext);
-
     const { isShowSideBar, getStartPageSideBarWidth } = useContext(StartPageContainerContext);
 
     const { 
@@ -396,7 +392,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         const editor = getOuterEditorContainer();
         const defaultCodeNoteInput = editor.parents(".DefaultCodeNoteInput");
 
-        const appOverlayZIndex = getAppOverlayZIndex();
+        const appOverlayZIndex = getCssConstant("overlayZIndex");
         
         defaultCodeNoteInput.animate(
             { width: "90vw" },

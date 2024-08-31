@@ -11,6 +11,8 @@ interface Props extends HelperProps {
 
     /** Default is "Search..." */
     placeHolder?: string,
+    /** Indicates whether to hide the x button that clears the search value. Default is ```false``` */
+    hideXIcon?: boolean,
     /** Default is {} */
     _searchIcon?: CSSProperties,
     /** Default is {} */
@@ -30,6 +32,7 @@ export default forwardRef(function SearchBar(
         defaultValue = "",
         disabled = false,
         rendered = true,
+        hideXIcon = false,
         onKeyDown,
         onKeyUp,
         onClick,
@@ -118,7 +121,7 @@ export default forwardRef(function SearchBar(
                 ...(disabled ? _disabled : {}),
                 ...(isFocus ? _focus : {})
             }}
-            rendered={rendered}
+            hidden={!rendered}
             flexWrap="nowrap"
             verticalAlign="center"
             ref={componentRef}
@@ -148,14 +151,15 @@ export default forwardRef(function SearchBar(
             />
 
             {/* X icon */}
-            {/* <Button 
+            <Button 
                 className="clearSearchValueButton" 
                 disabled={disabled} 
-                onClick={handleXIconClick}
                 title="Clear search"
+                rendered={!hideXIcon}
+                onClick={handleXIconClick}
             >
                 <i className="fa-solid fa-xmark m-1" style={_xIcon}></i>
-            </Button> */}
+            </Button>
             {children}
         </Flex>
     )

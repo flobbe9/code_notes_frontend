@@ -21,6 +21,8 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 // IDEA: filter icon
+// TODO: 
+    // consider heading like "Filter by tag", remove hr
 export default function StartPageSideBar({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);

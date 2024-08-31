@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../assets/styles/Popup.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "./Flex";
 import Button from "./Button";
 import { AppContext } from "../App";
+import { useInitialStyles } from "../../hooks/useInitialStyles";
 
 
 interface Props extends DefaultProps {
@@ -108,7 +109,7 @@ export default function Popup({...props}: Props) {
                 </Flex>
 
                 {/* Body */}
-                {popupContent}
+                <div className="popupContent">{popupContent}</div>
 
                 {children}
             </div>

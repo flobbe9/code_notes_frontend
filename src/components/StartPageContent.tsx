@@ -92,9 +92,10 @@ export default function StartPageContent({...props}: Props) {
                         className="fullWidth" 
                         placeHolder="Search for note Title, note Tag or note Text" 
                         title="Search notes (Ctrl+Shift+F)"
+                        hideXIcon
                         ref={searchInputRef}
                         _focus={{borderColor: "var(--accentColor)"}}
-                        _searchIcon={{color: "var(--vsCodeBlackLight)"}}
+                        _searchIcon={{color: "var(--matteBlackLight)"}}
                     />
                 </Flex>
 

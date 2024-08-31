@@ -29,6 +29,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagInput");
 
     const inputRef = useRef(null);
+    const componentRef = useRef(null);
 
     const { toast, isControlKeyPressed } = useContext(AppContext);
     const { noteEntity } = useContext(NoteContext);
@@ -37,7 +38,6 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
         getTagElementIndex, 
         addTagElement,
         addTag, 
-        // removeTagElement,
         removeTag, 
         getNumBlankTagElements,
         tagElements,
@@ -91,26 +91,37 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
 
     /**
-     * Add current tag to ```noteEntity.tags``` if not present and update ```tag``` state
+     * Add current tag to ```noteEntity.tags``` if not present and update ```tag``` state. Focusses new tag
      */
     function handleNewTag(): void {
 
         if (isTagElementContainedInNoteEntity() || isTagValueBlank())
             return;
         
-        const tag = {name: getTagElementValue()};
+        const tagEntity = {name: getTagElementValue()};
 
         // add to note
-        addTag(tag);
+        addTag(tagEntity);
 
         // update state
-        setTag(tag);
+        setTag(tagEntity);
+
+        // focus new tag
+        setTimeout(() => {
+            focusNextTagInput();
+        }, 10);
     }
 
 
     function handleRemoveTag(event): void {
         
         removeTag(getTagElementIndex(propsKey));
+    }
+
+
+    function focusNextTagInput(): void {
+
+        $(componentRef.current!).next().find("input").trigger("focus");
     }
 
 
@@ -222,6 +233,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
             className={className}
             style={style}
             flexWrap="nowrap"
+            ref={componentRef}
             {...otherProps}
         >
             <input 

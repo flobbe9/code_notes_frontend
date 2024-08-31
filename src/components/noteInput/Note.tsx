@@ -13,7 +13,7 @@ import AddNewNoteInput from "./AddNewNoteInput";
 import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
 import { NoteEntity } from "../../abstract/entites/NoteEntity";
 import { NoteInputType } from "../../abstract/NoteInputType";
-import { getJsxElementIndexByKey, getRandomString, log } from '../../helpers/utils';
+import { confirmPageUnload, getJsxElementIndexByKey, getRandomString, log } from '../../helpers/utils';
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { AppContext } from "../App";
 import { StartPageContentContext } from "../StartPageContent";

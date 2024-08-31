@@ -1,13 +1,13 @@
 @import "./global/functions.scss";
 
 .Note {
-    background-color: var(--vsCodeBlack);
+    background-color: var(--matteBlack);
     border-radius: var(--borderRadius);
     margin-bottom: 65px;
     padding: 15px;
 
     .deleteNoteButton, .saveNoteButton {
-        background-color: var(--vsCodeBlackLight);
+        background-color: var(--matteBlackLight);
     }
 
     .deleteNoteButton {

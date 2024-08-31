@@ -3,7 +3,7 @@ import "../../assets/styles/PlainTextNoteInput.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import Flex from "../helpers/Flex";
-import { cleanUpSpecialChars, getClipboardText, isBlank, log, setClipboardText } from "../../helpers/utils";
+import { cleanUpSpecialChars, getClipboardText, getCssConstant, isBlank, log, setClipboardText } from "../../helpers/utils";
 import sanitize from "sanitize-html";
 import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
 import { AppContext } from "../App";
@@ -35,14 +35,10 @@ export default function PlainTextNoteInput({
     ...props}: Props) {
     
     const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
-    const [parsing, setParsing] = useState(false);
+    const [isParsing, setIsParsing] = useState(false);
     const [inputDivValue, setInputDivValue] = useState<any>()
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
-
-    const { 
-        getAppOverlayZIndex
-    } = useContext(AppContext);
 
     const { numNoteInputsParsing, setNumNoteInputsParsing } = useContext(NoteContext);
     
@@ -73,10 +69,12 @@ export default function PlainTextNoteInput({
 
 
     useEffect(() => {
-        updateNumNoteInputsParsing();
-
-    }, [parsing]);
-
+        // decrease num isParsing inputs
+        if (!isParsing && numNoteInputsParsing > 0)
+            setNumNoteInputsParsing(numNoteInputsParsing - 1);
+            
+    }, [isParsing]);
+    
 
     function handleFocus(event): void {
         
@@ -113,9 +111,10 @@ export default function PlainTextNoteInput({
      */
     async function parseCodeTextToCodeHtml(): Promise<string> {
 
-        // notify parsing process has started (should not take long here)
-        setParsing(true);
+        // notify isParsing process has started (should not take long here)
+        setIsParsing(true);
         setNoteInputOverlayVisible(true);
+        setNumNoteInputsParsing(numNoteInputsParsing + 1);
 
         const parsedText = await new Promise<string>((res, rej) => {
             setTimeout(() => {
@@ -144,7 +143,7 @@ export default function PlainTextNoteInput({
                 })
 
                 res(inputHtmlString);
-            }, 100); // wait for states to update
+            }, 0); // somehow necessary for states to update properly, 0 milliseconds is fine
         });
 
         // sanitize
@@ -152,11 +151,8 @@ export default function PlainTextNoteInput({
         
         updateAppUserEntity();
         
-        setTimeout(() => {
-            setParsing(false);
-            setNoteInputOverlayVisible(false);
-
-        }, 1); // states wont update correctly without this
+        setIsParsing(false);
+        setNoteInputOverlayVisible(false);
 
         return sanitizedInputDivValue;
     }
@@ -252,20 +248,6 @@ export default function PlainTextNoteInput({
     }
 
 
-    /**
-     * Increase the ```numNoteInputsParsing``` by 1 if noteInput is currently parsing, or else decrease it by 1 
-     * (but never go below 0).
-     */
-    function updateNumNoteInputsParsing(): void {
-
-        if (parsing)
-            setNumNoteInputsParsing(numNoteInputsParsing + 1);
-        
-        else if (numNoteInputsParsing > 0)
-            setNumNoteInputsParsing(numNoteInputsParsing - 1);
-    }
-
-
     function cleanUpEmptyInputDiv(event): void {
 
         const inputDiv = $(inputDivRef.current!);
@@ -306,7 +288,7 @@ export default function PlainTextNoteInput({
         const inputDiv = $(inputDivRef.current!);
         const plainTextNoteInput = inputDiv.parents(".PlainTextNoteInput");
 
-        const appOverlayZIndex = getAppOverlayZIndex();
+        const appOverlayZIndex = getCssConstant("overlayZIndex");
 
         plainTextNoteInput.css({
             position: "fixed",
@@ -394,7 +376,7 @@ export default function PlainTextNoteInput({
             {/* Copy button */}
             <Button
                 className="defaultNoteInputButton copyButton"
-                disabled={parsing}
+                disabled={isParsing}
                 title="Copy"
                 onClick={handleCopyClick}
             >

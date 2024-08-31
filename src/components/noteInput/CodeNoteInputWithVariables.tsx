@@ -6,7 +6,7 @@ import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import hljs from "highlight.js";
-import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, setClipboardText } from "../../helpers/utils";
+import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, log, setClipboardText } from "../../helpers/utils";
 import sanitize from "sanitize-html";
 import { VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_START_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../helpers/constants";
 import { AppContext } from "../App";
@@ -55,10 +55,7 @@ export default function CodeNoteInputWithVariables({
     
     const inputDivRef = useRef(null);
 
-    const { 
-        isKeyPressed, 
-        getAppOverlayZIndex
-    } = useContext(AppContext);
+    const { isKeyPressed } = useContext(AppContext);
 
     const { numNoteInputsParsing, setNumNoteInputsParsing } = useContext(NoteContext);
 
@@ -91,8 +88,10 @@ export default function CodeNoteInputWithVariables({
 
 
     useEffect(() => {
-        updateNumNoteInputsParsing();
-
+        // decrease num parsing inputs
+        if (!isParsing && numNoteInputsParsing > 0)
+            setNumNoteInputsParsing(numNoteInputsParsing - 1);
+            
     }, [isParsing]);
 
 
@@ -130,6 +129,7 @@ export default function CodeNoteInputWithVariables({
 
         setIsParsing(true);
         setNoteInputOverlayVisible(true);
+        setNumNoteInputsParsing(numNoteInputsParsing + 1);
 
         const highlightPromise = await new Promise<string>((res, rej) => {
             setTimeout(() => {
@@ -178,9 +178,8 @@ export default function CodeNoteInputWithVariables({
 
                 inputDiv.html(highlightedHtmlString);
 
-                
-                res("highlightedHtmlString"); 
-            }, 100); // wait for state to update
+                res(highlightedHtmlString); 
+            }, 0); // somehow necessary for states to update properly, 0 milliseconds is fine
         });
         
         setInputHighlighted(true);
@@ -200,22 +199,20 @@ export default function CodeNoteInputWithVariables({
     async function unHighlightInputDivContent(): Promise<string> {
 
         const unHighlightedContent = await new Promise<string>((res, rej) => {
-            setTimeout(() => {
-                const inputDiv = $(inputDivRef.current!);
-                const inputHtml = inputDiv.html();
+            const inputDiv = $(inputDivRef.current!);
+            const inputHtml = inputDiv.html();
 
-                // remove highlights
-                let sanitizedInputHtml = sanitizeForInputDiv(inputHtml);
+            // remove highlights
+            let sanitizedInputHtml = sanitizeForInputDiv(inputHtml);
 
-                // convert inputs
-                sanitizedInputHtml = parseVariableInputToVariableInputSequence(sanitizedInputHtml);
+            // convert inputs
+            sanitizedInputHtml = parseVariableInputToVariableInputSequence(sanitizedInputHtml);
 
-                inputDiv.html(sanitizedInputHtml);
+            inputDiv.html(sanitizedInputHtml);
 
-                setInputHighlighted(false);
-                
-                res(sanitizedInputHtml);
-            }, 10); // wait for states to update
+            setInputHighlighted(false);
+            
+            res(sanitizedInputHtml);
         });
 
         return unHighlightedContent;
@@ -466,20 +463,6 @@ export default function CodeNoteInputWithVariables({
 
         return values;
     }
-    
-
-    /**
-     * Increase the ```numNoteInputsParsing``` by 1 if noteInput is currently parsing, or else decrease it by 1 
-     * (but never go below 0).
-     */
-    function updateNumNoteInputsParsing(): void {
-
-        if (isParsing)
-            setNumNoteInputsParsing(numNoteInputsParsing + 1);
-        
-        else if (numNoteInputsParsing > 0)
-            setNumNoteInputsParsing(numNoteInputsParsing - 1);
-    }
 
 
     /**
@@ -584,7 +567,7 @@ export default function CodeNoteInputWithVariables({
         const defaultCodeNoteInput = inputDiv.parents(".DefaultCodeNoteInput");
         const inputDivContainer = inputDiv.parents(".inputDivContainer");
 
-        const appOverlayZIndex = getAppOverlayZIndex();
+        const appOverlayZIndex = getCssConstant("overlayZIndex");
 
         defaultCodeNoteInput.css({
             position: "fixed",

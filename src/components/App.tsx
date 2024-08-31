@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useRef, useState } from 'react';
 import '../assets/styles/App.scss';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { getCSSValueAsNumber, isNumberFalsy, stringToNumber } from '../helpers/utils';
+import { confirmPageUnload, getCSSValueAsNumber, isNumberFalsy, log, stringToNumber } from '../helpers/utils';
 import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
 import useKeyPress from '../hooks/useKeyPress';
@@ -11,6 +11,7 @@ import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { AppUserRole } from '../abstract/AppUserRole';
 import { NoteInputType } from '../abstract/NoteInputType';
 import Popup from './helpers/Popup';
+import Confirm from './helpers/Confirm';
 
 
 /**
@@ -19,7 +20,8 @@ import Popup from './helpers/Popup';
 // IDEA: consider changing the component names
 // TODO:
     // search
-    // replace parsing states with checkbox states
+    // drag and drop noteInputs
+    // test new rendered condition
 export default function App() {
 
     const [appUserEntity, setAppUserEntity] = useState<AppUserEntity>(mockAppUserEntity);
@@ -79,12 +81,8 @@ export default function App() {
         window.addEventListener("keydown", handleWindowKeyDown);
         window.addEventListener("keyup", handleWindowKeyUp);
         window.addEventListener("resize", handleWindowResize);
+        confirmPageUnload(handlePageUnload);
 
-        return () => {
-            window.removeEventListener("keydown", handleWindowKeyDown);
-            window.removeEventListener("keyup", handleWindowKeyUp);
-            window.removeEventListener("resize", handleWindowResize);
-        }
     }, []);
 
 
@@ -205,19 +203,21 @@ export default function App() {
     }
 
 
-    function toggleAppOverlay(): void {
+    function handlePageUnload(event: Event): void {
 
-        setIsAppOverlayVisible(!isAppOverlayVisible);
+        setPopupContent(
+            <Confirm
+                heading={<h3>Save changes?</h3>}
+                message={"There are some unsaved changes. Would you like to save them?"}
+                confirmLabel="Save"
+                cancelLabel="Don't save"
+                onConfirm={(event) => log("saving...")} // TODO: implement save
+            />
+        );
+
+        setIsPopupVisible(true);
     }
     
-
-    function getAppOverlayZIndex(): number {
-
-        const appOverlay = $("#OverlayApp");
-
-        return stringToNumber(appOverlay.css("zIndex"));
-    }
-
 
     return (
         <AppContext.Provider value={context}>

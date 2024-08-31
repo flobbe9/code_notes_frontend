@@ -294,13 +294,6 @@ export function getCursorIndex(textInputId: string): number {
 }
 
 
-function confirmPageUnloadEvent(event): void {
-
-    event.preventDefault();
-    event.returnValue = "";
-}
-
-
 /**
  * Create a hidden ```<a href="url" download></a>``` element, click it and remove it from the dom afterwards. Optionally handle
  * given url with {@link fetchAnyReturnBlobUrl} first.
@@ -426,23 +419,26 @@ export function getTextWidth(text: string, fontSize: string, fontFamily: string,
 
 
 /**
- * Confirm page refresh, tab close and window close with browser popup.<p>
+ * Confirm page refresh, tab close and window close with browser popup. Will show browser confirm alert first, 
+ * then execute given callback.
  * 
  * Do nothing if ```API_ENV``` is "dev".
+ * 
+ * @param callback with "beforeunload" event param to execute after default has been prevnted
+ * @param dontConfirmInDev indicates whether to avoid confirm alert if env is "development". Defautl is ```true```
  */
-export function confirmPageUnload(): void {
+export function confirmPageUnload(callback?: (event) => void, dontConfirmInDev = true): void {
 
-    if (ENV === "development")
+    if (ENV === "development" && dontConfirmInDev)
         return;
 
     // confirm page refresh / tab close / window close
-    window.addEventListener("beforeunload", confirmPageUnloadEvent);
-}
+    window.addEventListener("beforeunload", (event) => {
+        event.preventDefault();
 
-
-export function removeConfirmPageUnloadEvent(): void {
-
-    window.removeEventListener("beforeunload", confirmPageUnloadEvent);
+        if (callback)
+            callback(event);
+    });
 }
 
 

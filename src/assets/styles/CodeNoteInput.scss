@@ -1,5 +1,5 @@
 .CodeNoteInput {
-    background-color: var(--vsCodeBlack);
+    background-color: var(--matteBlack);
     
     &.fullScreen {
         border-radius: var(--borderRadius); // for full screen mode
@@ -9,19 +9,19 @@
     .editorContainer {
         // = <Editor /> tag
         section {
-            background-color: var(--vsCodeBlack);
+            background-color: var(--matteBlack);
             color: white;
 
             .vsCodeEditor {
                 margin: 3px;
                 
                 .overflow-guard {
-                    background-color: var(--vsCodeBlack);
+                    background-color: var(--matteBlack);
 
                     // line number container
                     .margin {
                         display: none;
-                        background-color: var(--vsCodeBlack);
+                        background-color: var(--matteBlack);
                         left: -20px;
                         
                         .margin-view-overlays, .current-line.current-line-margin-both {
@@ -43,7 +43,7 @@
                     }
                     
                     .lines-content {
-                        background-color: var(--vsCodeBlack);
+                        background-color: var(--matteBlack);
 
                         // line container
                         .view-lines {
