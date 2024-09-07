@@ -10,6 +10,7 @@ import Overlay from "../helpers/Overlay";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
 import { NoteContext } from "./Note";
 import { AppContext } from "../App";
+import Confirm from "../helpers/Confirm";
 
 
 interface Props extends DefaultProps {
@@ -45,7 +46,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     const componentRef = useRef(null);
 
-    const { isAppOverlayVisible, setIsAppOverlayVisible } = useContext(AppContext);
+    const { isAppOverlayVisible, setIsAppOverlayVisible, setPopupContent } = useContext(AppContext);
 
     const { noteEntity, noteInputs, setNoteInputs, numNoteInputsParsing } = useContext(NoteContext);
 
@@ -93,11 +94,15 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     function handleDeleteNote(event): void {
 
-        // TODO: confirm
-
-        deleteNote();
+        setPopupContent((
+            <Confirm 
+                heading={<h3>Delete this section?</h3>}
+                message={`Are you sure you want to delete this section of the '${noteEntity.title}' note?`}
+                onConfirm={deleteNote}
+            />
+        ));
+        
     }
-
 
 
     function deleteNote(): void {

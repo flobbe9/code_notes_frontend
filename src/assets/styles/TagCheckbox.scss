@@ -1,0 +1,25 @@
+@import "./global/functions.scss";
+
+
+.TagCheckbox {
+    border-color: white;
+    height: fit-content !important;
+    line-break: anywhere;
+    margin: 10px 0;
+    min-height: 50px;
+    width: fit-content !important;
+
+    // case: input not checked and not disabled
+    &:has(.checkboxInput:not(:disabled):not(:checked)):hover {
+        @include hover();
+    }
+        
+    // case: focused
+    &:has(.checkboxInput:focus) {
+        @include focusOutline(white);
+    }
+
+    .checkboxContent {
+        margin: 0 10px;
+    }   
+}

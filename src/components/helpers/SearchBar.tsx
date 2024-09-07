@@ -13,6 +13,9 @@ interface Props extends HelperProps {
     placeHolder?: string,
     /** Indicates whether to hide the x button that clears the search value. Default is ```false``` */
     hideXIcon?: boolean,
+
+    onXIconClick?: (event) => void,
+
     /** Default is {} */
     _searchIcon?: CSSProperties,
     /** Default is {} */
@@ -36,8 +39,10 @@ export default forwardRef(function SearchBar(
         onKeyDown,
         onKeyUp,
         onClick,
+        onXIconClick,
         onFocus,
         onBlur,
+        onChange,
         _searchIcon = {},
         _searchInput = {},
         _xIcon = {},
@@ -61,7 +66,13 @@ export default forwardRef(function SearchBar(
 
     function handleXIconClick(event): void {
 
+        if (disabled)
+            return;
+
         clearInputValue();
+
+        if (onXIconClick)
+            onXIconClick(event);
     }
 
 
@@ -71,7 +82,21 @@ export default forwardRef(function SearchBar(
     }
 
 
-    function handleFocus(event): void {
+    function handleClick(event): void {
+
+        if (disabled)
+            return;
+
+        setIsFocus(true);
+
+        $(inputRef.current!).trigger("focus");
+
+        if (onClick)
+            onClick(event);
+    }
+
+
+    function handleInputFocus(event): void {
 
         if (disabled)
             return;
@@ -125,6 +150,7 @@ export default forwardRef(function SearchBar(
             flexWrap="nowrap"
             verticalAlign="center"
             ref={componentRef}
+            onClick={handleClick}
             _hover={_hover}
             {...otherProps}
         >
@@ -146,8 +172,9 @@ export default forwardRef(function SearchBar(
                 onClick={onClick}
                 onKeyDown={onKeyDown}
                 onKeyUp={onKeyUp}
-                onFocus={handleFocus}
+                onFocus={handleInputFocus}
                 onBlur={handleBlur}
+                onChange={onChange}
             />
 
             {/* X icon */}

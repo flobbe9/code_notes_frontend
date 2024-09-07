@@ -8,18 +8,33 @@
     transition: border var(--transitionTime);
 
     // case: hover or focus on code noteInput with vars
-    &:has(.PlainTextNoteInput:hover), &:has(.ContentEditableDiv:focus) {
+    &:has(.PlainTextNoteInput .ContentEditableDiv:focus) {
         border-color: var(--plainTextNoteInputColor);
+    }
+    @include customHover {
+        &:has(.PlainTextNoteInput) {
+            border-color: var(--plainTextNoteInputColor);
+        }
     }
 
     // case: hover or focus on code noteInput
-    &:has(.CodeNoteInput:hover), &:has(.vsCodeEditor textarea:focus) {
+    &:has(.vsCodeEditor textarea:focus) {
         border-color: var(--codeNoteInputColor);
     }
+    @include customHover {
+        &:has(.CodeNoteInput) {
+            border-color: var(--codeNoteInputColor);
+        }
+    }
 
-    // case: hover or focus on plain text
-    &:has(.CodeNoteInputWithVariables:hover), &:has(.ContentEditableDiv:focus) {
+    // case: hover or focus on code noteinput with variables
+    &:has(.CodeNoteInputWithVariables .ContentEditableDiv:focus) {
         border-color: var(--codeNoteInputWithVariablesColor);
+    }
+    @include customHover {
+        &:has(.CodeNoteInputWithVariables) {
+            border-color: var(--codeNoteInputWithVariablesColor);
+        }
     }
 
     .noteInputContent {

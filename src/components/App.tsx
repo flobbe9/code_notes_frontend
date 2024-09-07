@@ -17,28 +17,27 @@ import Confirm from './helpers/Confirm';
 /**
  * @since 0.0.1
  */
-// IDEA: consider changing the component names
-// TODO:
-    // search
+// IDEA: 
     // drag and drop noteInputs
-    // test new rendered condition
 export default function App() {
 
     const [appUserEntity, setAppUserEntity] = useState<AppUserEntity>(mockAppUserEntity);
-
+    
     const [toastSummary, setToastSummary] = useState("");
     const [toastMessage, setToastMessage] = useState("");
     const [toastSevirity, setToastSevirity] = useState<ToastSevirity>("info");
     const [toastScreenTimeTimeout, setToastScreenTimeTimeout] = useState<NodeJS.Timeout>();
-
+    
     const [isAppOverlayVisible, setIsAppOverlayVisible] = useState(false);
     const [isAppOverlayHideOnClick, setIsAppOverlayHideOnClick] = useState(true);
     const [isAppOverlayHideOnEscape, setIsAppOverlayHideOnEscape] = useState(true);
-
+    
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [popupContent, setPopupContent] = useState<JSX.Element | JSX.Element[]>([]);
-
+    
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
+
+    const [hasAppRendered, setHasAppRendered] = useState(false);
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -78,12 +77,23 @@ export default function App() {
 
     
     useEffect(() => {
+        setHasAppRendered(true);
+
         window.addEventListener("keydown", handleWindowKeyDown);
         window.addEventListener("keyup", handleWindowKeyUp);
         window.addEventListener("resize", handleWindowResize);
-        confirmPageUnload(handlePageUnload);
 
     }, []);
+
+
+    useEffect(() => {
+        if (hasAppRendered) {
+            log("asdf")
+        
+            setIsPopupVisible(true);
+        }
+
+    }, [popupContent])
 
 
     /**
@@ -201,22 +211,6 @@ export default function App() {
 
         handleKeyUpUseKeyPress(event);
     }
-
-
-    function handlePageUnload(event: Event): void {
-
-        setPopupContent(
-            <Confirm
-                heading={<h3>Save changes?</h3>}
-                message={"There are some unsaved changes. Would you like to save them?"}
-                confirmLabel="Save"
-                cancelLabel="Don't save"
-                onConfirm={(event) => log("saving...")} // TODO: implement save
-            />
-        );
-
-        setIsPopupVisible(true);
-    }
     
 
     return (
@@ -293,14 +287,15 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
     "$2a$10$e4k/4uTWn/fnWA8KEYs/Zu.W1b4OWK82rXgwpZsvFhPPbFaYjZlBi",
     AppUserRole.USER,
     [
-        {
-          name: "tag14"
-        }
+        { name: "tag14" },
+        { name: "docker" },
+        { name: "linux" },
+        { name: "other stuff" }
     ],
     [
       {
         id: 20,
-        title: "note20",
+        title: "bash into",
         noteInputs: [
             {
                 value: "const x = 3;\n\nadsf\nasdf",
@@ -313,7 +308,11 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
                 programmingLanguage: "_auto"
             },
         ],
-        tags: []
+        tags: [
+            {
+                name: "other stuff"
+            }
+        ]
       },
       {
         id: 19,
@@ -329,16 +328,23 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
                 programmingLanguage: "_auto"
             },
         ],
-        tags: []
+        tags: [
+            {
+                name: "docker"
+            },
+            {
+                name: "linux"
+            }
+        ]
       },
       {
         id: 18,
-        title: "note18",
+        title: "win bash",
         noteInputs: [
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
                 type: NoteInputType.CODE_WITH_VARIABLES,
-                programmingLanguage: "_auto"
+                programmingLanguage: "_auto",
             },
             {
                 value: "<div>docker exec -<span class='hljs-keyword'>it</span> <input type='text' style='width: 110.375px' class='variableInput' placeholder='CONTAINER_ID'> /bin/bash</div>",
@@ -348,7 +354,7 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
         ],
         tags: [
             {
-                name: "tag14"
+                name: "tag14",
             }
         ]
       }

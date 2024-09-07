@@ -160,7 +160,7 @@ export default forwardRef(function Button({
     return (
         <button 
             id={id} 
-            className={className + (isDefaultDisabledStyle() ? " disabledButton" : "") + " dontSelectText"}
+            className={className + (isDefaultDisabledStyle() ? " disabledButton" : "") + " dontSelectText " + (!rendered && "hidden")}
             ref={componentRef}
             style={{
                 ...style,
@@ -168,7 +168,6 @@ export default forwardRef(function Button({
                 ...(isMouseDown && !disabled ? _click : {}),
                 ...(isDisabled ? _disabled : {})
             }}
-            hidden={!rendered}
             disabled={isDisabled}
             title={title}
             type={type}

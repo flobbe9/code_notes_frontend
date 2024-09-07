@@ -20,6 +20,7 @@ interface Props extends DefaultProps {
 
 
 /**
+ * @parent ```<NoteTagList>```
  * @since 0.0.1
  */
 export default function TagInput({initialTag, propsKey, ...props}: Props) {

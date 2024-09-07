@@ -1086,7 +1086,7 @@ export async function setClipboardText(text: string): Promise<void> {
 
 /**
  * @param eventKey to check
- * @param includeEnter whether to return ```true``` if event key equals "Enter"
+ * @param includeEnter whether to return ```true``` if event key equals "Enter". Default is ```true```
  * @returns ```true``` if given eventKey would take up space when inserted into a text input
  */
 export function isEventKeyTakingUpSpace(eventKey: string, includeEnter = true): boolean {
@@ -1095,6 +1095,13 @@ export function isEventKeyTakingUpSpace(eventKey: string, includeEnter = true): 
         return false;
 
     return eventKey.length === 1 || (includeEnter && eventKey === "Enter");
+}
+
+
+export function isEventKeyRemovingKey(eventKey: string): boolean {
+
+    return eventKey === "Backspace" ||
+           eventKey === "Delete";
 }
 
 

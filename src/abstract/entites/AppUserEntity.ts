@@ -45,7 +45,7 @@ export class AppUserEntity extends AbstractEntity {
 
 
     /**
-     * Adds given tag to ```this.tags```if not yet exists.
+     * Adds given tag to ```this.tags``` if not yet exists.
      * 
      * @param tagEntity to add to ```this.tags```
      */
@@ -55,7 +55,7 @@ export class AppUserEntity extends AbstractEntity {
             this.tags = [];
 
         if (!this.isTagEntityPresentInANote(tagEntity))
-            this.tags?.push(tagEntity);
+            this.tags.push(tagEntity);
     }
 
 
@@ -84,8 +84,10 @@ export class AppUserEntity extends AbstractEntity {
         if (!tag || !this.notes)
             return false;
 
-        return !!this.notes.find(noteEntity => 
-                    !!(noteEntity.tags || []).find(tagEntity => 
+        return !!this.notes
+            .find(noteEntity => 
+                !!(noteEntity.tags || [])
+                    .find(tagEntity => 
                         tag.name === tagEntity.name))
     }
 

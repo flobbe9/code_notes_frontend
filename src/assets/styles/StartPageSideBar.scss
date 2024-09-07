@@ -9,6 +9,7 @@
 }
 
 .StartPageSideBar {
+    background-color: var(--matBlueLight);
     min-height: 100vh;
     
     .toolBar {
@@ -30,7 +31,6 @@
     }
     
     .tagFilterContainer {
-        background-color: var(--matBlueLight);
         border-radius: var(--borderRadius);
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
@@ -58,6 +58,11 @@
             background-color: transparent;
             color: white;
             padding: 3px 5px;
+        }
+
+        .startPageSideBarListContainer {
+            overflow: auto;
+            @include scrollBar();
         }
     }
 }

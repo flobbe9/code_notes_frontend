@@ -1,6 +1,7 @@
 @import "./global/functions.scss";
 
 .StartPageContent {
+    overflow: hidden;
     padding: 0 5px;
 
     .AddNewNoteButton {

@@ -35,8 +35,6 @@ export default forwardRef(function(
         disableFlex = false,
         flexDirection = "row",
         flexWrap = "wrap",
-        onClick,
-        title = "",
         rendered = true,
         _hover = {},
         ...props
@@ -58,11 +56,9 @@ export default forwardRef(function(
                 flexWrap: flexWrap,
                 justifyContent: horizontalAlign,
             }}
-            _hover={_hover}
-            title={title}
             ref={ref}
-            onClick={onClick}
-            rendered={rendered}
+            hidden={!rendered}
+            _hover={_hover}
             {...otherProps}
         >
             {children}

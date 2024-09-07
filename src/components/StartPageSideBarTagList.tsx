@@ -1,14 +1,18 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "../assets/styles/StartPageSideBarTagList.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import Checkbox from "./helpers/Checkbox";
 import { AppContext } from "./App";
 import { TagEntity } from "../abstract/entites/TagEntity";
-import { getRandomString, isBooleanFalsy, log } from "../helpers/utils";
+import { getRandomString, includesIgnoreCaseTrim, isBlank, isBooleanFalsy, log } from "../helpers/utils";
 import { StartPageContainerContext } from "./StartPageContainer";
+import { StartPageSideBarContext } from "./StartPageSideBar";
+import TagCheckbox from "./TagCheckbox";
+import { matchStringsConsiderWhiteSpace } from "../helpers/searchUtils";
+import HelperProps from "../abstract/HelperProps";
+import HelperDiv from "./helpers/HelperDiv";
 
 
-interface Props extends DefaultProps {
+interface Props extends HelperProps {
 
 }
 
@@ -18,14 +22,17 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function StartPageSideBarTagList({...props}: Props) {
+export default function StartPageSideBarTagList({disabled, ...props}: Props) {
 
     const [tags, setTags] = useState<JSX.Element[]>([]);
 
     const { appUserEntity } = useContext(AppContext);
     const { updateSideBarStates } = useContext(StartPageContainerContext);
+    const { searchValue } = useContext(StartPageSideBarContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBarTagList", true);
+
+    const componentRef = useRef(null);
 
 
     useEffect(() => {
@@ -34,46 +41,67 @@ export default function StartPageSideBarTagList({...props}: Props) {
     }, [updateSideBarStates]);
 
 
-    function updateTags(): void {
+    useEffect(() =>  {
+        handleSearch(searchValue);
+
+    }, [searchValue])
+
+
+    function handleSearch(searchValue: string): void {
+
+        updateTags(filterTagsBySearchValue(searchValue));
+    }
+
+
+    function updateTags(tagEntities = appUserEntity.tags): void {
 
         if (!isBooleanFalsy(updateSideBarStates))
-            setTags(mapTags());
+            setTags(mapTags(tagEntities));
     }
 
 
-    function mapTags(): JSX.Element[] {
+    function mapTags(tagEntities = appUserEntity.tags): JSX.Element[] {
 
-        if (!appUserEntity.tags)
+        if (!tagEntities)
             return [];
 
-        return appUserEntity.tags.map(tagEntity => 
-            getTag(tagEntity));
+        return tagEntities.map(tagEntity => 
+            getTagCheckboxElement(tagEntity));
     }
 
 
-    function getTag(tagEntity: TagEntity): JSX.Element {
+    function getTagCheckboxElement(tagEntity: TagEntity): JSX.Element {
 
-        return (
-            <Checkbox
-                dontHideChildren
-                key={getRandomString()}
-                _checked={{borderColor: "var(--accentColor)"}}
-            >
-                {tagEntity.name}
-            </Checkbox>
-        );
+        return <TagCheckbox key={getRandomString()} tagEntity={tagEntity} disabled={disabled} />;
     }
+
+
+    function filterTagsBySearchValue(searchValue: string): TagEntity[] {
+
+        const allTagEntities = appUserEntity.tags || [];
+
+        // case: no search value or no tags at all
+        if (isBlank(searchValue) || !allTagEntities)
+            return allTagEntities;
+        
+        // iterate all tags
+        return allTagEntities
+            .filter(tagEntity =>
+                matchStringsConsiderWhiteSpace(searchValue, tagEntity.name));
+    }
+
 
     return (
-        <div 
+        <HelperDiv    
             id={id} 
             className={className}
             style={style}
+            ref={componentRef}
             {...otherProps}
         >
             {tags}
                            
             {children}
-        </div>
+        </HelperDiv>
     )
 }

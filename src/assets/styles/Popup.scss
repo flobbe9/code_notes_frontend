@@ -14,13 +14,16 @@
         padding: 10px;
         z-index: calc(var(--overlayZIndex) + 1);
 
+        // Header
         .popupXButton {
             background-color: transparent;
             padding: 0;
         }
 
+        // Body
         .popupContent {
             padding: 10px;
+            padding-top: 0;
         }
     }
 }

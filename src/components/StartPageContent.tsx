@@ -3,11 +3,14 @@ import "../assets/styles/StartPageContent.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Note from "./noteInput/Note";
 import SearchBar from "./helpers/SearchBar";
-import { getRandomString, isArrayFalsy, log } from "../helpers/utils";
+import { getRandomString, isArrayFalsy, isBlank, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import Flex from "./helpers/Flex";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import AddNewNoteButton from "./AddNewNoteButton";
+import { TagEntity } from "../abstract/entites/TagEntity";
+import { StartPageContainerContext } from "./StartPageContainer";
+import { useSearchNotes } from "../hooks/useSearchNotes";
 
 
 interface Props extends DefaultProps {
@@ -20,19 +23,36 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
+// TODO: 
+    // move selected tags?
+    // disabled sidebar tags and search bar if no notes, 
 export default function StartPageContent({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageContent", true);
-
+    
     const { appUserEntity, isKeyPressed } = useContext(AppContext);
-
+    
     const [notes, setNotes] = useState<JSX.Element[]>([]);
+    const [noteSearchValue, setNoteSearchValue] = useState("");
+    const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[]>([]);
+
+    const { getNoteSearchResults } = useSearchNotes();
+    const { selectedTagEntityNames } = useContext(StartPageContainerContext);
+
+
+    useEffect(() => {
+        handleSearch();
+
+    }, [selectedTagEntityNames]);
+
 
     const searchInputRef = useRef(null);
 
     const context = {
         notes,
         setNotes,
+
+        noteSearchResults,
 
         getNoteByNoteEntity
     }
@@ -59,6 +79,7 @@ export default function StartPageContent({...props}: Props) {
     }
 
 
+    // TOOD: map in revers for last to be on top?
     function mapNoteEntitiesToJsx(): JSX.Element[] {
 
         if (!appUserEntity.notes)
@@ -76,32 +97,68 @@ export default function StartPageContent({...props}: Props) {
     }
 
 
+    function handleSearchKeyDown(event): void {
+
+        if (event.key === "Enter")
+            handleSearch(event.target.value)
+    }
+
+
+    function handleSearchValueChange(event): void {
+
+        const currentSearchValue = event.target.value;
+
+        handleSearch(currentSearchValue);
+
+        setNoteSearchValue(currentSearchValue);
+    }
+
+
+    function handleSearchXIconClick(event): void {
+
+        handleSearch("");
+    }
+
+
+    function handleSearch(searchValue = noteSearchValue): void {
+
+        const searchResults = getNoteSearchResults(searchValue);
+
+        // setNotes(mapNoteEntitiesToJsx(searchResults));
+
+        // update search results state
+        setNoteSearchResults(searchResults);
+    }
+
+
     return (
         <StartPageContentContext.Provider value={context}>
-
             <div 
                 id={id} 
                 className={className + " fullWidth"}
                 style={style}
                 {...otherProps}
             >
+                {/* SearchBar */}
                 <Flex className="mt-3" flexWrap="nowrap" verticalAlign="center">
-                    {/* SearchBar */}
                     <SearchBar 
                         id="StartPage"
                         className="fullWidth" 
-                        placeHolder="Search for note Title, note Tag or note Text" 
+                        placeHolder="Search for note Title or Tag" 
                         title="Search notes (Ctrl+Shift+F)"
-                        hideXIcon
                         ref={searchInputRef}
+                        disabled={!appUserEntity.notes?.length}
+                        onChange={handleSearchValueChange}
+                        onKeyUp={handleSearchKeyDown}
+                        onXIconClick={handleSearchXIconClick}
                         _focus={{borderColor: "var(--accentColor)"}}
                         _searchIcon={{color: "var(--matteBlackLight)"}}
                     />
                 </Flex>
 
+                {/* New Note Button */}
                 <Flex className="mt-2 mb-5" horizontalAlign="right">
-                    {/* New Note Button */}
-                    <AddNewNoteButton />
+                    <AddNewNoteButton className={notes.length ? "" : "hover"} />
                 </Flex>
 
                 {/* Notes */}
@@ -117,6 +174,8 @@ export default function StartPageContent({...props}: Props) {
 export const StartPageContentContext = createContext({
     notes: [<></>],
     setNotes: (notes: JSX.Element[]) => {},
+
+    noteSearchResults: [] as NoteEntity[],
 
     getNoteByNoteEntity: (noteEntity: NoteEntity) => {return <></>}
 })

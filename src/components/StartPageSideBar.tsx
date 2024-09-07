@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import "../assets/styles/StartPageSideBar.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Flex from "./helpers/Flex";
 import SearchBar from "./helpers/SearchBar";
-import { JQueryEasing } from "../abstract/CSSTypes";
-import { getCssConstant, log } from "../helpers/utils";
+import { getCssConstant } from "../helpers/utils";
 import { AppContext } from "./App";
 import StartPageSideBarTagList from "./StartPageSideBarTagList";
 import { StartPageContainerContext } from "./StartPageContainer";
@@ -23,15 +22,27 @@ interface Props extends DefaultProps {
 // IDEA: filter icon
 // TODO: 
     // consider heading like "Filter by tag", remove hr
+    // give tags differen border radius?
 export default function StartPageSideBar({...props}: Props) {
+
+    /** Tag search value eagerly updated on change event */
+    const [searchValue, setSearchValue] = useState("");
+
+    /** Refers to ```selectedTagEntityNames``` beeing not empty */
+    const [anyTagsSelected, setAnyTagsSelected] = useState(false);
+
+    const { appUserEntity, getDeviceWidth, isKeyPressed } = useContext(AppContext);
+    const { setIsShowSideBar, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
 
     const componentRef = useRef(null);
     const tagFilterContainerRef = useRef(null);
+    const searchBarRef = useRef(null);
 
-    const { getDeviceWidth, isKeyPressed } = useContext(AppContext);
-    const { setIsShowSideBar } = useContext(StartPageContainerContext);
+    const context = {
+        searchValue
+    }
 
 
     useEffect(() => {
@@ -41,6 +52,12 @@ export default function StartPageSideBar({...props}: Props) {
             window.removeEventListener("keydown", handleKeyDown);
         }
     }, []);
+
+
+    useEffect(() => {
+        setAnyTagsSelected(!!selectedTagEntityNames.size)
+
+    }, [selectedTagEntityNames]);
 
 
     function slideInTagFilterContainer(): void {
@@ -113,47 +130,87 @@ export default function StartPageSideBar({...props}: Props) {
     }
 
 
+    function handleSearchBarChange(event): void {
+
+        setSearchValue(event.target.value);
+    }
+
+
+    function handleSearchBarXIconClick(event): void {
+
+        setSearchValue("");
+    }
+
+
+    function handleResetClick(event): void {
+
+        setSelectedTagEntityNames(new Set());
+        $(searchBarRef.current!).val("");
+        setSearchValue("");
+    }
+
+
     return (
-        <div 
-            id={id} 
-            className={className}
-            style={style}
-            ref={componentRef}
-            {...otherProps}
-        >
-            <Flex className="fullHeight" flexWrap="nowrap">
-                {/* Toolbar button */}
-                <div className="toolBar">
-                    <Button className="toolBarToggleButton hover" onClick={toggleTagFilterContainer}>
-                        <i className="fa-solid fa-bars fa-xl" title="Side bar (Ctrl + B)"></i>
-                    </Button>
-                </div>
-
-                {/* Tag filter container */}
-                <div className="tagFilterContainer hidden" ref={tagFilterContainerRef}>
-                    <SearchBar 
-                        placeHolder="Search tags..."
-                        title="Search tags"
-                        _focus={{borderColor: "var(--accentColor)"}} 
-                        _searchIcon={{color: "var(--iconColor)"}}
-                        _searchInput={{color: "white"}} 
-                        _xIcon={{color: "var(--iconColor)"}}
-                    />
-
-                    {/* Reset tag filters */}
-                    <Flex className="mt-3" horizontalAlign="right">
-                        <Button className="resetButton hover" title="Reset tag filter">
-                            Reset   
+        <StartPageSideBarContext.Provider value={context}>
+            <div 
+                id={id} 
+                className={className}
+                style={style}
+                ref={componentRef}
+                {...otherProps}
+            >
+                <Flex className="fullHeight" flexWrap="nowrap">
+                    {/* Fixed sidebar part*/}
+                    <div className="toolBar">
+                        <Button className="toolBarToggleButton hover" onClick={toggleTagFilterContainer}>
+                            <i className="fa-solid fa-bars fa-xl" title="Side bar (Ctrl + B)"></i>
                         </Button>
-                    </Flex>
+                    </div>
 
-                    <hr />
+                    {/* Expandable sidebar part */}
+                    <div className="tagFilterContainer hidden" ref={tagFilterContainerRef}>
+                        {/* SearchBar */}
+                        <SearchBar 
+                            placeHolder="Search tags..."
+                            title="Search tags"
+                            disabled={!appUserEntity.notes?.length}
+                            onChange={handleSearchBarChange}
+                            onXIconClick={handleSearchBarXIconClick}
+                            ref={searchBarRef}
+                            _focus={{borderColor: "var(--accentColor)"}} 
+                            _searchIcon={{color: "var(--iconColor)"}}
+                            _searchInput={{color: "white"}} 
+                            _xIcon={{color: "var(--iconColor)"}}
+                        />
 
-                    <StartPageSideBarTagList />
-                </div>
-            </Flex>
-                
-            {children}
-        </div>
+                        {/* Reset button */}
+                        <Flex className="mt-3" horizontalAlign="right">
+                            <Button 
+                                className="resetButton hover" 
+                                title="Reset tag filter" 
+                                disabled={!anyTagsSelected}
+                                onClick={handleResetClick} 
+                            >
+                                Reset   
+                            </Button>
+                        </Flex>
+
+                        <hr />
+
+                        {/* Tag checkboxes */}
+                        <div className="startPageSideBarListContainer">
+                            <StartPageSideBarTagList disabled={!appUserEntity.notes?.length} />
+                        </div>
+                    </div>
+                </Flex>
+                    
+                {children}
+            </div>
+        </StartPageSideBarContext.Provider>
     )
 }
+
+
+export const StartPageSideBarContext = createContext({
+    searchValue: ""
+})

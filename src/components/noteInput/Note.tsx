@@ -22,10 +22,12 @@ import { TagEntityService } from './../../abstract/services/TagEntityService';
 import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityService";
 import { NoteEntityService } from './../../abstract/services/NoteEntityService';
 import Confirm from "../helpers/Confirm";
+import HelperDiv from "../helpers/HelperDiv";
 
 
 interface Props extends DefaultProps {
 
+    /** Assuming that this object is taken from ```appUserEntity```. */
     noteEntity: NoteEntity,
 
     propsKey: string
@@ -38,17 +40,18 @@ interface Props extends DefaultProps {
  * @parent ```<StartPageContent>```
  * @since 0.0.1
  */
-// TODO: 
-    // confirm leave if not saved
 export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Note");
+
+    const [isNoteInSearchResults, setIsNoteInSearchResults] = useState(true);
 
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
     const [aboutToSave, setAboutToSave] = useState(false);
 
     const { setIsPopupVisible, setPopupContent } = useContext(AppContext);
+    const { noteSearchResults } = useContext(StartPageContentContext);
 
     /** 
      * Number of noteInputs that are currently parsing or highlighting their values. Indicates whether the save() function should wait
@@ -89,12 +92,18 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     }, [numNoteInputsParsing]);
 
 
+    useEffect(() => {
+        setIsNoteInSearchResults(noteSearchResults.includes(noteEntity));
+
+    }, [noteSearchResults]);
+
+
     function mapNoteInputsToJsx(): JSX.Element[] {
 
         if (!noteEntity.noteInputs)
             return [];
 
-        return noteEntity.noteInputs.map((noteInputEntity, i) =>
+        return noteEntity.noteInputs.map(noteInputEntity =>
             getNoteInputByNoteInputType(noteInputEntity));
     }
 
@@ -176,8 +185,6 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
                 style={{maxWidth: "50vw"}}
             />
         );
-
-        setIsPopupVisible(true);
     }
 
 
@@ -234,11 +241,12 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     return (
         <NoteContext.Provider value={context}>
-            <div 
+            <HelperDiv 
                 id={id} 
                 className={className}
                 style={style}
                 ref={componentRef}
+                rendered={isNoteInSearchResults}
                 {...otherProps}
             >
                 <div className="contentContainer">
@@ -281,7 +289,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
                 </Flex>
 
                 {children}
-            </div>
+            </HelperDiv>
         </NoteContext.Provider>
     )
 }
