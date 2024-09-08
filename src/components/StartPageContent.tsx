@@ -3,14 +3,19 @@ import "../assets/styles/StartPageContent.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Note from "./noteInput/Note";
 import SearchBar from "./helpers/SearchBar";
-import { getRandomString, isArrayFalsy, isBlank, log } from "../helpers/utils";
+import { getRandomString, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import Flex from "./helpers/Flex";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import AddNewNoteButton from "./AddNewNoteButton";
-import { TagEntity } from "../abstract/entites/TagEntity";
 import { StartPageContainerContext } from "./StartPageContainer";
 import { useSearchNotes } from "../hooks/useSearchNotes";
+import CryptoJSImpl from "../abstract/CryptoJSImpl";
+import { CRYPTO_KEY, CRYPTO_IV, BACKEND_BASE_URL } from "../helpers/constants";
+import { AppUserRole } from "../abstract/AppUserRole";
+import { useAuth } from "../hooks/useAuth";
+import Button from "./helpers/Button";
+import fetchJson, { fetchAny } from "../helpers/fetchUtils";
 
 
 interface Props extends DefaultProps {
@@ -38,14 +43,7 @@ export default function StartPageContent({...props}: Props) {
 
     const { getNoteSearchResults } = useSearchNotes();
     const { selectedTagEntityNames } = useContext(StartPageContainerContext);
-
-
-    useEffect(() => {
-        handleSearch();
-
-    }, [selectedTagEntityNames]);
-
-
+    
     const searchInputRef = useRef(null);
 
     const context = {
@@ -56,6 +54,15 @@ export default function StartPageContent({...props}: Props) {
 
         getNoteByNoteEntity
     }
+
+
+    const { fetchLogout } = useAuth(appUserEntity.email, appUserEntity.password);
+
+
+    useEffect(() => {
+        handleSearch();
+
+    }, [selectedTagEntityNames]);
 
 
     useEffect(() => {
@@ -124,9 +131,6 @@ export default function StartPageContent({...props}: Props) {
 
         const searchResults = getNoteSearchResults(searchValue);
 
-        // setNotes(mapNoteEntitiesToJsx(searchResults));
-
-        // update search results state
         setNoteSearchResults(searchResults);
     }
 
@@ -159,6 +163,8 @@ export default function StartPageContent({...props}: Props) {
                 {/* New Note Button */}
                 <Flex className="mt-2 mb-5" horizontalAlign="right">
                     <AddNewNoteButton className={notes.length ? "" : "hover"} />
+                    <Button onClickPromise={async (event) => fetchLogout()}>Logout</Button>
+                    <Button onClickPromise={async (event) => await fetchAny(`${BACKEND_BASE_URL}/test`)}>test</Button>
                 </Flex>
 
                 {/* Notes */}

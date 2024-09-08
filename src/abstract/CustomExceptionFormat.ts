@@ -3,7 +3,7 @@
  * 
  * @since 0.0.1
  */
-export class ApiExceptionFormat {
+export class CustomExceptionFormat {
 
     status: number;
 

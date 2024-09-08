@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { ApiExceptionFormat } from "../abstract/ApiExceptionFormat";
+import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
 import { CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
 import { CSSProperties } from "react";
@@ -86,11 +86,11 @@ function logColored(sevirity: LogSevirity, obj?: any, ...optionalParams: any[]):
 
 
 /**
- * Log the all props of given {@link ApiExceptionFormat} response and include the stacktrace.
+ * Log the all props of given {@link CustomExceptionFormat} response and include the stacktrace.
  * 
- * @param response idealy formatted as {@link ApiExceptionFormat}
+ * @param response idealy formatted as {@link CustomExceptionFormat}
  */
-export function logApiResponse(response: ApiExceptionFormat): void {
+export function logApiResponse(response: CustomExceptionFormat): void {
 
     logError(getTimeStamp() + " " +  response.error + "(" + response.status + "): " + response.message + (response.path ? " " + response.path : ""));
 }
@@ -309,7 +309,7 @@ export function getCursorIndex(textInputId: string): number {
  * @param method http method to use for fetch. Default is "get"
  * @param body to send with the request
  * @param headers json object with strings as keys and values
- * @returns error response as {@link ApiExceptionFormat} if ```fetchBlob``` or nothing if all went well 
+ * @returns error response as {@link CustomExceptionFormat} if ```fetchBlob``` or nothing if all went well 
  */
 export async function downloadFileByUrl(url: string, 
                                         fileName?: string, 
@@ -317,7 +317,7 @@ export async function downloadFileByUrl(url: string,
                                         method = "get", 
                                         body?: object, 
                                         headers = {"Content-Type": "application/octet-stream"} 
-                                        ): Promise<ApiExceptionFormat | void> {
+                                        ): Promise<CustomExceptionFormat | void> {
 
     // case: fetch blob first
     if (fetchBlob) {
@@ -1041,27 +1041,6 @@ function prepend0ToNumber(num: number): string {
         str = "0" + str;
 
     return str;
-}
-
-
-/**
- * @param value to generate a hash for
- * @param config to pass to hash function
- * @returns ```toString()``` call on the generated ```CryptoJS.lib.WordArray```
- */
-export function hash(value: CryptoJS.lib.WordArray | string, config?: object): string {
-
-    return CryptoJS.SHA256(value, config).toString();
-}
-
-
-/**
- * @param date to generate a hash for
- * @returns ```this.hash()``` with the time stripped from the date and then passing ```date.getTime()``` to the hash function
- */
-export function hashDate(date = new Date()): string {
-
-    return hash(stripTimeFromDate(date).getTime().toString());
 }
 
 

@@ -7,6 +7,10 @@ export abstract class AbstractEntity {
 
     id?: number | null;
 
+    created?: string;
+
+    updated?: string;
+
 
     public constructor(id: number | null) {
         

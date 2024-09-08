@@ -1,5 +1,5 @@
-import { log } from "../../helpers/utils";
 import { AppUserRole } from "../AppUserRole";
+import CryptoJSImpl from "../CryptoJSImpl";
 import { AbstractEntity } from "./AbstractEntity";
 import { NoteEntity } from "./NoteEntity";
 import { TagEntity } from "./TagEntity";
@@ -11,6 +11,9 @@ import { TagEntity } from "./TagEntity";
  * @since 0.0.1
  */
 export class AppUserEntity extends AbstractEntity {
+
+    /** List of app user fields that need to be encrypted before caching the app user */
+    private static SENSITIVE_FIELDS = ["email", "password", "csrfToken"];
 
     email: string;
 
@@ -26,7 +29,9 @@ export class AppUserEntity extends AbstractEntity {
 
 
     public constructor(
-        id: number,
+        id: number | null,
+        created: string | undefined,
+        updated: string | undefined,
         email: string, 
         password: string, 
         role: AppUserRole, 
@@ -35,6 +40,8 @@ export class AppUserEntity extends AbstractEntity {
         csrfToken: string | null
     ) {
         super(id);
+        this.created = created;
+        this.updated = updated;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -93,10 +100,62 @@ export class AppUserEntity extends AbstractEntity {
 
 
     /**
+     * @param appUserEntity app user to encrypt fields for. Will be altered
+     * @returns ```appUserEntity``` with {@link SENSITIVE_FIELDS} beeing encrypted
+     */
+    public static encryptSensitiveFields(appUserEntity: AppUserEntity): AppUserEntity {
+
+        const cryptoHelper = new CryptoJSImpl();
+
+        AppUserEntity.SENSITIVE_FIELDS.forEach(prop => {
+            if (appUserEntity[prop])
+                appUserEntity[prop] = cryptoHelper.encrypt(appUserEntity[prop]);
+        });
+
+        return appUserEntity;
+    }
+
+
+    /**
+     * @param appUserEntity app user to decrypt fields for. Wont be altered
+     * @returns a copy of ```appUserEntity``` instance with decrypted {@link SENSITIVE_FIELDS}.
+     */
+    public static decryptSensitiveFields(appUserEntity: AppUserEntity): AppUserEntity {
+
+        const cryptoHelper = new CryptoJSImpl();
+
+        const appUserEntityCopy = AppUserEntity.getInstance(appUserEntity);
+
+        AppUserEntity.SENSITIVE_FIELDS.forEach(prop => {
+            if (appUserEntityCopy[prop])
+                appUserEntityCopy[prop] = cryptoHelper.decrypt(appUserEntityCopy[prop]);
+        });
+
+        return appUserEntityCopy;
+    }
+
+
+    /**
      * @returns instance with default values (mostly ```null```)
      */
     public static getDefaultInstance(): AppUserEntity {
 
-        return new AppUserEntity(-1, "", "", AppUserRole.USER, null, null, null);
+        return new AppUserEntity(-1, new Date().toISOString(), new Date().toISOString(), "", "", AppUserRole.USER, null, null, null);
+    }
+    
+
+    public static getInstance(appUserEntity: AppUserEntity): AppUserEntity {
+
+        return new AppUserEntity(
+            appUserEntity.id || null,
+            appUserEntity.created,
+            appUserEntity.updated,
+            appUserEntity.email,
+            appUserEntity.password,
+            appUserEntity.role,
+            appUserEntity.tags || null,
+            appUserEntity.notes || null,
+            appUserEntity.csrfToken || null
+        )
     }
 }

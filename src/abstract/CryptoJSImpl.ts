@@ -1,5 +1,6 @@
 import CryptoJS from "crypto-js";
-import { isBlank, log, logError, stripTimeFromDate } from "../helpers/utils";
+import { isBlank, logError, stripTimeFromDate } from "../helpers/utils";
+import { CRYPTO_IV, CRYPTO_KEY } from "../helpers/constants";
 
 
 /**
@@ -15,11 +16,11 @@ export default class CryptoJSImpl {
 
 
     /**
-     * @param key secret string used by alogrithm. Needs to be 22 chars long 
-     * @param iv secret string used by alogrithm. Necessary for encryption to always return the same value. 
+     * @param key secret string used by alogrithm. Needs to be 22 chars long. Default is {@link CRYPTO_KEY}.
+     * @param iv secret string used by alogrithm. Necessary for encryption to always return the same value. Default is {@link CRYPTO_IV}
      *           Needs to be 22 chars long
      */
-    constructor(key: string, iv: string) {
+    constructor(key = CRYPTO_KEY, iv = CRYPTO_IV) {
 
         // case: falsy params
         if (!this.areConstructorParamsValid(key, iv)) {
@@ -32,31 +33,26 @@ export default class CryptoJSImpl {
     }
 
 
-    public encrypt(value: CryptoJS.lib.WordArray | string): CryptoJS.lib.CipherParams {
+    public encrypt(value: CryptoJS.lib.WordArray | string): string {
 
-        return CryptoJS.AES.encrypt(value, this.key, { iv: this.iv });
+        return CryptoJS.AES.encrypt(value, this.key, { iv: this.iv }).toString();
     }
 
 
-    public decrypt(encryptedValue: CryptoJS.lib.CipherParams | string): CryptoJS.lib.WordArray {
+    public decrypt(encryptedValue: CryptoJS.lib.CipherParams | string): string {
 
-        return CryptoJS.AES.decrypt(encryptedValue, this.key, { iv: this.iv });
+        return this.wordArrayToString(CryptoJS.AES.decrypt(encryptedValue, this.key, { iv: this.iv }));
     }
 
 
     /**
-     * @param wordArray to convert to string (produced by ```decrypt()``` e.g.)
-     * @returns readable string representation of given wordArray
+     * @param value to generate a hash for
+     * @param cfg config object. See ```CipherOption``` interface in CryptoJS lib.
+     * @returns the generated hash
      */
-    public wordArrayToString(wordArray: CryptoJS.lib.WordArray): string {
-
-        return wordArray ? wordArray.toString(CryptoJS.enc.Utf8) : "";
-    }
-
-
     public hash(value: CryptoJS.lib.WordArray | string, cfg?: object): string {
 
-        return CryptoJS.SHA256(value).toString();
+        return CryptoJS.SHA256(value, cfg).toString();
     }
 
 
@@ -72,6 +68,16 @@ export default class CryptoJSImpl {
 
 
     /**
+     * @param wordArray to convert to string (produced by ```decrypt()``` e.g.)
+     * @returns readable string representation of given wordArray
+     */
+    private wordArrayToString(wordArray: CryptoJS.lib.WordArray): string {
+
+        return wordArray ? wordArray.toString(CryptoJS.enc.Utf8) : "";
+    }
+
+
+    /**
      * Validate constructor params.
      * 
      * @param key 
@@ -80,12 +86,16 @@ export default class CryptoJSImpl {
      */
     private areConstructorParamsValid(key: string, iv: string): boolean {
 
-        if (isBlank(key) || isBlank(iv))
+        if (isBlank(key) || isBlank(iv)) {
+            logError("Either key or iv are blank.");
             return false;
+        }
 
         // length necessary for algorithm to work
-        if (key.length !== 22 || iv.length !== 22)
+        if (key.length !== 22 || iv.length !== 22) {
+            logError("Either key or iv length are unexpected.");
             return false;
+        }
 
         return true;
     }

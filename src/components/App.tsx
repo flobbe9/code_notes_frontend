@@ -21,6 +21,8 @@ import Confirm from './helpers/Confirm';
     // drag and drop noteInputs
 export default function App() {
 
+    // cache notes and tags separatly, no need to encrypt
+    // cache other user data encrypted, dont save password!
     const [appUserEntity, setAppUserEntity] = useState<AppUserEntity>(mockAppUserEntity);
     
     const [toastSummary, setToastSummary] = useState("");
@@ -87,11 +89,8 @@ export default function App() {
 
 
     useEffect(() => {
-        if (hasAppRendered) {
-            log("asdf")
-        
+        if (hasAppRendered) 
             setIsPopupVisible(true);
-        }
 
     }, [popupContent])
 
@@ -281,10 +280,13 @@ export const AppContext = createContext({
 });
 
 
+// TODO: remove in prod
 const mockAppUserEntity: AppUserEntity = new AppUserEntity(
     3,
+    new Date().toISOString(),
+    new Date().toISOString(),
     "user@user.com",
-    "$2a$10$e4k/4uTWn/fnWA8KEYs/Zu.W1b4OWK82rXgwpZsvFhPPbFaYjZlBi",
+    "Abc123,.",
     AppUserRole.USER,
     [
         { name: "tag14" },
