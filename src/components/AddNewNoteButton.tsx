@@ -8,6 +8,7 @@ import { NoteEntity } from "../abstract/entites/NoteEntity";
 import { getRandomString, isArrayFalsy } from "../helpers/utils";
 import { AppContext } from "./App";
 import Note from "./noteInput/Note";
+import { AppUserService } from "../services/AppUserService";
 
 
 interface Props extends HelperProps {
@@ -40,6 +41,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
         // update appUser
         appUserEntity.notes! = [newNoteEntity, ...appUserEntity.notes!];
+        AppUserService.fetchSave(appUserEntity);
 
         // create new note element
         const newNote = getNoteByNoteEntity(newNoteEntity);

@@ -1,5 +1,4 @@
 import { AppUserRole } from "../AppUserRole";
-import CryptoJSImpl from "../CryptoJSImpl";
 import { AbstractEntity } from "./AbstractEntity";
 import { NoteEntity } from "./NoteEntity";
 import { TagEntity } from "./TagEntity";
@@ -13,7 +12,7 @@ import { TagEntity } from "./TagEntity";
 export class AppUserEntity extends AbstractEntity {
 
     /** List of app user fields that need to be encrypted before caching the app user */
-    private static SENSITIVE_FIELDS = ["email", "password", "csrfToken"];
+    public static SENSITIVE_FIELDS = ["email", "password", "csrfToken"];
 
     email: string;
 
@@ -96,42 +95,6 @@ export class AppUserEntity extends AbstractEntity {
                 !!(noteEntity.tags || [])
                     .find(tagEntity => 
                         tag.name === tagEntity.name))
-    }
-
-
-    /**
-     * @param appUserEntity app user to encrypt fields for. Will be altered
-     * @returns ```appUserEntity``` with {@link SENSITIVE_FIELDS} beeing encrypted
-     */
-    public static encryptSensitiveFields(appUserEntity: AppUserEntity): AppUserEntity {
-
-        const cryptoHelper = new CryptoJSImpl();
-
-        AppUserEntity.SENSITIVE_FIELDS.forEach(prop => {
-            if (appUserEntity[prop])
-                appUserEntity[prop] = cryptoHelper.encrypt(appUserEntity[prop]);
-        });
-
-        return appUserEntity;
-    }
-
-
-    /**
-     * @param appUserEntity app user to decrypt fields for. Wont be altered
-     * @returns a copy of ```appUserEntity``` instance with decrypted {@link SENSITIVE_FIELDS}.
-     */
-    public static decryptSensitiveFields(appUserEntity: AppUserEntity): AppUserEntity {
-
-        const cryptoHelper = new CryptoJSImpl();
-
-        const appUserEntityCopy = AppUserEntity.getInstance(appUserEntity);
-
-        AppUserEntity.SENSITIVE_FIELDS.forEach(prop => {
-            if (appUserEntityCopy[prop])
-                appUserEntityCopy[prop] = cryptoHelper.decrypt(appUserEntityCopy[prop]);
-        });
-
-        return appUserEntityCopy;
     }
 
 

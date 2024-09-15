@@ -200,7 +200,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         newNotes.splice(noteIndex, 1);
         setNotes([...newNotes]);
 
-        // TODO: save appuser
+        // TODO: fetch delete note
     }
 
 

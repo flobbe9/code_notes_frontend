@@ -4,7 +4,8 @@ import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
-import fetchJson, { fetchAny, isJsonResponseAlright } from "../helpers/fetchUtils";
+import fetchJson, { fetchAny, isJsonResponseError } from "../helpers/fetchUtils";
+import { AppUserService } from "../services/AppUserService";
 
 
 /**
@@ -12,14 +13,15 @@ import fetchJson, { fetchAny, isJsonResponseAlright } from "../helpers/fetchUtil
  * 
  * @param email raw email input
  * @param password raw password input
+ * @since 0.0.1
  */
 export function useAuth(email: string | null, password: string | null): {
-    /** Either the fetched and encrypted ```appUserEntity``` or ```null``` if no login input or login error */
-    appUserEntity: AppUserEntity | null,
+    /** Either the fetched and encrypted ```fetchedAppUserEntity``` or ```null``` if no login input or login error */
+    fetchedAppUserEntity: AppUserEntity | null,
     fetchLogout: () => void
 } {
 
-    const [appUserEntity, setAppUserEntity] = useState<AppUserEntity | null>(null);
+    const [fetchedAppUserEntity, setFetchedAppUserEntity] = useState<AppUserEntity | null>(null);
 
     const { toast } = useContext(AppContext);
 
@@ -35,11 +37,8 @@ export function useAuth(email: string | null, password: string | null): {
 
 
     useEffect(() => {
-        if (data) {
-            log(data)
-            log(AppUserEntity.decryptSensitiveFields(data))
-            setAppUserEntity(data);
-        }
+        if (data)
+            setFetchedAppUserEntity(data);
 
     }, [email, password, data]);
 
@@ -64,15 +63,15 @@ export function useAuth(email: string | null, password: string | null): {
         }
 
         const url = `${BACKEND_BASE_URL}/login?username=${email}&password=${password}`;
-        const jsonResponse = await fetchJson(url, "post");
+        const jsonResponse = await fetchJson<AppUserEntity>(url, "post");
 
         // case: bad credentials or fetch error
-        if (!isJsonResponseAlright(jsonResponse)) {
+        if (isJsonResponseError(jsonResponse)) {
             handleLoginFailure(jsonResponse.status)
             return null;
         }
 
-        return AppUserEntity.encryptSensitiveFields(jsonResponse as any as AppUserEntity);
+        return AppUserService.encryptSensitiveFields(jsonResponse as AppUserEntity);
     }
 
 
@@ -98,7 +97,7 @@ export function useAuth(email: string | null, password: string | null): {
 
 
     return {
-        appUserEntity,
+        fetchedAppUserEntity,
         fetchLogout
     };
 }

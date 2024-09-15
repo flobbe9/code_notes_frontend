@@ -16,15 +16,15 @@ export const FAILED_TO_FETCH_STATUS_CODE = 503;
  * @param headers json object with strings as keys and values
  * @returns response as json
  */
-export default async function fetchJson(url: string, method = "get", body?: any, headers?): Promise<Response | CustomExceptionFormat> {
+export default async function fetchJson<ResponseType>(url: string, method = "get", body?: any, headers?: object): Promise<CustomExceptionFormat | ResponseType> {
 
     const response = await fetchAny(url, method, body, headers);
 
     // case: failed to fetch, already streamed to json
     if (!isHttpStatusCodeAlright(response.status))
-        return response;
-    
-    return await (response as Response).json();
+        return response as CustomExceptionFormat;
+
+    return await (response as Response).json() as ResponseType;
 }
 
 
@@ -120,9 +120,13 @@ export function isHttpStatusCodeAlright(statusCode: number): boolean {
 }
 
 
-export function isJsonResponseAlright(jsonResponse: any): boolean {
+/**
+ * @param jsonResponse to check if is error
+ * @returns ```true``` if given jsonResponse is of type ```CustomExceptionFormat``` and will infer that ```jsonResponse``` if so
+ */
+export function isJsonResponseError(jsonResponse: any): jsonResponse is CustomExceptionFormat {
 
-    return jsonResponse && isNumberFalsy(jsonResponse.status);
+    return jsonResponse === undefined || !isNumberFalsy(jsonResponse.status);
 }
 
 
