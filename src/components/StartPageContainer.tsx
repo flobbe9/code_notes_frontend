@@ -4,9 +4,11 @@ import DefaultProps from "../abstract/DefaultProps";
 import StartPageContent from "./StartPageContent";
 import StartPageSideBar from "./StartPageSideBar";
 import Flex from "./helpers/Flex";
-import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, log } from "../helpers/utils";
+import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import Confirm from "./helpers/Confirm";
+import Head from "./Head";
+import { BASE_URL, getHeadTitleText } from "../helpers/constants";
 
 
 interface Props extends DefaultProps {
@@ -18,6 +20,7 @@ interface Props extends DefaultProps {
  * Container defining the context for all components on start page. Try to keep this as clean as possible and
  * write logic only for the context. Do styling in child components
  * 
+ * @parent ```<App>```
  * @since 0.0.1
  */
 export default function StartPageContainer({children, ...props}: Props) {
@@ -130,6 +133,11 @@ export default function StartPageContainer({children, ...props}: Props) {
 
     return (
         <StartPageContainerContext.Provider value={context} {...props}>
+            <Head headTagStrings={[
+                `<link rel='canonical' href='${getCurrentUrlWithoutWWW()}' />`,
+                `<title>${getHeadTitleText()}</title>`,
+            ]} />
+
             <Flex flexWrap="nowrap">
                 <StartPageSideBar />
 

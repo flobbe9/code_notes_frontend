@@ -10,9 +10,30 @@ export const VERSION = process.env.REACT_APP_VERSION + "";
 
 
 // URLs
+export const BASE_URL = process.env.REACT_APP_BASE_URL as string;
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL + "";
 /** Default rel attr to pass to any link */
 export const LINK_DEFAULT_REL = "noopener noreferrer nofollow";
+
+
+// Other
+/** Time the noteInput settings slide animation takes (in ms). */
+export const BLOCK_SETTINGS_ANIMATION_DURATION = 150;
+export const INVALID_INPUT_CLASS_NAME = "invalidInput";
+export const MAX_TAG_INPUT_VALUE_LENGTH = 255;
+export const MAX_NOTE_TITLE_VALUE_LENGTH = 255;
+export const MAX_NOTE_INPUT_VALUE_LENGTH = 50_000;
+
+/**
+ * Get the text for the ```<title>```.
+ * 
+ * @param pageTitle title of page, not including the company name
+ * @returns ```pageTitle | ${companyName}``` or just ```companyName``` if no ```pageTitle```
+ */
+export function getHeadTitleText(pageTitle?: string): string {
+
+    return isBlank(pageTitle) ? "Code Notes" : `${pageTitle} | Code Notes`; 
+}
 
 
 // Sanitizer
@@ -1930,12 +1951,3 @@ export function getDefaultVariableInput(placeholder = VARIABLE_INPUT_DEFAULT_PLA
 
     return `<input type="text" style="width: ${inputWidth}px" class="variableInput" placeholder="${placeholder}" />`;
 }
-
-
-// Other
-/** Time the noteInput settings slide animation takes (in ms). */
-export const BLOCK_SETTINGS_ANIMATION_DURATION = 150;
-export const INVALID_INPUT_CLASS_NAME = "invalidInput";
-export const MAX_TAG_INPUT_VALUE_LENGTH = 255;
-export const MAX_NOTE_TITLE_VALUE_LENGTH = 255;
-export const MAX_NOTE_INPUT_VALUE_LENGTH = 50_000;

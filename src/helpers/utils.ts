@@ -1,7 +1,7 @@
 import $ from "jquery";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
-import { CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
+import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
 import { CSSProperties } from "react";
 import parse, { Element } from "html-react-parser";
 import sanitize from "sanitize-html";
@@ -1133,4 +1133,9 @@ export function getJsxElementIndexByKey(array: JSX.Element[], key: string): numb
             return i;
 
     return -1;
+}
+
+export function getCurrentUrlWithoutWWW(): string {
+
+    return `${BASE_URL}${window.location.pathname}`;
 }
