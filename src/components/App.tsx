@@ -1,7 +1,6 @@
 import $ from "jquery";
 import React, { createContext, useEffect, useRef, useState } from 'react';
 import '../assets/styles/App.scss';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { getCSSValueAsNumber, isNumberFalsy, log } from '../helpers/utils';
@@ -13,6 +12,11 @@ import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { AppUserRole } from '../abstract/AppUserRole';
 import { NoteInputType } from '../abstract/NoteInputType';
 import Popup from './helpers/Popup';
+import Login from "./Login";
+import { useAppUser } from "../hooks/useAppUser";
+import { useLoggedIn } from "../hooks/useLoggedIn";
+import FetchAppUser from "./FetchAppUser";
+import FetchLoggedIn from "./FetchLoggedIn";
 
 
 /**
@@ -21,44 +25,25 @@ import Popup from './helpers/Popup';
 // IDEA: 
     // drag and drop noteInputs
 // TODO: 
-    // login page
-        // call useauth
-        // if remember me
-            // remove session timeout
-        // else
-            // 7 days session timeout
-        // on submit
-            // set email and password
-            // if app user not null
-                // set app userf
-            // listen to app user here
-            // set logged in to appuser !== null
-    // use current app user
-        // fetch current
-        // update state
-        // update cache
-        // error
-            // 403
-                // toast reload page, csrf problem
-            // any other
-                // toast reload page
-        // display pending while app user is beeing fetched null or login is pending
-    // use is logged in
-        // fetch is logged in
-        // cache
-        // update state
-        // 401
-            // if isloggedin
-                // toast session has become invalid
-                // logout
+    // pending while fetching
+        // app user null or login null
+        // remove global overlay (?)
+    // finish other auth hooks
     // app user service
         // save
         // delete
         // logout
+            // clear query cache
+            // remove csrf token
+            // set app user null
+            // set logged in false
     // logout method for states in App.tsx
+    // bug: add new note
+        // move instance methods to service class
+        // continue here
 export default function App() {
 
-    const [appUserEntity, setAppUserEntity] = useState<AppUserEntity>(mockAppUserEntity);
+    const [appUserEntity, setAppUserEntity] = useState<AppUserEntity | null>(null);
     
     const [toastSummary, setToastSummary] = useState("");
     const [toastMessage, setToastMessage] = useState("");
@@ -66,6 +51,7 @@ export default function App() {
     const [toastScreenTimeTimeout, setToastScreenTimeTimeout] = useState<NodeJS.Timeout>();
     
     const [isAppOverlayVisible, setIsAppOverlayVisible] = useState(false);
+    const [appOverlayContent, setAppOverlayContent] = useState<JSX.Element | JSX.Element[]>(<></>);
     const [isAppOverlayHideOnClick, setIsAppOverlayHideOnClick] = useState(true);
     const [isAppOverlayHideOnEscape, setIsAppOverlayHideOnEscape] = useState(true);
     
@@ -79,11 +65,6 @@ export default function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress();
-
-    // is logged in hook
-
-    // use app user hook
-        // on is logged in
 
     /** Time the toast popup takes to slide up and down in ms. */
     const toastSlideDuration = 400;
@@ -99,6 +80,7 @@ export default function App() {
         getDeviceWidth,
 
         isLoggedIn,
+        setIsLoggedIn,
 
         isKeyPressed,
         isControlKeyPressed,
@@ -108,6 +90,7 @@ export default function App() {
         isAppOverlayHideOnClick,
         setIsAppOverlayHideOnClick,
         setIsAppOverlayHideOnEscape,
+        setAppOverlayContent,
 
         isPopupVisible, 
         setIsPopupVisible,
@@ -132,7 +115,16 @@ export default function App() {
         if (hasAppRendered) 
             setIsPopupVisible(true);
 
-    }, [popupContent])
+    }, [popupContent]);
+
+
+    useEffect(() => {
+        if (appUserEntity === null && isLoggedIn) 
+            setTimeout(() => showPendingOverlay(), 500);
+        else
+            setTimeout(() => hidePendingOverlay(), 500);
+
+    }, [appUserEntity]);
 
 
     /**
@@ -250,16 +242,32 @@ export default function App() {
 
         handleKeyUpUseKeyPress(event);
     }
+
+
+    function showPendingOverlay(): void {
+
+        setIsAppOverlayVisible(true);
+        setAppOverlayContent(
+            <i className="fa-solid fa-circle-notch rotating" style={{fontSize: "2em"}}></i>
+        )
+        setIsAppOverlayHideOnClick(false);
+        setIsAppOverlayHideOnEscape(false);
+    }
+
+
+    function hidePendingOverlay(): void {
+
+        setIsAppOverlayVisible(false);
+        setAppOverlayContent(<></>);
+        setIsAppOverlayHideOnClick(true);
+        setIsAppOverlayHideOnEscape(true);
+    }
     
 
     return (
         <AppContext.Provider value={context}>
             <BrowserRouter>
                 <div id="App" className="App">
-                    {
-                        // remove
-                        // do an individual one for each occasion
-                    }
                     <Overlay 
                         id="App"
                         isOverlayVisible={isAppOverlayVisible} 
@@ -267,23 +275,23 @@ export default function App() {
                         hideOnClick={isAppOverlayHideOnClick}
                         hideOnEscape={isAppOverlayHideOnEscape}
                         fitParent={false}
-                    />
+                    >
+                        {appOverlayContent}
+                    </Overlay>
 
                     <Popup />
 
+                    {/* Fetch data on render */}
+                    <FetchLoggedIn />
+                    { isLoggedIn && <FetchAppUser />}
+
                     <NavBar />
 
-                    {
-                        // hide if app user null or loggedin null
-
-                        // pending popup
-                            // show if app user null or loggedin null
-                    }
                     <div className="content">
                         <Routes>
                             <Route path="/" element={<StartPageContainer />} />
                             <Route path="/register" element={<div>Register</div>} />
-                            <Route path="/login" element={<div>login</div>} />
+                            <Route path="/login" element={<Login />} />
                             <Route path="*" element={<div>404</div>} />
                         </Routes>
                     </div>
@@ -303,8 +311,8 @@ export default function App() {
 
 
 export const AppContext = createContext({
-    appUserEntity: AppUserEntity.getDefaultInstance(),
-    setAppUserEntity: (appUserEntity: AppUserEntity) => {},
+    appUserEntity: AppUserEntity.getDefaultInstance() as AppUserEntity | null,
+    setAppUserEntity: (appUserEntity: AppUserEntity | null) => {},
 
     toast: (summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number) => {},
     moveToast: (hideToast = false, screenTime?: number) => {},
@@ -313,6 +321,7 @@ export const AppContext = createContext({
     getDeviceWidth: () => {return {isMobileWidth: false, isTabletWidth: false,isDesktopWidth: true}},
 
     isLoggedIn: false,
+    setIsLoggedIn: (isLoggedIn: boolean) => {},
 
     isKeyPressed: (keyName: string): boolean => {return false},
     isControlKeyPressed: () => {return false as boolean},
@@ -322,6 +331,7 @@ export const AppContext = createContext({
     isAppOverlayHideOnClick: true,
     setIsAppOverlayHideOnClick: (isHideOnClick: boolean) => {},
     setIsAppOverlayHideOnEscape: (isHideOnEscape: boolean) => {},
+    setAppOverlayContent: (overlayContent: JSX.Element | JSX.Element[]) => {},
 
     isPopupVisible: false, 
     setIsPopupVisible: (isVisible: boolean) => {},
@@ -333,10 +343,10 @@ export const AppContext = createContext({
 // TODO: remove in prod
 const mockAppUserEntity: AppUserEntity = new AppUserEntity(
     3,
-    new Date().toISOString(),
-    new Date().toISOString(),
+    "2024-09-15 22:21:22.22222",
+    "2024-09-15 22:21:22.22222",
     "user@user.com",
-    "Abc123,.",
+    "$2a$10$PDzuJ0g.FZMEDyXJq70qMuKSCSsS56wilmo5iuzxVFD/LCiMG5/.i", // Abc123,.
     AppUserRole.USER,
     [
         { name: "tag14" },
@@ -410,6 +420,5 @@ const mockAppUserEntity: AppUserEntity = new AppUserEntity(
             }
         ]
       }
-    ],
-    null
+    ]
 )

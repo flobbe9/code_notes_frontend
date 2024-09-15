@@ -1,3 +1,5 @@
+import { getTimeStamp } from "../helpers/utils";
+
 /**
  * Interface defining the format of an http error object.
  * 
@@ -7,18 +9,34 @@ export class CustomExceptionFormat {
 
     status: number;
 
-    error: string | null;
+    timestamp: string;
 
     message: string;
 
     path: string;
 
 
-    constructor(status: number, error: string | null, message: string, path: string) {
+    constructor(status: number, timestamp: string, message: string, path: string) {
 
         this.status = status;
-        this.error = error;
+        this.timestamp = timestamp;
         this.message = message;
         this.path = path;
+    }
+
+
+    /**
+     * @param status 
+     * @param message 
+     * @returns instance using "now" as timestamp and the current ```window.location.pathname``` as path
+     */
+    public static getInstance(status: number, message: string): CustomExceptionFormat {
+
+        return new CustomExceptionFormat(
+            status, 
+            getTimeStamp(),
+            message,
+            window.location.pathname
+        )
     }
 }

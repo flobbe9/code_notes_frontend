@@ -5,6 +5,7 @@ import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import HelperDiv from "./HelperDiv";
 import { log } from "../../helpers/utils";
+import Flex from "./Flex";
 
 
 interface Props extends HelperProps {
@@ -183,7 +184,14 @@ export default forwardRef(function Overlay(
             {...otherProps}
         >
             <div className="overlayBackground" ref={backgroundRef}></div>
-            <div className="overlayChildrenContainer" ref={childrenRef}>{children}</div>
+            <Flex 
+                className="overlayChildrenContainer" 
+                horizontalAlign="center"
+                verticalAlign="center"
+                ref={childrenRef}
+            >
+                {children}
+            </Flex>
         </HelperDiv>
     )
 })

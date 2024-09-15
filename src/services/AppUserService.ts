@@ -1,8 +1,9 @@
 
 import CryptoJSImpl from '../abstract/CryptoJSImpl';
+import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
 import { BACKEND_BASE_URL } from '../helpers/constants';
-import fetchJson from '../helpers/fetchUtils';
-import { log, logError } from '../helpers/utils';
+import fetchJson, { fetchAny } from '../helpers/fetchUtils';
+import { isBlank, log, logError } from '../helpers/utils';
 import { AppUserEntity } from './../abstract/entites/AppUserEntity';
 
 
@@ -34,7 +35,36 @@ export class AppUserService {
             appUserEntityCopy = this.decryptSensitiveFields(appUserEntity);
 
         const url = `${BACKEND_BASE_URL}/appUser/save`;
-        await fetchJson<AppUserEntity>(url, "post", appUserEntityCopy);
+        await fetchJson(url, "post", appUserEntityCopy);
+    }
+
+
+    /**
+     * Fetch login request which will create a session in the browser.
+     * 
+     * @param email of the app user
+     * @param password of the app user
+     * @returns the response which is either a ```Response``` object with a csrf token or an error object
+     */
+    public static async fetchLogin(email: string, password: string): Promise<Response | CustomExceptionFormat> {
+
+        if (isBlank(email) || isBlank(password))
+            return CustomExceptionFormat.getInstance(400, "Failed to fetch login. 'email' or 'password' are blank");
+
+        const url = `${BACKEND_BASE_URL}/login?username=${email}&password=${password}`;
+
+        return await fetchAny(url, "post");
+    }
+    
+
+    /**
+     * Make logout request to backend. Cannot fail
+     */
+    public static async fetchLogout(): Promise<void> {
+
+        const url = `${BACKEND_BASE_URL}/logout`;
+
+        await fetchAny(url);
     }
 
     

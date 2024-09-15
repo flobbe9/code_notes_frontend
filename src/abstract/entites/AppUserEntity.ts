@@ -12,7 +12,7 @@ import { TagEntity } from "./TagEntity";
 export class AppUserEntity extends AbstractEntity {
 
     /** List of app user fields that need to be encrypted before caching the app user */
-    public static SENSITIVE_FIELDS = ["email", "password", "csrfToken"];
+    public static SENSITIVE_FIELDS = ["email", "password"];
 
     email: string;
 
@@ -24,8 +24,6 @@ export class AppUserEntity extends AbstractEntity {
 
     notes?: NoteEntity[] | null;
 
-    csrfToken?: string | null;
-
 
     public constructor(
         id: number | null,
@@ -36,7 +34,6 @@ export class AppUserEntity extends AbstractEntity {
         role: AppUserRole, 
         tags: TagEntity[] | null, 
         notes: NoteEntity[] | null,
-        csrfToken: string | null
     ) {
         super(id);
         this.created = created;
@@ -46,7 +43,6 @@ export class AppUserEntity extends AbstractEntity {
         this.role = role;
         this.tags = tags;
         this.notes = notes;
-        this.csrfToken = csrfToken;
     }
 
 
@@ -103,7 +99,7 @@ export class AppUserEntity extends AbstractEntity {
      */
     public static getDefaultInstance(): AppUserEntity {
 
-        return new AppUserEntity(-1, new Date().toISOString(), new Date().toISOString(), "", "", AppUserRole.USER, null, null, null);
+        return new AppUserEntity(-1, new Date().toISOString(), new Date().toISOString(), "", "", AppUserRole.USER, null, null);
     }
     
 
@@ -117,8 +113,7 @@ export class AppUserEntity extends AbstractEntity {
             appUserEntity.password,
             appUserEntity.role,
             appUserEntity.tags || null,
-            appUserEntity.notes || null,
-            appUserEntity.csrfToken || null
+            appUserEntity.notes || null
         )
     }
 }
