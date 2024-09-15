@@ -2,7 +2,6 @@ import $ from "jquery";
 import React, { createContext, useEffect, useRef, useState } from 'react';
 import '../assets/styles/App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import 'font-awesome/css/font-awesome.min.css';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { getCSSValueAsNumber, isNumberFalsy, log } from '../helpers/utils';
@@ -57,7 +56,6 @@ import Popup from './helpers/Popup';
         // delete
         // logout
     // logout method for states in App.tsx
-    // replace cdns with libs
 export default function App() {
 
     const [appUserEntity, setAppUserEntity] = useState<AppUserEntity>(mockAppUserEntity);
