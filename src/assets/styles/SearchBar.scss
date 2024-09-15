@@ -5,7 +5,7 @@
     border-radius: 20px;
     padding: 10px;
 
-    &:has:not(.searchInput:disabled) {
+    &:has(.searchInput:not([disabled])) {
         @include customHover {
             cursor: text;
         }

@@ -174,7 +174,7 @@ export default function StartPageSideBar({...props}: Props) {
                         <SearchBar 
                             placeHolder="Search tags..."
                             title="Search tags"
-                            disabled={!appUserEntity.notes?.length}
+                            disabled={!appUserEntity?.notes?.length}
                             onChange={handleSearchBarChange}
                             onXIconClick={handleSearchBarXIconClick}
                             ref={searchBarRef}
@@ -200,7 +200,7 @@ export default function StartPageSideBar({...props}: Props) {
 
                         {/* Tag checkboxes */}
                         <div className="startPageSideBarListContainer">
-                            <StartPageSideBarTagList disabled={!appUserEntity.notes?.length} />
+                            <StartPageSideBarTagList disabled={!appUserEntity?.notes?.length} />
                         </div>
                     </div>
                 </Flex>

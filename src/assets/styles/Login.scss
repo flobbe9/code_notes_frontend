@@ -1,0 +1,56 @@
+@import "./global/functions.scss";
+
+
+.Login {
+    $paddingX: 10px;
+
+    height: 80vh;
+
+    .loginContentContainer {
+        width: 400px;
+
+        .loginHeading {
+            color: var(--matBlue);
+        }
+
+        .loginSubmitButton {
+            background-color: var(--accentColor2);
+            background-color: var(--matBlueLight);
+            color: white;
+            padding: $paddingX 20px;
+
+            @include hover();
+            @include buttonFocus(var(--accentColor));
+        }
+
+        .TextInput {
+            width: 100%;
+
+            .textInput {
+                border-color: var(--matBlue);
+                width: 100%;
+
+                @include customFocus {
+                    border-color: var(--accentColor);
+                }
+            }
+
+            .floatingLabel {
+                color: var(--matBlue);
+                left: $paddingX;
+                top: -15px;
+
+                &.moveFloatingLabelDown {
+                    top: 18px;
+                }
+            }
+        }
+    }
+
+    @media only screen and (max-width: 575) {
+        .loginContentContainer {
+            min-width: 250px;
+            width: unset;
+        }
+    }
+}

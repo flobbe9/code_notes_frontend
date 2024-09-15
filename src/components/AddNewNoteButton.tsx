@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { useContext } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";
@@ -6,9 +5,8 @@ import ButtonWithSlideLabel from "./helpers/ButtonWithSlideLabel";
 import { StartPageContentContext } from "./StartPageContent";
 import Button from "./helpers/Button";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
-import { getRandomString, isArrayFalsy } from "../helpers/utils";
+import { isArrayFalsy } from "../helpers/utils";
 import { AppContext } from "./App";
-import Note from "./noteInput/Note";
 import { AppUserService } from "../services/AppUserService";
 
 
@@ -31,7 +29,10 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
     /**
      * Prepend both a new ```note``` and a new ```noteEntity``` to their corresponding states.
      */
-    function prependNote(): void {
+    async function prependNote(): Promise<void> {
+
+        if (!appUserEntity)
+            return;
 
         if (isArrayFalsy(appUserEntity.notes))
             appUserEntity.notes = [];
@@ -42,7 +43,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
         // update appUser
         appUserEntity.notes! = [newNoteEntity, ...appUserEntity.notes!];
-        AppUserService.fetchSave(appUserEntity);
+        await AppUserService.fetchSave(appUserEntity);
 
         // create new note element
         const newNote = getNoteByNoteEntity(newNoteEntity);
@@ -54,7 +55,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
     }
 
 
-    function handleClick(event): void {
+    async function handleClick(event: React.MouseEvent<any, MouseEvent>): Promise<void> {
 
         if (disabled)
             return;
@@ -62,7 +63,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
         if (onClick)
             onClick(event);
 
-        prependNote();
+        await prependNote();
     }
 
 
@@ -75,7 +76,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
                         className={className}
                         style={style}
                         label="New note"
-                        onClick={handleClick}
+                        onClickPromise={handleClick}
                         {...otherProps}
                         
                     >
@@ -88,7 +89,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
                         id={id} 
                         className={className + " fullWidth"}
                         style={style}
-                        onClick={handleClick}
+                        onClickPromise={handleClick}
                         {...otherProps}
                     >
                         <i className="fa-solid fa-plus me-1"></i> New Note

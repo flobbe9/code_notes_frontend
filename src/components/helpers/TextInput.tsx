@@ -11,6 +11,9 @@ interface Props extends HelperProps {
     /** Default is "" */
     placeholder?: string;
 
+    /** Default is "text" */
+    type?: "text" | "password";
+
     /** Default is "" */
     defaultValue?: string;
 
@@ -49,6 +52,7 @@ export default forwardRef(function TextInput(
         defaultValue = '',
         title = '',
         name = '',
+        type = "text",
         isValidPredicate,
         invalidMessage = '',
         required = false,
@@ -160,7 +164,7 @@ export default forwardRef(function TextInput(
                 <input
                     className="textInput"
                     disabled={disabled}
-                    type="text"
+                    type={type}
                     defaultValue={defaultValue}
                     name={name}
                     title={title}

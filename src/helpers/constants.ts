@@ -23,6 +23,7 @@ export const INVALID_INPUT_CLASS_NAME = "invalidInput";
 export const MAX_TAG_INPUT_VALUE_LENGTH = 255;
 export const MAX_NOTE_TITLE_VALUE_LENGTH = 255;
 export const MAX_NOTE_INPUT_VALUE_LENGTH = 50_000;
+export const CSRF_TOKEN_HEADER_NAME = "X-CSRF-TOKEN";
 
 /**
  * Get the text for the ```<title>```.

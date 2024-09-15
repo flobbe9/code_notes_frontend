@@ -54,14 +54,14 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
     }
 
 
-    function updateTags(tagEntities = appUserEntity.tags): void {
+    function updateTags(tagEntities = appUserEntity?.tags): void {
 
         if (!isBooleanFalsy(updateSideBarStates))
             setTags(mapTags(tagEntities));
     }
 
 
-    function mapTags(tagEntities = appUserEntity.tags): JSX.Element[] {
+    function mapTags(tagEntities = appUserEntity?.tags): JSX.Element[] {
 
         if (!tagEntities)
             return [];
@@ -79,7 +79,7 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
 
     function filterTagsBySearchValue(searchValue: string): TagEntity[] {
 
-        const allTagEntities = appUserEntity.tags || [];
+        const allTagEntities = appUserEntity?.tags || [];
 
         // case: no search value or no tags at all
         if (isBlank(searchValue) || !allTagEntities)

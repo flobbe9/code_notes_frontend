@@ -1,4 +1,4 @@
-@import './helpers/functions.scss';
+@import './global/functions.scss';
 
 .TextInput {
     $smallerFontSize: 0.8em;
@@ -31,11 +31,11 @@
         font-size: $smallerFontSize;
         position: absolute;
         top: 0;
-        @include smallText();
+        left: 5px;
 
         &.moveFloatingLabelDown {
             font-size: 1em;
-            top: 35px;
+            top: 37px;
         }
 
         .requiredAsterisk {
@@ -45,11 +45,11 @@
 
     .textInput {
         background-color: transparent;
-        border: none;
-        border-bottom: 2px solid rgba(0, 0, 0);
+        border: 2px solid rgba(0, 0, 0);
+        border-radius: var(--borderRadius);
         caret-color: currentColor;
         opacity: 0.7;
-        padding: 10px 0;
+        padding: 10px;
         transition: 0.1s;
         width: 400px;
 

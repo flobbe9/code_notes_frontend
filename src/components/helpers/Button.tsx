@@ -34,6 +34,7 @@ export default forwardRef(function Button({
         title = "",
         tabIndex,
         onClick,
+        onMouseDown,
         onSubmit,
         onClickPromise,
         _hover = {},
@@ -96,6 +97,9 @@ export default forwardRef(function Button({
 
         if (disabled)
             return;
+
+        if (onMouseDown)
+            onMouseDown(event);
 
         setIsMouseDown(true);
     }

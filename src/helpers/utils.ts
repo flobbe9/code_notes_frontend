@@ -92,7 +92,7 @@ function logColored(sevirity: LogSevirity, obj?: any, ...optionalParams: any[]):
  */
 export function logApiResponse(response: CustomExceptionFormat): void {
 
-    logError(getTimeStamp() + " " +  response.error + "(" + response.status + "): " + response.message + (response.path ? " " + response.path : ""));
+    logError(response.timestamp + " (" + response.status + "): " + response.message + (response.path ? " " + response.path : ""));
 }
 
 
@@ -1021,7 +1021,7 @@ export function getHTMLStringAttribs(dirtyHtml: string): {className: string, id:
  * @param date to format, default is ```new Date()```
  * @returns nicely formatted string formatted like ```year-month-date hours:minutes:seconds:milliseconds```
  */
-function getTimeStamp(date = new Date()): string {
+export function getTimeStamp(date = new Date()): string {
 
     return date.getFullYear() + "-" + prepend0ToNumber(date.getMonth() + 1) + "-" + prepend0ToNumber(date.getDate()) + " " + 
            prepend0ToNumber(date.getHours()) + ":" + prepend0ToNumber(date.getMinutes()) + ":" + prepend0ToNumber(date.getSeconds()) + ":" + date.getMilliseconds();

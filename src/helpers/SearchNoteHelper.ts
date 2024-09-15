@@ -13,12 +13,12 @@ import { AppUserEntity } from '../abstract/entites/AppUserEntity';
  */
 export class SearchNoteHelper {
 
-    private appUserEntity: AppUserEntity;
+    private appUserEntity: AppUserEntity | null;
     
     private selectedTagEntityNames: Set<string>;
 
 
-    constructor(appUserEtity: AppUserEntity, selectedTagEntityNames: Set<string>) {
+    constructor(appUserEtity: AppUserEntity | null, selectedTagEntityNames: Set<string>) {
 
         this.appUserEntity = appUserEtity;
         this.selectedTagEntityNames = selectedTagEntityNames;
@@ -30,8 +30,8 @@ export class SearchNoteHelper {
         const selectedTagNames = [...this.selectedTagEntityNames || []];
 
         // case: no notes
-        if (!this.appUserEntity.notes)
-            return this.appUserEntity.notes || [];
+        if (!this.appUserEntity?.notes)
+            return [];
 
         // case: no serach value and no selected tag
         if (isBlank(searchValue) && !selectedTagNames.length)
@@ -52,9 +52,9 @@ export class SearchNoteHelper {
 
     private matchAllNoteEntitiesBySelectedTag(): NoteEntity[] {
 
-        // case: falsy search input or no notes present
-        if (!this.appUserEntity.notes)
-            return this.appUserEntity.notes || [];
+        // case: no notes present
+        if (!this.appUserEntity?.notes)
+            return [];
 
         return this.appUserEntity.notes
             .filter(noteEntity => 
@@ -65,8 +65,8 @@ export class SearchNoteHelper {
     private matchAllNoteEntitiesBySearchValue(searchValue: string) {
 
         // case: falsy search input or no notes present
-        if (isBlank(searchValue) || !this.appUserEntity.notes)
-            return this.appUserEntity.notes || [];
+        if (isBlank(searchValue) || !this.appUserEntity?.notes)
+            return [];
 
         return this.appUserEntity.notes
             .filter(noteEntity => 
@@ -81,8 +81,8 @@ export class SearchNoteHelper {
     private matchAllNoteEntitiesBySearchValueAndSelectedTag(searchValue: string): NoteEntity[] {
 
         // case: falsy search input or no notes present
-        if (!this.appUserEntity.notes)
-            return this.appUserEntity.notes || [];
+        if (!this.appUserEntity?.notes)
+            return [];
 
         return this.appUserEntity.notes
             .filter(noteEntity => 

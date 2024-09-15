@@ -81,7 +81,7 @@ export default function StartPageContent({...props}: Props) {
     // TOOD: map in revers for last to be on top?
     function mapNoteEntitiesToJsx(): JSX.Element[] {
 
-        if (!appUserEntity.notes)
+        if (!appUserEntity?.notes)
             return [];
 
         return appUserEntity.notes.map(note => 
@@ -143,7 +143,7 @@ export default function StartPageContent({...props}: Props) {
                         placeHolder="Search for note Title or Tag" 
                         title="Search notes (Ctrl+Shift+F)"
                         ref={searchInputRef}
-                        disabled={!appUserEntity.notes?.length}
+                        disabled={!appUserEntity?.notes?.length}
                         onChange={handleSearchValueChange}
                         onKeyUp={handleSearchKeyDown}
                         onXIconClick={handleSearchXIconClick}

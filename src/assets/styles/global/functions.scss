@@ -124,8 +124,25 @@
 }
 
 @mixin buttonFocus($color: currentColor) {
-    &:focus {
+    @include customFocusVisible {
         @include focusOutline($color);
+    }
+}
+
+@mixin customFocus {
+    &:not([disabled]):focus {
+        @content;
+    }
+}
+
+/** 
+ * Will not focus on click but only on tab focus
+ */
+@mixin customFocusVisible {
+    @include customFocus {
+        &:focus-visible {
+            @content;
+        }
     }
 }
 
