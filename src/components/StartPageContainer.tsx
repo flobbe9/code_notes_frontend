@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import DefaultProps from "../abstract/DefaultProps";
 import StartPageContent from "./StartPageContent";

@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "../assets/styles/StartPageSideBarTagList.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";

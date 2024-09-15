@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { createContext, useRef } from "react";
 import "../../assets/styles/DefaultCodeNoteInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";

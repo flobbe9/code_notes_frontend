@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { useContext, useRef, useState } from "react";
 import "../assets/styles/TagInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";

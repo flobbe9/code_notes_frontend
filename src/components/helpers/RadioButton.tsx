@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { CSSProperties, forwardRef, HTMLAttributes, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "../../assets/styles/RadioButton.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";

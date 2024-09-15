@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { forwardRef, LegacyRef, useContext } from "react";
 import "../../assets/styles/Toast.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";

@@ -1,4 +1,5 @@
 import React from 'react';
+import $ from "jquery";
 import ReactDOM from 'react-dom/client';
 import App from './components/App';
 import { QueryClient } from '@tanstack/react-query';

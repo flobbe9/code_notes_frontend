@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { useContext, useEffect, useState } from "react";
 import "../assets/styles/TagCheckbox.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";

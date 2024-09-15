@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { forwardRef, Ref, useState } from "react";
 import "../../assets/styles/NoteInputSwitch.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";

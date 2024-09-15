@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "../../assets/styles/Button.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";

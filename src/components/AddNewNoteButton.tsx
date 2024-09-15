@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { useContext } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";

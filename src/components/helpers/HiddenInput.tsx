@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { forwardRef, HTMLInputTypeAttribute, Ref } from "react";
 import "../../assets/styles/HiddenInput.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";

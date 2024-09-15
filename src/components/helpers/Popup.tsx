@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { useContext, useEffect, useRef } from "react";
 import "../../assets/styles/Popup.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";

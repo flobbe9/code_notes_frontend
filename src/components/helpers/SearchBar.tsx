@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { CSSProperties, forwardRef, Ref, useImperativeHandle, useRef, useState } from "react";
 import "../../assets/styles/SearchBar.scss";
 import HelperProps from "../../abstract/HelperProps";

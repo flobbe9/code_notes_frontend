@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "../../assets/styles/ContentEditableDiv.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";

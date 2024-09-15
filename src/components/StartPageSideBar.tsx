@@ -1,5 +1,7 @@
+import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import "../assets/styles/StartPageSideBar.scss";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Flex from "./helpers/Flex";
 import SearchBar from "./helpers/SearchBar";

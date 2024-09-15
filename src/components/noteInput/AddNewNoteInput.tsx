@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { useContext } from "react";
 import "../../assets/styles/AddNewNoteInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";

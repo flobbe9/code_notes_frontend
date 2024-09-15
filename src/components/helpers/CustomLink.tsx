@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { Link } from "react-router-dom";

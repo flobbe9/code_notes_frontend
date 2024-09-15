@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { forwardRef, Ref } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { FlexDirection, FlexWrap, TextAlign } from "../../abstract/CSSTypes";

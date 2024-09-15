@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { createElement, ReactNode, useEffect, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import sanitize from "sanitize-html";

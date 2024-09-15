@@ -1,3 +1,4 @@
+import $ from "jquery";
 import React, { forwardRef, Ref, useContext } from "react";
 import "../../assets/styles/Confirm.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
