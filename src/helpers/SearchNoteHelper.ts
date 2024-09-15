@@ -1,9 +1,9 @@
-import { useContext } from "react";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import { AppContext } from "../components/App";
 import { StartPageContainerContext } from "../components/StartPageContainer";
-import { matchStringsConsiderWhiteSpace } from "../helpers/searchUtils";
-import { isBlank } from "../helpers/utils";
+import { matchStringsConsiderWhiteSpace } from "./searchUtils";
+import { isBlank } from "./utils";
+import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 
 
 /**
@@ -11,74 +11,82 @@ import { isBlank } from "../helpers/utils";
  * 
  * @since 0.0.1
  */
-export function useSearchNotes() {
+export class SearchNoteHelper {
 
-    const { appUserEntity } = useContext(AppContext);
-    const { selectedTagEntityNames } = useContext(StartPageContainerContext);
+    private appUserEntity: AppUserEntity;
+    
+    private selectedTagEntityNames: Set<string>;
 
 
-    function getNoteSearchResults(searchValue: string): NoteEntity[] {
+    constructor(appUserEtity: AppUserEntity, selectedTagEntityNames: Set<string>) {
 
-        const selectedTagNames = [...selectedTagEntityNames || []];
+        this.appUserEntity = appUserEtity;
+        this.selectedTagEntityNames = selectedTagEntityNames;
+    }
+
+
+    public getNoteSearchResults(searchValue: string): NoteEntity[] {
+
+        const selectedTagNames = [...this.selectedTagEntityNames || []];
 
         // case: no notes
-        if (!appUserEntity.notes)
-            return appUserEntity.notes || [];
+        if (!this.appUserEntity.notes)
+            return this.appUserEntity.notes || [];
 
         // case: no serach value and no selected tag
         if (isBlank(searchValue) && !selectedTagNames.length)
-            return appUserEntity.notes || [];
+            return this.appUserEntity.notes || [];
 
         // case: both serach value and selected tag
         if (selectedTagNames.length && !isBlank(searchValue))
-            return matchAllNoteEntitiesBySearchValueAndSelectedTag(searchValue);
+            return this.matchAllNoteEntitiesBySearchValueAndSelectedTag(searchValue);
 
         // case: no selected tags
         if (!selectedTagNames.length)
-            return matchAllNoteEntitiesBySearchValue(searchValue);
+            return this.matchAllNoteEntitiesBySearchValue(searchValue);
 
         // case: no search value
-        return matchAllNoteEntitiesBySelectedTag();
+        return this.matchAllNoteEntitiesBySelectedTag();
     }
     
 
-    function matchAllNoteEntitiesBySelectedTag(): NoteEntity[] {
+    private matchAllNoteEntitiesBySelectedTag(): NoteEntity[] {
 
         // case: falsy search input or no notes present
-        if (!appUserEntity.notes)
-            return appUserEntity.notes || [];
+        if (!this.appUserEntity.notes)
+            return this.appUserEntity.notes || [];
 
-        return appUserEntity.notes
+        return this.appUserEntity.notes
             .filter(noteEntity => 
-                matchNoteEntityBySelectedTagAndNoteTagExactly(selectedTagEntityNames, noteEntity));
+                this.matchNoteEntityBySelectedTagAndNoteTagExactly(this.selectedTagEntityNames, noteEntity));
     }
 
 
-    function matchAllNoteEntitiesBySearchValue(searchValue: string) {
+    private matchAllNoteEntitiesBySearchValue(searchValue: string) {
 
         // case: falsy search input or no notes present
-        if (isBlank(searchValue) || !appUserEntity.notes)
-            return appUserEntity.notes || [];
+        if (isBlank(searchValue) || !this.appUserEntity.notes)
+            return this.appUserEntity.notes || [];
 
-        return appUserEntity.notes
+        return this.appUserEntity.notes
             .filter(noteEntity => 
                 // match title
-                matchNoteEntityBySearchValueAndNoteTitle(searchValue, noteEntity) ||
+                this.matchNoteEntityBySearchValueAndNoteTitle(searchValue, noteEntity) ||
                 // match note tag
-                matchNoteEntityBySearchValueAndNoteTag(searchValue, noteEntity)
+                this.matchNoteEntityBySearchValueAndNoteTag(searchValue, noteEntity)
             );
     }
 
 
-    function matchAllNoteEntitiesBySearchValueAndSelectedTag(searchValue: string): NoteEntity[] {
+    private matchAllNoteEntitiesBySearchValueAndSelectedTag(searchValue: string): NoteEntity[] {
 
         // case: falsy search input or no notes present
-        if (!appUserEntity.notes)
-            return appUserEntity.notes || [];
+        if (!this.appUserEntity.notes)
+            return this.appUserEntity.notes || [];
 
-        return appUserEntity.notes
+        return this.appUserEntity.notes
             .filter(noteEntity => 
-                matchNoteEntityBySearchValueAndSelectedTag(searchValue, noteEntity));
+                this.matchNoteEntityBySearchValueAndSelectedTag(searchValue, noteEntity));
     }
 
 
@@ -89,15 +97,15 @@ export function useSearchNotes() {
      * @param noteEntity 
      * @returns 
      */
-    function matchNoteEntityBySearchValueAndSelectedTag(searchValue: string, noteEntity: NoteEntity): boolean {
+    private matchNoteEntityBySearchValueAndSelectedTag(searchValue: string, noteEntity: NoteEntity): boolean {
 
         return (
             // match selected tags with note tags (mandatory criteria)
-            matchNoteEntityBySelectedTagAndNoteTagExactly(selectedTagEntityNames, noteEntity) &&
+            this.matchNoteEntityBySelectedTagAndNoteTagExactly(this.selectedTagEntityNames, noteEntity) &&
             // match title
-            (matchNoteEntityBySearchValueAndNoteTitle(searchValue, noteEntity) ||
+            (this.matchNoteEntityBySearchValueAndNoteTitle(searchValue, noteEntity) ||
             // match note tag
-            matchNoteEntityBySearchValueAndNoteTag(searchValue, noteEntity))
+            this.matchNoteEntityBySearchValueAndNoteTag(searchValue, noteEntity))
         );
     }
 
@@ -109,7 +117,7 @@ export function useSearchNotes() {
      * @param noteEntity 
      * @returns 
      */
-    function matchNoteEntityBySelectedTagAndNoteTagExactly(selectedTagNames: Iterable<string> | null | undefined, noteEntity: NoteEntity): boolean {
+    private matchNoteEntityBySelectedTagAndNoteTagExactly(selectedTagNames: Iterable<string> | null | undefined, noteEntity: NoteEntity): boolean {
 
         if (!noteEntity || !selectedTagNames)
             return false;
@@ -121,7 +129,7 @@ export function useSearchNotes() {
 
         return selectedTagNameArray
             .filter(selectedTagName => 
-                matchNoteEntityBySearchValueAndNoteTagExactly(selectedTagName, noteEntity))
+                this.matchNoteEntityBySearchValueAndNoteTagExactly(selectedTagName, noteEntity))
             .length === selectedTagNameArray.length;
     }
 
@@ -133,7 +141,7 @@ export function useSearchNotes() {
      * @param noteEntity 
      * @returns 
      */
-    function matchNoteEntityBySearchValueAndNoteTitle(searchValue: string, noteEntity: NoteEntity): boolean {
+    private matchNoteEntityBySearchValueAndNoteTitle(searchValue: string, noteEntity: NoteEntity): boolean {
 
         if (isBlank(searchValue) || !noteEntity)
             return false;
@@ -149,7 +157,7 @@ export function useSearchNotes() {
      * @param noteEntity to iterate tags of
      * @returns ```true``` if at least one match was found
      */
-    function matchNoteEntityBySearchValueAndNoteTag(searchValue: string, noteEntity: NoteEntity): boolean {
+    private matchNoteEntityBySearchValueAndNoteTag(searchValue: string, noteEntity: NoteEntity): boolean {
 
         if (isBlank(searchValue) || !noteEntity || !noteEntity.tags)
             return false;
@@ -167,7 +175,7 @@ export function useSearchNotes() {
      * @param noteEntity to iterate tags of
      * @returns ```true``` if at least one match was found
      */
-    function matchNoteEntityBySearchValueAndNoteTagExactly(searchValue: string, noteEntity: NoteEntity): boolean {
+    private matchNoteEntityBySearchValueAndNoteTagExactly(searchValue: string, noteEntity: NoteEntity): boolean {
 
         if (isBlank(searchValue) || !noteEntity || !noteEntity.tags)
             return false;
@@ -176,7 +184,4 @@ export function useSearchNotes() {
             .find(tagEntity => 
                 searchValue === tagEntity.name);
     }
-
-
-    return { getNoteSearchResults };
 }

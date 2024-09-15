@@ -10,7 +10,7 @@ import Flex from "./helpers/Flex";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import AddNewNoteButton from "./AddNewNoteButton";
 import { StartPageContainerContext } from "./StartPageContainer";
-import { useSearchNotes } from "../hooks/useSearchNotes";
+import { SearchNoteHelper } from "../helpers/SearchNoteHelper";
 
 
 interface Props extends DefaultProps {
@@ -36,8 +36,8 @@ export default function StartPageContent({...props}: Props) {
     const [noteSearchValue, setNoteSearchValue] = useState("");
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[]>([]);
 
-    const { getNoteSearchResults } = useSearchNotes();
     const { selectedTagEntityNames } = useContext(StartPageContainerContext);
+    const searchNoteHelper = new SearchNoteHelper(appUserEntity, selectedTagEntityNames);
     
     const searchInputRef = useRef(null);
 
@@ -121,7 +121,7 @@ export default function StartPageContent({...props}: Props) {
 
     function handleSearch(searchValue = noteSearchValue): void {
 
-        const searchResults = getNoteSearchResults(searchValue);
+        const searchResults = searchNoteHelper.getNoteSearchResults(searchValue);
 
         setNoteSearchResults(searchResults);
     }
