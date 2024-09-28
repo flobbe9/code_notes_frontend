@@ -6,6 +6,8 @@ import Link from "./helpers/CustomLink";
 import Button from "./helpers/Button";
 import { log } from "./../helpers/utils";
 import { AppContext } from "./App";
+import { PROFILE_PATH } from "../helpers/constants";
+import CustomLink from "./helpers/CustomLink";
 
 
 interface Props extends DefaultProps {
@@ -34,13 +36,15 @@ export default function NavBarProfileSection({...props}: Props) {
             {
                 isLoggedIn ?
                     // Profile icon
-                    <img 
-                        src="/img/account.png" 
-                        alt="account" 
-                        className="accountIcon invertColor hover" 
-                        height={30}
-                        title="Profile"
-                    />
+                    <CustomLink to={PROFILE_PATH} >
+                        <img 
+                            src="/img/account.png" 
+                            alt="account" 
+                            className="accountIcon invertColor hover" 
+                            height={30}
+                            title="Profile"
+                        />
+                    </CustomLink>
                 :
                     <div>
                         {

@@ -10,6 +10,7 @@ import { getRandomString, isArrayFalsy, isBlank, log } from '../../helpers/utils
 import { TagEntity } from "../../abstract/entites/TagEntity";
 import { AppContext } from "../App";
 import { StartPageContainerContext } from "../StartPageContainer";
+import { AppUserService } from "../../services/AppUserService";
 
 
 interface Props extends DefaultProps {
@@ -87,7 +88,7 @@ export default function NoteTagList({...props}: Props) {
             return;
 
         // add to appUser first
-        appUserEntity.addTag(tagEntity);
+        AppUserService.addTag(appUserEntity, tagEntity);
 
         // add to noteEntity
         noteEntity.tags = [...(noteEntity.tags || []), tagEntity];
@@ -154,10 +155,10 @@ export default function NoteTagList({...props}: Props) {
             return;
 
         // case: tagEntity is used somewhere else
-        if (appUserEntity.isTagEntityPresentInANote(tagEntity))
+        if (AppUserService.isTagEntityPresentInANote(appUserEntity, tagEntity))
             return;
                 
-        appUserEntity.removeTagEntity(tagEntity);
+        AppUserService.removeTagEntity(appUserEntity, tagEntity);
     }
     
 
@@ -231,5 +232,5 @@ export const NoteTagListContext = createContext({
     removeTag: (index: number) => {},
     getNumBlankTagElements: () => {return 1 as number},
     tagElements: [<></>],
-    noteTagEntities: [new TagEntity()] as (TagEntity[] | null)
+    noteTagEntities: [{}] as (TagEntity[] | null)
 })

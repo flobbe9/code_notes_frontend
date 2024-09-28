@@ -29,7 +29,6 @@ export default function CustomLink(
         rel = "", 
         target = "_self", 
         rendered = true,
-        onClick,
         ...props
     }: Props
 ) {
@@ -45,7 +44,6 @@ export default function CustomLink(
             rel={LINK_DEFAULT_REL + " " + rel}
             title={title}
             target={target}
-            onClick={onClick}
             hidden={!rendered}
             {...otherProps}
         >
