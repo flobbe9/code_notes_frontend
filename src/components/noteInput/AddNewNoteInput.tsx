@@ -58,7 +58,7 @@ export default function AddNewNoteInput({...props}: Props) {
         let value = "";
 
         // case: is first note and first noteInput with variables
-        if ((appUserEntity.notes || []).length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.PLAIN_TEXT))
+        if ((appUserEntity!.notes || []).length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.PLAIN_TEXT))
             // add tutorial text
             value = "Plain text and some <code>code...</code>";
 
@@ -74,7 +74,7 @@ export default function AddNewNoteInput({...props}: Props) {
         let value = "";
 
         // case: is first note and first noteInput with variables
-        if ((appUserEntity.notes || []).length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.CODE_WITH_VARIABLES))
+        if ((appUserEntity!.notes || []).length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.CODE_WITH_VARIABLES))
             // add tutorial text
             value = "Some code and a variable x = " + getDefaultVariableInput() + ". Change the programming language on the right.";
 

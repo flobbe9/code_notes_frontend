@@ -5,9 +5,10 @@ import ButtonWithSlideLabel from "./helpers/ButtonWithSlideLabel";
 import { StartPageContentContext } from "./StartPageContent";
 import Button from "./helpers/Button";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
-import { isArrayFalsy } from "../helpers/utils";
+import { isArrayFalsy, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import { AppUserService } from "../services/AppUserService";
+import { isResponseError } from "../helpers/fetchUtils";
 
 
 interface Props extends HelperProps {
@@ -20,8 +21,8 @@ interface Props extends HelperProps {
  */
 export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
-    const { appUserEntity } = useContext(AppContext);
-    const { notes, setNotes, getNoteByNoteEntity } = useContext(StartPageContentContext)
+    const { appUserEntity, toast } = useContext(AppContext);
+    const { notes, setNotes, getNoteByNoteEntity, setIsSearchingNotes } = useContext(StartPageContentContext)
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteButton", true);
 
@@ -38,20 +39,33 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
             appUserEntity.notes = [];
 
         // create new note entity
-        const newNoteEntity = new NoteEntity();
-        newNoteEntity.title = "";
+        const newNoteEntity: NoteEntity = {
+            title: "",
+            noteInputs: [],
+            tags: []
+        }
 
         // update appUser
+        // TODO: update cache??
+            // make fetch a separate helper
+        const appUserEntityCopy = appUserEntity;
+        appUserEntityCopy.notes! = [newNoteEntity, ...appUserEntityCopy.notes!];
+
+        const savedAppUserEntity = await AppUserService.fetchSave(appUserEntityCopy);
+        // case: fetch error
+        if (isResponseError(savedAppUserEntity)) {
+            toast("Failed to save note", "An unexpected error occurred. Please try refreshing the page", "error");
+            return;
+        }
+
+        // will prevent note render from considering search results
+        setIsSearchingNotes(false);
+
         appUserEntity.notes! = [newNoteEntity, ...appUserEntity.notes!];
-        await AppUserService.fetchSave(appUserEntity);
 
-        // create new note element
+        // update notes
         const newNote = getNoteByNoteEntity(newNoteEntity);
-        let newNotes = notes;
-
-        // update notes state
-        newNotes = [newNote, ...newNotes];
-        setNotes(newNotes);
+        setNotes([newNote, ...notes]);
     }
 
 

@@ -14,7 +14,7 @@ import AddNewNoteInput from "./AddNewNoteInput";
 import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
 import { NoteEntity } from "../../abstract/entites/NoteEntity";
 import { NoteInputType } from "../../abstract/NoteInputType";
-import { confirmPageUnload, getJsxElementIndexByKey, getRandomString, log } from '../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, log } from '../../helpers/utils';
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { AppContext } from "../App";
 import { StartPageContentContext } from "../StartPageContent";
@@ -52,7 +52,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     const [aboutToSave, setAboutToSave] = useState(false);
 
     const { setIsPopupVisible, setPopupContent } = useContext(AppContext);
-    const { noteSearchResults } = useContext(StartPageContentContext);
+    const { noteSearchResults, isSearchingNotes } = useContext(StartPageContentContext);
 
     /** 
      * Number of noteInputs that are currently parsing or highlighting their values. Indicates whether the save() function should wait
@@ -94,7 +94,8 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
 
     useEffect(() => {
-        setIsNoteInSearchResults(noteSearchResults.includes(noteEntity));
+        if (isSearchingNotes)
+            setIsNoteInSearchResults(noteSearchResults.includes(noteEntity));
 
     }, [noteSearchResults]);
 
@@ -191,15 +192,17 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     function deleteNote(): void {
 
+        if (!appUserEntity)
+            return;
+
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
 
         // update appUserEntity
         appUserEntity.notes?.splice(noteIndex, 1);
 
         // update notes
-        const newNotes = notes;
-        newNotes.splice(noteIndex, 1);
-        setNotes([...newNotes]);
+        notes.splice(noteIndex, 1);
+        setNotes([...notes]);
 
         // TODO: fetch delete note
     }
@@ -238,7 +241,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
         toast("Note title invalid", `The note title cannot be longer than ${MAX_NOTE_TITLE_VALUE_LENGTH} characters.`, "warn");
     }
-        
+
 
     return (
         <NoteContext.Provider value={context}>
@@ -297,7 +300,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
 
 export const NoteContext = createContext({
-    noteEntity: new NoteEntity(),
+    noteEntity: {} as NoteEntity,
 
     numNoteInputsParsing: 0, 
     setNumNoteInputsParsing: (num: number) => {},
