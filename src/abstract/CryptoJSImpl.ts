@@ -32,13 +32,23 @@ export default class CryptoJSImpl {
         this.iv = CryptoJS.enc.Base64.parse(iv);
     }
 
-
+    
+    /**
+     * 
+     * @param decryptedValue to decrypt
+     * @returns the encrypted value or an empty string
+     */
     public encrypt(value: CryptoJS.lib.WordArray | string): string {
 
         return CryptoJS.AES.encrypt(value, this.key, { iv: this.iv }).toString();
     }
 
 
+    /**
+     * 
+     * @param encryptedValue to decrypt
+     * @returns the decrypted value or an empty string
+     */
     public decrypt(encryptedValue: CryptoJS.lib.CipherParams | string): string {
 
         return this.wordArrayToString(CryptoJS.AES.decrypt(encryptedValue, this.key, { iv: this.iv }));

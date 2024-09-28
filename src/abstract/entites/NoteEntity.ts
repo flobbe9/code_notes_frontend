@@ -10,16 +10,11 @@ import { TagEntity } from "./TagEntity";
  * 
  * @since 0.0.1
  */
-export class NoteEntity extends AbstractEntity {
+export interface NoteEntity extends AbstractEntity {
 
     title: string;
 
     noteInputs: NoteInputEntity[] | null;
 
     tags: TagEntity[] | null;
-
-
-    constructor() {
-        super(null);
-    }
 }
