@@ -14,6 +14,7 @@ export const BASE_URL = process.env.REACT_APP_BASE_URL as string;
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL + "";
 /** Default rel attr to pass to any link */
 export const LINK_DEFAULT_REL = "noopener noreferrer nofollow";
+export const PROFILE_PATH = "/profile";
 
 
 // Other

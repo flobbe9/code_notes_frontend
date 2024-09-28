@@ -3,6 +3,7 @@ import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
 import { BACKEND_BASE_URL, CSRF_TOKEN_HEADER_NAME } from "./constants";
 import { CSRF_TOKEN_LOCAL_STORAGE_KEY } from "../components/Login";
 import CryptoJSImpl from "../abstract/CryptoJSImpl";
+import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
 
 
 /** Http status code "Service Unavailable" 503, use this status when ```fetch()``` throws "failed to fetch" error */
@@ -100,7 +101,7 @@ export async function fetchAnyReturnBlobUrl(url: string, method = "get", body?: 
 
     // case: falsy blob
     if (!blob) {
-        const error = CustomExceptionFormat.getInstance(
+        const error = CustomExceptionFormatService.getInstance(
             406, // not acceptable
             "Failed to get blob from response."
         );
@@ -186,7 +187,7 @@ function getCsrfTokenDecrypted(): string {
  */
 function handleFetchError(e: Error, url: string): CustomExceptionFormat {
 
-    const error = CustomExceptionFormat.getInstance(500, e.message);
+    const error = CustomExceptionFormatService.getInstance(500, e.message);
     error.path = url.replace(BACKEND_BASE_URL, "")
 
     logApiResponse(error);

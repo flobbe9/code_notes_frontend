@@ -1,5 +1,5 @@
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import fetchJson, { isResponseError } from "../helpers/fetchUtils";
@@ -13,16 +13,17 @@ import { log } from "../helpers/utils";
  * @since 0.0.1
  */
 export function useLoggedIn() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    const { toast, setIsLoggedIn } = useContext(AppContext);
+    const { toast } = useContext(AppContext);
 
     const queryClient = useQueryClient();
 
 
-    const { data } = useQuery<boolean>({
+    const { data, isFetched } = useQuery<boolean>({
         queryKey: LOGGED_IN_USER_QUERY_KEY,
         queryFn: fetchCurrentAppUser,
-        initialData: queryClient.getQueryData(LOGGED_IN_USER_QUERY_KEY)
+        initialData: queryClient.getQueryData(LOGGED_IN_USER_QUERY_KEY) || false,
     });
 
 
@@ -56,6 +57,13 @@ export function useLoggedIn() {
         }
 
         return (jsonResponse as CustomExceptionFormat).status === 200;
+    }
+
+
+    return {
+        isLoggedIn,
+        setIsLoggedIn,
+        isLoggedInFetched: isFetched
     }
 }
 
