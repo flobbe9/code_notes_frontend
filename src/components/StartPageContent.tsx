@@ -4,7 +4,7 @@ import "../assets/styles/StartPageContent.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import Note from "./noteInput/Note";
 import SearchBar from "./helpers/SearchBar";
-import { getRandomString } from "../helpers/utils";
+import { getRandomString, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import Flex from "./helpers/Flex";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
@@ -35,6 +35,7 @@ export default function StartPageContent({...props}: Props) {
     const [notes, setNotes] = useState<JSX.Element[]>([]);
     const [noteSearchValue, setNoteSearchValue] = useState("");
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[]>([]);
+    const [isSearchingNotes, setIsSearchingNotes] = useState(false);
 
     const { selectedTagEntityNames } = useContext(StartPageContainerContext);
     const searchNoteHelper = new SearchNoteHelper(appUserEntity, selectedTagEntityNames);
@@ -46,15 +47,11 @@ export default function StartPageContent({...props}: Props) {
         setNotes,
 
         noteSearchResults,
+        isSearchingNotes,
+        setIsSearchingNotes,
 
         getNoteByNoteEntity
     }
-
-
-    useEffect(() => {
-        handleSearch();
-
-    }, [selectedTagEntityNames]);
 
 
     useEffect(() => {
@@ -66,6 +63,12 @@ export default function StartPageContent({...props}: Props) {
             $(window).off("keydown", handleKeyDown);
         }
     }, []);
+
+
+    useEffect(() => {
+        handleSearch();
+
+    }, [selectedTagEntityNames]);
 
 
     function handleKeyDown(event): void {
@@ -84,8 +87,8 @@ export default function StartPageContent({...props}: Props) {
         if (!appUserEntity?.notes)
             return [];
 
-        return appUserEntity.notes.map(note => 
-            getNoteByNoteEntity(note));
+        return appUserEntity.notes.map(noteEntity => 
+            getNoteByNoteEntity(noteEntity));
     }
 
 
@@ -97,6 +100,7 @@ export default function StartPageContent({...props}: Props) {
 
 
     function handleSearchKeyDown(event): void {
+        // set is search
 
         if (event.key === "Enter")
             handleSearch(event.target.value)
@@ -120,6 +124,8 @@ export default function StartPageContent({...props}: Props) {
 
 
     function handleSearch(searchValue = noteSearchValue): void {
+
+        setIsSearchingNotes(true);
 
         const searchResults = searchNoteHelper.getNoteSearchResults(searchValue);
 
@@ -172,6 +178,8 @@ export const StartPageContentContext = createContext({
     setNotes: (notes: JSX.Element[]) => {},
 
     noteSearchResults: [] as NoteEntity[],
+    isSearchingNotes: false,
+    setIsSearchingNotes: (isSearching: boolean) => {},
 
     getNoteByNoteEntity: (noteEntity: NoteEntity) => {return <></>}
 })

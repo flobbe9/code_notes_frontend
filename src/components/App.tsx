@@ -14,6 +14,7 @@ import Popup from './helpers/Popup';
 import Login from "./Login";
 import { useAppUser } from "../hooks/useAppUser";
 import { useLoggedIn } from "../hooks/useLoggedIn";
+import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 
 
 /**
@@ -40,7 +41,7 @@ export default function App() {
 
     const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress();
     const { isLoggedIn, setIsLoggedIn, isLoggedInFetched } = useLoggedIn();
-    const { appUserEntity, setAppUserEntity, isAppUserEntityFetched } = useAppUser(isLoggedIn);
+    const { appUserEntity, setAppUserEntity, isAppUserEntityFetched, fetchSaveAppUserEntity, fetchLogin } = useAppUser(isLoggedIn);
 
     /** Time the toast popup takes to slide up and down in ms. */
     const toastSlideDuration = 400;
@@ -49,16 +50,18 @@ export default function App() {
         appUserEntity,
         setAppUserEntity, 
         isAppUserEntityFetched,
+        fetchSaveAppUserEntity,
+        fetchLogin,
+
+        isLoggedIn,
+        setIsLoggedIn,
+        isLoggedInFetched,
 
         toast,
         moveToast,
 
         windowSize,
         getDeviceWidth,
-
-        isLoggedIn,
-        setIsLoggedIn,
-        isLoggedInFetched,
 
         isKeyPressed,
         isControlKeyPressed,
@@ -287,16 +290,18 @@ export const AppContext = createContext({
     appUserEntity: AppUserService.getDefaultInstance() as AppUserEntity,
     setAppUserEntity: (appUserEntity: AppUserEntity) => {},
     isAppUserEntityFetched: false,
+    fetchSaveAppUserEntity: async (appUserToSave?: AppUserEntity, decrypt = true) => {return {} as Promise<AppUserEntity | CustomExceptionFormat> },
+    fetchLogin: async (email: string, password: string) => {return {} as Promise<CustomExceptionFormat | Response>},
+
+    isLoggedIn: false,
+    setIsLoggedIn: (isLoggedIn: boolean) => {},
+    isLoggedInFetched: false,
 
     toast: (summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number) => {},
     moveToast: (hideToast = false, screenTime?: number) => {},
 
     windowSize: [0, 0],
     getDeviceWidth: () => {return {isMobileWidth: false, isTabletWidth: false,isDesktopWidth: true}},
-
-    isLoggedIn: false,
-    setIsLoggedIn: (isLoggedIn: boolean) => {},
-    isLoggedInFetched: false,
 
     isKeyPressed: (keyName: string): boolean => {return false},
     isControlKeyPressed: () => {return false as boolean},

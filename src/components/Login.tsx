@@ -27,7 +27,7 @@ export default function Login({...props}: Props) {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
-    const { toast } = useContext(AppContext);
+    const { toast, fetchLogin } = useContext(AppContext);
 
     const emailInputRef = useRef(null);
     const passwordInputRef = useRef(null);
@@ -46,7 +46,7 @@ export default function Login({...props}: Props) {
             return;
         }
 
-        const loginResponse = await AppUserService.fetchLogin(email, password);
+        const loginResponse = await fetchLogin(email, password);
 
         // case: fetch error
         if (isResponseError(loginResponse)) {

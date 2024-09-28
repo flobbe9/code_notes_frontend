@@ -1,10 +1,9 @@
-import $ from "jquery";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "../assets/styles/StartPageSideBarTagList.scss";
-import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
+import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { AppContext } from "./App";
 import { TagEntity } from "../abstract/entites/TagEntity";
-import { getRandomString, includesIgnoreCaseTrim, isBlank, isBooleanFalsy, log } from "../helpers/utils";
+import { getRandomString, isBlank, isBooleanFalsy } from "../helpers/utils";
 import { StartPageContainerContext } from "./StartPageContainer";
 import { StartPageSideBarContext } from "./StartPageSideBar";
 import TagCheckbox from "./TagCheckbox";

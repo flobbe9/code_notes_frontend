@@ -6,4 +6,4 @@ package-lock.json
 *.csr
 *.p12
 *.md
-test.js
+test.*

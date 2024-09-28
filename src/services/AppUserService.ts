@@ -1,13 +1,10 @@
 
 import { AppUserRole } from '../abstract/AppUserRole';
 import CryptoJSImpl from '../abstract/CryptoJSImpl';
-import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
 import { TagEntity } from '../abstract/entites/TagEntity';
 import { BACKEND_BASE_URL } from '../helpers/constants';
-import fetchJson, { fetchAny } from '../helpers/fetchUtils';
-import { isBlank, log, logError } from '../helpers/utils';
+import { fetchAny } from '../helpers/fetchUtils';
 import { AppUserEntity } from './../abstract/entites/AppUserEntity';
-import { CustomExceptionFormatService } from './CustomExceptionFormatService';
 
 
 /**
@@ -17,62 +14,6 @@ export class AppUserService {
     
     /** List of app user fields that need to be encrypted before caching the app user */
     private static SENSITIVE_FIELDS = ["email", "password"];
-
-
-    /**
-     * Save given ```appUserEntity``` if has no id or update if has an existing one.
-     * 
-     * Expecting all fields to present.
-     * 
-     * @param appUserEntity to save or update. Wont be altered
-     * @param decrypt indicates whether to decrypt sensitive fields of given ```appUserEntity``` (see {@link decryptSensitiveFields})
-     */
-    public static async fetchSave(appUserEntity: AppUserEntity, decrypt = true): Promise<AppUserEntity | CustomExceptionFormat | null> {
-
-        // case: falsy arg
-        if (!appUserEntity) {
-            logError("Failed to save app user. 'appUserEntity' cannot be falsy");
-            return null;
-        }
-
-        let appUserEntityCopy = appUserEntity;
-
-        // case: given app user is encrypted
-        if (decrypt)
-            appUserEntityCopy = this.decryptSensitiveFields(appUserEntity);
-
-        const url = `${BACKEND_BASE_URL}/appUser/save`;
-        return await fetchJson(url, "post", appUserEntityCopy);
-    }
-
-
-    /**
-     * Fetch login request which will create a session in the browser.
-     * 
-     * @param email of the app user
-     * @param password of the app user
-     * @returns the response which is either a ```Response``` object with a csrf token or an error object
-     */
-    public static async fetchLogin(email: string, password: string): Promise<Response | CustomExceptionFormat> {
-
-        if (isBlank(email) || isBlank(password))
-            return CustomExceptionFormatService.getInstance(400, "Failed to fetch login. 'email' or 'password' are blank");
-
-        const url = `${BACKEND_BASE_URL}/login?username=${email}&password=${password}`;
-
-        return await fetchAny(url, "post");
-    }
-    
-
-    /**
-     * Make logout request to backend. Cannot fail
-     */
-    public static async fetchLogout(): Promise<void> {
-
-        const url = `${BACKEND_BASE_URL}/logout`;
-
-        await fetchAny(url);
-    }
 
     
     /**

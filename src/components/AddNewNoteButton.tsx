@@ -7,7 +7,6 @@ import Button from "./helpers/Button";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import { isArrayFalsy, log } from "../helpers/utils";
 import { AppContext } from "./App";
-import { AppUserService } from "../services/AppUserService";
 import { isResponseError } from "../helpers/fetchUtils";
 
 
@@ -21,7 +20,7 @@ interface Props extends HelperProps {
  */
 export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
-    const { appUserEntity, toast } = useContext(AppContext);
+    const { appUserEntity, toast, fetchSaveAppUserEntity } = useContext(AppContext);
     const { notes, setNotes, getNoteByNoteEntity, setIsSearchingNotes } = useContext(StartPageContentContext)
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteButton", true);
@@ -51,7 +50,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
         const appUserEntityCopy = appUserEntity;
         appUserEntityCopy.notes! = [newNoteEntity, ...appUserEntityCopy.notes!];
 
-        const savedAppUserEntity = await AppUserService.fetchSave(appUserEntityCopy);
+        const savedAppUserEntity = await fetchSaveAppUserEntity(appUserEntityCopy);
         // case: fetch error
         if (isResponseError(savedAppUserEntity)) {
             toast("Failed to save note", "An unexpected error occurred. Please try refreshing the page", "error");
