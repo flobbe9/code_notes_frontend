@@ -7,6 +7,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import { logErrorFiltered, logWarnFiltered } from './helpers/utils';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 
 // useQuery config
@@ -28,5 +29,7 @@ root.render(
         persistOptions={{persister: persister}}
     >
         <App />
+        
+        <ReactQueryDevtools />
     </PersistQueryClientProvider>
 );
