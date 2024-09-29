@@ -20,5 +20,7 @@
         color: white;
         height: 100%;
         opacity: 0;
+        // necessary for z index to be applied
+        position: relative;
     }
 }

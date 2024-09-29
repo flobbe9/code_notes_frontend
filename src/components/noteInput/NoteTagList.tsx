@@ -11,6 +11,7 @@ import { TagEntity } from "../../abstract/entites/TagEntity";
 import { AppContext } from "../App";
 import { StartPageContainerContext } from "../StartPageContainer";
 import { AppUserService } from "../../services/AppUserService";
+import { AppFetchContext } from "../AppFetchContextHolder";
 
 
 interface Props extends DefaultProps {
@@ -31,8 +32,7 @@ export default function NoteTagList({...props}: Props) {
 
     const componentRef = useRef(null);
 
-    const { appUserEntity } = useContext(AppContext);
-    const { updateSideBar } = useContext(StartPageContainerContext);
+    const { appUserEntity, noteEntities } = useContext(AppFetchContext);
     const { noteEntity } = useContext(NoteContext);
 
     const context = {
@@ -88,13 +88,10 @@ export default function NoteTagList({...props}: Props) {
             return;
 
         // add to appUser first
-        AppUserService.addTag(appUserEntity, tagEntity);
+        AppUserService.addTag(appUserEntity, noteEntities, tagEntity);
 
         // add to noteEntity
         noteEntity.tags = [...(noteEntity.tags || []), tagEntity];
-
-        // notify sidebar
-        updateSideBar();
     }
 
 
@@ -143,19 +140,17 @@ export default function NoteTagList({...props}: Props) {
         removeTagFromAppUserEntityEntity(tagToRemove);
 
         removeTagElement(index);
-
-        updateSideBar();
     }
 
 
     function removeTagFromAppUserEntityEntity(tagEntity: TagEntity): void {
 
         // case: falsy arg or appUserEntity has no tagEntities or no notes anyway
-        if (!tagEntity || !appUserEntity.tags || !appUserEntity.notes)
+        if (!tagEntity || !appUserEntity.tags)
             return;
 
         // case: tagEntity is used somewhere else
-        if (AppUserService.isTagEntityPresentInANote(appUserEntity, tagEntity))
+        if (AppUserService.isTagEntityPresentInANote(noteEntities, tagEntity))
             return;
                 
         AppUserService.removeTagEntity(appUserEntity, tagEntity);

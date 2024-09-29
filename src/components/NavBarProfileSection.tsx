@@ -8,6 +8,7 @@ import { log } from "./../helpers/utils";
 import { AppContext } from "./App";
 import { PROFILE_PATH } from "../helpers/constants";
 import CustomLink from "./helpers/CustomLink";
+import { AppFetchContext } from "./AppFetchContextHolder";
 
 
 interface Props extends DefaultProps {
@@ -22,7 +23,8 @@ export default function NavBarProfileSection({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NavBarProfileSection", true);
 
-    const { getDeviceWidth, isLoggedIn } = useContext(AppContext);
+    const { getDeviceWidth } = useContext(AppContext);
+    const { isLoggedIn } = useContext(AppFetchContext);
     const { isMobileWidth } = getDeviceWidth();
 
 

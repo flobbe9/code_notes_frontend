@@ -24,6 +24,10 @@ import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityS
 import { NoteEntityService } from './../../abstract/services/NoteEntityService';
 import Confirm from "../helpers/Confirm";
 import HelperDiv from "../helpers/HelperDiv";
+import { isResponseError } from "../../helpers/fetchUtils";
+import { AppFetchContext } from "../AppFetchContextHolder";
+import { StartPageSideBarContext } from "../StartPageSideBar";
+import { StartPageContainerContext } from "../StartPageContainer";
 
 
 interface Props extends DefaultProps {
@@ -51,17 +55,21 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     const [aboutToSave, setAboutToSave] = useState(false);
 
-    const { setIsPopupVisible, setPopupContent } = useContext(AppContext);
-    const { noteSearchResults, isSearchingNotes } = useContext(StartPageContentContext);
-
     /** 
      * Number of noteInputs that are currently parsing or highlighting their values. Indicates whether the save() function should wait
      * for noteInput values or not.
      */
     const [numNoteInputsParsing, setNumNoteInputsParsing] = useState(0);
 
-    const { toast, appUserEntity } = useContext(AppContext);
-    const { notes, setNotes } = useContext(StartPageContentContext);
+    const { toast, setIsPopupVisible, setPopupContent } = useContext(AppContext);
+    const { appUserEntity, 
+        noteEntities, 
+        setNoteEntities, 
+        fetchSaveNoteEntity, 
+        fetchDeleteNoteEntity,
+        refetchAppUserEntity
+    } = useContext(AppFetchContext);
+    const { noteSearchResults, isSearchingNotes, notes, setNotes } = useContext(StartPageContentContext);
 
     const componentRef = useRef(null);
     const saveButtonRef = useRef(null);
@@ -144,23 +152,31 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     async function handleSave(event): Promise<void> {
 
-        // case: still parsing
-        if (!isReadyToSave()) 
-            return;
+        // // case: still parsing
+        // if (!isReadyToSave()) 
+        //     return;
 
         // case: invalid input
         if (!isNoteValid())
             return;
 
-        return new Promise((res, rej) => {
-            setTimeout(() => {
-                toast("Save", "Successfully saved note", "success", 5000);
-                log(noteEntity);
-                log(appUserEntity)
-                setAboutToSave(false);
-                res();
-            }, 2000);
-        });
+        const jsonResponse = await fetchSaveNoteEntity(noteEntity);
+
+        // TODO: still necessary?
+        setAboutToSave(false);
+
+        if (isResponseError(jsonResponse)) {
+            toast("Failed to save note", "An unexpected error occurred. Please copy your unsaved contents and refresh the page.", "error");
+            return;
+        }
+
+        // call this before updating side bar
+        refetchAppUserEntity();
+
+        // update sidebar
+        setNoteEntities([...noteEntities]);
+
+        toast("Save", "Successfully saved note", "success", 5000);
     }
 
 
@@ -190,21 +206,26 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     }
 
 
-    function deleteNote(): void {
+    async function deleteNote(): Promise<void> {
 
         if (!appUserEntity)
             return;
+        
+        const response = await fetchDeleteNoteEntity(noteEntity);
+        if (isResponseError(response))
+            return;
+
+        refetchAppUserEntity();
 
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
 
-        // update appUserEntity
-        appUserEntity.notes?.splice(noteIndex, 1);
+        // update note entities
+        noteEntities.splice(noteIndex, 1);
+        setNoteEntities([...noteEntities]);
 
         // update notes
         notes.splice(noteIndex, 1);
         setNotes([...notes]);
-
-        // TODO: fetch delete note
     }
 
 

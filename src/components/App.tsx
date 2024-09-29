@@ -3,18 +3,14 @@ import React, { createContext, useEffect, useRef, useState } from 'react';
 import '../assets/styles/App.scss';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { getCSSValueAsNumber, isNumberFalsy, log } from '../helpers/utils';
+import { getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
 import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
 import useKeyPress from '../hooks/useKeyPress';
 import Overlay from './helpers/Overlay';
-import { AppUserEntity } from '../abstract/entites/AppUserEntity';
-import { AppUserService } from "../services/AppUserService";
 import Popup from './helpers/Popup';
 import Login from "./Login";
-import { useAppUser } from "../hooks/useAppUser";
-import { useLoggedIn } from "../hooks/useLoggedIn";
-import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
+import AppFetchContextHolder from "./AppFetchContextHolder";
 
 
 /**
@@ -40,23 +36,11 @@ export default function App() {
     const [hasAppRendered, setHasAppRendered] = useState(false);
 
     const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress();
-    const { isLoggedIn, setIsLoggedIn, isLoggedInFetched } = useLoggedIn();
-    const { appUserEntity, setAppUserEntity, isAppUserEntityFetched, fetchSaveAppUserEntity, fetchLogin } = useAppUser(isLoggedIn);
 
     /** Time the toast popup takes to slide up and down in ms. */
     const toastSlideDuration = 400;
 
     const context = {
-        appUserEntity,
-        setAppUserEntity, 
-        isAppUserEntityFetched,
-        fetchSaveAppUserEntity,
-        fetchLogin,
-
-        isLoggedIn,
-        setIsLoggedIn,
-        isLoggedInFetched,
-
         toast,
         moveToast,
 
@@ -72,6 +56,8 @@ export default function App() {
         setIsAppOverlayHideOnClick,
         setIsAppOverlayHideOnEscape,
         setAppOverlayContent,
+        showPendingOverlay,
+        hidePendingOverlay,
 
         isPopupVisible, 
         setIsPopupVisible,
@@ -217,14 +203,25 @@ export default function App() {
 
 
     /**
-     * Displays the app overlay with a pending icon and makes it non-escapable
+     * Displays the app overlay with a pending icon and makes it non-escapable.
+     * 
+     * @param overlayContent the content to put below the pending icon
      */
-    function showPendingOverlay(): void {
+    function showPendingOverlay(overlayContent?: JSX.Element | JSX.Element[]): void {
 
         setIsAppOverlayVisible(true);
         // TODO: make spinner icon
         setAppOverlayContent(
-            <i className="fa-solid fa-circle-notch rotating" style={{fontSize: "2em"}}></i>
+            <>
+                <i 
+                    className="fa-solid fa-circle-notch rotating" 
+                    style={{
+                        color: "var(--accentColor)",
+                        fontSize: "2em"
+                    }}
+                ></i>
+                {overlayContent}
+            </>
         )
         setIsAppOverlayHideOnClick(false);
         setIsAppOverlayHideOnEscape(false);
@@ -246,40 +243,41 @@ export default function App() {
     return (
         <AppContext.Provider value={context}>
             <BrowserRouter>
-                <div id="App" className="App">
-                    <Overlay 
-                        id="App"
-                        isOverlayVisible={isAppOverlayVisible} 
-                        setIsOverlayVisible={setIsAppOverlayVisible} 
-                        hideOnClick={isAppOverlayHideOnClick}
-                        hideOnEscape={isAppOverlayHideOnEscape}
-                        fitParent={false}
-                    >
-                        {appOverlayContent}
-                    </Overlay>
+                <AppFetchContextHolder>
+                    <div id="App" className="App">
+                        <Overlay 
+                            id="App"
+                            isOverlayVisible={isAppOverlayVisible} 
+                            setIsOverlayVisible={setIsAppOverlayVisible} 
+                            hideOnClick={isAppOverlayHideOnClick}
+                            hideOnEscape={isAppOverlayHideOnEscape}
+                            fitParent={false}
+                        >
+                            {appOverlayContent}
+                        </Overlay>
 
-                    <Popup />
+                        <Popup />
 
-                    <NavBar />
+                        <NavBar />
 
-                    <div className="content">
-                        <Routes>
-                            <Route path="/" element={<StartPageContainer />} />
-                            <Route path="/register" element={<div>Register</div>} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/profile" element={<div>{appUserEntity?.email || "undefined"}</div>} />
-                            <Route path="*" element={<div>404</div>} />
-                        </Routes>
+                        <div className="content">
+                            <Routes>
+                                <Route path="/" element={<StartPageContainer />} />
+                                <Route path="/register" element={<div>Register</div>} />
+                                <Route path="/login" element={<Login />} />
+                                <Route path="*" element={<div>404</div>} />
+                            </Routes>
+                        </div>
+
+                        {/* Toast popup */}
+                        <Toast 
+                            summary={toastSummary}
+                            message={toastMessage}
+                            sevirity={toastSevirity}
+                            ref={toastRef} 
+                        />
                     </div>
-
-                    {/* Toast popup */}
-                    <Toast 
-                        summary={toastSummary}
-                        message={toastMessage}
-                        sevirity={toastSevirity}
-                        ref={toastRef} 
-                    />
-                </div>
+                </AppFetchContextHolder>
             </BrowserRouter>
         </AppContext.Provider>
     );
@@ -287,16 +285,6 @@ export default function App() {
 
 
 export const AppContext = createContext({
-    appUserEntity: AppUserService.getDefaultInstance() as AppUserEntity,
-    setAppUserEntity: (appUserEntity: AppUserEntity) => {},
-    isAppUserEntityFetched: false,
-    fetchSaveAppUserEntity: async (appUserToSave?: AppUserEntity, decrypt = true) => {return {} as Promise<AppUserEntity | CustomExceptionFormat> },
-    fetchLogin: async (email: string, password: string) => {return {} as Promise<CustomExceptionFormat | Response>},
-
-    isLoggedIn: false,
-    setIsLoggedIn: (isLoggedIn: boolean) => {},
-    isLoggedInFetched: false,
-
     toast: (summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number) => {},
     moveToast: (hideToast = false, screenTime?: number) => {},
 
@@ -312,6 +300,8 @@ export const AppContext = createContext({
     setIsAppOverlayHideOnClick: (isHideOnClick: boolean) => {},
     setIsAppOverlayHideOnEscape: (isHideOnEscape: boolean) => {},
     setAppOverlayContent: (overlayContent: JSX.Element | JSX.Element[]) => {},
+    showPendingOverlay: (overlayContent?: JSX.Element | JSX.Element[]) => {},
+    hidePendingOverlay: () => {},
 
     isPopupVisible: false, 
     setIsPopupVisible: (isVisible: boolean) => {},

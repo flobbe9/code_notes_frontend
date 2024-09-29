@@ -19,5 +19,5 @@ export interface AppUserEntity extends AbstractEntity {
 
     tags?: TagEntity[] | null;
 
-    notes?: NoteEntity[] | null;
+    // notes?: NoteEntity[] | null;
 }

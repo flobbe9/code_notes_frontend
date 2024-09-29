@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React from "react";
 import "./../assets/styles/NavBar.scss";
 import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";

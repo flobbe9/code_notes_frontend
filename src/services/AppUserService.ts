@@ -1,9 +1,8 @@
 
 import { AppUserRole } from '../abstract/AppUserRole';
 import CryptoJSImpl from '../abstract/CryptoJSImpl';
+import { NoteEntity } from '../abstract/entites/NoteEntity';
 import { TagEntity } from '../abstract/entites/TagEntity';
-import { BACKEND_BASE_URL } from '../helpers/constants';
-import { fetchAny } from '../helpers/fetchUtils';
 import { AppUserEntity } from './../abstract/entites/AppUserEntity';
 
 
@@ -56,14 +55,15 @@ export class AppUserService {
      * Adds given tag to ```appUserEntity.tags``` if not contains.
      * 
      * @param appUserEntity to add tags to
+     * @param noteEntities to check for given ```tagEntitiy``` beforehand
      * @param tagEntity to add to ```this.tags```
      */
-    public static addTag(appUserEntity: AppUserEntity, tagEntity: TagEntity): void {
+    public static addTag(appUserEntity: AppUserEntity, noteEntities: NoteEntity[], tagEntity: TagEntity): void {
 
-        if (!appUserEntity.tags)
+        if (!appUserEntity.tags || !noteEntities)
             appUserEntity.tags = [];
 
-        if (!this.isTagEntityPresentInANote(appUserEntity, tagEntity))
+        if (!this.isTagEntityPresentInANote(noteEntities, tagEntity))
             appUserEntity.tags.push(tagEntity);
     }
 
@@ -86,16 +86,16 @@ export class AppUserService {
 
 
     /**
-     * @param appUserEntity to check tags for
+     * @param noteEntities to check for given ```tagEntity```
      * @param tag to search
-     * @returns ```true``` if given tag is present at least in one note of ```appUserEntity.notes```, else ```false```
+     * @returns ```true``` if given tag is present at least in one note of ```noteEntities```, else ```false```
      */
-    public static isTagEntityPresentInANote(appUserEntity: AppUserEntity, tag: TagEntity): boolean {
+    public static isTagEntityPresentInANote(noteEntities: NoteEntity[], tag: TagEntity): boolean {
 
-        if (!tag || !appUserEntity.notes)
+        if (!tag || !noteEntities)
             return false;
 
-        return !!appUserEntity.notes
+        return !!noteEntities
             .find(noteEntity => 
                 !!(noteEntity.tags || [])
                     .find(tagEntity => 
@@ -116,7 +116,6 @@ export class AppUserService {
             password: "", 
             role: AppUserRole.USER, 
             tags: null, 
-            notes: null
         };
     }
     
@@ -131,7 +130,6 @@ export class AppUserService {
             password: appUserEntity.password,
             role: appUserEntity.role,
             tags: appUserEntity.tags || null,
-            notes: appUserEntity.notes || null
         }
     }
 }

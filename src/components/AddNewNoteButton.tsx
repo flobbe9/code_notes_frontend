@@ -8,6 +8,7 @@ import { NoteEntity } from "../abstract/entites/NoteEntity";
 import { isArrayFalsy, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import { isResponseError } from "../helpers/fetchUtils";
+import { AppFetchContext } from "./AppFetchContextHolder";
 
 
 interface Props extends HelperProps {
@@ -20,7 +21,8 @@ interface Props extends HelperProps {
  */
 export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
-    const { appUserEntity, toast, fetchSaveAppUserEntity } = useContext(AppContext);
+    const { toast } = useContext(AppContext);
+    const { noteEntities, setNoteEntities, fetchSaveNoteEntity, isLoggedIn } = useContext(AppFetchContext);
     const { notes, setNotes, getNoteByNoteEntity, setIsSearchingNotes } = useContext(StartPageContentContext)
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteButton", true);
@@ -31,12 +33,6 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
      */
     async function prependNote(): Promise<void> {
 
-        if (!appUserEntity)
-            return;
-
-        if (isArrayFalsy(appUserEntity.notes))
-            appUserEntity.notes = [];
-
         // create new note entity
         const newNoteEntity: NoteEntity = {
             title: "",
@@ -44,27 +40,26 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
             tags: []
         }
 
-        // update appUser
-        // TODO: update cache??
-            // make fetch a separate helper
-        const appUserEntityCopy = appUserEntity;
-        appUserEntityCopy.notes! = [newNoteEntity, ...appUserEntityCopy.notes!];
+        // wont save if not logged in but that's fine here
+        const jsonResponse = await fetchSaveNoteEntity(newNoteEntity);
 
-        const savedAppUserEntity = await fetchSaveAppUserEntity(appUserEntityCopy);
-        // case: fetch error
-        if (isResponseError(savedAppUserEntity)) {
+        // only point out fetch error if is logged in
+        if (isResponseError(jsonResponse) && isLoggedIn) {
             toast("Failed to save note", "An unexpected error occurred. Please try refreshing the page", "error");
             return;
         }
 
+        newNoteEntity.id = (jsonResponse as NoteEntity).id;
+        newNoteEntity.created = (jsonResponse as NoteEntity).created;
+
         // will prevent note render from considering search results
         setIsSearchingNotes(false);
 
-        appUserEntity.notes! = [newNoteEntity, ...appUserEntity.notes!];
+        // update note entities
+        setNoteEntities([newNoteEntity, ...noteEntities]);
 
         // update notes
-        const newNote = getNoteByNoteEntity(newNoteEntity);
-        setNotes([newNote, ...notes]);
+        setNotes([getNoteByNoteEntity(newNoteEntity), ...notes]);
     }
 
 

@@ -10,6 +10,7 @@ import CryptoJSImpl from "../abstract/CryptoJSImpl";
 import { AppContext } from "./App";
 import { AppUserService } from "../services/AppUserService";
 import { isResponseError } from "../helpers/fetchUtils";
+import { AppFetchContext } from "./AppFetchContextHolder";
 
 
 interface Props extends DefaultProps {
@@ -27,7 +28,8 @@ export default function Login({...props}: Props) {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
-    const { toast, fetchLogin } = useContext(AppContext);
+    const { toast } = useContext(AppContext);
+    const { fetchLogin } = useContext(AppFetchContext);
 
     const emailInputRef = useRef(null);
     const passwordInputRef = useRef(null);

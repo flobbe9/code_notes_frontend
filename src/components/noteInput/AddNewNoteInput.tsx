@@ -12,6 +12,7 @@ import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE
 import { StartPageContentContext } from "../StartPageContent";
 import { AppContext } from "../App";
 import { StartPageContainerContext } from "../StartPageContainer";
+import { AppFetchContext } from "../AppFetchContextHolder";
 
 
 interface Props extends DefaultProps {
@@ -28,8 +29,7 @@ export default function AddNewNoteInput({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInput");
 
-    const { appUserEntity } = useContext(AppContext);
-
+    const { appUserEntity, noteEntities } = useContext(AppFetchContext);
     const { noteEntity, noteInputs, setNoteInputs, numNoteInputsParsing, getNoteInputByNoteInputType } = useContext(NoteContext);
 
 
@@ -58,7 +58,7 @@ export default function AddNewNoteInput({...props}: Props) {
         let value = "";
 
         // case: is first note and first noteInput with variables
-        if ((appUserEntity!.notes || []).length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.PLAIN_TEXT))
+        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.PLAIN_TEXT))
             // add tutorial text
             value = "Plain text and some <code>code...</code>";
 
@@ -74,7 +74,7 @@ export default function AddNewNoteInput({...props}: Props) {
         let value = "";
 
         // case: is first note and first noteInput with variables
-        if ((appUserEntity!.notes || []).length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.CODE_WITH_VARIABLES))
+        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.CODE_WITH_VARIABLES))
             // add tutorial text
             value = "Some code and a variable x = " + getDefaultVariableInput() + ". Change the programming language on the right.";
 

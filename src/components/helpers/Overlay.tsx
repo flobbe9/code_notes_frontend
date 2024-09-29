@@ -120,7 +120,7 @@ export default forwardRef(function Overlay(
         // show background
         background.animate(
             {
-                opacity: 0.3
+                opacity: 0.5
             },
             fadeInDuration
         );
@@ -186,6 +186,7 @@ export default forwardRef(function Overlay(
             <div className="overlayBackground" ref={backgroundRef}></div>
             <Flex 
                 className="overlayChildrenContainer" 
+                flexDirection="column"
                 horizontalAlign="center"
                 verticalAlign="center"
                 ref={childrenRef}

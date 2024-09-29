@@ -11,6 +11,7 @@ import { NoteEntity } from "../abstract/entites/NoteEntity";
 import AddNewNoteButton from "./AddNewNoteButton";
 import { StartPageContainerContext } from "./StartPageContainer";
 import { SearchNoteHelper } from "../helpers/SearchNoteHelper";
+import { AppFetchContext } from "./AppFetchContextHolder";
 
 
 interface Props extends DefaultProps {
@@ -30,15 +31,18 @@ export default function StartPageContent({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageContent", true);
     
-    const { appUserEntity, isKeyPressed } = useContext(AppContext);
+    const { isKeyPressed } = useContext(AppContext);
+    const { noteEntities, isFetchNoteEntitiesTakingLonger } = useContext(AppFetchContext);
     
     const [notes, setNotes] = useState<JSX.Element[]>([]);
     const [noteSearchValue, setNoteSearchValue] = useState("");
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[]>([]);
     const [isSearchingNotes, setIsSearchingNotes] = useState(false);
 
+    const { showPendingOverlay, hidePendingOverlay } = useContext(AppContext);
+    const { isNoteEntitiesFetched } = useContext(AppFetchContext);
     const { selectedTagEntityNames } = useContext(StartPageContainerContext);
-    const searchNoteHelper = new SearchNoteHelper(appUserEntity, selectedTagEntityNames);
+    const searchNoteHelper = new SearchNoteHelper(noteEntities, selectedTagEntityNames);
     
     const searchInputRef = useRef(null);
 
@@ -53,6 +57,12 @@ export default function StartPageContent({...props}: Props) {
         getNoteByNoteEntity
     }
 
+    
+    useEffect(() => {
+        handleFetchNoteEntitiesTakingLonger();
+
+    }, [isFetchNoteEntitiesTakingLonger, isNoteEntitiesFetched])
+
 
     useEffect(() => {
         $(window).on("keydown", handleKeyDown);
@@ -62,7 +72,7 @@ export default function StartPageContent({...props}: Props) {
         return () => {
             $(window).off("keydown", handleKeyDown);
         }
-    }, []);
+    }, [noteEntities]);
 
 
     useEffect(() => {
@@ -84,10 +94,10 @@ export default function StartPageContent({...props}: Props) {
     // TOOD: map in revers for last to be on top?
     function mapNoteEntitiesToJsx(): JSX.Element[] {
 
-        if (!appUserEntity?.notes)
+        if (!noteEntities)
             return [];
 
-        return appUserEntity.notes.map(noteEntity => 
+        return noteEntities.map(noteEntity => 
             getNoteByNoteEntity(noteEntity));
     }
 
@@ -125,11 +135,24 @@ export default function StartPageContent({...props}: Props) {
 
     function handleSearch(searchValue = noteSearchValue): void {
 
-        setIsSearchingNotes(true);
-
         const searchResults = searchNoteHelper.getNoteSearchResults(searchValue);
 
         setNoteSearchResults(searchResults);
+    }
+
+
+    function handleFetchNoteEntitiesTakingLonger(): void {
+
+        // case: fetch was quick enough, dont do anything
+        if (!isFetchNoteEntitiesTakingLonger)
+            return;
+
+        const overlayContent = <p className="mt-1">Loading notes is taking a little longer...</p>;
+
+        if (!isNoteEntitiesFetched)
+            showPendingOverlay(overlayContent);
+        else
+            hidePendingOverlay(); 
     }
 
 
@@ -149,7 +172,7 @@ export default function StartPageContent({...props}: Props) {
                         placeHolder="Search for note Title or Tag" 
                         title="Search notes (Ctrl+Shift+F)"
                         ref={searchInputRef}
-                        disabled={!appUserEntity?.notes?.length}
+                        disabled={!noteEntities.length}
                         onChange={handleSearchValueChange}
                         onKeyUp={handleSearchKeyDown}
                         onXIconClick={handleSearchXIconClick}

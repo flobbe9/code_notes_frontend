@@ -10,6 +10,7 @@ import StartPageSideBarTagList from "./StartPageSideBarTagList";
 import { StartPageContainerContext } from "./StartPageContainer";
 import Button from "./helpers/Button";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../helpers/constants";
+import { AppFetchContext } from "./AppFetchContextHolder";
 
 
 interface Props extends DefaultProps {
@@ -32,7 +33,8 @@ export default function StartPageSideBar({...props}: Props) {
     /** Refers to ```selectedTagEntityNames``` beeing not empty */
     const [anyTagsSelected, setAnyTagsSelected] = useState(false);
 
-    const { appUserEntity, getDeviceWidth, isKeyPressed } = useContext(AppContext);
+    const { getDeviceWidth, isKeyPressed } = useContext(AppContext);
+    const { appUserEntity, noteEntities } = useContext(AppFetchContext);
     const { setIsShowSideBar, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
@@ -174,7 +176,7 @@ export default function StartPageSideBar({...props}: Props) {
                         <SearchBar 
                             placeHolder="Search tags..."
                             title="Search tags"
-                            disabled={!appUserEntity?.notes?.length}
+                            disabled={!noteEntities.length}
                             onChange={handleSearchBarChange}
                             onXIconClick={handleSearchBarXIconClick}
                             ref={searchBarRef}
@@ -200,7 +202,7 @@ export default function StartPageSideBar({...props}: Props) {
 
                         {/* Tag checkboxes */}
                         <div className="startPageSideBarListContainer">
-                            <StartPageSideBarTagList disabled={!appUserEntity?.notes?.length} />
+                            <StartPageSideBarTagList disabled={!noteEntities.length} />
                         </div>
                     </div>
                 </Flex>

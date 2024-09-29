@@ -41,7 +41,6 @@ export default function StartPageContainer({children, ...props}: Props) {
 
         updateSideBarStates, 
         setUpdateSideBarStates,
-        updateSideBar,
 
         getStartPageSideBarWidth,
 
@@ -51,9 +50,6 @@ export default function StartPageContainer({children, ...props}: Props) {
 
 
     useEffect(() => {
-        // initialize sidebar states
-        updateSideBar();
-
         confirmPageUnload(handlePageUnload);
 
     }, []);
@@ -63,12 +59,6 @@ export default function StartPageContainer({children, ...props}: Props) {
         updateStartPageContentWidth();
 
     }, [isShowSideBar, windowSize]);
-
-
-    function updateSideBar(): void {
-
-        setUpdateSideBarStates(!updateSideBarStates);
-    }
 
 
     function updateStartPageContentWidth(): void {
@@ -156,7 +146,6 @@ export const StartPageContainerContext = createContext({
 
     updateSideBarStates: true as (boolean | undefined), 
     setUpdateSideBarStates: (update: boolean | undefined) => {},
-    updateSideBar: () => {},
 
     getStartPageSideBarWidth: () => {return 0 as number},
 

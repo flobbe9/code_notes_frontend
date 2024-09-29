@@ -3,7 +3,6 @@ import { AppContext } from "../components/App";
 import { StartPageContainerContext } from "../components/StartPageContainer";
 import { matchStringsConsiderWhiteSpace } from "./searchUtils";
 import { isBlank } from "./utils";
-import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 
 
 /**
@@ -13,14 +12,14 @@ import { AppUserEntity } from '../abstract/entites/AppUserEntity';
  */
 export class SearchNoteHelper {
 
-    private appUserEntity: AppUserEntity | null;
+    private noteEntities: NoteEntity[];
     
     private selectedTagEntityNames: Set<string>;
 
 
-    constructor(appUserEtity: AppUserEntity | null, selectedTagEntityNames: Set<string>) {
+    constructor(noteEntities: NoteEntity[], selectedTagEntityNames: Set<string>) {
 
-        this.appUserEntity = appUserEtity;
+        this.noteEntities = noteEntities;
         this.selectedTagEntityNames = selectedTagEntityNames;
     }
 
@@ -30,12 +29,12 @@ export class SearchNoteHelper {
         const selectedTagNames = [...this.selectedTagEntityNames || []];
 
         // case: no notes
-        if (!this.appUserEntity?.notes)
+        if (!this.noteEntities.length)
             return [];
 
         // case: no serach value and no selected tag
         if (isBlank(searchValue) && !selectedTagNames.length)
-            return this.appUserEntity.notes || [];
+            return this.noteEntities || [];
 
         // case: both serach value and selected tag
         if (selectedTagNames.length && !isBlank(searchValue))
@@ -53,10 +52,10 @@ export class SearchNoteHelper {
     private matchAllNoteEntitiesBySelectedTag(): NoteEntity[] {
 
         // case: no notes present
-        if (!this.appUserEntity?.notes)
+        if (!this.noteEntities.length)
             return [];
 
-        return this.appUserEntity.notes
+        return this.noteEntities
             .filter(noteEntity => 
                 this.matchNoteEntityBySelectedTagAndNoteTagExactly(this.selectedTagEntityNames, noteEntity));
     }
@@ -65,10 +64,10 @@ export class SearchNoteHelper {
     private matchAllNoteEntitiesBySearchValue(searchValue: string) {
 
         // case: falsy search input or no notes present
-        if (isBlank(searchValue) || !this.appUserEntity?.notes)
+        if (isBlank(searchValue) || !this.noteEntities.length)
             return [];
 
-        return this.appUserEntity.notes
+        return this.noteEntities
             .filter(noteEntity => 
                 // match title
                 this.matchNoteEntityBySearchValueAndNoteTitle(searchValue, noteEntity) ||
@@ -81,10 +80,10 @@ export class SearchNoteHelper {
     private matchAllNoteEntitiesBySearchValueAndSelectedTag(searchValue: string): NoteEntity[] {
 
         // case: falsy search input or no notes present
-        if (!this.appUserEntity?.notes)
+        if (!this.noteEntities.length)
             return [];
 
-        return this.appUserEntity.notes
+        return this.noteEntities
             .filter(noteEntity => 
                 this.matchNoteEntityBySearchValueAndSelectedTag(searchValue, noteEntity));
     }
