@@ -2,7 +2,7 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
-import fetchJson, { isResponseError } from "../helpers/fetchUtils";
+import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { log } from "../helpers/utils";
 
@@ -13,6 +13,7 @@ import { log } from "../helpers/utils";
  * @since 0.0.1
  */
 export function useLoggedIn() {
+    
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const { toast } = useContext(AppContext);
@@ -22,7 +23,7 @@ export function useLoggedIn() {
 
     const { data, isFetched } = useQuery<boolean>({
         queryKey: LOGGED_IN_USER_QUERY_KEY,
-        queryFn: fetchCurrentAppUser,
+        queryFn: fetchLoggedIn,
         initialData: queryClient.getQueryData(LOGGED_IN_USER_QUERY_KEY) || false,
     });
 
@@ -39,16 +40,14 @@ export function useLoggedIn() {
      * 
      * @returns ```true``` if login fetch request is status 200, else false
      */
-    async function fetchCurrentAppUser(): Promise<boolean> {
+    async function fetchLoggedIn(): Promise<boolean> {
 
-        const url = `${BACKEND_BASE_URL}/appUser/checkLoggedIn`;
+        const url = `${BACKEND_BASE_URL}/app-user/check-logged-in`;
 
-        const jsonResponse = await fetchJson(url, "get", null, undefined, false);
+        const jsonResponse = await fetchAny(url);
 
         if (isResponseError(jsonResponse)) {
-            // case: actual fetch error (401 is expected if not logged in)
-            if (jsonResponse.status !== 401)
-                toast("Unexpected Error", "The page could not be loaded completely. Please refresh the page.", "error");
+            toast("Unexpected Error", "The page could not be loaded completely. Please refresh the page.", "error");
 
             // TODO: logout if still logged in but 401
             // else ()
@@ -56,7 +55,7 @@ export function useLoggedIn() {
             return false;
         }
 
-        return (jsonResponse as CustomExceptionFormat).status === 200;
+        return await jsonResponse.text() === "true";
     }
 
 
