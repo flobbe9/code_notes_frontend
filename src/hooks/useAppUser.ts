@@ -50,7 +50,7 @@ export function useAppUser(isLoggedIn: boolean) {
         if (!isLoggedIn)
             return initAppUserEntity;
 
-        const url = `${BACKEND_BASE_URL}/appUser/getCurrent`;
+        const url = `${BACKEND_BASE_URL}/app-user/getCurrent`;
 
         const jsonResponse = await fetchJson(url, "post");
 
@@ -87,7 +87,7 @@ export function useAppUser(isLoggedIn: boolean) {
         if (decrypt)
             appUserToSaveCopy = AppUserService.decryptSensitiveFields(appUserToSave);
 
-        const url = `${BACKEND_BASE_URL}/appUser/save`;
+        const url = `${BACKEND_BASE_URL}/app-user/save`;
         return await fetchJson(url, "post", appUserToSaveCopy);
     }
 
