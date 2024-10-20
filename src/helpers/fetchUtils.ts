@@ -121,9 +121,7 @@ export async function fetchAnyReturnBlobUrl(url: string, method = "get", body?: 
  */
 export function isHttpStatusCodeAlright(statusCode: number): boolean {
 
-    const firstDigit = Math.floor(statusCode / 100)
-
-    return firstDigit === 1 || firstDigit === 2 ||  firstDigit === 3;
+    return statusCode <= 399;
 }
 
 

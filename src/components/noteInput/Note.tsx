@@ -206,14 +206,19 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     }
 
 
+    /**
+     * Fetch delete notes and update both ```noteEntities``` and ```notes``` state.
+     */
     async function deleteNote(): Promise<void> {
 
         if (!appUserEntity)
             return;
         
         const response = await fetchDeleteNoteEntity(noteEntity);
-        if (isResponseError(response))
+        if (isResponseError(response)) {
+            toast("Failed to delete note", "An unexpected error occurred. Please copy your unsaved contents and refresh the page.", "error");
             return;
+        }
 
         refetchAppUserEntity();
 

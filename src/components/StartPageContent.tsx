@@ -26,7 +26,6 @@ interface Props extends DefaultProps {
  */
 // TODO: 
     // move selected tags?
-    // disabled sidebar tags and search bar if no notes, 
 export default function StartPageContent({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageContent", true);

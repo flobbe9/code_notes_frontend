@@ -60,7 +60,7 @@ export default forwardRef(function Button({
 
     
     // set min width for promise buttons
-    useInitialStyles(componentJQuery, (onClickPromise ? [["min-width", "width"]] : []), 200);
+    useInitialStyles(componentJQuery, (onClickPromise ? [["min-width", "font-size"]] : []), 200);
 
 
     useEffect(() => {
