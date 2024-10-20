@@ -1,9 +1,8 @@
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
-import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
+import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { log } from "../helpers/utils";
 
 
@@ -21,7 +20,7 @@ export function useLoggedIn() {
     const queryClient = useQueryClient();
 
 
-    const { data, isFetched } = useQuery<boolean>({
+    const useQueryResult = useQuery<boolean>({
         queryKey: LOGGED_IN_USER_QUERY_KEY,
         queryFn: fetchLoggedIn,
         initialData: queryClient.getQueryData(LOGGED_IN_USER_QUERY_KEY) || false,
@@ -29,10 +28,10 @@ export function useLoggedIn() {
 
 
     useEffect(() => {
-        if (data)
-            setIsLoggedIn(data);
+        if (useQueryResult.data)
+            setIsLoggedIn(useQueryResult.data);
 
-    }, [data]);
+    }, [useQueryResult.data]);
 
 
     /**
@@ -44,25 +43,21 @@ export function useLoggedIn() {
 
         const url = `${BACKEND_BASE_URL}/app-user/check-logged-in`;
 
-        const jsonResponse = await fetchAny(url);
+        const resopnse = await fetchAny(url);
 
-        if (isResponseError(jsonResponse)) {
+        if (isResponseError(resopnse)) {
             toast("Unexpected Error", "The page could not be loaded completely. Please refresh the page.", "error");
-
-            // TODO: logout if still logged in but 401
-            // else ()
-
             return false;
         }
 
-        return await jsonResponse.text() === "true";
+        return await resopnse.text() === "true";
     }
 
 
     return {
         isLoggedIn,
         setIsLoggedIn,
-        isLoggedInFetched: isFetched
+        useQueryResult
     }
 }
 

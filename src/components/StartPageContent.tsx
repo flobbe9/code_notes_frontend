@@ -12,6 +12,7 @@ import AddNewNoteButton from "./AddNewNoteButton";
 import { StartPageContainerContext } from "./StartPageContainer";
 import { SearchNoteHelper } from "../helpers/SearchNoteHelper";
 import { AppFetchContext } from "./AppFetchContextHolder";
+import PendingFetchHelper from "./helpers/PendingFetchHelper";
 
 
 interface Props extends DefaultProps {
@@ -30,16 +31,13 @@ export default function StartPageContent({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageContent", true);
     
-    const { isKeyPressed } = useContext(AppContext);
-    const { noteEntities, isFetchNoteEntitiesTakingLonger } = useContext(AppFetchContext);
-    
     const [notes, setNotes] = useState<JSX.Element[]>([]);
     const [noteSearchValue, setNoteSearchValue] = useState("");
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[]>([]);
     const [isSearchingNotes, setIsSearchingNotes] = useState(false);
-
-    const { showPendingOverlay, hidePendingOverlay } = useContext(AppContext);
-    const { isNoteEntitiesFetched } = useContext(AppFetchContext);
+    
+    const { isKeyPressed } = useContext(AppContext);
+    const { noteEntities, isFetchNoteEntitiesTakingLonger, noteUseQueryResult } = useContext(AppFetchContext);
     const { selectedTagEntityNames } = useContext(StartPageContainerContext);
     const searchNoteHelper = new SearchNoteHelper(noteEntities, selectedTagEntityNames);
     
@@ -55,12 +53,6 @@ export default function StartPageContent({...props}: Props) {
 
         getNoteByNoteEntity
     }
-
-    
-    useEffect(() => {
-        handleFetchNoteEntitiesTakingLonger();
-
-    }, [isFetchNoteEntitiesTakingLonger, isNoteEntitiesFetched])
 
 
     useEffect(() => {
@@ -140,23 +132,14 @@ export default function StartPageContent({...props}: Props) {
     }
 
 
-    function handleFetchNoteEntitiesTakingLonger(): void {
-
-        // case: fetch was quick enough, dont do anything
-        if (!isFetchNoteEntitiesTakingLonger)
-            return;
-
-        const overlayContent = <p className="mt-1">Loading notes is taking a little longer...</p>;
-
-        if (!isNoteEntitiesFetched)
-            showPendingOverlay(overlayContent);
-        else
-            hidePendingOverlay(); 
-    }
-
-
     return (
         <StartPageContentContext.Provider value={context}>
+            <PendingFetchHelper 
+                isFetchTakingLong={isFetchNoteEntitiesTakingLonger} 
+                useQueryResult={noteUseQueryResult}
+                overlayContent={<p className="mt-1">Loading notes is taking a little longer...</p>}
+            />
+
             <div 
                 id={id} 
                 className={className + " fullWidth"}

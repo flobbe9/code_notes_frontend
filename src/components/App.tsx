@@ -1,9 +1,9 @@
 import $ from "jquery";
-import React, { createContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react';
 import '../assets/styles/App.scss';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
+import { getCSSValueAsNumber, isNumberFalsy, log } from '../helpers/utils';
 import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
 import useKeyPress from '../hooks/useKeyPress';
@@ -207,7 +207,7 @@ export default function App() {
      * 
      * @param overlayContent the content to put below the pending icon
      */
-    function showPendingOverlay(overlayContent?: JSX.Element | JSX.Element[]): void {
+    function showPendingOverlay(overlayContent?: ReactNode): void {
 
         setIsAppOverlayVisible(true);
         // TODO: make spinner icon
@@ -275,7 +275,7 @@ export default function App() {
                             message={toastMessage}
                             sevirity={toastSevirity}
                             ref={toastRef} 
-                        />
+                        />  
                     </div>
                 </AppFetchContextHolder>
             </BrowserRouter>
@@ -300,7 +300,7 @@ export const AppContext = createContext({
     setIsAppOverlayHideOnClick: (isHideOnClick: boolean) => {},
     setIsAppOverlayHideOnEscape: (isHideOnEscape: boolean) => {},
     setAppOverlayContent: (overlayContent: JSX.Element | JSX.Element[]) => {},
-    showPendingOverlay: (overlayContent?: JSX.Element | JSX.Element[]) => {},
+    showPendingOverlay: (overlayContent?: ReactNode) => {},
     hidePendingOverlay: () => {},
 
     isPopupVisible: false, 

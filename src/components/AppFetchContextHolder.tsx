@@ -1,12 +1,13 @@
-import React, { createContext } from "react";
-import { useLoggedIn } from "../hooks/useLoggedIn";
-import { useNotes } from "../hooks/useNote";
-import { useAppUser } from "../hooks/useAppUser";
+import { DefinedUseQueryResult } from "@tanstack/react-query";
+import React, { createContext, ReactNode } from "react";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
+import { useAppUser } from "../hooks/useAppUser";
+import { useLoggedIn } from "../hooks/useLoggedIn";
+import { useNotes } from "../hooks/useNote";
 import { AppUserService } from "../services/AppUserService";
-import { RefetchOptions, QueryObserverResult } from "@tanstack/react-query";
+import { log } from "../helpers/utils";
 
 
 /**
@@ -19,16 +20,46 @@ import { RefetchOptions, QueryObserverResult } from "@tanstack/react-query";
  */
 export default function AppFetchContextHolder({ children }) {
     
-    const { isLoggedIn, setIsLoggedIn, isLoggedInFetched } = useLoggedIn();
-    const { appUserEntity, setAppUserEntity, isAppUserEntityFetched, fetchSaveAppUserEntity, fetchLogin, refetchAppUserEntity } = useAppUser(isLoggedIn);
-    const { noteEntities, setNoteEntities, isNoteEntitiesFetched, fetchSaveNoteEntity, fetchDeleteNoteEntity, isFetchNoteEntitiesTakingLonger } = useNotes(isLoggedIn, appUserEntity);
+    const { 
+        isLoggedIn, 
+        setIsLoggedIn, 
+        useQueryResult: isLoggedInUseQueryResult
+    } = useLoggedIn();
+
+    const { 
+        appUserEntity, 
+        setAppUserEntity, 
+        useQueryResult: appUserEntityUseQueryResult,
+        fetchSave: fetchSaveAppUserEntity, 
+        fetchLogin, 
+    } = useAppUser(isLoggedIn);
+
+    const { 
+        noteEntities, 
+        setNoteEntities,
+        useQueryResult: noteUseQueryResult ,
+        isFetchTakingLonger: isFetchNoteEntitiesTakingLonger, 
+        fetchSave: fetchSaveNoteEntity, 
+        fetchDelete: fetchDeleteNoteEntity, 
+    } = useNotes(isLoggedIn, appUserEntity);
 
     const context = {
-        appUserEntity, setAppUserEntity, isAppUserEntityFetched, fetchSaveAppUserEntity, fetchLogin, refetchAppUserEntity,
+        appUserEntity, 
+        setAppUserEntity, 
+        appUserEntityUseQueryResult,
+        fetchSaveAppUserEntity, 
+        fetchLogin, 
 
-        noteEntities, setNoteEntities, isNoteEntitiesFetched, fetchSaveNoteEntity, fetchDeleteNoteEntity, isFetchNoteEntitiesTakingLonger,
+        noteEntities, 
+        setNoteEntities, 
+        noteUseQueryResult,
+        isFetchNoteEntitiesTakingLonger, 
+        fetchSaveNoteEntity, 
+        fetchDeleteNoteEntity, 
 
-        isLoggedIn, setIsLoggedIn, isLoggedInFetched,
+        isLoggedIn, 
+        setIsLoggedIn, 
+        isLoggedInUseQueryResult,
     }
 
     return (
@@ -42,19 +73,18 @@ export default function AppFetchContextHolder({ children }) {
 export const AppFetchContext = createContext({
     appUserEntity: AppUserService.getDefaultInstance() as AppUserEntity,
     setAppUserEntity: (appUserEntity: AppUserEntity) => {},
-    isAppUserEntityFetched: false,
+    appUserEntityUseQueryResult: {} as DefinedUseQueryResult,
     fetchSaveAppUserEntity: async (appUserToSave?: AppUserEntity, decrypt = true) => {return {} as Promise<AppUserEntity | CustomExceptionFormat> },
     fetchLogin: async (email: string, password: string) => {return {} as Promise<CustomExceptionFormat | Response>},
-    refetchAppUserEntity: async (options?: RefetchOptions) => {return {} as  Promise<QueryObserverResult<AppUserEntity, Error>>},
 
     noteEntities: [] as NoteEntity[],
     setNoteEntities: (noteEntities: NoteEntity[]) => {},
-    isNoteEntitiesFetched: false as boolean,
     fetchSaveNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<NoteEntity | CustomExceptionFormat>},
     fetchDeleteNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<Response | CustomExceptionFormat>},
     isFetchNoteEntitiesTakingLonger: false as boolean,
+    noteUseQueryResult: {} as DefinedUseQueryResult,
 
     isLoggedIn: false,
     setIsLoggedIn: (isLoggedIn: boolean) => {},
-    isLoggedInFetched: false,
+    isLoggedInUseQueryResult: {} as DefinedUseQueryResult,
 })

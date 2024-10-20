@@ -23,8 +23,7 @@ export function useAppUser(isLoggedIn: boolean) {
 
     const queryClient = useQueryClient();
 
-
-    const { data, isFetched, refetch } = useQuery<AppUserEntity>({
+    const useQueryResult = useQuery<AppUserEntity>({
         queryKey: APP_USER_QUERY_KEY,
         queryFn: fetchCurrentAppUser,
         initialData: queryClient.getQueryData(APP_USER_QUERY_KEY) || initAppUserEntity
@@ -32,15 +31,15 @@ export function useAppUser(isLoggedIn: boolean) {
 
 
     useEffect(() => {
-        if (data)
-            setAppUserEntity(data);
+        if (useQueryResult.data)
+            setAppUserEntity(useQueryResult.data);
 
-    }, [data]);
+    }, [useQueryResult.data]);
 
 
     useEffect(() => {
         if (isLoggedIn)
-            refetch();
+            useQueryResult.refetch();
         
     }, [isLoggedIn])
 
@@ -50,7 +49,7 @@ export function useAppUser(isLoggedIn: boolean) {
         if (!isLoggedIn)
             return initAppUserEntity;
 
-        const url = `${BACKEND_BASE_URL}/app-user/getCurrent`;
+        const url = `${BACKEND_BASE_URL}/app-user/get-current`;
 
         const jsonResponse = await fetchJson(url, "post");
 
@@ -124,10 +123,9 @@ export function useAppUser(isLoggedIn: boolean) {
     return {
         appUserEntity,
         setAppUserEntity,
-        isAppUserEntityFetched: isFetched,
-        refetchAppUserEntity: refetch,
+        useQueryResult,
 
-        fetchSaveAppUserEntity: fetchSave,
+        fetchSave,
         fetchLogin,
         fetchLogout
     }

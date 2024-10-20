@@ -1,33 +1,31 @@
 import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/Note.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import DefaultNoteInput from "./DefaultNoteInput";
-import DefaultCodeNoteInput from "./DefaultCodeNoteInput";
-import CodeNoteInput from "./CodeNoteInput";
-import PlainTextNoteInput from "./PlainTextNoteInput";
-import CodeNoteInputWithVariables from "./CodeNoteInputWithVariables";
-import NoteTagList from "./NoteTagList";
-import Flex from "../helpers/Flex";
-import NoteTitle from "./NoteTitle";
-import AddNewNoteInput from "./AddNewNoteInput";
-import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
 import { NoteEntity } from "../../abstract/entites/NoteEntity";
-import { NoteInputType } from "../../abstract/NoteInputType";
-import { getJsxElementIndexByKey, getRandomString, log } from '../../helpers/utils';
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { AppContext } from "../App";
-import { StartPageContentContext } from "../StartPageContent";
-import { MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
-import { TagEntityService } from './../../abstract/services/TagEntityService';
+import { NoteInputType } from "../../abstract/NoteInputType";
 import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityService";
-import { NoteEntityService } from './../../abstract/services/NoteEntityService';
-import Confirm from "../helpers/Confirm";
-import HelperDiv from "../helpers/HelperDiv";
+import "../../assets/styles/Note.scss";
+import { MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
+import { getJsxElementIndexByKey, getRandomString, log } from '../../helpers/utils';
+import { AppContext } from "../App";
 import { AppFetchContext } from "../AppFetchContextHolder";
-import { StartPageSideBarContext } from "../StartPageSideBar";
-import { StartPageContainerContext } from "../StartPageContainer";
+import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
+import Confirm from "../helpers/Confirm";
+import Flex from "../helpers/Flex";
+import HelperDiv from "../helpers/HelperDiv";
+import { StartPageContentContext } from "../StartPageContent";
+import { NoteEntityService } from './../../abstract/services/NoteEntityService';
+import { TagEntityService } from './../../abstract/services/TagEntityService';
+import AddNewNoteInput from "./AddNewNoteInput";
+import CodeNoteInput from "./CodeNoteInput";
+import CodeNoteInputWithVariables from "./CodeNoteInputWithVariables";
+import DefaultCodeNoteInput from "./DefaultCodeNoteInput";
+import DefaultNoteInput from "./DefaultNoteInput";
+import NoteTagList from "./NoteTagList";
+import NoteTitle from "./NoteTitle";
+import PlainTextNoteInput from "./PlainTextNoteInput";
 
 
 interface Props extends DefaultProps {
@@ -65,9 +63,9 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     const { appUserEntity, 
         noteEntities, 
         setNoteEntities, 
+        appUserEntityUseQueryResult,
         fetchSaveNoteEntity, 
         fetchDeleteNoteEntity,
-        refetchAppUserEntity
     } = useContext(AppFetchContext);
     const { noteSearchResults, isSearchingNotes, notes, setNotes } = useContext(StartPageContentContext);
 
@@ -170,8 +168,8 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
             return;
         }
 
-        // call this before updating side bar
-        refetchAppUserEntity();
+        // call this before updating side bar, need to get fresh app user tags first
+        appUserEntityUseQueryResult.refetch();
 
         // update sidebar
         setNoteEntities([...noteEntities]);
@@ -220,7 +218,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
             return;
         }
 
-        refetchAppUserEntity();
+        appUserEntityUseQueryResult.refetch();
 
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
 

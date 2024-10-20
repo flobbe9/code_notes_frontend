@@ -7,7 +7,8 @@ import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
 import { AppUserEntity } from './../abstract/entites/AppUserEntity';
-import { useTimeout } from "./useTimeout";
+import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
+import { log } from "../helpers/utils";
 
 
 export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
@@ -18,27 +19,28 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     const queryClient = useQueryClient();
 
-    const { data, isFetched, refetch } = useQuery<NoteEntity[]>({
+    const useQueryResult = useQuery<NoteEntity[]>({
         queryKey: NOTE_QUERY_KEY,
         queryFn: fetchNotes,
         initialData: queryClient.getQueryData(NOTE_QUERY_KEY) || []
     });
 
+
     /** The time (in milliseconds) the note entities' fetch process may take before considering the process "taking longer" */
     const noteEntitiesFetchDelay = 1000;
-    const { finished: isFetchTakingLonger } = useTimeout(noteEntitiesFetchDelay, !isFetched);
+    const isFetchTakingLonger = useIsFetchTakingLong(useQueryResult.isFetched, noteEntitiesFetchDelay, !useQueryResult.isFetched);
 
     
     useEffect(() => {
-        if (data)
-            setNoteEntities(data);
+        if (useQueryResult.data)
+            setNoteEntities(useQueryResult.data);
 
-    }, [data]);
+    }, [useQueryResult.data]);
 
 
     useEffect(() => {
         if (isLoggedIn && appUserEntity)
-            refetch();
+            useQueryResult.refetch();
 
     }, [isLoggedIn, appUserEntity])
 
@@ -48,7 +50,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         if (!isLoggedIn || !appUserEntity)
             return [];
 
-        const url = `${BACKEND_BASE_URL}/note/getAllByAppUser`;
+        const url = `${BACKEND_BASE_URL}/note/get-all-by-appUser`;
 
         const jsonResponse = await fetchJson(url);
 
@@ -117,11 +119,11 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
     return {
         noteEntities,
         setNoteEntities,
-        isNoteEntitiesFetched: isFetched,
+        useQueryResult,
+        isFetchTakingLonger,
 
-        fetchSaveNoteEntity: fetchSave,
-        fetchDeleteNoteEntity: fetchDelete,
-        isFetchNoteEntitiesTakingLonger: isFetchTakingLonger
+        fetchSave,
+        fetchDelete
     }
 }
 
