@@ -5,8 +5,8 @@
         border-radius: 5px;
 
         &:hover {
-            #CustomLinkRegister {
-                color: black;
+            a#Register {
+                color: black !important;
             }
         }
     }

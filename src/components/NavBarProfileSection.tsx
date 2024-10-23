@@ -1,14 +1,11 @@
-import $ from "jquery";
 import React, { useContext } from "react";
-import "./../assets/styles/NavBarProfileSection.scss";
-import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
-import Link from "./helpers/CustomLink";
-import Button from "./helpers/Button";
-import { log } from "./../helpers/utils";
-import { AppContext } from "./App";
 import { PROFILE_PATH } from "../helpers/constants";
-import CustomLink from "./helpers/CustomLink";
+import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
+import "./../assets/styles/NavBarProfileSection.scss";
+import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
+import Button from "./helpers/Button";
+import { Link } from "react-router-dom";
 
 
 interface Props extends DefaultProps {
@@ -38,7 +35,7 @@ export default function NavBarProfileSection({...props}: Props) {
             {
                 isLoggedIn ?
                     // Profile icon
-                    <CustomLink to={PROFILE_PATH} >
+                    <Link to={PROFILE_PATH} >
                         <img 
                             src="/img/account.png" 
                             alt="account" 
@@ -46,7 +43,7 @@ export default function NavBarProfileSection({...props}: Props) {
                             height={30}
                             title="Profile"
                         />
-                    </CustomLink>
+                    </Link>
                 :
                     <div>
                         {
