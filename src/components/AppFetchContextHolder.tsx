@@ -1,13 +1,14 @@
 import { DefinedUseQueryResult } from "@tanstack/react-query";
-import React, { createContext, ReactNode } from "react";
+import React, { createContext, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
+import { clearUserCache } from "../helpers/utils";
 import { useAppUser } from "../hooks/useAppUser";
 import { useLoggedIn } from "../hooks/useLoggedIn";
 import { useNotes } from "../hooks/useNote";
 import { AppUserService } from "../services/AppUserService";
-import { log } from "../helpers/utils";
 
 
 /**
@@ -19,10 +20,11 @@ import { log } from "../helpers/utils";
  * @since 0.0.1
  */
 export default function AppFetchContextHolder({ children }) {
+
+    const location = useLocation();
     
     const { 
         isLoggedIn, 
-        setIsLoggedIn, 
         useQueryResult: isLoggedInUseQueryResult
     } = useLoggedIn();
 
@@ -58,9 +60,34 @@ export default function AppFetchContextHolder({ children }) {
         fetchDeleteNoteEntity, 
 
         isLoggedIn, 
-        setIsLoggedIn, 
         isLoggedInUseQueryResult,
     }
+    
+
+    // revalidate session
+    useEffect(() => {
+        isLoggedInUseQueryResult.refetch();
+
+    }, [location]);
+    
+
+    useEffect(() => {
+        if (!isLoggedInUseQueryResult.data && isLoggedInUseQueryResult.isFetched)
+            handleSessionInvalid();
+
+    }, [isLoggedInUseQueryResult.data, isLoggedInUseQueryResult.isFetched]);
+
+    
+    /**
+     * Clear user related use query cache and user related global states.
+     */
+    function handleSessionInvalid() {
+
+        clearUserCache();
+        setAppUserEntity(AppUserService.getDefaultInstance());
+        setNoteEntities([]);
+    }
+
 
     return (
         <AppFetchContext.Provider value={context}>
@@ -85,6 +112,5 @@ export const AppFetchContext = createContext({
     noteUseQueryResult: {} as DefinedUseQueryResult,
 
     isLoggedIn: false,
-    setIsLoggedIn: (isLoggedIn: boolean) => {},
     isLoggedInUseQueryResult: {} as DefinedUseQueryResult,
 })

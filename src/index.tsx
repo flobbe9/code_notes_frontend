@@ -11,7 +11,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 
 // useQuery config
-const client = new QueryClient();
+export const useQueryClientObj = new QueryClient();
 
 const persister = createSyncStoragePersister({
     storage: localStorage
@@ -25,7 +25,7 @@ console.warn = logWarnFiltered;
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
     <PersistQueryClientProvider
-        client={client}
+        client={useQueryClientObj}
         persistOptions={{persister: persister}}
     >
         <App />

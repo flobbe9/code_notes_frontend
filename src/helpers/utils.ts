@@ -5,7 +5,10 @@ import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV
 import { CSSProperties } from "react";
 import parse, { Element } from "html-react-parser";
 import sanitize from "sanitize-html";
-import CryptoJS from "crypto-js";
+import { useQueryClientObj } from "..";
+import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
+import { AppUserEntity } from "../abstract/entites/AppUserEntity";
+import { NOTE_QUERY_KEY } from "../hooks/useNote";
 
 
 export function log(message?: any, ...optionalParams: any[]): void {
@@ -1135,7 +1138,38 @@ export function getJsxElementIndexByKey(array: JSX.Element[], key: string): numb
     return -1;
 }
 
+
 export function getCurrentUrlWithoutWWW(): string {
 
     return `${BASE_URL}${window.location.pathname}`;
+}
+
+
+/**
+ * Removes sensitive data from use query cache.
+ */
+export function clearSensitiveCache(): void {
+
+    if (!useQueryClientObj)
+        return;
+    
+    // remove app user from cache if present
+    if (useQueryClientObj.getQueryData<AppUserEntity>(APP_USER_QUERY_KEY))
+        useQueryClientObj.removeQueries({queryKey: APP_USER_QUERY_KEY});
+}
+
+
+/**
+ * Removes use query cache data related to app user (not ```isLoggedIn``` though). May be used on logout.
+ */
+export function clearUserCache(): void {
+
+    if (!useQueryClientObj)
+        return;
+    
+    if (useQueryClientObj.getQueryData<AppUserEntity>(APP_USER_QUERY_KEY))
+        useQueryClientObj.removeQueries({queryKey: APP_USER_QUERY_KEY});
+
+    if (useQueryClientObj.getQueryData<AppUserEntity>(NOTE_QUERY_KEY))
+        useQueryClientObj.removeQueries({queryKey: NOTE_QUERY_KEY});
 }

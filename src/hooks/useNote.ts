@@ -98,8 +98,11 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
         const defaultErrorMessage = "Failed to delete note.";
 
-        if (!noteEntity || !isLoggedIn)
+        if (!noteEntity)
             return CustomExceptionFormatService.getInstanceAndLog(500, `${defaultErrorMessage} 'noteEntity' cannot be falsy`);
+        
+        if (!isLoggedIn)
+            return CustomExceptionFormatService.getInstanceAndLog(401, `${defaultErrorMessage} UNAUTHORIZED`);
 
         const url = `${BACKEND_BASE_URL}/note/delete?id=${noteEntity.id}`;
 

@@ -2,8 +2,8 @@ import React from "react";
 import "./../assets/styles/NavBar.scss";
 import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
 import Flex from "./helpers/Flex";
-import Link from "./helpers/CustomLink"
 import NavBarProfileSection from "./NavBarProfileSection";
+import { Link } from "react-router-dom";
 
 
 interface Props extends DefaultProps {

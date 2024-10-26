@@ -1,20 +1,17 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { log } from "../helpers/utils";
 
 
 /**
- * Determine if current session is valid and cache response.
+ * Determine if current session is valid and cache response. Will revalidate on navigate and clear cache and states if not logged in.
  * 
  * @since 0.0.1
  */
 export function useLoggedIn() {
     
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
     const { toast } = useContext(AppContext);
 
     const queryClient = useQueryClient();
@@ -25,13 +22,6 @@ export function useLoggedIn() {
         queryFn: fetchLoggedIn,
         initialData: queryClient.getQueryData(LOGGED_IN_USER_QUERY_KEY) || false,
     });
-
-
-    useEffect(() => {
-        if (useQueryResult.data)
-            setIsLoggedIn(useQueryResult.data);
-
-    }, [useQueryResult.data]);
 
 
     /**
@@ -55,8 +45,7 @@ export function useLoggedIn() {
 
 
     return {
-        isLoggedIn,
-        setIsLoggedIn,
+        isLoggedIn: useQueryResult.data,
         useQueryResult
     }
 }

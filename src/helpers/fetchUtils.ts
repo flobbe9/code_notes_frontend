@@ -1,9 +1,9 @@
-import { getTimeStamp, isNumberFalsy, log, logApiResponse } from "./utils";
-import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
-import { BACKEND_BASE_URL, CSRF_TOKEN_HEADER_NAME } from "./constants";
-import { CSRF_TOKEN_LOCAL_STORAGE_KEY } from "../components/Login";
 import CryptoJSImpl from "../abstract/CryptoJSImpl";
+import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
+import { CSRF_TOKEN_LOCAL_STORAGE_KEY } from "../components/Login";
 import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
+import { BACKEND_BASE_URL, CSRF_TOKEN_HEADER_NAME } from "./constants";
+import { clearSensitiveCache, isNumberFalsy, logApiResponse } from "./utils";
 
 
 /** Http status code "Service Unavailable" 503, use this status when ```fetch()``` throws "failed to fetch" error */
@@ -67,8 +67,8 @@ export async function fetchAny(url: string, method = "get", body?: any, headers?
         const response = await fetch(url, fetchConfig);
 
         // case: request failed
-        if (!isHttpStatusCodeAlright(response.status) && debug) 
-            logApiResponse(await response.json());
+        if (!isHttpStatusCodeAlright(response.status))
+            handleResponseError(response, debug);
         
         return response;
 
@@ -177,7 +177,34 @@ function getCsrfTokenDecrypted(): string {
 
 
 /**
- * Format given fetch error as {@link CustomExceptionFormat}, log and return it.
+ * Possibly log error and clear sensitive data from cache.
+ * 
+ * @param response that has a bad status code
+ * @param debug indicates whether to log the error
+ */
+async function handleResponseError(response: Response, debug: boolean): Promise<void> {
+
+    if (!response)
+        return;
+
+    try {
+        if (debug)
+            logApiResponse(await response.json());
+
+    // case: already read to json
+    } catch (e) {
+        if (debug)
+            logApiResponse(response as any as CustomExceptionFormat);
+    }
+
+    // case: session may has become invalid
+    if (response.status === 401) 
+        clearSensitiveCache();
+}
+
+
+/**
+ * Formats given fetch error as {@link CustomExceptionFormat}, log and return it.
  * 
  * @param e fetch error that was thrown 
  * @param url that fetch() used
