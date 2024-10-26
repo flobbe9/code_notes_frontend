@@ -32,7 +32,7 @@ export default function StartPageContainer({children, ...props}: Props) {
     /** List of tag entities inside ```<StartPageSideBarTagList>``` that are checked */
     const [selectedTagEntityNames, setSelectedTagEntityNames] = useState<Set<string>>(new Set());
 
-    const { windowSize, getDeviceWidth, setPopupContent } = useContext(AppContext);
+    const { windowSize, getDeviceWidth, setPopupContent, setIsPopupVisible } = useContext(AppContext);
     const { isMobileWidth } = getDeviceWidth();
 
     const context = {
@@ -118,6 +118,7 @@ export default function StartPageContainer({children, ...props}: Props) {
                 onConfirm={(event) => log("saving...")} // TODO: implement save
             />
         );
+        setIsPopupVisible(true);
     }
 
 

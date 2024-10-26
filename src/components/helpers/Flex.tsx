@@ -1,7 +1,6 @@
-import $ from "jquery";
 import React, { forwardRef, Ref } from "react";
-import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { FlexDirection, FlexWrap, TextAlign } from "../../abstract/CSSTypes";
+import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import HelperDiv from "./HelperDiv";
 

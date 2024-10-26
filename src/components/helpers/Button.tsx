@@ -1,10 +1,10 @@
 import $ from "jquery";
 import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
-import "../../assets/styles/Button.scss";
+import { ButtonType } from "../../abstract/CSSTypes";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import { ButtonType } from "../../abstract/CSSTypes";
-import { isObjectFalsy, log } from "../../helpers/utils";
+import "../../assets/styles/Button.scss";
+import { isObjectFalsy } from "../../helpers/utils";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 
 
@@ -12,6 +12,7 @@ interface Props extends HelperProps {
 
     /** Button type (e.g. "submit") */
     type?: ButtonType,
+    tabIndex?: number,
     onSubmit?: (event?) => void,
     /** 
      * Button will be disabled and show "spinner" while awaiting the promise. 
@@ -20,7 +21,6 @@ interface Props extends HelperProps {
     onClickPromise?: (event?) => Promise<any>,
     /** Styles on click */
     _click?: CSSProperties,
-    tabIndex?: number
 }
 
 
@@ -33,6 +33,7 @@ export default forwardRef(function Button({
         type,
         title = "",
         tabIndex,
+        onRender,
         onClick,
         onMouseDown,
         onSubmit,
@@ -64,6 +65,9 @@ export default forwardRef(function Button({
 
 
     useEffect(() => {
+        if (onRender) 
+            onRender();
+
         setComponentJQuery($(componentRef.current!));
 
     }, []);

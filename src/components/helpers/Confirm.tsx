@@ -1,9 +1,9 @@
-import React, { forwardRef, Ref, useContext } from "react";
-import "../../assets/styles/Confirm.scss";
+import React, { forwardRef, Ref, useContext, useRef } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import Flex from "./Flex";
-import Button from "./Button";
+import "../../assets/styles/Confirm.scss";
 import { AppContext } from "../App";
+import Button from "./Button";
+import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";
 
 
@@ -13,16 +13,19 @@ interface Props extends DefaultProps {
     confirmLabel?: string,
     /** Label for the "cancel" button. Default is "Cancel" */
     cancelLabel?: string,
+    
+    /** No default styles in here */
+    heading?: string | JSX.Element | JSX.Element[],
+    /** No default styles in here */
+    message?: string | JSX.Element | JSX.Element[],
+
+    /** If ```true```, hitting "Enter" will trigger the confirm button without any tabbing. Else, it will trigger the cancel button. Default is ```false``` */
+    focusConfirmOnRender?: boolean,
 
     /** Assuming a "click" event. Will always hide the popup */
     onConfirm?: (clickEvent) => void,
     /** Assuming a "click" event. Will always hide the popup */
     onCancel?: (clickEvent) => void,
-
-    /** No default styles in here */
-    heading?: string | JSX.Element | JSX.Element[],
-    /** No default styles in here */
-    message?: string | JSX.Element | JSX.Element[]
 }
 
 
@@ -35,10 +38,11 @@ export default forwardRef(function Confirm(
     {
         confirmLabel = "Yes",
         cancelLabel = "Cancel",
-        onConfirm,
-        onCancel,
         heading,
         message,
+        focusConfirmOnRender = false,
+        onConfirm,
+        onCancel,
         ...props
     }: Props,
     ref: Ref<HTMLDivElement>
@@ -47,6 +51,9 @@ export default forwardRef(function Confirm(
     const { setIsPopupVisible } = useContext(AppContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Confirm");
+
+    const cancelButtonRef = useRef<HTMLButtonElement>(null);
+    const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
 
     function handleCancel(event): void {
@@ -64,7 +71,24 @@ export default forwardRef(function Confirm(
             onConfirm(event);
             
         setIsPopupVisible(false);
+    }
 
+
+    function focusCancelButton(): void {
+
+        if (!focusConfirmOnRender)
+            setTimeout(() => {
+                cancelButtonRef.current!.focus();
+            }, 0); // somehow necessary, 0 is fine
+    }
+
+
+    function focusConfirmButton(): void {
+
+        if (focusConfirmOnRender)
+            setTimeout(() => {
+                confirmButtonRef.current!.focus();
+            }, 0); // somehow necessary, 0 is fine
     }
 
 
@@ -76,22 +100,33 @@ export default forwardRef(function Confirm(
             {...otherProps}
         >
             {/* Heading */}
-            <HelperDiv className="confirmHeading mb-3" rendered={!!heading}>
+            <HelperDiv className="Confirm-heading mb-3" rendered={!!heading}>
                 {heading}
             </HelperDiv>
 
             {/* Message */}
-            <div className="confirmMessage mb-5">
+            <div className="Confirm-message mb-5">
                 {message}
             </div>
 
-            {/* Footer */}
-            <Flex className="confirmFooter" horizontalAlign="right">
-                <Button className="cancelButton hover" onClick={handleCancel}>
+            <Flex className="Confirm-footer" horizontalAlign="right">
+                {/* Cancel */}
+                <Button 
+                    className="Confirm-footer-cancelButton hover" 
+                    ref={cancelButtonRef}
+                    onRender={focusCancelButton}
+                    onClick={handleCancel}
+                >
                     {cancelLabel}
                 </Button>
 
-                <Button className="confirmButton hover" onClick={handleConfirm}>
+                {/* Confirm */}
+                <Button 
+                    className="Confirm-footer-confirmButton hover" 
+                    ref={confirmButtonRef} 
+                    onRender={focusConfirmButton}
+                    onClick={handleConfirm}
+                >
                     {confirmLabel}
                 </Button>
             </Flex>

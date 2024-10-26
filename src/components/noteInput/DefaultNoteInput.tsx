@@ -46,7 +46,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     const componentRef = useRef(null);
 
-    const { isAppOverlayVisible, setIsAppOverlayVisible, setPopupContent } = useContext(AppContext);
+    const { isAppOverlayVisible, setIsAppOverlayVisible, setPopupContent, setIsPopupVisible } = useContext(AppContext);
 
     const { noteEntity, noteInputs, setNoteInputs } = useContext(NoteContext);
 
@@ -101,7 +101,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
                 onConfirm={deleteNote}
             />
         ));
-        
+        setIsPopupVisible(true);        
     }
 
 

@@ -1,15 +1,16 @@
 @import "./global/functions.scss";
 
-.Confirm {    
-    .confirmButton {
-        background-color: var(--matBlue);
-        color: white;
-        
-        @include buttonFocus(var(--accentColor));
+.Confirm {   
+    &-footer {
+        &-confirmButton {
+            background-color: var(--matBlue);
+            color: white;
+            
+            @include buttonFocus(black);
+        } 
 
-    }
-
-    .cancelButton {
-        background-color: transparent;
+        &-cancelButton {
+            background-color: transparent;
+        }
     }
 }

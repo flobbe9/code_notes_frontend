@@ -1,15 +1,14 @@
 import $ from "jquery";
-import { createContext, forwardRef, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import '../../assets/styles/Select.scss';
+import React, { createContext, forwardRef, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import HelperProps from '../../abstract/HelperProps';
+import '../../assets/styles/Select.scss';
 import { getRandomString } from '../../helpers/utils';
-import TextInput from './TextInput';
-import Flex from './Flex';
 import { AppContext } from '../App';
+import Flex from './Flex';
 import HelperDiv from './HelperDiv';
 import SelectOption from './SelectOption';
-import React from "react";
+import TextInput from './TextInput';
 
 interface Props extends HelperProps {
     /** Default is "" */
@@ -247,7 +246,7 @@ export default forwardRef(function Select(
 
     return (
         <SelectContext.Provider value={context}>
-            <div id={id} className={className} style={style} {...otherProps}>
+            <HelperDiv id={id} className={className} style={style} {...otherProps}>
                 {/* Select label */}
                 <Flex verticalAlign="center" flexWrap="nowrap">
                     <TextInput
@@ -278,12 +277,12 @@ export default forwardRef(function Select(
                 </Flex>
 
                 {/* Select options */}
-                <HelperDiv className="selectOptionsContainer" ref={optionsContainerRef}>
+                <div className="selectOptionsContainer" ref={optionsContainerRef}>
                     {optionElements}
-                </HelperDiv>
+                </div>
 
                 {children}
-            </div>
+            </HelperDiv>
         </SelectContext.Provider>
     );
 });

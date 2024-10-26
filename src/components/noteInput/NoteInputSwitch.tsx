@@ -1,11 +1,10 @@
-import $ from "jquery";
 import React, { forwardRef, Ref, useState } from "react";
-import "../../assets/styles/NoteInputSwitch.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import HelperProps from "../../abstract/HelperProps";
+import "../../assets/styles/NoteInputSwitch.scss";
+import { getRandomString } from "../../helpers/utils";
 import Flex from "../helpers/Flex";
 import RadioButton from "../helpers/RadioButton";
-import { getRandomString } from "../../helpers/utils";
-import HelperProps from "../../abstract/HelperProps";
 
 
 interface Props extends HelperProps {

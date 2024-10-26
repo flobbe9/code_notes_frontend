@@ -13,6 +13,7 @@ export default interface HelperProps extends DefaultProps {
     /** If false, this component will get passed ```display: none``` */
     rendered?: boolean,
     disabled?: boolean,
+    onRender?: () => void,
     /** Style for given event */
     _hover?: CSSProperties,
     /** Style for given event */

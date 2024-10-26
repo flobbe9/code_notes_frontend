@@ -2,7 +2,6 @@ import $ from "jquery";
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import { log } from "../../helpers/utils";
 
 
 interface Props extends HelperProps {
@@ -17,6 +16,7 @@ interface Props extends HelperProps {
 export default forwardRef(function HelperDiv(
     {
         title = "",
+        onRender,
         onClick,
         disabled = false,
         rendered = true,
@@ -37,8 +37,11 @@ export default forwardRef(function HelperDiv(
 
 
     useEffect(() => {
+        if (onRender)
+            onRender();
 
         toggleIsHover();
+        
     }, []);
 
 

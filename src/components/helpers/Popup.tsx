@@ -26,7 +26,8 @@ export default function Popup({...props}: Props) {
         isAppOverlayHideOnClick,
         popupContent,
         isPopupVisible,
-        setIsPopupVisible
+        setIsPopupVisible,
+        setPopupContent
     } = useContext(AppContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props);
@@ -57,10 +58,20 @@ export default function Popup({...props}: Props) {
     }
 
 
-    function hidePopup(): void {
+    /**
+     * Fade out popup and reset content
+     */
+    async function hidePopup(): Promise<void> {
 
         $(componentRef.current!).fadeOut(fadeDuration);
         setIsAppOverlayVisible(false);
+        
+        // wait for popup to be hidden
+        await new Promise((res, rej) => {
+            setTimeout(() => {
+                res(setPopupContent(<></>));
+            }, fadeDuration);   
+        });
     }
 
 

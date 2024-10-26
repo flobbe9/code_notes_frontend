@@ -1,14 +1,12 @@
-import $ from "jquery";
-import React, { createElement, ReactNode, useEffect, useState } from "react";
-import { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import parse, { attributesToProps, Element, HTMLReactParserOptions } from "html-react-parser";
+import React, { ReactNode } from "react";
 import sanitize from "sanitize-html";
-import parse, { Element, HTMLReactParserOptions, attributesToProps } from "html-react-parser";
+import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
-import { getRandomString, includesIgnoreCaseTrim, log, logError } from "../../helpers/utils";
-import HelperProps from "../../abstract/HelperProps";
+import { getRandomString, includesIgnoreCaseTrim } from "../../helpers/utils";
 
 
-interface Props extends HelperProps {
+interface Props extends DefaultProps {
 
     dirtyHTML: string,
     /** Will fully replace the default options */
@@ -16,7 +14,8 @@ interface Props extends HelperProps {
     /** Will fully replace the default options */
     sanitizeOptions?: sanitize.IOptions,
     /** Tag names that component props will be passed to. Default is ```["div"]``` */
-    mainTagNames?: (keyof HTMLElementTagNameMap)[]
+    mainTagNames?: (keyof HTMLElementTagNameMap)[],
+    rendered?: boolean
 }
 
 

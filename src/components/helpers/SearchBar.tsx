@@ -1,11 +1,11 @@
 import $ from "jquery";
 import React, { CSSProperties, forwardRef, Ref, useImperativeHandle, useRef, useState } from "react";
-import "../../assets/styles/SearchBar.scss";
-import HelperProps from "../../abstract/HelperProps";
-import Flex from "./Flex";
-import { isObjectFalsy, log } from "../../helpers/utils";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import HelperProps from "../../abstract/HelperProps";
+import "../../assets/styles/SearchBar.scss";
+import { isObjectFalsy } from "../../helpers/utils";
 import Button from "./Button";
+import Flex from "./Flex";
 
 
 interface Props extends HelperProps {

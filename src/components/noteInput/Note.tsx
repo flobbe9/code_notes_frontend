@@ -160,11 +160,12 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
             <Confirm
                 heading={<h3>Delete Note?</h3>}
                 message={`Are you sure you want to delete '${noteEntity.title}'?`}
+                style={{maxWidth: "50vw"}}
                 onConfirm={event => {deleteNote(); setIsPopupVisible(false)}}
                 onCancel={event => setIsPopupVisible(false)}
-                style={{maxWidth: "50vw"}}
             />
         );
+        setIsPopupVisible(true);
     }
 
 

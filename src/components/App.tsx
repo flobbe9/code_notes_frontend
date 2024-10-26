@@ -1,17 +1,17 @@
 import $ from "jquery";
 import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react';
-import '../assets/styles/App.scss';
-import Toast, { ToastSevirity } from './helpers/Toast';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { getCSSValueAsNumber, isNumberFalsy, log } from '../helpers/utils';
-import NavBar from './NavBar';
-import StartPageContainer from './StartPageContainer';
+import '../assets/styles/App.scss';
+import { getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
-import Overlay from './helpers/Overlay';
-import Popup from './helpers/Popup';
-import Login from "./Login";
 import AppFetchContextHolder from "./AppFetchContextHolder";
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
+import Overlay from './helpers/Overlay';
+import Popup from './helpers/Popup';
+import Toast, { ToastSevirity } from './helpers/Toast';
+import Login from "./Login";
+import NavBar from './NavBar';
+import StartPageContainer from './StartPageContainer';
 
 
 /**
@@ -33,8 +33,6 @@ export default function App() {
     const [popupContent, setPopupContent] = useState<JSX.Element | JSX.Element[]>([]);
     
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
-
-    const [hasAppRendered, setHasAppRendered] = useState(false);
 
     const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress();
 
@@ -70,20 +68,11 @@ export default function App() {
 
     
     useEffect(() => {
-        setHasAppRendered(true);
-
         window.addEventListener("keydown", handleWindowKeyDown);
         window.addEventListener("keyup", handleWindowKeyUp);
         window.addEventListener("resize", handleWindowResize);
 
     }, []);
-
-
-    useEffect(() => {
-        if (hasAppRendered) 
-            setIsPopupVisible(true);
-
-    }, [popupContent]);
 
 
     /**
