@@ -1,18 +1,16 @@
+import { Editor } from "@monaco-editor/react";
 import $ from "jquery";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/CodeNoteInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { Editor } from "@monaco-editor/react";
-import { getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, log, setClipboardText } from "../../helpers/utils";
-import { DefaultNoteInputContext } from "./DefaultNoteInput";
-import { AppContext } from "../App";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
+import "../../assets/styles/CodeNoteInput.scss";
+import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
+import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, setClipboardText } from "../../helpers/utils";
+import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
 import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
-import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
-import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
-import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
 import { StartPageContainerContext } from "../StartPageContainer";
-import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
+import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import NoteInputSettings from "./NoteInputSettings";
 
 

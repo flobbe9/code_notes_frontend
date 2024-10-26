@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { NoteEntity } from "../../abstract/entites/NoteEntity";
@@ -6,9 +5,10 @@ import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { NoteInputType } from "../../abstract/NoteInputType";
 import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityService";
 import "../../assets/styles/Note.scss";
-import { MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
+import { DEFAULT_ERROR_MESSAGE, MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString, log } from '../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString } from '../../helpers/utils';
+import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 import { AppContext } from "../App";
 import { AppFetchContext } from "../AppFetchContextHolder";
 import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
@@ -51,14 +51,6 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
-    const [aboutToSave, setAboutToSave] = useState(false);
-
-    /** 
-     * Number of noteInputs that are currently parsing or highlighting their values. Indicates whether the save() function should wait
-     * for noteInput values or not.
-     */
-    const [numNoteInputsParsing, setNumNoteInputsParsing] = useState(0);
-
     const { toast, setIsPopupVisible, setPopupContent } = useContext(AppContext);
     const { appUserEntity, 
         noteEntities, 
@@ -67,7 +59,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         fetchSaveNoteEntity, 
         fetchDeleteNoteEntity,
     } = useContext(AppFetchContext);
-    const { noteSearchResults, isSearchingNotes, notes, setNotes } = useContext(StartPageContentContext);
+    const { noteSearchResults, notes, setNotes } = useContext(StartPageContentContext);
 
     const componentRef = useRef(null);
     const saveButtonRef = useRef(null);
@@ -75,14 +67,13 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     const context = {
         noteEntity,
 
-        numNoteInputsParsing, 
-        setNumNoteInputsParsing,
-
         noteInputs, 
         setNoteInputs,
 
         getNoteInputByNoteInputType
     }
+
+    const hasComponentMounted = useHasComponentMounted();
 
 
     useEffect(() => {
@@ -92,15 +83,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
 
     useEffect(() => {
-        // case: clicked save and has finished parsing
-        if (isReadyToSave())
-            $(saveButtonRef.current!).trigger("click");
-
-    }, [numNoteInputsParsing]);
-
-
-    useEffect(() => {
-        if (isSearchingNotes)
+        if (hasComponentMounted)
             setIsNoteInSearchResults(noteSearchResults.includes(noteEntity));
 
     }, [noteSearchResults]);
@@ -143,16 +126,12 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
             // should not happen
             default: 
-                return <div key={getRandomString()}></div>;
+                return <div key={key}></div>;
         }
     }
 
 
     async function handleSave(event): Promise<void> {
-
-        // // case: still parsing
-        // if (!isReadyToSave()) 
-        //     return;
 
         // case: invalid input
         if (!isNoteValid())
@@ -160,11 +139,8 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
         const jsonResponse = await fetchSaveNoteEntity(noteEntity);
 
-        // TODO: still necessary?
-        setAboutToSave(false);
-
         if (isResponseError(jsonResponse)) {
-            toast("Failed to save note", "An unexpected error occurred. Please copy your unsaved contents and refresh the page.", "error");
+            toast("Failed to save note", DEFAULT_ERROR_MESSAGE, "error");
             return;
         }
 
@@ -175,18 +151,6 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         setNoteEntities([...noteEntities]);
 
         toast("Save", "Successfully saved note", "success", 5000);
-    }
-
-
-    function handleMouseDown(event): void {
-
-        setAboutToSave(true);
-    }
-
-
-    function isReadyToSave(): boolean {
-
-        return aboutToSave && numNoteInputsParsing === 0
     }
 
 
@@ -214,7 +178,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         
         const response = await fetchDeleteNoteEntity(noteEntity);
         if (isResponseError(response)) {
-            toast("Failed to delete note", "An unexpected error occurred. Please copy your unsaved contents and refresh the page.", "error");
+            toast("Failed to delete note", DEFAULT_ERROR_MESSAGE, "error");
             return;
         }
 
@@ -309,7 +273,6 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
                         className="saveNoteButton saveNoteButton" 
                         title="Save note"
                         ref={saveButtonRef}
-                        onMouseDown={handleMouseDown}
                         onClickPromise={handleSave}
                     >
                         <i className="fa-solid fa-floppy-disk"></i>
@@ -325,9 +288,6 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
 export const NoteContext = createContext({
     noteEntity: {} as NoteEntity,
-
-    numNoteInputsParsing: 0, 
-    setNumNoteInputsParsing: (num: number) => {},
 
     noteInputs: [<></>],
     setNoteInputs: (noteInputs: JSX.Element[]) => {},

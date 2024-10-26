@@ -1,17 +1,16 @@
 import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/DefaultNoteInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import Flex from "../helpers/Flex";
-import Button from "../helpers/Button";
-import { getJsxElementIndexByKey, log } from "../../helpers/utils";
-import NoteInputSettings from "./NoteInputSettings";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import Overlay from "../helpers/Overlay";
+import "../../assets/styles/DefaultNoteInput.scss";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
-import { NoteContext } from "./Note";
+import { getJsxElementIndexByKey } from "../../helpers/utils";
 import { AppContext } from "../App";
+import Button from "../helpers/Button";
 import Confirm from "../helpers/Confirm";
+import Flex from "../helpers/Flex";
+import Overlay from "../helpers/Overlay";
+import { NoteContext } from "./Note";
 
 
 interface Props extends DefaultProps {
@@ -49,7 +48,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     const { isAppOverlayVisible, setIsAppOverlayVisible, setPopupContent } = useContext(AppContext);
 
-    const { noteEntity, noteInputs, setNoteInputs, numNoteInputsParsing } = useContext(NoteContext);
+    const { noteEntity, noteInputs, setNoteInputs } = useContext(NoteContext);
 
     const context = {
         isShowNoteInputSettings, 

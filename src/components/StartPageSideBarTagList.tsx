@@ -1,16 +1,14 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import "../assets/styles/StartPageSideBarTagList.scss";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
-import { AppContext } from "./App";
 import { TagEntity } from "../abstract/entites/TagEntity";
-import { getRandomString, isBlank, isBooleanFalsy, log } from "../helpers/utils";
-import { StartPageContainerContext } from "./StartPageContainer";
+import HelperProps from "../abstract/HelperProps";
+import "../assets/styles/StartPageSideBarTagList.scss";
+import { matchStringsConsiderWhiteSpace } from "../helpers/searchUtils";
+import { getRandomString, isBlank } from "../helpers/utils";
+import { AppFetchContext } from "./AppFetchContextHolder";
+import HelperDiv from "./helpers/HelperDiv";
 import { StartPageSideBarContext } from "./StartPageSideBar";
 import TagCheckbox from "./TagCheckbox";
-import { matchStringsConsiderWhiteSpace } from "../helpers/searchUtils";
-import HelperProps from "../abstract/HelperProps";
-import HelperDiv from "./helpers/HelperDiv";
-import { AppFetchContext } from "./AppFetchContextHolder";
 
 
 interface Props extends HelperProps {

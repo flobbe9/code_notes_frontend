@@ -1,16 +1,16 @@
 import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import "../assets/styles/StartPageSideBar.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import Flex from "./helpers/Flex";
-import SearchBar from "./helpers/SearchBar";
+import "../assets/styles/StartPageSideBar.scss";
+import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../helpers/constants";
 import { getCssConstant } from "../helpers/utils";
 import { AppContext } from "./App";
-import StartPageSideBarTagList from "./StartPageSideBarTagList";
-import { StartPageContainerContext } from "./StartPageContainer";
-import Button from "./helpers/Button";
-import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../helpers/constants";
 import { AppFetchContext } from "./AppFetchContextHolder";
+import { StartPageContainerContext } from "./StartPageContainer";
+import StartPageSideBarTagList from "./StartPageSideBarTagList";
+import Button from "./helpers/Button";
+import Flex from "./helpers/Flex";
+import SearchBar from "./helpers/SearchBar";
 
 
 interface Props extends DefaultProps {

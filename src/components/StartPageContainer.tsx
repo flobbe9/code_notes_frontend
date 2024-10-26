@@ -1,14 +1,14 @@
 import $ from "jquery";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import DefaultProps from "../abstract/DefaultProps";
-import StartPageContent from "./StartPageContent";
-import StartPageSideBar from "./StartPageSideBar";
-import Flex from "./helpers/Flex";
+import { getHeadTitleText } from "../helpers/constants";
 import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, log } from "../helpers/utils";
 import { AppContext } from "./App";
-import Confirm from "./helpers/Confirm";
 import Head from "./Head";
-import { BASE_URL, getHeadTitleText } from "../helpers/constants";
+import StartPageContent from "./StartPageContent";
+import StartPageSideBar from "./StartPageSideBar";
+import Confirm from "./helpers/Confirm";
+import Flex from "./helpers/Flex";
 
 
 interface Props extends DefaultProps {

@@ -1,14 +1,13 @@
-import { useContext, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useContext, useEffect, useState } from "react";
+import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
+import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { NoteEntity } from '../abstract/entites/NoteEntity';
 import { AppContext } from "../components/App";
-import { BACKEND_BASE_URL } from "../helpers/constants";
+import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
-import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
-import { log } from "../helpers/utils";
 
 
 export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
@@ -55,8 +54,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         const jsonResponse = await fetchJson(url);
 
         if (isResponseError(jsonResponse)) {
-            if (jsonResponse.status !== 401)
-                toast("Failed to load notes", "An unexpected error occurred. Please try refreshing the page.", "error");
+            toast("Failed to load notes", DEFAULT_ERROR_MESSAGE, "error");
 
             return [];
         }
@@ -84,8 +82,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         const jsonResponse = await fetchJson(url, "post", noteEntity);
 
         if (isResponseError(jsonResponse)) {
-            if (jsonResponse.status !== 401)
-                toast("Failed to save note", "An unexpected error has occurred. Please secure your unsaved contents and refresh the page.", "error");
+            toast("Failed to save note", "An unexpected error has occurred. Please secure your unsaved contents and refresh the page.", "error");
 
             return CustomExceptionFormatService.getInstance(jsonResponse.status, jsonResponse.message);
         }
@@ -109,8 +106,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         const response = await fetchAny(url, "delete", noteEntity);
 
         if (isResponseError(response)) {
-            if (response.status !== 401)
-                toast(defaultErrorMessage, "An unexpected error occurred. Please try refreshing the page.", "error");
+            toast(defaultErrorMessage, DEFAULT_ERROR_MESSAGE, "error");
 
             return CustomExceptionFormatService.getInstance(response.status, response.message);
         }

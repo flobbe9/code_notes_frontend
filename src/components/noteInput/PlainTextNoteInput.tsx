@@ -1,21 +1,18 @@
+import parse from 'html-react-parser';
 import $ from "jquery";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/PlainTextNoteInput.scss";
+import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
+import HelperProps from "../../abstract/HelperProps";
+import "../../assets/styles/PlainTextNoteInput.scss";
+import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
+import { getClipboardText, getCssConstant, isBlank, setClipboardText } from "../../helpers/utils";
+import { useInitialStyles } from "../../hooks/useInitialStyles";
+import Button from "../helpers/Button";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import Flex from "../helpers/Flex";
-import { cleanUpSpecialChars, getClipboardText, getCssConstant, isBlank, log, setClipboardText } from "../../helpers/utils";
-import sanitize from "sanitize-html";
-import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
-import { AppContext } from "../App";
-import { useInitialStyles } from "../../hooks/useInitialStyles";
-import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { NoteContext } from "./Note";
-import HelperProps from "../../abstract/HelperProps";
-import parse from 'html-react-parser';
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
-import Button from "../helpers/Button";
-import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
 
 
 interface Props extends HelperProps {
@@ -41,8 +38,6 @@ export default function PlainTextNoteInput({
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
 
-    const { numNoteInputsParsing, setNumNoteInputsParsing } = useContext(NoteContext);
-    
     const { 
         setNoteInputOverlayVisible, 
         animateCopyIcon,
@@ -68,14 +63,6 @@ export default function PlainTextNoteInput({
 
     }, []);
 
-
-    useEffect(() => {
-        // decrease num isParsing inputs
-        if (!isParsing && numNoteInputsParsing > 0)
-            setNumNoteInputsParsing(numNoteInputsParsing - 1);
-            
-    }, [isParsing]);
-    
 
     function handleFocus(event): void {
         
@@ -115,7 +102,6 @@ export default function PlainTextNoteInput({
         // notify isParsing process has started (should not take long here)
         setIsParsing(true);
         setNoteInputOverlayVisible(true);
-        setNumNoteInputsParsing(numNoteInputsParsing + 1);
 
         const parsedText = await new Promise<string>((res, rej) => {
             setTimeout(() => {

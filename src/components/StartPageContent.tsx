@@ -34,7 +34,6 @@ export default function StartPageContent({...props}: Props) {
     const [notes, setNotes] = useState<JSX.Element[]>([]);
     const [noteSearchValue, setNoteSearchValue] = useState("");
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[]>([]);
-    const [isSearchingNotes, setIsSearchingNotes] = useState(false);
     
     const { isKeyPressed } = useContext(AppContext);
     const { noteEntities, isFetchNoteEntitiesTakingLonger, noteUseQueryResult } = useContext(AppFetchContext);
@@ -48,8 +47,6 @@ export default function StartPageContent({...props}: Props) {
         setNotes,
 
         noteSearchResults,
-        isSearchingNotes,
-        setIsSearchingNotes,
 
         getNoteByNoteEntity
     }
@@ -101,12 +98,11 @@ export default function StartPageContent({...props}: Props) {
 
 
     function handleSearchKeyDown(event): void {
-        // set is search
 
         if (event.key === "Enter")
             handleSearch(event.target.value)
     }
-
+    
 
     function handleSearchValueChange(event): void {
 
@@ -156,7 +152,7 @@ export default function StartPageContent({...props}: Props) {
                         ref={searchInputRef}
                         disabled={!noteEntities.length}
                         onChange={handleSearchValueChange}
-                        onKeyUp={handleSearchKeyDown}
+                        onKeyDown={handleSearchKeyDown}
                         onXIconClick={handleSearchXIconClick}
                         _focus={{borderColor: "var(--accentColor)"}}
                         _searchIcon={{color: "var(--matteBlackLight)"}}
@@ -183,8 +179,6 @@ export const StartPageContentContext = createContext({
     setNotes: (notes: JSX.Element[]) => {},
 
     noteSearchResults: [] as NoteEntity[],
-    isSearchingNotes: false,
-    setIsSearchingNotes: (isSearching: boolean) => {},
 
     getNoteByNoteEntity: (noteEntity: NoteEntity) => {return <></>}
 })

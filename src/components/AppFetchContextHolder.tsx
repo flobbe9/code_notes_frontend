@@ -7,7 +7,7 @@ import { NoteEntity } from "../abstract/entites/NoteEntity";
 import { clearUserCache } from "../helpers/utils";
 import { useAppUser } from "../hooks/useAppUser";
 import { useLoggedIn } from "../hooks/useLoggedIn";
-import { useNotes } from "../hooks/useNote";
+import { useNotes } from "../hooks/useNotes";
 import { AppUserService } from "../services/AppUserService";
 
 

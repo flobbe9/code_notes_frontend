@@ -1,12 +1,10 @@
-import $ from "jquery";
 import React, { useContext, useEffect, useState } from "react";
-import "../assets/styles/TagCheckbox.scss";
-import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import Checkbox from "./helpers/Checkbox";
-import { log } from "../helpers/utils";
+import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { TagEntity } from "../abstract/entites/TagEntity";
-import { StartPageContainerContext } from "./StartPageContainer";
 import HelperProps from "../abstract/HelperProps";
+import "../assets/styles/TagCheckbox.scss";
+import Checkbox from "./helpers/Checkbox";
+import { StartPageContainerContext } from "./StartPageContainer";
 
 
 interface Props extends HelperProps {
@@ -42,12 +40,12 @@ export default function TagCheckbox({tagEntity, ...props}: Props) {
 
     useEffect(() => {
         if (hasComponentMounted)
-            onIsSelectedChange();
+            handleIsSelectedChange();
 
     }, [isSelected]);
 
 
-    function onIsSelectedChange(): void {
+    function handleIsSelectedChange(): void {
 
         // case: switched from not-checked to checked
         if (isSelected && !selectedTagEntityNames.has(tagEntity.name))

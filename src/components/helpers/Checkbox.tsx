@@ -1,11 +1,9 @@
-import $ from "jquery";
 import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
-import "../../assets/styles/Checkbox.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import HelperDiv from "./HelperDiv";
-import { log } from "../../helpers/utils";
+import "../../assets/styles/Checkbox.scss";
 import Flex from "./Flex";
+import HelperDiv from "./HelperDiv";
 import HiddenInput from "./HiddenInput";
 
 
@@ -15,6 +13,7 @@ interface Props extends HelperProps {
     _checked?: CSSProperties,
 
     isChecked?: boolean,
+    /** Triggered on click */
     setIsChecked?: (isChecked: boolean) => void,
 
     /** If ```true``` the children (or default icon) will be visible while checked. Default is ```false``` */

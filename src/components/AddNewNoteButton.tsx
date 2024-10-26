@@ -1,14 +1,14 @@
 import React, { useContext } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
+import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";
+import { DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
+import { isResponseError } from "../helpers/fetchUtils";
+import { AppContext } from "./App";
+import { AppFetchContext } from "./AppFetchContextHolder";
+import Button from "./helpers/Button";
 import ButtonWithSlideLabel from "./helpers/ButtonWithSlideLabel";
 import { StartPageContentContext } from "./StartPageContent";
-import Button from "./helpers/Button";
-import { NoteEntity } from "../abstract/entites/NoteEntity";
-import { isArrayFalsy, log } from "../helpers/utils";
-import { AppContext } from "./App";
-import { isResponseError } from "../helpers/fetchUtils";
-import { AppFetchContext } from "./AppFetchContextHolder";
 
 
 interface Props extends HelperProps {
@@ -23,7 +23,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
     const { toast } = useContext(AppContext);
     const { noteEntities, setNoteEntities, fetchSaveNoteEntity, isLoggedIn } = useContext(AppFetchContext);
-    const { notes, setNotes, getNoteByNoteEntity, setIsSearchingNotes } = useContext(StartPageContentContext)
+    const { notes, setNotes, getNoteByNoteEntity } = useContext(StartPageContentContext)
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteButton", true);
 
@@ -45,15 +45,12 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
         // only point out fetch error if is logged in
         if (isResponseError(jsonResponse) && isLoggedIn) {
-            toast("Failed to save note", "An unexpected error occurred. Please try refreshing the page", "error");
+            toast("Failed to save note", DEFAULT_ERROR_MESSAGE, "error");
             return;
         }
 
         newNoteEntity.id = (jsonResponse as NoteEntity).id;
         newNoteEntity.created = (jsonResponse as NoteEntity).created;
-
-        // will prevent note render from considering search results
-        setIsSearchingNotes(false);
 
         // update note entities
         setNoteEntities([newNoteEntity, ...noteEntities]);

@@ -8,7 +8,7 @@ import sanitize from "sanitize-html";
 import { useQueryClientObj } from "..";
 import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
-import { NOTE_QUERY_KEY } from "../hooks/useNote";
+import { NOTE_QUERY_KEY } from "../hooks/useNotes";
 
 
 export function log(message?: any, ...optionalParams: any[]): void {
