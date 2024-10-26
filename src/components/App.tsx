@@ -11,6 +11,7 @@ import Overlay from './helpers/Overlay';
 import Popup from './helpers/Popup';
 import Login from "./Login";
 import AppFetchContextHolder from "./AppFetchContextHolder";
+import SpinnerIcon from "./helpers/icons/SpinnerIcon";
 
 
 /**
@@ -210,16 +211,9 @@ export default function App() {
     function showPendingOverlay(overlayContent?: ReactNode): void {
 
         setIsAppOverlayVisible(true);
-        // TODO: make spinner icon
         setAppOverlayContent(
             <>
-                <i 
-                    className="fa-solid fa-circle-notch rotating" 
-                    style={{
-                        color: "var(--accentColor)",
-                        fontSize: "2em"
-                    }}
-                ></i>
+                <SpinnerIcon size="2em" style={{color: "var(--accentColor)"}} />
                 {overlayContent}
             </>
         )
