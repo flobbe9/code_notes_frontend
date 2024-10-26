@@ -16,7 +16,7 @@ interface Props extends DefaultProps {
 
     initialTag: TagEntity,
 
-    propsKey: string
+    propsKey: string | number
 }
 
 

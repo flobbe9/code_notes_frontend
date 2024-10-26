@@ -3,7 +3,7 @@ import React, { ReactNode } from "react";
 import sanitize from "sanitize-html";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
-import { getRandomString, includesIgnoreCaseTrim } from "../../helpers/utils";
+import { includesIgnoreCaseTrim } from "../../helpers/utils";
 
 
 interface Props extends DefaultProps {
@@ -37,16 +37,17 @@ export default function Sanitized({
     // add component props to parsed html
     const defaultParserOptions: HTMLReactParserOptions = {
         replace(domNode) {
-            return nodeToJSXElement(domNode as Element);
+            return nodeToJSXElement(domNode as Element, -1);
         }
     }
 
 
     /**
      * @param node to convert to jsx element
+     * @param childIndex -1 if this is the top level node, else the index of this node child amongst it's siblings
      * @returns jsx element of given ```node``` or ```null``` if given ```node``` is falsy
      */
-    function nodeToJSXElement(node: Element): JSX.Element | null {
+    function nodeToJSXElement(node: Element, childIndex: number): JSX.Element | null {
 
         // case: invalid node
         if (!node || !node.attribs) 
@@ -54,7 +55,7 @@ export default function Sanitized({
 
         // pass component props to 
         const tagName = node.name;
-        const newProps = combineProps(node);
+        const newProps = combineProps(node, childIndex);
         
         // case: no children
         if (!node.children || !node.children.length)
@@ -71,9 +72,10 @@ export default function Sanitized({
      * Combine ```node``` props and component's props if tag name of ```node``` is included in ```mainTagNames```.
      * 
      * @param node to get props from
+     * @param childIndex -1 if this is the top level node, else the index of this child amongst it's siblings
      * @returns combined props of ```node``` props and this component's props
      */
-    function combineProps(node: Element): object {
+    function combineProps(node: Element, childIndex: number): object {
 
         // case: invalid node
         if (!node || !node.attribs) 
@@ -83,7 +85,7 @@ export default function Sanitized({
 
         // case: is not main tag
         if (!isMainTagName(node)) 
-            return {...nodeProps, key: getRandomString()};
+            return {...nodeProps, key: childIndex};
 
         // combine node and component properties
         return {
@@ -91,7 +93,7 @@ export default function Sanitized({
             id: (nodeProps.id || "") + (id || ""),
             className: (nodeProps.className || "") + " " + (className || ""),
             style: {...nodeProps.style, ...style},
-            key: getRandomString()
+            key: childIndex
         }
     }
 
@@ -102,14 +104,14 @@ export default function Sanitized({
      */
     function mapNodeChildrenToReactNode(node: Element): ReactNode[] {
 
-        return node.children.map(child => {
+        return node.children.map((child, i) => {
             const childElement = child as Element;
             
             // case: only text as children
             if (child.type === "text")
                 return child.data;
 
-            return nodeToJSXElement(childElement);
+            return nodeToJSXElement(childElement, i);
         });
     }
 

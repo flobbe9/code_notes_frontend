@@ -1,11 +1,10 @@
 import $ from "jquery";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import "../assets/styles/LanguageSearchResults.scss";
+import React, { useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
-import { log, moveCursor, toUpperCaseFirstChar } from "../helpers/utils";
-import HelperDiv from "./helpers/HelperDiv";
 import HelperProps from "../abstract/HelperProps";
-import { getRandomString } from './../helpers/utils';
+import "../assets/styles/LanguageSearchResults.scss";
+import { moveCursor, toUpperCaseFirstChar } from "../helpers/utils";
+import HelperDiv from "./helpers/HelperDiv";
 import HiddenInput from "./helpers/HiddenInput";
 
 
@@ -127,13 +126,13 @@ export default function LanguageSearchResults({
                     className="searchResultInput" 
                     spellCheck={false}
                     tabIndex={-1}
-                    key={getRandomString()}
+                    key={0}
                     value="No results..."
                     disabled
                 />
             ];
 
-        return languageSearchResults.map(searchResult => {
+        return languageSearchResults.map((searchResult, i) => {
             const upperCaseSearchResult = toUpperCaseFirstChar(searchResult);
 
             return <input 
@@ -142,7 +141,7 @@ export default function LanguageSearchResults({
                 value={upperCaseSearchResult}
                 tabIndex={-1}
                 title={upperCaseSearchResult}
-                key={getRandomString()}
+                key={i}
                 onKeyDown={(event) => handleSearchResultKeyDown(event, upperCaseSearchResult)}
                 onKeyUp={handleSearchResultKeyUp}
                 onFocus={handleSearchResultFocus}

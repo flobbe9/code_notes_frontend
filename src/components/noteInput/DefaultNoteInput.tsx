@@ -1,7 +1,7 @@
 import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
+import { DefaultNoteInputProps } from "../../abstract/DefaultNoteInputProps";
+import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/DefaultNoteInput.scss";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
 import { getJsxElementIndexByKey } from "../../helpers/utils";
@@ -13,11 +13,7 @@ import Overlay from "../helpers/Overlay";
 import { NoteContext } from "./Note";
 
 
-interface Props extends DefaultProps {
-
-    noteInputEntity: NoteInputEntity,
-
-    propsKey: string
+interface Props extends DefaultNoteInputProps {
 }
 
 

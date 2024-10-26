@@ -1,18 +1,13 @@
-import $ from "jquery";
 import React, { createContext, useRef } from "react";
+import { DefaultNoteInputProps } from "../../abstract/DefaultNoteInputProps";
+import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/DefaultCodeNoteInput.scss";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import DefaultNoteInput from "./DefaultNoteInput";
 import Flex from "../helpers/Flex";
-import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { log } from "../../helpers/utils";
+import DefaultNoteInput from "./DefaultNoteInput";
 
 
-interface Props extends DefaultProps {
+interface Props extends DefaultNoteInputProps {
 
-    noteInputEntity: NoteInputEntity,
-
-    propsKey: string
 }
 
 

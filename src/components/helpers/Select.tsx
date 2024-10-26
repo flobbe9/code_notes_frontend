@@ -3,7 +3,6 @@ import React, { createContext, forwardRef, Ref, useContext, useEffect, useImpera
 import { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import HelperProps from '../../abstract/HelperProps';
 import '../../assets/styles/Select.scss';
-import { getRandomString } from '../../helpers/utils';
 import { AppContext } from '../App';
 import Flex from './Flex';
 import HelperDiv from './HelperDiv';
@@ -110,21 +109,21 @@ export default forwardRef(function Select(
 
         options.forEach((optionName, i) => {
             // add empty option at the top
-            if (i === 0 && addEmptyOption) optionElements.push(getSingleOption(''));
+            if (i === 0 && addEmptyOption) optionElements.push(getSingleOption('', -1));
 
-            optionElements.push(getSingleOption(optionName));
+            optionElements.push(getSingleOption(optionName, i));
         });
 
         return optionElements;
     }
 
-    function getSingleOption(optionName: string): JSX.Element {
+    function getSingleOption(optionName: string, index: number): JSX.Element {
         return (
             <SelectOption
                 label={optionName}
                 multiSelect={multiSelect}
                 title={optionName}
-                key={getRandomString()}
+                key={index}
                 tabIndex={-1}
                 onMouseDownCapture={() => handleOptionSelect(optionName)}
                 onKeyDown={event => handleOptionsKeyDown(event, optionName)}

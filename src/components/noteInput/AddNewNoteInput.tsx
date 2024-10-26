@@ -29,8 +29,8 @@ export default function AddNewNoteInput({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInput");
 
-    const { appUserEntity, noteEntities } = useContext(AppFetchContext);
-    const { noteEntity, noteInputs, setNoteInputs, numNoteInputsParsing, getNoteInputByNoteInputType } = useContext(NoteContext);
+    const { noteEntities } = useContext(AppFetchContext);
+    const { noteEntity, noteInputs, setNoteInputs, getNoteInputByNoteInputType } = useContext(NoteContext);
 
 
     function handleAddPlainTextNoteInput(event): void {
@@ -128,7 +128,7 @@ export default function AddNewNoteInput({...props}: Props) {
 
         // update noteInputEntitys
         let newNoteInputEntitys = noteInputs;
-        const newNoteInputEntity = getNoteInputByNoteInputType(noteInputEntityEntity);
+        const newNoteInputEntity = getNoteInputByNoteInputType(noteInputEntityEntity, noteInputs.length);
         newNoteInputEntitys = [...newNoteInputEntitys, newNoteInputEntity];
         setNoteInputs(newNoteInputEntitys);
     }
@@ -147,7 +147,6 @@ export default function AddNewNoteInput({...props}: Props) {
                     className="fullWidth addPlainTextNoteInputButton" 
                     label="Plain Text" 
                     title="Add plain text section"
-                    disabled={numNoteInputsParsing > 0}
                     onClick={handleAddPlainTextNoteInput}
                 >
                     <i className="fa-solid fa-plus me-2"></i>
@@ -160,7 +159,6 @@ export default function AddNewNoteInput({...props}: Props) {
                     className="fullWidth addCodeNoteInputButton" 
                     label="Code" 
                     title="Add code section"
-                    disabled={numNoteInputsParsing > 0}
                     onClick={handleAddCodeNoteInput}
                 >
                     <i className="fa-solid fa-plus me-2"></i>
@@ -173,7 +171,6 @@ export default function AddNewNoteInput({...props}: Props) {
                     className="fullWidth addCodeNoteInputWithVariablesButton" 
                     label="Code with Variables" 
                     title="Add code with variables section"
-                    disabled={numNoteInputsParsing > 0}
                     onClick={handleAddCodeNoteInputWithVariables}
                 >
                     <i className="fa-solid fa-plus me-2"></i>

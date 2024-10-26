@@ -1,18 +1,17 @@
 import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import "../assets/styles/StartPageContent.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import Note from "./noteInput/Note";
-import SearchBar from "./helpers/SearchBar";
-import { getRandomString, log } from "../helpers/utils";
-import { AppContext } from "./App";
-import Flex from "./helpers/Flex";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
-import AddNewNoteButton from "./AddNewNoteButton";
-import { StartPageContainerContext } from "./StartPageContainer";
+import "../assets/styles/StartPageContent.scss";
 import { SearchNoteHelper } from "../helpers/SearchNoteHelper";
+import AddNewNoteButton from "./AddNewNoteButton";
+import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
+import Flex from "./helpers/Flex";
 import PendingFetchHelper from "./helpers/PendingFetchHelper";
+import SearchBar from "./helpers/SearchBar";
+import Note from "./noteInput/Note";
+import { StartPageContainerContext } from "./StartPageContainer";
 
 
 interface Props extends DefaultProps {
@@ -85,15 +84,14 @@ export default function StartPageContent({...props}: Props) {
         if (!noteEntities)
             return [];
 
-        return noteEntities.map(noteEntity => 
-            getNoteByNoteEntity(noteEntity));
+        return noteEntities.map((noteEntity, i) => 
+            getNoteByNoteEntity(noteEntity, i));
     }
 
 
-    function getNoteByNoteEntity(noteEntity: NoteEntity): JSX.Element {
+    function getNoteByNoteEntity(noteEntity: NoteEntity, index: number): JSX.Element {
 
-        const key = getRandomString();
-        return <Note noteEntity={noteEntity} key={key} propsKey={key} />
+        return <Note noteEntity={noteEntity} key={index} propsKey={index} />
     }
 
 
@@ -180,5 +178,5 @@ export const StartPageContentContext = createContext({
 
     noteSearchResults: [] as NoteEntity[],
 
-    getNoteByNoteEntity: (noteEntity: NoteEntity) => {return <></>}
+    getNoteByNoteEntity: (noteEntity: NoteEntity, index: number) => {return <></>}
 })

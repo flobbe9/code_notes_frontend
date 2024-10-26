@@ -7,7 +7,7 @@ import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityS
 import "../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE, MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString } from '../../helpers/utils';
+import { getJsxElementIndexByKey } from '../../helpers/utils';
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 import { AppContext } from "../App";
 import { AppFetchContext } from "../AppFetchContextHolder";
@@ -33,7 +33,7 @@ interface Props extends DefaultProps {
     /** Assuming that this object is taken from ```appUserEntity```. */
     noteEntity: NoteEntity,
 
-    propsKey: string
+    propsKey: string | number
 }
 
 
@@ -94,39 +94,38 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         if (!noteEntity.noteInputs)
             return [];
 
-        return noteEntity.noteInputs.map(noteInputEntity =>
-            getNoteInputByNoteInputType(noteInputEntity));
+        return noteEntity.noteInputs.map((noteInputEntity, i) =>
+            getNoteInputByNoteInputType(noteInputEntity, i));
     }
 
 
-    function getNoteInputByNoteInputType(noteInputEntity: NoteInputEntity): JSX.Element {
+    function getNoteInputByNoteInputType(noteInputEntity: NoteInputEntity, index: number): JSX.Element {
 
-        const key = getRandomString();
         switch (noteInputEntity.type) {
             case NoteInputType.PLAIN_TEXT:
                 return (
-                    <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                    <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={index} key={index}>
                         <PlainTextNoteInput noteInputEntity={noteInputEntity} />
                     </DefaultNoteInput>
                     )
 
             case NoteInputType.CODE:
                 return (
-                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={index} key={index}>
                         <CodeNoteInput noteInputEntity={noteInputEntity} />
                     </DefaultCodeNoteInput>
                 )
 
             case NoteInputType.CODE_WITH_VARIABLES:
                 return (
-                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={index} key={index}>
                         <CodeNoteInputWithVariables noteInputEntity={noteInputEntity} />
                     </DefaultCodeNoteInput>
                 )
 
             // should not happen
             default: 
-                return <div key={key}></div>;
+                return <div key={index}></div>;
         }
     }
 
@@ -292,5 +291,5 @@ export const NoteContext = createContext({
 
     noteInputs: [<></>],
     setNoteInputs: (noteInputs: JSX.Element[]) => {},
-    getNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity) => {return <></>}
+    getNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity, index: number) => {return <></>}
 })
