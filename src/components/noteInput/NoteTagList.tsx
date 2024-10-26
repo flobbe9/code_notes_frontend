@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { TagEntity } from "../../abstract/entites/TagEntity";
 import "../../assets/styles/NoteTagList.scss";
-import { isBlank } from '../../helpers/utils';
+import { isBlank, log } from '../../helpers/utils';
 import { AppUserService } from "../../services/AppUserService";
 import { AppFetchContext } from "../AppFetchContextHolder";
 import Flex from "../helpers/Flex";
@@ -30,7 +30,7 @@ export default function NoteTagList({...props}: Props) {
 
     const componentRef = useRef(null);
 
-    const { appUserEntity, noteEntities } = useContext(AppFetchContext);
+    const { appUserEntity, setAppUserEntity, noteEntities, setNoteEntities } = useContext(AppFetchContext);
     const { noteEntity } = useContext(NoteContext);
 
     const context = {
@@ -57,7 +57,7 @@ export default function NoteTagList({...props}: Props) {
             return [getNewTagElement(0)];
 
         const tagElements = noteEntity.tags.map((tag, i) => 
-            <TagInput initialTag={tag} key={i} propsKey={i} />);
+            <TagInput initialTag={tag} key={i} propsKey={String(i)} />);
 
         // add blank tag
         tagElements.push(getNewTagElement(tagElements.length));
@@ -78,13 +78,14 @@ export default function NoteTagList({...props}: Props) {
     /**
      * @param tagEntity to add to ```noteEntity.tags``` and ```appUserEntity.tags```
      */
-    function addTag(tagEntity: TagEntity): void {
+    function addTag(tagEntity: TagEntity, noteEntities, appUserEntity): void {
 
         if (!tagEntity)
             return;
 
         // add to appUser first
         AppUserService.addTag(appUserEntity, noteEntities, tagEntity);
+        setAppUserEntity({...appUserEntity});
 
         // add to noteEntity
         noteEntity.tags = [...(noteEntity.tags || []), tagEntity];
@@ -92,6 +93,7 @@ export default function NoteTagList({...props}: Props) {
 
 
     /**
+     * @param index
      * @param name the tag name. Default is ""
      * @returns a ```<TagInput />``` with an empty tag name
      */
@@ -99,7 +101,7 @@ export default function NoteTagList({...props}: Props) {
 
         const defaultTag = {name: name};
 
-        return <TagInput initialTag={defaultTag} key={index} propsKey={index} />;
+        return <TagInput initialTag={defaultTag} key={index} propsKey={String(index)} />;
     }
 
 
@@ -149,6 +151,7 @@ export default function NoteTagList({...props}: Props) {
             return;
                 
         AppUserService.removeTagEntity(appUserEntity, tagEntity);
+        setAppUserEntity({...appUserEntity});
     }
     
 
@@ -158,17 +161,17 @@ export default function NoteTagList({...props}: Props) {
      */
     function getTagElementIndex(key: string | number): number {
 
-        let tagToRemoveIndex = -1;
+        let tagElementIndex = -1;
 
         tagElements.forEach((tag, i) => { 
             // case: found tag by key
             if (tag.key === key) {
-                tagToRemoveIndex = i; 
+                tagElementIndex = i; 
                 return;
             }
         });
         
-        return tagToRemoveIndex;
+        return tagElementIndex;
     }
 
 
@@ -214,7 +217,7 @@ export default function NoteTagList({...props}: Props) {
 export const NoteTagListContext = createContext({
     getTagElementIndex: (tag: string | number) => {return -1 as number},
     addTagElement: () => {},
-    addTag: (tag: TagEntity) => {},
+    addTag: (tag: TagEntity, n, a) => {},
     removeTag: (index: number) => {},
     getNumBlankTagElements: () => {return 1 as number},
     tagElements: [<></>],

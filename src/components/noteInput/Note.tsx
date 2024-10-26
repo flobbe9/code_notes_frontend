@@ -33,7 +33,7 @@ interface Props extends DefaultProps {
     /** Assuming that this object is taken from ```appUserEntity```. */
     noteEntity: NoteEntity,
 
-    propsKey: string | number
+    propsKey: string
 }
 
 
@@ -104,21 +104,21 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         switch (noteInputEntity.type) {
             case NoteInputType.PLAIN_TEXT:
                 return (
-                    <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={index} key={index}>
+                    <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={String(index)} key={index}>
                         <PlainTextNoteInput noteInputEntity={noteInputEntity} />
                     </DefaultNoteInput>
                     )
 
             case NoteInputType.CODE:
                 return (
-                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={index} key={index}>
+                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={String(index)} key={index}>
                         <CodeNoteInput noteInputEntity={noteInputEntity} />
                     </DefaultCodeNoteInput>
                 )
 
             case NoteInputType.CODE_WITH_VARIABLES:
                 return (
-                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={index} key={index}>
+                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={String(index)} key={index}>
                         <CodeNoteInputWithVariables noteInputEntity={noteInputEntity} />
                     </DefaultCodeNoteInput>
                 )

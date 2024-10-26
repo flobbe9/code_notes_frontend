@@ -9,5 +9,5 @@ export interface DefaultNoteInputProps extends DefaultProps {
     
     noteInputEntity: NoteInputEntity,
 
-    propsKey: string | number
+    propsKey: string
 }

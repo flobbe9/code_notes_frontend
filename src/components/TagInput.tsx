@@ -1,22 +1,23 @@
 import $ from "jquery";
 import React, { useContext, useRef, useState } from "react";
-import "../assets/styles/TagInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
+import { TagEntity } from "../abstract/entites/TagEntity";
+import "../assets/styles/TagInput.scss";
+import { MAX_TAG_INPUT_VALUE_LENGTH } from "../helpers/constants";
+import { isBlank } from "../helpers/utils";
+import { AppContext } from "./App";
+import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
-import { isBlank, isEventKeyTakingUpSpace, log } from "../helpers/utils";
-import { TagEntity } from "../abstract/entites/TagEntity";
-import { NoteTagListContext } from "./noteInput/NoteTagList";
 import { NoteContext } from "./noteInput/Note";
-import { AppContext } from "./App";
-import { INVALID_INPUT_CLASS_NAME, MAX_TAG_INPUT_VALUE_LENGTH } from "../helpers/constants";
+import { NoteTagListContext } from "./noteInput/NoteTagList";
 
 
 interface Props extends DefaultProps {
 
     initialTag: TagEntity,
 
-    propsKey: string | number
+    propsKey: string
 }
 
 
@@ -33,7 +34,8 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     const inputRef = useRef(null);
     const componentRef = useRef(null);
 
-    const { toast, isControlKeyPressed } = useContext(AppContext);
+    const { toast } = useContext(AppContext);
+    const { noteEntities, appUserEntity } = useContext(AppFetchContext);
     const { noteEntity } = useContext(NoteContext);
 
     const { 
@@ -53,13 +55,10 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
         if (keyName === "Enter") 
             handleEnterKey(event);
-
-        else if (isEventKeyTakingUpSpace(keyName, false) && !isControlKeyPressed() && isTagValueTooLong(event))
-            handleTagValueTooLong(event);
     }
 
     
-    function handleEnterKey(event): void {
+    function handleEnterKey(event: React.KeyboardEvent<HTMLInputElement>): void {
 
         event.preventDefault();
         $(inputRef.current!).trigger("blur");
@@ -102,16 +101,14 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
         
         const tagEntity = {name: getTagElementValue()};
 
-        // add to note
-        addTag(tagEntity);
+        // add to states
+        addTag(tagEntity, noteEntities, appUserEntity);
 
-        // update state
+        // update component state
         setTag(tagEntity);
 
         // focus new tag
-        setTimeout(() => {
-            focusNextTagInput();
-        }, 10);
+        setTimeout(focusNextTagInput, 10);
     }
 
 
@@ -183,52 +180,6 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     }
 
 
-    /**
-     * @param event the key down event (assuming that the key has not yet been added to the input value)
-     * @returns ```true``` if the tag input's value is longer than {@link MAX_TAG_INPUT_VALUE_LENGTH}
-     */
-    function isTagValueTooLong(event): boolean {
-
-        const tagInput = $(inputRef.current!);
-        const tagInputValue = tagInput.prop("value") + event.key;
-
-        return tagInputValue.length > MAX_TAG_INPUT_VALUE_LENGTH;
-    }
-
-
-    /**
-     * Prevent given key event and toast warn about text length.
-     * 
-     * @param event the key event that triggered this method
-     */
-    function handleTagValueTooLong(event: Event): void {
-
-        event.preventDefault();
-
-        toggleTagInvalid();
-
-        toast("Tag name too long", "A tag name cannot have more than " + MAX_TAG_INPUT_VALUE_LENGTH + " characters.", "warn", 7000);
-    }
-
-
-    /**
-     * Add the {@link INVALID_INPUT_CLASS_NAME} class to this input for given ```duration```.
-     * 
-     * @param duration the time in ms to keep the {@link INVALID_INPUT_CLASS_NAME} class before removing it again
-     */
-    function toggleTagInvalid(duration = 300): void {
-
-        // get element
-        const tagInput = $(inputRef.current!);
-
-        tagInput.addClass(INVALID_INPUT_CLASS_NAME);
-
-        setTimeout(() => {
-            tagInput.removeClass(INVALID_INPUT_CLASS_NAME);
-        }, duration);
-    }
-
-
     return (
         <Flex 
             id={id} 
@@ -246,6 +197,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
                 spellCheck={false}
                 defaultValue={tag.name}
                 ref={inputRef}
+                maxLength={MAX_TAG_INPUT_VALUE_LENGTH}
                 onKeyDown={handleKeyDown}
                 onChange={handleChange}
                 onBlur={handleBlur}

@@ -101,9 +101,10 @@ export default function NoteTitle({...props}: Props) {
                 title="Note title"
                 placeholder="Note title..."
                 defaultValue={noteEntity.title}
+                maxLength={MAX_NOTE_TITLE_VALUE_LENGTH}
+                ref={inputRef}
                 onKeyDown={handleKeyDown}
                 onChange={handleChange}
-                ref={inputRef}
             />
 
             {children}

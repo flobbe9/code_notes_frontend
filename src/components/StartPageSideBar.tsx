@@ -34,7 +34,7 @@ export default function StartPageSideBar({...props}: Props) {
     const [anyTagsSelected, setAnyTagsSelected] = useState(false);
 
     const { getDeviceWidth, isKeyPressed } = useContext(AppContext);
-    const { appUserEntity, noteEntities } = useContext(AppFetchContext);
+    const { appUserEntity } = useContext(AppFetchContext);
     const { setIsShowSideBar, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
@@ -176,10 +176,10 @@ export default function StartPageSideBar({...props}: Props) {
                         <SearchBar 
                             placeHolder="Search tags..."
                             title="Search tags"
-                            disabled={!noteEntities.length}
+                            disabled={!appUserEntity.tags?.length}
+                            ref={searchBarRef}
                             onChange={handleSearchBarChange}
                             onXIconClick={handleSearchBarXIconClick}
-                            ref={searchBarRef}
                             _focus={{borderColor: "var(--accentColor)"}} 
                             _searchIcon={{color: "var(--iconColor)"}}
                             _searchInput={{color: "white"}} 
@@ -202,7 +202,7 @@ export default function StartPageSideBar({...props}: Props) {
 
                         {/* Tag checkboxes */}
                         <div className="startPageSideBarListContainer">
-                            <StartPageSideBarTagList disabled={!noteEntities.length} />
+                            <StartPageSideBarTagList disabled={!appUserEntity.tags?.length} />
                         </div>
                     </div>
                 </Flex>

@@ -91,7 +91,7 @@ export default function StartPageContent({...props}: Props) {
 
     function getNoteByNoteEntity(noteEntity: NoteEntity, index: number): JSX.Element {
 
-        return <Note noteEntity={noteEntity} key={index} propsKey={index} />
+        return <Note noteEntity={noteEntity} key={index} propsKey={String(index)} />
     }
 
 

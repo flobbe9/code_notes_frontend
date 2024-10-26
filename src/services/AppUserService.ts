@@ -63,8 +63,8 @@ export class AppUserService {
         if (!appUserEntity.tags || !noteEntities)
             appUserEntity.tags = [];
 
-        if (!this.isTagEntityPresentInANote(noteEntities, tagEntity))
-            appUserEntity.tags.push(tagEntity);
+        if (!this.isTagEntityPresentInANote(noteEntities, tagEntity)) 
+            appUserEntity.tags = [...appUserEntity.tags, tagEntity]
     }
 
 
