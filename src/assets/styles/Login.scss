@@ -6,49 +6,57 @@
 
     height: 80vh;
 
-    .loginContentContainer {
+    &-contentContainer {
         width: 400px;
 
-        .loginHeading {
+        &-heading {
             color: var(--matBlue);
         }
 
-        .loginSubmitButton {
-            background-color: var(--accentColor2);
-            background-color: var(--matBlueLight);
-            color: white;
-            padding: $paddingX 20px;
-
-            @include hover();
-            @include buttonFocus(var(--accentColor));
-        }
-
-        .TextInput {
-            width: 100%;
-
-            .textInput {
-                border-color: var(--matBlue);
+        &-formContainer {
+            &-submitButton {
+                background-color: var(--accentColor2);
+                background-color: var(--matBlueLight);
+                color: white;
+                padding: $paddingX 20px;
+                
+                @include hover();
+                @include buttonFocus(var(--accentColor));
+            }
+            
+            .TextInput {
                 width: 100%;
 
-                @include customFocus {
-                    border-color: var(--accentColor);
+                .textInput {
+                    border-color: var(--matBlue);
+                    width: 100%;
+
+                    @include customFocus {
+                        border-color: var(--accentColor);
+                    }
+                }
+
+                .floatingLabel {
+                    color: var(--matBlue);
+                    left: $paddingX;
+                    top: -15px;
+
+                    &.moveFloatingLabelDown {
+                        top: 18px;
+                    }
                 }
             }
-
-            .floatingLabel {
-                color: var(--matBlue);
-                left: $paddingX;
-                top: -15px;
-
-                &.moveFloatingLabelDown {
-                    top: 18px;
-                }
+        }
+        
+        &-oauth2Container {
+            .Oauth2LoginButton {
+                @include hover();
             }
         }
     }
 
     @media only screen and (max-width: 575) {
-        .loginContentContainer {
+        .Login-contentContainer {
             min-width: 250px;
             width: unset;
         }

@@ -6,6 +6,7 @@ import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import { Link } from "react-router-dom";
+import HelperDiv from "./helpers/HelperDiv";
 
 
 interface Props extends DefaultProps {
@@ -21,8 +22,12 @@ export default function NavBarProfileSection({...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NavBarProfileSection", true);
 
     const { getDeviceWidth } = useContext(AppContext);
-    const { isLoggedIn } = useContext(AppFetchContext);
+    const { isLoggedIn, isLoggedInUseQueryResult } = useContext(AppFetchContext);
     const { isMobileWidth } = getDeviceWidth();
+
+    
+    if (!isLoggedInUseQueryResult.isFetched)
+        return <></>;
 
 
     return (
@@ -32,49 +37,46 @@ export default function NavBarProfileSection({...props}: Props) {
             style={style}
             {...otherProps}
         >
-            {
-                isLoggedIn ?
-                    // Profile icon
-                    <Link to={PROFILE_PATH} >
-                        <img 
-                            src="/img/account.png" 
-                            alt="account" 
-                            className="accountIcon invertColor hover" 
-                            height={30}
-                            title="Profile"
-                        />
-                    </Link>
-                :
-                    <div>
-                        {
-                            isMobileWidth ?
-                                <div className="textRight">
-                                    {/* Register */}
-                                    <Link to="/register" id="Register" className="whiteLink dontBreakText">Create Account</Link>
-                                    <br />
-                                    {/* Login */}
-                                    <Link to="/login" className="whiteLink">Login</Link>
-                                </div>
-                            :
-                                <div>
-                                    {/* Register */}
-                                    <Button 
-                                        id="Register" 
-                                        className="me-4 transition" 
-                                        tabIndex={-1}
-                                        _hover={{backgroundColor: "white"}} 
-                                    >
-                                        <Link to="/register" id="Register" className="whiteLink">
-                                            Create Account
-                                        </Link>
-                                    </Button>
+            {/* Profile icon */}
+            <HelperDiv rendered={isLoggedIn}>
+                <Link to={PROFILE_PATH}>
+                    <img 
+                        src="/img/account.png" 
+                        alt="account" 
+                        className="accountIcon invertColor hover" 
+                        height={30}
+                        title="Profile"
+                    />
+                </Link>
+            </HelperDiv>
             
-                                    {/* Login */}
-                                    <Link to="/login" className="whiteLink hover dontSelectText">Login</Link>
-                                </div>
-                        }
-                    </div>
-            }  
+            <HelperDiv rendered={!isLoggedIn}>
+                <HelperDiv className="textRight" rendered={isMobileWidth}>
+                    {/* Register */}
+                    <Link to="/register" id="Register" className="whiteLink dontBreakText">Create Account</Link>
+                    <br />
+
+                    {/* Login */}
+                    <Link to="/login" className="whiteLink">Login</Link>
+                </HelperDiv>
+
+                <HelperDiv rendered={!isMobileWidth}>
+                    {/* Register */}
+                    <Button 
+                        id="Register" 
+                        className="me-4 transition" 
+                        tabIndex={-1}
+                        _hover={{backgroundColor: "white"}} 
+                    >
+                        <Link to="/register" id="Register" className="whiteLink">
+                            Create Account
+                        </Link>
+                    </Button>
+
+                    {/* Login */}
+                    <Link to="/login" className="whiteLink hover dontSelectText">Login</Link>
+                </HelperDiv>
+            </HelperDiv>
 
             {children}
         </div>

@@ -11,6 +11,9 @@ import { AppContext } from "./App";
 import { AppUserService } from "../services/AppUserService";
 import { isResponseError } from "../helpers/fetchUtils";
 import { AppFetchContext } from "./AppFetchContextHolder";
+import { Link } from "react-router-dom";
+import { OAUTH2_AUTH_LINK_GOOGLE } from "../helpers/constants";
+import Oauth2LoginButton from "./Oauth2LoginButton";
 
 
 interface Props extends DefaultProps {
@@ -22,7 +25,6 @@ interface Props extends DefaultProps {
  * @parent ```<App>```
  * @since 0.0.1
  */
-// TODO: remember me
 export default function Login({...props}: Props) {
 
     const [email, setEmail] = useState<string>("");
@@ -123,10 +125,10 @@ export default function Login({...props}: Props) {
             verticalAlign="center"
             {...otherProps}
         >
-            <div className="loginContentContainer">
-                <h1 className="loginHeading mb-4">Login</h1>
+            <div className="Login-contentContainer">
+                <h1 className="Login-contentContainer-heading mb-4">Login</h1>
 
-                <div className="loginFormContainer">
+                <div className="Login-contentContainer-formContainer mb-5">
                     {/* Email */}
                     <TextInput 
                         className="mb-3"
@@ -152,7 +154,7 @@ export default function Login({...props}: Props) {
 
                     {/* Submit */}
                     <Button 
-                        className="loginSubmitButton fullWidth mt-5"
+                        className="Login-contentContainer-formContainer-submitButton fullWidth mt-5"
                         ref={submitButtonRef}
                         onClickPromise={handleSubmit}
                     >
@@ -160,6 +162,38 @@ export default function Login({...props}: Props) {
                     </Button>
                 </div>
 
+                <hr />
+
+                {/* 
+                    TODO
+                        center text properly
+
+                 */}
+                <div className="Login-contentContainer-oauth2Container mt-5">
+                    <Oauth2LoginButton 
+                        className="Login-contentContainer-oauth2Container-googleButton mb-3"
+                        clientRegistrationId="google"
+                        iconSrc={"/img/google.png"}
+                    >
+                        Login with Google
+                    </Oauth2LoginButton>
+
+                    <Oauth2LoginButton 
+                        className="Login-contentContainer-oauth2Container-githubButton mb-3"
+                        clientRegistrationId="github"
+                        iconSrc={"/img/github.png"}
+                    >
+                        Login with GitHub
+                    </Oauth2LoginButton>
+
+                    <Oauth2LoginButton 
+                        className="Login-contentContainer-oauth2Container-azureButton mb-3"
+                        clientRegistrationId="azure"
+                        iconSrc={"/img/microsoft.png"}
+                    >
+                        Login with Microsoft
+                    </Oauth2LoginButton>
+                </div>
             </div>
                 
             {children}
