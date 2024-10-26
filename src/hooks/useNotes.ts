@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { NoteEntity } from './../abstract/entites/NoteEntity';
+import { NoteEntity } from '../abstract/entites/NoteEntity';
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
-import { AppUserEntity } from './../abstract/entites/AppUserEntity';
+import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 import { log } from "../helpers/utils";
 
