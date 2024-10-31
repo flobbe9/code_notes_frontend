@@ -1,18 +1,17 @@
 import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { AppUserEntity } from "../../abstract/entites/AppUserEntity";
+import { NoteEntity } from "../../abstract/entites/NoteEntity";
 import { TagEntity } from "../../abstract/entites/TagEntity";
 import "../../assets/styles/NoteTagList.scss";
-import { getRandomString, isBlank, log } from '../../helpers/utils';
+import { getRandomString, isBlank } from '../../helpers/utils';
 import { AppUserService } from "../../services/AppUserService";
 import { AppFetchContext } from "../AppFetchContextHolder";
 import Flex from "../helpers/Flex";
 import HelperDiv from "../helpers/HelperDiv";
 import TagInput from "../TagInput";
 import { NoteContext } from "./Note";
-import { StartPageContainerContext } from "../StartPageContainer";
-import { NoteEntity } from "../../abstract/entites/NoteEntity";
-import { AppUserEntity } from "../../abstract/entites/AppUserEntity";
 
 
 interface Props extends DefaultProps {
@@ -33,7 +32,6 @@ export default function NoteTagList({...props}: Props) {
     const componentRef = useRef(null);
 
     const { appUserEntity, noteEntities } = useContext(AppFetchContext);
-    const { updateStartPageSideBarTagList } = useContext(StartPageContainerContext);
     const { noteEntity } = useContext(NoteContext);
 
     const context = {
@@ -95,8 +93,6 @@ export default function NoteTagList({...props}: Props) {
 
         // add to noteEntity
         noteEntity.tags = [...(noteEntity.tags || []), tagEntity];
-
-        updateStartPageSideBarTagList();
     }
 
 
@@ -146,8 +142,6 @@ export default function NoteTagList({...props}: Props) {
         removeTagFromAppUserEntityEntity(tagToRemove);
 
         removeTagElement(index);
-
-        updateStartPageSideBarTagList();
     }
 
 

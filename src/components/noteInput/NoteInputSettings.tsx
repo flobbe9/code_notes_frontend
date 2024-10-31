@@ -311,7 +311,8 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
                 disabled={areNoteInputSettingsDisabled}
                 onClick={() => toggleNoteInputSettings()}
             >
-                <i className="fa-solid fa-globe dontSelectText"></i>
+                {/* <i className="fa-solid fa-globe dontSelectText"></i> */}
+                <i className="fa-solid fa-code dontSelectText"></i>
             </Button>
                 
             {children}

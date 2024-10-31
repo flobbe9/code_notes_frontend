@@ -1,11 +1,25 @@
 @import "./global/functions.scss";
 
 .DefaultNoteInput {
-    border-left: 2px solid transparent;
+    $noteInputDefaultBorder: 2px solid;
+
+    border-left: $noteInputDefaultBorder transparent;
     margin: 5px 0;
     padding-left: 2px;
     position: relative;
     transition: border var(--transitionTime);
+
+    &:has(.PlainTextNoteInput) {
+        border-right: $noteInputDefaultBorder var(--plainTextNoteInputColor);
+    }
+    
+    &:has(.CodeNoteInputWithVariables) {
+        border-right: $noteInputDefaultBorder var(--codeNoteInputWithVariablesColor);
+    }
+    
+    &:has(.CodeNoteInput) {
+        border-right: $noteInputDefaultBorder var(--codeNoteInputColor);
+    }
 
     // case: hover or focus on code noteInput with vars
     &:has(.PlainTextNoteInput .ContentEditableDiv:focus) {

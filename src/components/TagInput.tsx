@@ -10,7 +10,8 @@ import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import { NoteContext } from "./noteInput/Note";
-import NoteTagList, { NoteTagListContext } from "./noteInput/NoteTagList";
+import { NoteTagListContext } from "./noteInput/NoteTagList";
+import { StartPageContainerContext } from "./StartPageContainer";
 
 
 interface Props extends DefaultProps {
@@ -36,6 +37,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
     const { toast } = useContext(AppContext);
     const { noteEntities, appUserEntity } = useContext(AppFetchContext);
+    const { updateStartPageSideBarTagList } = useContext(StartPageContainerContext);
     const { noteEntity } = useContext(NoteContext);
 
     const { 
@@ -81,13 +83,15 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
         // case: tag is blank and other blank tags are present
         if (isTagValueBlank() && numBlankTags > 1)
-            handleRemoveTag(event);
+            removeTag(getTagElementIndex(propsKey));
 
         handleNewTag();
 
         // case: no blank tags
         if (!numBlankTags)
             addTagElement();
+
+        updateStartPageSideBarTagList();
     }
 
 
@@ -115,6 +119,8 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     function handleRemoveTag(event): void {
         
         removeTag(getTagElementIndex(propsKey));
+
+        updateStartPageSideBarTagList();
     }
 
 

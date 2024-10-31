@@ -28,6 +28,16 @@ export default function AddNewNoteInput({...props}: Props) {
     const { noteEntity, noteInputs, setNoteInputs, getNoteInputByNoteInputType } = useContext(NoteContext);
 
 
+    function handleAddCodeNoteInput(event): void {
+         
+        // case: not noteInputs yet
+        if (!noteEntity.noteInputs)
+            noteEntity.noteInputs = [];
+
+        appendNoteInputEntity(getNewNoteInputEntityCode());
+    }
+
+
     function handleAddPlainTextNoteInput(event): void {
          
         // case: not noteInputs yet
@@ -71,12 +81,28 @@ export default function AddNewNoteInput({...props}: Props) {
         // case: is first note and first noteInput with variables
         if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE_WITH_VARIABLES"))
             // add tutorial text
-            value = `The value of x = ${getDefaultVariableInput()} can be copied to the clipboard. Change the programming language on the right.`;
+            value = `x = ${getDefaultVariableInput()} can be copied to the clipboard. Change the programming language on the right.`;
 
         return {
             value: value,
             type: "CODE_WITH_VARIABLES",
             programmingLanguage: CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE
+        }
+    }
+
+    
+    function getNewNoteInputEntityCode(): NoteInputEntity {
+
+        let value = "";
+
+        // case: is first note and first noteInput with variables
+        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE"))
+            // add tutorial text
+            value = "VSCode Editor. Change the programming language on the right.";
+
+        return {
+            value: value,
+            type: "CODE"
         }
     }
 
@@ -89,22 +115,6 @@ export default function AddNewNoteInput({...props}: Props) {
 
         return !!noteEntity.noteInputs?.find(noteInputEntity => 
             noteInputEntity.type === noteInputType);
-    }
-
- 
-    function handleAddCodeNoteInput(event): void {
-
-        // case: not noteInputs yet
-        if (!noteEntity.noteInputs)
-            noteEntity.noteInputs = [];
- 
-        const newCodeNoteInput: NoteInputEntity = {
-            value: "",
-            type: "CODE",
-            programmingLanguage: CODE_BLOCK_DEFAULT_LANGUAGE
-        }
-
-        appendNoteInputEntity(newCodeNoteInput);        
     }
 
 
@@ -157,7 +167,8 @@ export default function AddNewNoteInput({...props}: Props) {
                     onClick={handleAddCodeNoteInput}
                 >
                     <i className="fa-solid fa-plus me-2"></i>
-                    <i className="fa-solid fa-code"></i>
+                    <img src="/img/vscode_blue.webp" alt="vscode" height={20} />
+                    {/* <i className="fa-solid fa-code"></i> */}
                 </ButtonWithSlideLabel>
             </div>
 
