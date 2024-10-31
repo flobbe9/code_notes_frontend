@@ -114,7 +114,6 @@ export class AppUserService {
             updated: "", 
             email: "", 
             password: "", 
-            enabled: false,
             role: AppUserRole.USER, 
             tags: null, 
         };
@@ -129,7 +128,6 @@ export class AppUserService {
             updated: appUserEntity.updated,
             email: appUserEntity.email,
             password: appUserEntity.password,
-            enabled: false,
             role: appUserEntity.role,
             tags: appUserEntity.tags || null,
         }

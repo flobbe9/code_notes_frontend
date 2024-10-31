@@ -17,7 +17,5 @@ export interface AppUserEntity extends AbstractEntity {
 
     role: AppUserRole;
 
-    enabled: boolean;
-
     tags?: TagEntity[] | null;
 }
