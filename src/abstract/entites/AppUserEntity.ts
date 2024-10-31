@@ -1,6 +1,5 @@
 import { AppUserRole } from "../AppUserRole";
 import { AbstractEntity } from "./AbstractEntity";
-import { NoteEntity } from "./NoteEntity";
 import { TagEntity } from "./TagEntity";
 
 

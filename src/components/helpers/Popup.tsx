@@ -1,10 +1,10 @@
 import $ from "jquery";
 import React, { useContext, useEffect, useRef } from "react";
-import "../../assets/styles/Popup.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import Flex from "./Flex";
-import Button from "./Button";
+import "../../assets/styles/Popup.scss";
 import { AppContext } from "../App";
+import Button from "./Button";
+import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";
 
 
@@ -34,7 +34,7 @@ export default function Popup({...props}: Props) {
 
     const fadeDuration = 200;
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
 
 
     useEffect(() => {

@@ -1,6 +1,6 @@
 import CryptoJS from "crypto-js";
-import { isBlank, logError, stripTimeFromDate } from "../helpers/utils";
 import { CRYPTO_IV, CRYPTO_KEY } from "../helpers/constants";
+import { isBlank, logError } from "../helpers/utils";
 
 
 /**
@@ -56,24 +56,25 @@ export default class CryptoJSImpl {
 
 
     /**
-     * @param value to generate a hash for
-     * @param cfg config object. See ```CipherOption``` interface in CryptoJS lib.
+     * @param rawValue to generate a hash for
+     * @param config config object. See ```CipherOption``` interface in CryptoJS lib.
      * @returns the generated hash
      */
-    public hash(value: CryptoJS.lib.WordArray | string, cfg?: object): string {
+    public hashSha256(rawValue: CryptoJS.lib.WordArray | string, config?: object): string {
 
-        return CryptoJS.SHA256(value, cfg).toString();
+        return CryptoJS.SHA256(rawValue, config).toString();
     }
 
 
     /**
-     * 
-     * @param date to generate a hash for
-     * @returns ```this.hash()``` with the time stripped from the date and then passing ```date.getTime()```
+     * @param rawValue that, if hashed, is supposed to match the ```comparisonHash```
+     * @param comparisonHash to compare to hashed ```rawValue```
+     * @param config see ```CryptoJS.SHA256()``` method
+     * @returns ```true``` if given ```comparisonHash``` is the hashed equal to given ```rawValue```
      */
-    public hashDate(date = new Date()): string {
+    public hashSha256Matches(rawValue: CryptoJS.lib.WordArray | string, comparisonHash: string, config?: object): boolean {
 
-        return this.hash(stripTimeFromDate(date).getTime().toString());
+        return this.hashSha256(rawValue, config) === comparisonHash;
     }
 
 

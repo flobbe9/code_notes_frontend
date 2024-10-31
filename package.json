@@ -1,6 +1,7 @@
 {
   "name": "code_notes_frontend",
   "version": "0.0.1",
+  "nodeVersion": "22.6.0",
   "private": true,
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",

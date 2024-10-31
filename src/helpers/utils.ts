@@ -9,6 +9,8 @@ import { useQueryClientObj } from "..";
 import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { NOTE_QUERY_KEY } from "../hooks/useNotes";
+import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
+import CryptoJSImpl from "../abstract/CryptoJSImpl";
 
 
 export function log(message?: any, ...optionalParams: any[]): void {
@@ -1153,9 +1155,11 @@ export function clearSensitiveCache(): void {
     if (!useQueryClientObj)
         return;
     
-    // remove app user from cache if present
     if (useQueryClientObj.getQueryData<AppUserEntity>(APP_USER_QUERY_KEY))
         useQueryClientObj.removeQueries({queryKey: APP_USER_QUERY_KEY});
+
+    if (useQueryClientObj.getQueryData<string>(CSRF_TOKEN_QUERY_KEY))
+        useQueryClientObj.removeQueries({queryKey: CSRF_TOKEN_QUERY_KEY});
 }
 
 
@@ -1167,9 +1171,60 @@ export function clearUserCache(): void {
     if (!useQueryClientObj)
         return;
     
-    if (useQueryClientObj.getQueryData<AppUserEntity>(APP_USER_QUERY_KEY))
-        useQueryClientObj.removeQueries({queryKey: APP_USER_QUERY_KEY});
+    clearSensitiveCache();
 
     if (useQueryClientObj.getQueryData<AppUserEntity>(NOTE_QUERY_KEY))
         useQueryClientObj.removeQueries({queryKey: NOTE_QUERY_KEY});
+}
+
+
+/**
+ * Removes given state from browser history. If no state is specified, this will simply remove the last entry.
+ * 
+ * @param state to remove from browser history. Default is state before the current one
+ */
+export function removeFromBrowserHistory(state = window.history.state): void {
+
+    if (!state)
+        return;
+
+    window.history.replaceState(state, "");
+}
+
+
+/**
+ * Attempts to retrieve the csrf token from cache and decrypt it. 
+ * 
+ * @returns the decrypted csrf token or a blank string
+ */
+export function getCsrfToken(): string {
+
+    const queryClient = useQueryClientObj;
+    if (!queryClient)
+        return "";
+
+    const encryptedCsrfToken = queryClient.getQueryData<string>(CSRF_TOKEN_QUERY_KEY) || "";
+
+    if (isBlank(encryptedCsrfToken))
+        return "";
+
+    return new CryptoJSImpl().decrypt(encryptedCsrfToken);
+}
+
+
+/**
+ * Will encrypt given ```csrfToken``` and update the use query cache. If ```csrfToken``` is falsy, the cache
+ * will still be updated but with a blank string.
+ * 
+ * @param csrfToken to encrypt and cache
+ */
+export function setCsrfToken(csrfToken: string): void {
+    
+    const queryClient = useQueryClientObj;
+    if (!queryClient)
+        return;
+
+    const encryptedCsrfToken = new CryptoJSImpl().encrypt(csrfToken);
+
+    queryClient.setQueryData<string>(CSRF_TOKEN_QUERY_KEY, encryptedCsrfToken);
 }

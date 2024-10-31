@@ -1,9 +1,8 @@
 import CryptoJSImpl from "../abstract/CryptoJSImpl";
 import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
-import { CSRF_TOKEN_LOCAL_STORAGE_KEY } from "../components/Login";
 import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
 import { BACKEND_BASE_URL, CSRF_TOKEN_HEADER_NAME } from "./constants";
-import { clearSensitiveCache, isNumberFalsy, logApiResponse } from "./utils";
+import { clearSensitiveCache, getCsrfToken, isNumberFalsy, log, logApiResponse } from "./utils";
 
 
 /** Http status code "Service Unavailable" 503, use this status when ```fetch()``` throws "failed to fetch" error */
@@ -155,24 +154,9 @@ function getFetchHeaders(headers?: HeadersInit): HeadersInit {
         Object.assign(headers, contentType);
 
     // csrf
-    headers = {...headers, [CSRF_TOKEN_HEADER_NAME]: getCsrfTokenDecrypted()}
+    headers = {...headers, [CSRF_TOKEN_HEADER_NAME]: getCsrfToken()}
 
     return headers!;
-}
-
-
-/**
- * @returns the decrypted csrf token from localstorage or an empty string
- */
-function getCsrfTokenDecrypted(): string {
-
-    const encrpytedCsrf = localStorage.getItem(CSRF_TOKEN_LOCAL_STORAGE_KEY);
-
-    // case: no csrf token present
-    if (!encrpytedCsrf)
-        return "";
-
-    return new CryptoJSImpl().decrypt(encrpytedCsrf);
 }
 
 

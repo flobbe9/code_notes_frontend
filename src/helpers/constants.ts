@@ -14,21 +14,24 @@ export const BASE_URL = process.env.REACT_APP_BASE_URL as string;
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL + "";
 /** Default rel attr to pass to any link */
 export const LINK_DEFAULT_REL = "noopener noreferrer nofollow";
+export const START_PAGE_PATH = "/";
 export const PROFILE_PATH = "/profile";
 /** The link that will trigger the oauth2 flow. This link is useless without the provider name appended. E.g. append "/google" */
 const OAUTH2_AUTH_LINK = `${BACKEND_BASE_URL}/oauth2/authorization`;
 export const OAUTH2_AUTH_LINK_GOOGLE = `${OAUTH2_AUTH_LINK}/google`;
 export const OAUTH2_AUTH_LINK_AZURE = `${OAUTH2_AUTH_LINK}/azure`;
 export const OAUTH2_AUTH_LINK_GITHUB = `${OAUTH2_AUTH_LINK}/github`;
+/** The url query param the csrf token value will be assigned to. */
+export const CSRF_TOKEN_QUERY_PARAM = process.env.REACT_APP_CSRF_TOKEN_QUERY_PARAM as string;
 
 
 // Other
 /** Time the noteInput settings slide animation takes (in ms). */
 export const BLOCK_SETTINGS_ANIMATION_DURATION = 150;
 export const INVALID_INPUT_CLASS_NAME = "invalidInput";
-export const MAX_TAG_INPUT_VALUE_LENGTH = 255;
+export const MAX_TAG_INPUT_VALUE_LENGTH = 50;
 export const MAX_NOTE_TITLE_VALUE_LENGTH = 255;
-export const MAX_NOTE_INPUT_VALUE_LENGTH = 50_000;
+export const MAX_NOTE_INPUT_VALUE_LENGTH = 65_535;
 export const CSRF_TOKEN_HEADER_NAME = "X-CSRF-TOKEN";
 export const DEFAULT_ERROR_MESSAGE = "An unexpected error occurred. Please copy your unsaved contents and refresh the page.";
 
@@ -57,6 +60,7 @@ export const DEFAULT_HTML_SANTIZER_OPTIONS: sanitize.IOptions = {
         "figcaption",
         "figure",
         "h1", "h2", "h3", "h4", "h5", "h6",
+        "i",
         "img",
         "input",
         "kbd",
@@ -80,6 +84,7 @@ export const DEFAULT_HTML_SANTIZER_OPTIONS: sanitize.IOptions = {
         "h4": [...ALLOWED_TAG_ATTRIBUTES],
         "h5": [...ALLOWED_TAG_ATTRIBUTES],
         "h6": [...ALLOWED_TAG_ATTRIBUTES],
+        "i": [...ALLOWED_TAG_ATTRIBUTES],
         "img": ["src", "alt", ...ALLOWED_TAG_ATTRIBUTES],
         "input": ["placeholder", "value", "defaultValue", ...ALLOWED_TAG_ATTRIBUTES],
         "mark": ["alt", "color", ...ALLOWED_TAG_ATTRIBUTES],

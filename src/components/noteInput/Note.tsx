@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { NoteEntity } from "../../abstract/entites/NoteEntity";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { NoteInputType } from "../../abstract/NoteInputType";
 import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityService";
 import "../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE, MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
@@ -102,21 +101,21 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     function getNoteInputByNoteInputType(noteInputEntity: NoteInputEntity, index: number): JSX.Element {
 
         switch (noteInputEntity.type) {
-            case NoteInputType.PLAIN_TEXT:
+            case "PLAIN_TEXT":
                 return (
                     <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={String(index)} key={index}>
                         <PlainTextNoteInput noteInputEntity={noteInputEntity} />
                     </DefaultNoteInput>
                     )
 
-            case NoteInputType.CODE:
+            case "CODE":
                 return (
                     <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={String(index)} key={index}>
                         <CodeNoteInput noteInputEntity={noteInputEntity} />
                     </DefaultCodeNoteInput>
                 )
 
-            case NoteInputType.CODE_WITH_VARIABLES:
+            case "CODE_WITH_VARIABLES":
                 return (
                     <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={String(index)} key={index}>
                         <CodeNoteInputWithVariables noteInputEntity={noteInputEntity} />

@@ -179,10 +179,10 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
     function handleSelectLanguage(language: string): void {
 
         // update language state
-        if (noteInputEntity.type === NoteInputType.CODE)
+        if (noteInputEntity.type === "CODE")
             setCodeNoteInputLanguage(language);
 
-        else if (noteInputEntity.type === NoteInputType.CODE_WITH_VARIABLES)
+        else if (noteInputEntity.type === "CODE_WITH_VARIABLES")
             setCodeNoteInputcodeNoteInputWithVariablesLanguage(language);
 
         // hide result box
@@ -232,10 +232,10 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
      */
     function getAllLanguagesByNoteInputType(): ProgrammingLanguage[] {
 
-        if (noteInputEntity.type === NoteInputType.CODE)
+        if (noteInputEntity.type === "CODE")
             return CODE_BLOCK_LANGUAGES;
 
-        if (noteInputEntity.type === NoteInputType.CODE_WITH_VARIABLES)
+        if (noteInputEntity.type === "CODE_WITH_VARIABLES")
             return CODE_BLOCK_WITH_VARIABLES_LANGUAGES;
 
         return [];
@@ -288,7 +288,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
                 title="Search programming language"
                 defaultValue={noteInputEntity.programmingLanguage || ""}
                 tabIndex={isShowNoteInputSettings ? undefined : -1}
-                rendered={noteInputEntity.type !== NoteInputType.PLAIN_TEXT}
+                rendered={noteInputEntity.type !== "PLAIN_TEXT"}
                 onFocus={handleLanguageSearchFocus}
                 onBlur={handleLanguageSearchBlur}
                 onKeyDown={handleLanguageSearchKeyDown}

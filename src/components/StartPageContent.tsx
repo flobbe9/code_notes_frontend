@@ -4,6 +4,7 @@ import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import "../assets/styles/StartPageContent.scss";
 import { SearchNoteHelper } from "../helpers/SearchNoteHelper";
+import { useCsrfToken } from "../hooks/useCsrfToken";
 import AddNewNoteButton from "./AddNewNoteButton";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
@@ -49,6 +50,9 @@ export default function StartPageContent({...props}: Props) {
 
         getNoteByNoteEntity
     }
+
+
+    useCsrfToken();
 
 
     useEffect(() => {

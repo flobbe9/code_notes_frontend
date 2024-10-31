@@ -1,18 +1,13 @@
-import $ from "jquery";
 import React, { useContext } from "react";
-import "../../assets/styles/AddNewNoteInput.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import Flex from "../helpers/Flex";
-import { log } from "../../helpers/utils";
-import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
-import { NoteContext } from "./Note";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { NoteInputType } from "../../abstract/NoteInputType";
-import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER } from "../../helpers/constants";
-import { StartPageContentContext } from "../StartPageContent";
-import { AppContext } from "../App";
-import { StartPageContainerContext } from "../StartPageContainer";
+import "../../assets/styles/AddNewNoteInput.scss";
+import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../helpers/constants";
 import { AppFetchContext } from "../AppFetchContextHolder";
+import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
+import Flex from "../helpers/Flex";
+import { NoteContext } from "./Note";
 
 
 interface Props extends DefaultProps {
@@ -58,13 +53,13 @@ export default function AddNewNoteInput({...props}: Props) {
         let value = "";
 
         // case: is first note and first noteInput with variables
-        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.PLAIN_TEXT))
+        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("PLAIN_TEXT"))
             // add tutorial text
             value = "Plain text and some <code>code...</code>";
 
         return {
             value: value,
-            type: NoteInputType.PLAIN_TEXT
+            type: "PLAIN_TEXT"
         }
     }
 
@@ -74,13 +69,13 @@ export default function AddNewNoteInput({...props}: Props) {
         let value = "";
 
         // case: is first note and first noteInput with variables
-        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType(NoteInputType.CODE_WITH_VARIABLES))
+        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE_WITH_VARIABLES"))
             // add tutorial text
-            value = "Some code and a variable x = " + getDefaultVariableInput() + ". Change the programming language on the right.";
+            value = `The value of x = ${getDefaultVariableInput()} can be copied to the clipboard. Change the programming language on the right.`;
 
         return {
             value: value,
-            type: NoteInputType.CODE_WITH_VARIABLES,
+            type: "CODE_WITH_VARIABLES",
             programmingLanguage: CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE
         }
     }
@@ -105,7 +100,7 @@ export default function AddNewNoteInput({...props}: Props) {
  
         const newCodeNoteInput: NoteInputEntity = {
             value: "",
-            type: NoteInputType.CODE,
+            type: "CODE",
             programmingLanguage: CODE_BLOCK_DEFAULT_LANGUAGE
         }
 

@@ -1,19 +1,17 @@
 import $ from "jquery";
 import React, { useContext, useRef, useState } from "react";
-import "../assets/styles/Login.scss";
+import { useNavigate } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
+import "../assets/styles/Login.scss";
+import { isResponseError } from "../helpers/fetchUtils";
+import { isBlank, isNumberFalsy, setCsrfToken } from "../helpers/utils";
+import { AppContext } from "./App";
+import { AppFetchContext } from "./AppFetchContextHolder";
+import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import TextInput from "./helpers/TextInput";
-import Button from "./helpers/Button";
-import { isBlank, isNumberFalsy, log } from "../helpers/utils";
-import CryptoJSImpl from "../abstract/CryptoJSImpl";
-import { AppContext } from "./App";
-import { AppUserService } from "../services/AppUserService";
-import { isResponseError } from "../helpers/fetchUtils";
-import { AppFetchContext } from "./AppFetchContextHolder";
-import { Link } from "react-router-dom";
-import { OAUTH2_AUTH_LINK_GOOGLE } from "../helpers/constants";
 import Oauth2LoginButton from "./Oauth2LoginButton";
+import { START_PAGE_PATH } from "../helpers/constants";
 
 
 interface Props extends DefaultProps {
@@ -32,6 +30,8 @@ export default function Login({...props}: Props) {
 
     const { toast } = useContext(AppContext);
     const { fetchLogin } = useContext(AppFetchContext);
+    
+    const navigate = useNavigate();
 
     const emailInputRef = useRef(null);
     const passwordInputRef = useRef(null);
@@ -84,13 +84,9 @@ export default function Login({...props}: Props) {
      */
     function handleLoginSuccess(csrfToken: string): void {
 
-        const cryptoJs = new CryptoJSImpl();
-        const encryptedCsrfToken = cryptoJs.encrypt(csrfToken);
+        setCsrfToken(csrfToken);
 
-        window.localStorage.setItem(CSRF_TOKEN_LOCAL_STORAGE_KEY, encryptedCsrfToken);
-
-        // dont navigate here, page reload is necessary for useLoggedIn hook to trigger
-        window.location.href = "/";
+        navigate(START_PAGE_PATH);
     }
 
 
@@ -200,6 +196,3 @@ export default function Login({...props}: Props) {
         </Flex>
     )
 }
-
-
-export const CSRF_TOKEN_LOCAL_STORAGE_KEY = "csrfToken";

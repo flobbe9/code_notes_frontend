@@ -1,5 +1,4 @@
 
-import { AppUserRole } from '../abstract/AppUserRole';
 import CryptoJSImpl from '../abstract/CryptoJSImpl';
 import { NoteEntity } from '../abstract/entites/NoteEntity';
 import { TagEntity } from '../abstract/entites/TagEntity';
@@ -114,7 +113,7 @@ export class AppUserService {
             updated: "", 
             email: "", 
             password: "", 
-            role: AppUserRole.USER, 
+            role: "USER" ,
             tags: null, 
         };
     }
