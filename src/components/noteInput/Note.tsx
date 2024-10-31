@@ -6,7 +6,7 @@ import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityS
 import "../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE, MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
-import { getJsxElementIndexByKey } from '../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, log } from '../../helpers/utils';
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 import { AppContext } from "../App";
 import { AppFetchContext } from "../AppFetchContextHolder";
@@ -51,7 +51,8 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
     const { toast, setIsPopupVisible, setPopupContent } = useContext(AppContext);
-    const { appUserEntity, 
+    const { 
+        appUserEntity, 
         noteEntities, 
         setNoteEntities, 
         appUserEntityUseQueryResult,
@@ -93,38 +94,39 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         if (!noteEntity.noteInputs)
             return [];
 
-        return noteEntity.noteInputs.map((noteInputEntity, i) =>
-            getNoteInputByNoteInputType(noteInputEntity, i));
+        return noteEntity.noteInputs.map(noteInputEntity =>
+            getNoteInputByNoteInputType(noteInputEntity));
     }
 
 
-    function getNoteInputByNoteInputType(noteInputEntity: NoteInputEntity, index: number): JSX.Element {
+    function getNoteInputByNoteInputType(noteInputEntity: NoteInputEntity): JSX.Element {
 
+        const key = getRandomString();
         switch (noteInputEntity.type) {
             case "PLAIN_TEXT":
                 return (
-                    <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={String(index)} key={index}>
+                    <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
                         <PlainTextNoteInput noteInputEntity={noteInputEntity} />
                     </DefaultNoteInput>
                     )
 
             case "CODE":
                 return (
-                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={String(index)} key={index}>
+                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
                         <CodeNoteInput noteInputEntity={noteInputEntity} />
                     </DefaultCodeNoteInput>
                 )
 
             case "CODE_WITH_VARIABLES":
                 return (
-                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={String(index)} key={index}>
+                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
                         <CodeNoteInputWithVariables noteInputEntity={noteInputEntity} />
                     </DefaultCodeNoteInput>
                 )
 
             // should not happen
             default: 
-                return <div key={index}></div>;
+                return <div key={key}></div>;
         }
     }
 

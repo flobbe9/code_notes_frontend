@@ -26,8 +26,8 @@ interface Props extends DefaultProps {
 export default function StartPageContainer({children, ...props}: Props) {
 
     const [isShowSideBar, setIsShowSideBar] = useState(false);
-    /** State that will trigger the sidebar to update some states if changed. ```undefined``` should stay the init value */
-    const [updateSideBarStates, setUpdateSideBarStates] = useState<boolean>();
+    /** State that will trigger the sidebar tag list to update. ```undefined``` should stay the init value */
+    const [isupdateSideBarTagList, setIsUpdateSideBarTagList] = useState<boolean>();
 
     /** List of tag entities inside ```<StartPageSideBarTagList>``` that are checked */
     const [selectedTagEntityNames, setSelectedTagEntityNames] = useState<Set<string>>(new Set());
@@ -39,8 +39,9 @@ export default function StartPageContainer({children, ...props}: Props) {
         isShowSideBar, 
         setIsShowSideBar,
 
-        updateSideBarStates, 
-        setUpdateSideBarStates,
+        isupdateSideBarTagList, 
+        setIsUpdateSideBarTagList,
+        updateStartPageSideBarTagList,
 
         getStartPageSideBarWidth,
 
@@ -59,6 +60,14 @@ export default function StartPageContainer({children, ...props}: Props) {
         updateStartPageContentWidth();
 
     }, [isShowSideBar, windowSize]);
+
+
+    /**
+     * Simply toggle the ```isIsUpdateSideBarTagList``` state.
+     */
+    function updateStartPageSideBarTagList(): void {
+        setIsUpdateSideBarTagList(!isupdateSideBarTagList)
+    }
 
 
     function updateStartPageContentWidth(): void {
@@ -145,8 +154,9 @@ export const StartPageContainerContext = createContext({
     isShowSideBar: false, 
     setIsShowSideBar: (isShow: boolean) => {},
 
-    updateSideBarStates: true as (boolean | undefined), 
-    setUpdateSideBarStates: (update: boolean | undefined) => {},
+    isupdateSideBarTagList: true as (boolean | undefined), 
+    setIsUpdateSideBarTagList: (update: boolean | undefined) => {},
+    updateStartPageSideBarTagList: () => {},
 
     getStartPageSideBarWidth: () => {return 0 as number},
 

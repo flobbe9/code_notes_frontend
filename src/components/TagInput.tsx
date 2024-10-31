@@ -4,13 +4,13 @@ import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { TagEntity } from "../abstract/entites/TagEntity";
 import "../assets/styles/TagInput.scss";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../helpers/constants";
-import { isBlank } from "../helpers/utils";
+import { isBlank, log } from "../helpers/utils";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import { NoteContext } from "./noteInput/Note";
-import { NoteTagListContext } from "./noteInput/NoteTagList";
+import NoteTagList, { NoteTagListContext } from "./noteInput/NoteTagList";
 
 
 interface Props extends DefaultProps {
@@ -83,11 +83,11 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
         if (isTagValueBlank() && numBlankTags > 1)
             handleRemoveTag(event);
 
+        handleNewTag();
+
         // case: no blank tags
         if (!numBlankTags)
             addTagElement();
-
-        handleNewTag();
     }
 
 
@@ -149,10 +149,11 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
      */
     function isTagElementContainedInNoteEntity(): boolean {
 
-        if (!noteEntity.tags)
+        if (!tagElements?.length)
             return false;
 
-        return getTagElementIndex(propsKey) !== noteEntity.tags.length;
+        log(getTagElementIndex(propsKey), tagElements.length)
+        return getTagElementIndex(propsKey) < tagElements.length - 1;
     }
 
 

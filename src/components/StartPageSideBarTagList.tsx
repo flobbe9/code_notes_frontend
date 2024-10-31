@@ -4,11 +4,12 @@ import { TagEntity } from "../abstract/entites/TagEntity";
 import HelperProps from "../abstract/HelperProps";
 import "../assets/styles/StartPageSideBarTagList.scss";
 import { matchStringsConsiderWhiteSpace } from "../helpers/searchUtils";
-import { isBlank } from "../helpers/utils";
+import { getRandomString, isBlank } from "../helpers/utils";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import HelperDiv from "./helpers/HelperDiv";
 import { StartPageSideBarContext } from "./StartPageSideBar";
 import TagCheckbox from "./TagCheckbox";
+import { StartPageContainerContext } from "./StartPageContainer";
 
 
 interface Props extends HelperProps {
@@ -26,6 +27,7 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
     const [tags, setTags] = useState<JSX.Element[]>([]);
 
     const { appUserEntity, noteEntities } = useContext(AppFetchContext);
+    const { isupdateSideBarTagList } = useContext(StartPageContainerContext);
     const { searchValue } = useContext(StartPageSideBarContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBarTagList", true);
@@ -36,7 +38,7 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
     useEffect(() => {
         updateTags();
 
-    }, [appUserEntity, noteEntities]);
+    }, [appUserEntity, noteEntities, isupdateSideBarTagList]);
 
 
     useEffect(() =>  {
@@ -62,14 +64,14 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
         if (!tagEntities)
             return [];
 
-        return tagEntities.map((tagEntity, i) => 
-            getTagCheckboxElement(tagEntity, i));
+        return tagEntities.map(tagEntity => 
+            getTagCheckboxElement(tagEntity));
     }
 
 
-    function getTagCheckboxElement(tagEntity: TagEntity, index: number): JSX.Element {
+    function getTagCheckboxElement(tagEntity: TagEntity): JSX.Element {
 
-        return <TagCheckbox key={index} tagEntity={tagEntity} disabled={disabled} />;
+        return <TagCheckbox key={getRandomString()} tagEntity={tagEntity} disabled={disabled} />;
     }
 
 

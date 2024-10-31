@@ -13,6 +13,7 @@ import PendingFetchHelper from "./helpers/PendingFetchHelper";
 import SearchBar from "./helpers/SearchBar";
 import Note from "./noteInput/Note";
 import { StartPageContainerContext } from "./StartPageContainer";
+import { getRandomString } from "../helpers/utils";
 
 
 interface Props extends DefaultProps {
@@ -88,14 +89,15 @@ export default function StartPageContent({...props}: Props) {
         if (!noteEntities)
             return [];
 
-        return noteEntities.map((noteEntity, i) => 
-            getNoteByNoteEntity(noteEntity, i));
+        return noteEntities.map(noteEntity => 
+            getNoteByNoteEntity(noteEntity));
     }
 
 
-    function getNoteByNoteEntity(noteEntity: NoteEntity, index: number): JSX.Element {
+    function getNoteByNoteEntity(noteEntity: NoteEntity): JSX.Element {
 
-        return <Note noteEntity={noteEntity} key={index} propsKey={String(index)} />
+        const key = getRandomString();
+        return <Note noteEntity={noteEntity} key={key} propsKey={String(key)} />
     }
 
 

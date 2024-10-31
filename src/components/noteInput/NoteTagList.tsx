@@ -3,17 +3,19 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { TagEntity } from "../../abstract/entites/TagEntity";
 import "../../assets/styles/NoteTagList.scss";
-import { isBlank, log } from '../../helpers/utils';
+import { getRandomString, isBlank, log } from '../../helpers/utils';
 import { AppUserService } from "../../services/AppUserService";
 import { AppFetchContext } from "../AppFetchContextHolder";
 import Flex from "../helpers/Flex";
 import HelperDiv from "../helpers/HelperDiv";
 import TagInput from "../TagInput";
 import { NoteContext } from "./Note";
+import { StartPageContainerContext } from "../StartPageContainer";
+import { NoteEntity } from "../../abstract/entites/NoteEntity";
+import { AppUserEntity } from "../../abstract/entites/AppUserEntity";
 
 
 interface Props extends DefaultProps {
-
 }
 
 
@@ -30,7 +32,8 @@ export default function NoteTagList({...props}: Props) {
 
     const componentRef = useRef(null);
 
-    const { appUserEntity, setAppUserEntity, noteEntities, setNoteEntities } = useContext(AppFetchContext);
+    const { appUserEntity, noteEntities } = useContext(AppFetchContext);
+    const { updateStartPageSideBarTagList } = useContext(StartPageContainerContext);
     const { noteEntity } = useContext(NoteContext);
 
     const context = {
@@ -54,13 +57,15 @@ export default function NoteTagList({...props}: Props) {
 
         // case: note has no tags
         if (!noteEntity.tags || !noteEntity.tags.length) 
-            return [getNewTagElement(0)];
+            return [getNewTagElement()];
 
-        const tagElements = noteEntity.tags.map((tag, i) => 
-            <TagInput initialTag={tag} key={i} propsKey={String(i)} />);
+        const tagElements = noteEntity.tags.map(tag => {
+            const key = getRandomString();
+            return <TagInput initialTag={tag} key={key} propsKey={key} />;
+        });
 
         // add blank tag
-        tagElements.push(getNewTagElement(tagElements.length));
+        tagElements.push(getNewTagElement());
 
         return tagElements;
     }
@@ -71,24 +76,27 @@ export default function NoteTagList({...props}: Props) {
      */
     function addTagElement(): void {
 
-        setTagElements([...tagElements, getNewTagElement(tagElements.length)]);
+        setTagElements([...tagElements, getNewTagElement()]);
     }
 
 
     /**
      * @param tagEntity to add to ```noteEntity.tags``` and ```appUserEntity.tags```
+     * @param noteEntities the globally fetched state
+     * @param appUserEntity the globally fetched state
      */
-    function addTag(tagEntity: TagEntity, noteEntities, appUserEntity): void {
+    function addTag(tagEntity: TagEntity, noteEntities: NoteEntity[], appUserEntity: AppUserEntity): void {
 
         if (!tagEntity)
             return;
 
         // add to appUser first
         AppUserService.addTag(appUserEntity, noteEntities, tagEntity);
-        setAppUserEntity({...appUserEntity});
 
         // add to noteEntity
         noteEntity.tags = [...(noteEntity.tags || []), tagEntity];
+
+        updateStartPageSideBarTagList();
     }
 
 
@@ -97,11 +105,12 @@ export default function NoteTagList({...props}: Props) {
      * @param name the tag name. Default is ""
      * @returns a ```<TagInput />``` with an empty tag name
      */
-    function getNewTagElement(index: number, name = ""): JSX.Element {
+    function getNewTagElement(name = ""): JSX.Element {
 
         const defaultTag = {name: name};
 
-        return <TagInput initialTag={defaultTag} key={index} propsKey={String(index)} />;
+        const key = getRandomString();
+        return <TagInput initialTag={defaultTag} key={key} propsKey={key} />;
     }
 
 
@@ -137,6 +146,8 @@ export default function NoteTagList({...props}: Props) {
         removeTagFromAppUserEntityEntity(tagToRemove);
 
         removeTagElement(index);
+
+        updateStartPageSideBarTagList();
     }
 
 
@@ -151,7 +162,6 @@ export default function NoteTagList({...props}: Props) {
             return;
                 
         AppUserService.removeTagEntity(appUserEntity, tagEntity);
-        setAppUserEntity({...appUserEntity});
     }
     
 
