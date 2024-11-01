@@ -3,7 +3,7 @@
 .Confirm {   
     &-footer {
         &-confirmButton {
-            background-color: var(--matBlue);
+            background-color: var(--matteBlue);
             color: white;
             
             @include buttonFocus(black);

@@ -1,7 +1,6 @@
-import { TagEntity } from "../entites/TagEntity";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
+import { TagEntity } from "../entites/TagEntity";
 import { AbstractService } from "./AbstractService";
-import { log } from "../../helpers/utils";
 
 
 export class TagEntityService extends AbstractService {

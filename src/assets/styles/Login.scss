@@ -12,13 +12,13 @@
         width: 400px;
 
         &-heading {
-            color: var(--matBlue);
+            color: var(--matteBlue);
         }
 
         &-formContainer {
             &-submitButton {
                 background-color: var(--accentColor2);
-                background-color: var(--matBlueLight);
+                background-color: var(--matteBlueLight);
                 color: white;
                 padding: $paddingX 20px;
                 
@@ -30,7 +30,7 @@
                 width: 100%;
 
                 .textInput {
-                    border-color: var(--matBlue);
+                    border-color: var(--matteBlue);
                     width: 100%;
 
                     @include customFocus {
@@ -39,7 +39,7 @@
                 }
 
                 .floatingLabel {
-                    color: var(--matBlue);
+                    color: var(--matteBlue);
                     left: $paddingX;
                     top: -15px;
 
