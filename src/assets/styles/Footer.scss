@@ -1,0 +1,18 @@
+@import "../styles/global/functions.scss";
+
+
+.Footer {
+    background-color: white;
+    border-top: 2px solid var(--matteBlue);
+    bottom: 0;
+    color: var(--matteBlue);
+    padding: 20px;
+    position: absolute;
+    width: 100%;
+
+    &-rightContainer {
+        &-version {
+            color: grey;
+        }
+    }
+}

@@ -12,6 +12,7 @@ import Toast, { ToastSevirity } from './helpers/Toast';
 import Login from "./Login";
 import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
+import Footer from "./Footer";
 
 
 /**
@@ -259,6 +260,8 @@ export default function App() {
                                 <Route path="*" element={<div>404</div>} />
                             </Routes>
                         </div>
+
+                        <Footer />
 
                         {/* Toast popup */}
                         <Toast 

@@ -16,6 +16,8 @@ export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL + "";
 export const LINK_DEFAULT_REL = "noopener noreferrer nofollow";
 export const START_PAGE_PATH = "/";
 export const PROFILE_PATH = "/profile";
+export const ABOUT_PATH = "/about";
+export const DATA_POLICY_PATH = "/data-policy";
 /** The link that will trigger the oauth2 flow. This link is useless without the provider name appended. E.g. append "/google" */
 const OAUTH2_AUTH_LINK = `${BACKEND_BASE_URL}/oauth2/authorization`;
 export const OAUTH2_AUTH_LINK_GOOGLE = `${OAUTH2_AUTH_LINK}/google`;

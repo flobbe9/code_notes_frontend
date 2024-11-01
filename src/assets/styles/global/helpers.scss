@@ -107,6 +107,16 @@
     }
 }
 
+.simpleLink {
+    color: currentColor;
+    text-decoration: none;
+
+    @include customHover {
+        cursor: pointer;
+        text-decoration: none;
+    }
+}
+
 .whiteLink {
     color: white;
     text-decoration: none;
