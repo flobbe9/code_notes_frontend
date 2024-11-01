@@ -1,19 +1,16 @@
 import $ from "jquery";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import "../../assets/styles/NoteInputSettings.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import Flex from "../helpers/Flex";
+import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
+import { ProgrammingLanguage } from "../../abstract/ProgrammingLanguage";
+import "../../assets/styles/NoteInputSettings.scss";
+import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES } from "../../helpers/constants";
+import { getCssConstant, getCSSValueAsNumber, includesIgnoreCaseTrim, isEventKeyTakingUpSpace } from "../../helpers/utils";
 import Button from "../helpers/Button";
+import Flex from "../helpers/Flex";
 import SearchBar from "../helpers/SearchBar";
 import LanguageSearchResults from "../LanguageSearchResults";
-import NoteInputSwitch from "./NoteInputSwitch";
-import { getCssConstant, getCSSValueAsNumber, includesIgnoreCase, includesIgnoreCaseTrim, isEmpty, isEventKeyTakingUpSpace, log } from "../../helpers/utils";
-import { AppContext } from "../App";
-import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES } from "../../helpers/constants";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
-import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { NoteInputType } from "../../abstract/NoteInputType";
-import { ProgrammingLanguage } from "../../abstract/ProgrammingLanguage";
 
 
 interface Props extends DefaultProps {
@@ -56,8 +53,6 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
 
     // IDEA: make custom colors and pass them to buttons as border color
 
-    const { getDeviceWidth } = useContext(AppContext);
-    const { isTabletWidth } = getDeviceWidth();
 
 
     useEffect(() => {

@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
+import { Link } from "react-router-dom";
 import { PROFILE_PATH } from "../helpers/constants";
 import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
 import "./../assets/styles/NavBarProfileSection.scss";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
-import { Link } from "react-router-dom";
 import HelperDiv from "./helpers/HelperDiv";
 
 
@@ -21,9 +21,8 @@ export default function NavBarProfileSection({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NavBarProfileSection", true);
 
-    const { getDeviceWidth } = useContext(AppContext);
+    const { isMobileWidth } = useContext(AppContext);
     const { isLoggedIn, isLoggedInUseQueryResult } = useContext(AppFetchContext);
-    const { isMobileWidth } = getDeviceWidth();
 
     
     if (!isLoggedInUseQueryResult.isFetched)

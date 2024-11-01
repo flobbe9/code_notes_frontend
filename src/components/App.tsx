@@ -2,7 +2,7 @@ import $ from "jquery";
 import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
-import { getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
+import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, log } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
@@ -44,7 +44,9 @@ export default function App() {
         moveToast,
 
         windowSize,
-        getDeviceWidth,
+        isMobileWidth: getDeviceWidth().isMobileWidth,
+        isTableWidth: getDeviceWidth().isTabletWidth,
+        isDesktopWidth: getDeviceWidth().isDesktopWidth,
 
         isKeyPressed,
         isControlKeyPressed,
@@ -73,6 +75,10 @@ export default function App() {
         window.addEventListener("resize", handleWindowResize);
 
     }, []);
+
+
+    useEffect(() => {
+    }, [windowSize]);
 
 
     /**
@@ -138,9 +144,6 @@ export default function App() {
     }
     
 
-    /**
-     * Update ```windowSize``` state on ```resize``` event
-     */
     function handleWindowResize(event): void {
 
         setWindowSize([window.innerWidth, window.innerHeight]);
@@ -165,12 +168,17 @@ export default function App() {
         isDesktopWidth: boolean
     } {
 
-        const windowWidth = windowSize[0];
+        const windowWidth = window.innerWidth;
+
+        const mobileMaxWidth = getCSSValueAsNumber(getCssConstant("mobileMaxWidth"), 2);
+        const tabletMinWidth = getCSSValueAsNumber(getCssConstant("tabletMinWidth"), 2);
+        const tabletMaxWidth = getCSSValueAsNumber(getCssConstant("tabletMaxWidth"), 2);
+        const desktopMinWidth = getCSSValueAsNumber(getCssConstant("desktopMinWidth"), 2);
 
         return {
-            isMobileWidth: windowWidth < 576,
-            isTabletWidth:  windowWidth >= 576 && windowWidth < 992,
-            isDesktopWidth: windowWidth >= 992,
+            isMobileWidth: windowWidth <= mobileMaxWidth,
+            isTabletWidth:  windowWidth >= tabletMinWidth && windowWidth <= tabletMaxWidth,
+            isDesktopWidth: windowWidth >= desktopMinWidth,
         }
     }
 
@@ -272,7 +280,9 @@ export const AppContext = createContext({
     moveToast: (hideToast = false, screenTime?: number) => {},
 
     windowSize: [0, 0],
-    getDeviceWidth: () => {return {isMobileWidth: false, isTabletWidth: false,isDesktopWidth: true}},
+    isMobileWidth: false as boolean,
+    isTableWidth: false as boolean,
+    isDesktopWidth: false as boolean,
 
     isKeyPressed: (keyName: string): boolean => {return false},
     isControlKeyPressed: () => {return false as boolean},

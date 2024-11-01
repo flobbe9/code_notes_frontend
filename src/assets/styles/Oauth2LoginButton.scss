@@ -1,3 +1,5 @@
+@import "../styles/global/variables.scss";
+
 .Oauth2LoginButton {
     width: 100%;
 
@@ -5,7 +7,11 @@
         position: relative;
 
         &-icon {
-            position: relative;
+            position: absolute;
+
+            @media only screen and (max-width: #{$mobileMaxWidth}) {
+                position: relative;  
+            }
         }
     }
 }

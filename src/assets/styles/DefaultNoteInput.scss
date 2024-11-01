@@ -58,6 +58,7 @@
             background-color: var(--matteBlack);
             color: var(--codeGrey);
             padding: 0 0.7rem;
+            margin-top: .3em;
             transition: var(--transitionTime);
 
             @include customHover {

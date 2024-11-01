@@ -32,8 +32,7 @@ export default function StartPageContainer({children, ...props}: Props) {
     /** List of tag entities inside ```<StartPageSideBarTagList>``` that are checked */
     const [selectedTagEntityNames, setSelectedTagEntityNames] = useState<Set<string>>(new Set());
 
-    const { windowSize, getDeviceWidth, setPopupContent, setIsPopupVisible } = useContext(AppContext);
-    const { isMobileWidth } = getDeviceWidth();
+    const { windowSize, isMobileWidth, setPopupContent, setIsPopupVisible } = useContext(AppContext);
 
     const context = {
         isShowSideBar, 

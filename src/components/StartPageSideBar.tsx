@@ -33,7 +33,7 @@ export default function StartPageSideBar({...props}: Props) {
     /** Refers to ```selectedTagEntityNames``` beeing not empty */
     const [anyTagsSelected, setAnyTagsSelected] = useState(false);
 
-    const { getDeviceWidth, isKeyPressed } = useContext(AppContext);
+    const { isKeyPressed, isMobileWidth } = useContext(AppContext);
     const { appUserEntity } = useContext(AppFetchContext);
     const { setIsShowSideBar, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
 
@@ -115,7 +115,7 @@ export default function StartPageSideBar({...props}: Props) {
 
     function getMaxWidth(): string {
 
-        return getDeviceWidth().isMobileWidth ? getCssConstant("startPageSideBarWidthWidthMobile") : getCssConstant("startPageSideBarWidth");
+        return isMobileWidth ? getCssConstant("startPageSideBarWidthWidthMobile") : getCssConstant("startPageSideBarWidth");
     }
 
 

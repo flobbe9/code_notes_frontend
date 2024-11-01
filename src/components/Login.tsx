@@ -160,12 +160,8 @@ export default function Login({...props}: Props) {
 
                 <hr />
 
-                {/* 
-                    TODO
-                        center text properly
-
-                 */}
                 <div className="Login-contentContainer-oauth2Container mt-5">
+                    {/* Google */}
                     <Oauth2LoginButton 
                         className="Login-contentContainer-oauth2Container-googleButton mb-3"
                         clientRegistrationId="google"
@@ -174,6 +170,7 @@ export default function Login({...props}: Props) {
                         Login with Google
                     </Oauth2LoginButton>
 
+                    {/* Github */}
                     <Oauth2LoginButton 
                         className="Login-contentContainer-oauth2Container-githubButton mb-3"
                         clientRegistrationId="github"
@@ -182,6 +179,7 @@ export default function Login({...props}: Props) {
                         Login with GitHub
                     </Oauth2LoginButton>
 
+                    {/* Microsoft */}
                     <Oauth2LoginButton 
                         className="Login-contentContainer-oauth2Container-azureButton mb-3"
                         clientRegistrationId="azure"

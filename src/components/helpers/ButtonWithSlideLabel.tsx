@@ -49,7 +49,7 @@ export default forwardRef(function ButtonWithSlideLabel(
         // prepare for animation
         buttonLabelElement.css("position", "relative");
         buttonLabelElement.css("width", "0");
-        buttonLabelElement.css("zIndex", "1");
+        buttonLabelElement.css("zIndex", "0");
 
         buttonLabelElement.stop();
 

@@ -5,8 +5,10 @@
     $paddingX: 10px;
 
     height: 80vh;
+    margin-top: 2em;
 
     &-contentContainer {
+        padding: 0 20px;
         width: 400px;
 
         &-heading {

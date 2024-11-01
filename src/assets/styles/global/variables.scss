@@ -1,3 +1,8 @@
+$mobileMaxWidth: 575px;
+$tabletMinWidth: 576px;
+$tabletMaxWidth: 991px;
+$desktopMinWidth: 992px;
+
 :root {
     --accentColor: orange;
     --accentColor2: #6993f3;
@@ -17,4 +22,9 @@
     --transitionTimeFast: 0.1s;
     --matteBlack: #1d1e1f;
     --matteBlackLight: #3a3a3a;
+
+    --mobileMaxWidth: #{$mobileMaxWidth};
+    --tabletMinWidth: #{$tabletMinWidth};
+    --tabletMaxWidth: #{$tabletMaxWidth};
+    --desktopMinWidth: #{$desktopMinWidth};
 }
