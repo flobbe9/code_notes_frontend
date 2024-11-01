@@ -12,6 +12,37 @@ export class AppUserService {
     
     /** List of app user fields that need to be encrypted before caching the app user */
     private static SENSITIVE_FIELDS = ["email", "password"];
+    
+
+    /**
+     * @returns instance with default values (mostly ```null```)
+     */
+    public static getDefaultInstance(): AppUserEntity {
+
+        return {
+            id: -1, 
+            created: "", 
+            updated: "", 
+            email: "", 
+            password: "", 
+            role: "USER" ,
+            tags: null, 
+        };
+    }
+    
+
+    public static getInstance(appUserEntity: AppUserEntity): AppUserEntity {
+
+        return {
+            id: appUserEntity.id || null,
+            created: appUserEntity.created,
+            updated: appUserEntity.updated,
+            email: appUserEntity.email,
+            password: appUserEntity.password,
+            role: appUserEntity.role,
+            tags: appUserEntity.tags || null,
+        }
+    }
 
     
     /**
@@ -99,36 +130,5 @@ export class AppUserService {
                 !!(noteEntity.tags || [])
                     .find(tagEntity => 
                         tag.name === tagEntity.name))
-    }
-
-
-    /**
-     * @returns instance with default values (mostly ```null```)
-     */
-    public static getDefaultInstance(): AppUserEntity {
-
-        return {
-            id: -1, 
-            created: "", 
-            updated: "", 
-            email: "", 
-            password: "", 
-            role: "USER" ,
-            tags: null, 
-        };
-    }
-    
-
-    public static getInstance(appUserEntity: AppUserEntity): AppUserEntity {
-
-        return {
-            id: appUserEntity.id || null,
-            created: appUserEntity.created,
-            updated: appUserEntity.updated,
-            email: appUserEntity.email,
-            password: appUserEntity.password,
-            role: appUserEntity.role,
-            tags: appUserEntity.tags || null,
-        }
     }
 }

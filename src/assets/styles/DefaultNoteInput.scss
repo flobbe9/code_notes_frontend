@@ -5,48 +5,73 @@
 
     border-left: $noteInputDefaultBorder transparent;
     margin: 5px 0;
-    padding-left: 2px;
+    padding-left: 5px;
     position: relative;
     transition: border var(--transitionTime);
 
     &:has(.PlainTextNoteInput) {
-        border-right: $noteInputDefaultBorder var(--plainTextNoteInputColor);
+        border-left: $noteInputDefaultBorder var(--plainTextNoteInputColor);
     }
     
     &:has(.CodeNoteInputWithVariables) {
-        border-right: $noteInputDefaultBorder var(--codeNoteInputWithVariablesColor);
+        border-left: $noteInputDefaultBorder var(--codeNoteInputWithVariablesColor);
     }
     
     &:has(.CodeNoteInput) {
-        border-right: $noteInputDefaultBorder var(--codeNoteInputColor);
+        padding-left: 2px;
+        border-left: $noteInputDefaultBorder var(--codeNoteInputColor);
     }
 
     // case: hover or focus on code noteInput with vars
     &:has(.PlainTextNoteInput .ContentEditableDiv:focus) {
+        .ContentEditableDiv {
+            transition: var(--transitionTime);
+            background-color: var(--matteBlackLight);
+        }
         border-color: var(--plainTextNoteInputColor);
     }
     @include customHover {
         &:has(.PlainTextNoteInput) {
+            .ContentEditableDiv {
+                transition: var(--transitionTime);
+                background-color: var(--matteBlackLight);
+            }
             border-color: var(--plainTextNoteInputColor);
         }
     }
 
     // case: hover or focus on code noteInput
-    &:has(.vsCodeEditor textarea:focus) {
+    &:has(.CodeNoteInput textarea:focus) {
+        .view-lines {
+            transition: var(--transitionTime);
+            background-color: var(--matteBlackLight);
+        }
         border-color: var(--codeNoteInputColor);
     }
     @include customHover {
         &:has(.CodeNoteInput) {
+            .view-lines {
+                transition: var(--transitionTime);
+                background-color: var(--matteBlackLight);
+            }
             border-color: var(--codeNoteInputColor);
         }
     }
 
     // case: hover or focus on code noteinput with variables
     &:has(.CodeNoteInputWithVariables .ContentEditableDiv:focus) {
+        .ContentEditableDiv {
+            transition: var(--transitionTime);
+            background-color: var(--matteBlackLight);
+        }
         border-color: var(--codeNoteInputWithVariablesColor);
     }
     @include customHover {
         &:has(.CodeNoteInputWithVariables) {
+            .ContentEditableDiv {
+                transition: var(--transitionTime);
+                background-color: var(--matteBlackLight);
+            }
             border-color: var(--codeNoteInputWithVariablesColor);
         }
     }

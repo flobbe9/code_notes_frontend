@@ -30,10 +30,6 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-// IDEA: 
-    // change theme (settings)
-        // adjust some css classes
-    // toggle minimap ? (settings)
 export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     /** Height of one line of the monaco vscode editor in px */

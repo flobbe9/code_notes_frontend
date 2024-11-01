@@ -338,7 +338,6 @@ export default function PlainTextNoteInput({
             <ContentEditableDiv 
                 className="plainTextInput fullWidth" 
                 spellCheck={false} 
-                placeholder="Plain text..."
                 ref={inputDivRef}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
