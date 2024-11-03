@@ -42,7 +42,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     const componentRef = useRef(null);
 
-    const { isAppOverlayVisible, setIsAppOverlayVisible, setPopupContent, setIsPopupVisible } = useContext(AppContext);
+    const { isAppOverlayVisible, setIsAppOverlayVisible, showPopup } = useContext(AppContext);
 
     const { noteEntity, noteInputs, setNoteInputs } = useContext(NoteContext);
 
@@ -90,14 +90,13 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     function handleDeleteNote(event): void {
 
-        setPopupContent((
+        showPopup((
             <Confirm 
                 heading={<h3>Delete this section?</h3>}
                 message={`Are you sure you want to delete this section of the '${noteEntity.title}' note?`}
                 onConfirm={deleteNote}
             />
         ));
-        setIsPopupVisible(true);        
     }
 
 

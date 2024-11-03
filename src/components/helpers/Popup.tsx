@@ -38,7 +38,6 @@ export default function Popup({...props}: Props) {
 
 
     useEffect(() => {
-        // hide popup if overlay is hidden
         if (!isAppOverlayVisible)
             setIsPopupVisible(false);
 
@@ -46,8 +45,10 @@ export default function Popup({...props}: Props) {
 
 
     useEffect(() => {
-        // toggle popup
-        isPopupVisible ? showPopup() : hidePopup();
+        if (isPopupVisible)
+            showPopup()
+        else
+            hidePopup();
 
     }, [isPopupVisible]);
 

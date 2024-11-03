@@ -5,6 +5,7 @@ import { AppContext } from "../App";
 import Button from "./Button";
 import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";
+import { isBooleanFalsy } from "../../helpers/utils";
 
 
 interface Props extends DefaultProps {
@@ -48,7 +49,7 @@ export default forwardRef(function Confirm(
     ref: Ref<HTMLDivElement>
 ) {
 
-    const { setIsPopupVisible } = useContext(AppContext);
+    const { hidePopup } = useContext(AppContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Confirm");
 
@@ -61,7 +62,7 @@ export default forwardRef(function Confirm(
         if (onCancel)
             onCancel(event);
             
-        setIsPopupVisible(false);
+        hidePopup();
     }
 
 
@@ -70,13 +71,13 @@ export default forwardRef(function Confirm(
         if (onConfirm)
             onConfirm(event);
             
-        setIsPopupVisible(false);
+        hidePopup();
     }
 
 
     function focusCancelButton(): void {
 
-        if (!focusConfirmOnRender)
+        if (!focusConfirmOnRender && !isBooleanFalsy(focusConfirmOnRender))
             setTimeout(() => {
                 cancelButtonRef.current!.focus();
             }, 0); // somehow necessary, 0 is fine

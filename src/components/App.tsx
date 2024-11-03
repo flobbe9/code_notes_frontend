@@ -2,9 +2,10 @@ import $ from "jquery";
 import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
-import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, log } from '../helpers/utils';
+import { getCssConstant, getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
+import Footer from "./Footer";
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
 import Overlay from './helpers/Overlay';
 import Popup from './helpers/Popup';
@@ -12,7 +13,6 @@ import Toast, { ToastSevirity } from './helpers/Toast';
 import Login from "./Login";
 import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
-import Footer from "./Footer";
 
 
 /**
@@ -31,7 +31,7 @@ export default function App() {
     const [isAppOverlayHideOnEscape, setIsAppOverlayHideOnEscape] = useState(true);
     
     const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const [popupContent, setPopupContent] = useState<JSX.Element | JSX.Element[]>([]);
+    const [popupContent, setPopupContent] = useState<ReactNode>([]);
     
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
@@ -64,7 +64,9 @@ export default function App() {
         isPopupVisible, 
         setIsPopupVisible,
         popupContent, 
-        setPopupContent
+        setPopupContent,
+        showPopup,
+        hidePopup
     }
 
     const toastRef = useRef(null);
@@ -230,6 +232,21 @@ export default function App() {
         setIsAppOverlayHideOnClick(true);
         setIsAppOverlayHideOnEscape(true);
     }
+
+
+    function showPopup(popupContent?: ReactNode): void {
+
+        if (popupContent !== undefined)
+            setPopupContent(popupContent);
+
+        setIsPopupVisible(true);
+    }
+
+
+    function hidePopup(): void {
+
+        setIsPopupVisible(false);
+    }
     
 
     return (
@@ -301,6 +318,8 @@ export const AppContext = createContext({
 
     isPopupVisible: false, 
     setIsPopupVisible: (isVisible: boolean) => {},
-    popupContent: <></> as (JSX.Element | JSX.Element[]), 
-    setPopupContent: (content: JSX.Element | JSX.Element[]) => {}
+    popupContent: <></> as (ReactNode), 
+    setPopupContent: (content: ReactNode) => {},
+    showPopup: (popupContent?: ReactNode) => {},
+    hidePopup: () => {},
 });

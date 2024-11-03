@@ -15,4 +15,8 @@
     /* To keep scrollbar */
     min-height: 101vh;
     position: relative;
+
+    .content {
+        padding-bottom: calc(var(--footerHeight));
+    }
 }

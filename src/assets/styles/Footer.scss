@@ -1,5 +1,10 @@
 @import "../styles/global/functions.scss";
 
+:root {
+    // set on footer render
+    --footerHeight: 0;
+}
+
 
 .Footer {
     background-color: white;

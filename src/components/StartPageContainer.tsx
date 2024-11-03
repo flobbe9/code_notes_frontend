@@ -32,7 +32,7 @@ export default function StartPageContainer({children, ...props}: Props) {
     /** List of tag entities inside ```<StartPageSideBarTagList>``` that are checked */
     const [selectedTagEntityNames, setSelectedTagEntityNames] = useState<Set<string>>(new Set());
 
-    const { windowSize, isMobileWidth, setPopupContent, setIsPopupVisible } = useContext(AppContext);
+    const { windowSize, isMobileWidth, showPopup } = useContext(AppContext);
 
     const context = {
         isShowSideBar, 
@@ -50,7 +50,7 @@ export default function StartPageContainer({children, ...props}: Props) {
 
 
     useEffect(() => {
-        confirmPageUnload(handlePageUnload);
+        confirmPageUnload(handlePageUnload, false);
 
     }, []);
 
@@ -117,16 +117,16 @@ export default function StartPageContainer({children, ...props}: Props) {
     // TODO: somehow know whether changes have been made :)
     function handlePageUnload(event: Event): void {
 
-        setPopupContent(
+        showPopup(
             <Confirm
                 heading={<h3>Save changes?</h3>}
                 message={"There are some unsaved changes. Would you like to save them?"}
                 confirmLabel="Save"
                 cancelLabel="Don't save"
+                focusConfirmOnRender
                 onConfirm={(event) => log("saving...")} // TODO: implement save
             />
         );
-        setIsPopupVisible(true);
     }
 
 

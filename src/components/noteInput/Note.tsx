@@ -6,7 +6,7 @@ import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityS
 import "../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE, MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString, log } from '../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString } from '../../helpers/utils';
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 import { AppContext } from "../App";
 import { AppFetchContext } from "../AppFetchContextHolder";
@@ -50,7 +50,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
-    const { toast, setIsPopupVisible, setPopupContent } = useContext(AppContext);
+    const { toast, showPopup } = useContext(AppContext);
     const { 
         appUserEntity, 
         noteEntities, 
@@ -156,16 +156,14 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     function handleDeleteNoteClick(event): void {
 
-        setPopupContent(
+        showPopup(
             <Confirm
                 heading={<h3>Delete Note?</h3>}
                 message={`Are you sure you want to delete '${noteEntity.title}'?`}
                 style={{maxWidth: "50vw"}}
-                onConfirm={event => {deleteNote(); setIsPopupVisible(false)}}
-                onCancel={event => setIsPopupVisible(false)}
+                onConfirm={event => {deleteNote()}}
             />
         );
-        setIsPopupVisible(true);
     }
 
 

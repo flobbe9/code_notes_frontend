@@ -1,9 +1,11 @@
-import React from "react";
-import "../assets/styles/Footer.scss";
-import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import Flex from "./helpers/Flex";
-import { ABOUT_PATH, DATA_POLICY_PATH, VERSION } from "../helpers/constants";
+import $ from "jquery";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
+import "../assets/styles/Footer.scss";
+import { ABOUT_PATH, DATA_POLICY_PATH, VERSION } from "../helpers/constants";
+import { setCssConstant } from "../helpers/utils";
+import Flex from "./helpers/Flex";
 
 
 interface Props extends DefaultProps {
@@ -18,11 +20,26 @@ export default function Footer({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Footer", true);
 
+    const componentRef = useRef<HTMLDivElement>(null);
+
+    
+    useEffect(() => {
+        setCssConstant("footerHeight", getFooterHeight());
+
+    }, []);
+
+
+    function getFooterHeight(): string {
+
+        return ($(componentRef.current!).outerHeight()?.toString() || "0") + "px";
+    }
+
     return (
         <Flex 
             id={id} 
             className={className}
             style={style}
+            ref={componentRef}
             {...otherProps}
         >
             <Flex className="Footer-leftContainer col-6" verticalAlign="center">
