@@ -22,11 +22,17 @@ export default function NavBarProfileSection({...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NavBarProfileSection", true);
 
     const { isMobileWidth } = useContext(AppContext);
-    const { isLoggedIn, isLoggedInUseQueryResult } = useContext(AppFetchContext);
+    const { isLoggedIn, isLoggedInUseQueryResult, logout } = useContext(AppFetchContext);
 
     
     if (!isLoggedInUseQueryResult.isFetched)
         return <></>;
+
+
+    async function handleLogout(): Promise<void> {
+        
+        await logout();
+    }
 
 
     return (
@@ -47,6 +53,14 @@ export default function NavBarProfileSection({...props}: Props) {
                         title="Profile"
                     />
                 </Link>
+
+                {/* TODO: move this somewhere else */}
+                <Button
+                    style={{color: "white"}}
+                    onClickPromise={handleLogout}
+                >
+                    Logout
+                </Button>
             </HelperDiv>
             
             <HelperDiv rendered={!isLoggedIn}>

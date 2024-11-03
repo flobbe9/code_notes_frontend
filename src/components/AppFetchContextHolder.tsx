@@ -9,6 +9,8 @@ import { useAppUser } from "../hooks/useAppUser";
 import { useLoggedIn } from "../hooks/useLoggedIn";
 import { useNotes } from "../hooks/useNotes";
 import { AppUserService } from "../services/AppUserService";
+import fetchJson from "../helpers/fetchUtils";
+import { LOGOUT_URL } from "../helpers/constants";
 
 
 /**
@@ -61,6 +63,8 @@ export default function AppFetchContextHolder({ children }) {
 
         isLoggedIn, 
         isLoggedInUseQueryResult,
+
+        logout
     }
     
 
@@ -89,6 +93,17 @@ export default function AppFetchContextHolder({ children }) {
     }
 
 
+    /**
+     * Reset global states, clear use query cache and fetch logout.
+     */
+    async function logout(): Promise<void> {
+
+        await fetchJson(LOGOUT_URL);
+
+        isLoggedInUseQueryResult.refetch();
+    }
+
+
     return (
         <AppFetchContext.Provider value={context}>
             {children}
@@ -113,4 +128,6 @@ export const AppFetchContext = createContext({
 
     isLoggedIn: false,
     isLoggedInUseQueryResult: {} as DefinedUseQueryResult,
+
+    logout: async () => {}
 })
