@@ -1,0 +1,13 @@
+.Hr {
+    background-color: inherit;
+    position: relative;
+    
+    hr {
+        width: 100%;
+    }
+
+    &-textContainer {
+        background-color: inherit;
+        position: absolute;
+    }
+}

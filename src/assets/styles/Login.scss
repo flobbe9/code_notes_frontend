@@ -48,6 +48,11 @@
                     }
                 }
             }
+
+            &-createAccountLink {
+                font-size: .9em;
+                text-decoration: underline;
+            }
         }
         
         &-oauth2Container {

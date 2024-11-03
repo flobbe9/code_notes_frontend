@@ -12,6 +12,7 @@ import Flex from "./helpers/Flex";
 import TextInput from "./helpers/TextInput";
 import Oauth2LoginButton from "./Oauth2LoginButton";
 import { START_PAGE_PATH } from "../helpers/constants";
+import Hr from "./helpers/Hr";
 
 
 interface Props extends DefaultProps {
@@ -127,7 +128,7 @@ export default function Login({...props}: Props) {
                 <div className="Login-contentContainer-formContainer mb-5">
                     {/* Email */}
                     <TextInput 
-                        className="mb-3"
+                        className="mb-2"
                         placeholder="Email"
                         name="email"
                         isValidPredicate={(value) => !isBlank(value)}
@@ -138,6 +139,7 @@ export default function Login({...props}: Props) {
                     />
                     {/* Password */}
                     <TextInput 
+                        className="mb-2"
                         placeholder="Password"
                         name="password"
                         type="password"
@@ -150,15 +152,20 @@ export default function Login({...props}: Props) {
 
                     {/* Submit */}
                     <Button 
-                        className="Login-contentContainer-formContainer-submitButton fullWidth mt-5"
+                        className="Login-contentContainer-formContainer-submitButton fullWidth mb-3"
                         ref={submitButtonRef}
                         onClickPromise={handleSubmit}
                     >
                         Login
                     </Button>
+
+                    <Flex horizontalAlign="center">
+                        {/* Register */}
+                        <span className="hover Login-contentContainer-formContainer-createAccountLink">Create account</span>
+                    </Flex>
                 </div>
 
-                <hr />
+                <Hr>Or</Hr>
 
                 <div className="Login-contentContainer-oauth2Container mt-5">
                     {/* Google */}
@@ -167,7 +174,7 @@ export default function Login({...props}: Props) {
                         clientRegistrationId="google"
                         iconSrc={"/img/google.png"}
                     >
-                        Login with Google
+                        Continue with Google
                     </Oauth2LoginButton>
 
                     {/* Github */}
@@ -176,7 +183,7 @@ export default function Login({...props}: Props) {
                         clientRegistrationId="github"
                         iconSrc={"/img/github.png"}
                     >
-                        Login with GitHub
+                        Continue with GitHub
                     </Oauth2LoginButton>
 
                     {/* Microsoft */}
@@ -185,7 +192,7 @@ export default function Login({...props}: Props) {
                         clientRegistrationId="azure"
                         iconSrc={"/img/microsoft.png"}
                     >
-                        Login with Microsoft
+                        Continue with Microsoft
                     </Oauth2LoginButton>
                 </div>
             </div>

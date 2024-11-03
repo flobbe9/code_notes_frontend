@@ -1,6 +1,7 @@
 @import "./global/functions.scss";
 
 .Button {
+    background-color: transparent;
     border: none;
     border-radius: var(--borderRadius);
     padding: 10px 15px;

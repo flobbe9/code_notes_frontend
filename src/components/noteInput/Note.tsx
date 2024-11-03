@@ -25,6 +25,7 @@ import DefaultNoteInput from "./DefaultNoteInput";
 import NoteTagList from "./NoteTagList";
 import NoteTitle from "./NoteTitle";
 import PlainTextNoteInput from "./PlainTextNoteInput";
+import Login from "../Login";
 
 
 interface Props extends DefaultProps {
@@ -156,14 +157,18 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     function handleDeleteNoteClick(event): void {
 
+        // showPopup(
+        //     <Confirm
+        //         heading={<h3>Delete Note?</h3>}
+        //         message={`Are you sure you want to delete '${noteEntity.title}'?`}
+        //         style={{maxWidth: "50vw"}}
+        //         onConfirm={event => {deleteNote()}}
+        //     />
+        // );
+
         showPopup(
-            <Confirm
-                heading={<h3>Delete Note?</h3>}
-                message={`Are you sure you want to delete '${noteEntity.title}'?`}
-                style={{maxWidth: "50vw"}}
-                onConfirm={event => {deleteNote()}}
-            />
-        );
+            <Login />
+        )
     }
 
 

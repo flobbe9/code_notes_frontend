@@ -4,6 +4,7 @@ import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import "../assets/styles/StartPageContent.scss";
 import { SearchNoteHelper } from "../helpers/SearchNoteHelper";
+import { getRandomString } from "../helpers/utils";
 import { useCsrfToken } from "../hooks/useCsrfToken";
 import AddNewNoteButton from "./AddNewNoteButton";
 import { AppContext } from "./App";
@@ -13,7 +14,6 @@ import PendingFetchHelper from "./helpers/PendingFetchHelper";
 import SearchBar from "./helpers/SearchBar";
 import Note from "./noteInput/Note";
 import { StartPageContainerContext } from "./StartPageContainer";
-import { getRandomString } from "../helpers/utils";
 
 
 interface Props extends DefaultProps {

@@ -18,6 +18,7 @@ export const START_PAGE_PATH = "/";
 export const PROFILE_PATH = "/profile";
 export const ABOUT_PATH = "/about";
 export const DATA_POLICY_PATH = "/data-policy";
+export const LOGOUT_URL = `${BACKEND_BASE_URL}/logout`;
 /** The link that will trigger the oauth2 flow. This link is useless without the provider name appended. E.g. append "/google" */
 const OAUTH2_AUTH_LINK = `${BACKEND_BASE_URL}/oauth2/authorization`;
 export const OAUTH2_AUTH_LINK_GOOGLE = `${OAUTH2_AUTH_LINK}/google`;

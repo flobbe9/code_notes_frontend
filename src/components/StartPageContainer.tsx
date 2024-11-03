@@ -50,7 +50,7 @@ export default function StartPageContainer({children, ...props}: Props) {
 
 
     useEffect(() => {
-        confirmPageUnload(handlePageUnload, false);
+        confirmPageUnload(handlePageUnload);
 
     }, []);
 

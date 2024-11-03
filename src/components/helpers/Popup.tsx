@@ -101,9 +101,9 @@ export default function Popup({...props}: Props) {
             className="Popup"
             ref={componentRef}
             tabIndex={0} 
-            >
+        >
             <Flex 
-                className="fullHeight hidePopup"
+                className="Popup-flexContainer fullHeight hidePopup"
                 horizontalAlign="center"
                 verticalAlign="center"
                 onClick={handleOuterClick}
