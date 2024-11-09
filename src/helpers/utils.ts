@@ -723,17 +723,14 @@ function matchString(str: string, regexp: RegExp): boolean {
 
     str = str.trim();
 
-    let matches = true;
     for (let i = 0; i < str.length; i++) {
         const char = str[i];
 
-        if (char.match(regexp) === null) {
-            matches = false;
-            break;
-        }
+        if (char.match(regexp) === null) 
+            return false;
     }
 
-    return matches
+    return true
 }
 
 

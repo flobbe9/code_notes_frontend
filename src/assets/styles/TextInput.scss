@@ -3,14 +3,15 @@
 .TextInput {
     $smallerFontSize: 0.8em;
 
-    height: 75px; // change this when changing font size
+    // space for the floating label to move up
+    margin-top: 1.2em;
     position: relative;
     width: fit-content;
 
     // case: input invalid
     &:has(.textInput.invalidInput) {
         .textInput {
-            border-color: red;
+            border-color: red !important;
         }
 
         .textInputErrorMessage {
@@ -29,13 +30,19 @@
 
     .floatingLabel {
         font-size: $smallerFontSize;
-        position: absolute;
-        top: 0;
         left: 5px;
+        position: absolute;
+        top: -1.5em;
 
+        @include dontSelectText();
+        
         &.moveFloatingLabelDown {
             font-size: 1em;
-            top: 37px;
+            top: 0.8em;
+
+            @include customHover {
+                cursor: text;
+            }
         }
 
         .requiredAsterisk {
@@ -48,22 +55,20 @@
         border: 2px solid rgba(0, 0, 0);
         border-radius: var(--borderRadius);
         caret-color: currentColor;
-        opacity: 0.7;
         padding: 10px;
         transition: 0.1s;
         width: 400px;
 
         &:focus {
             outline: none;
-            opacity: 1;
         }
     }
 
     .textInputErrorMessage {
         color: red;
-        visibility: hidden;
         font-size: $smallerFontSize;
         margin-top: 2px;
+        visibility: hidden;
     }
 
     @media only screen and (max-width: 990px) {
