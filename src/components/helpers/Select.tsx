@@ -2,13 +2,14 @@ import $ from "jquery";
 import React, { createContext, forwardRef, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import HelperProps from '../../abstract/HelperProps';
+import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
 import '../../assets/styles/Select.scss';
+import { getRandomString } from "../../helpers/utils";
 import { AppContext } from '../App';
 import Flex from './Flex';
 import HelperDiv from './HelperDiv';
 import SelectOption from './SelectOption';
 import TextInput from './TextInput';
-import { getRandomString } from "../../helpers/utils";
 
 interface Props extends HelperProps {
     /** Default is "" */
@@ -29,11 +30,7 @@ interface Props extends HelperProps {
     /** Default is ```false``` */
     required?: boolean;
 
-    /** Default is "" */
-    invalidMessage?: string;
-
-    /** Will be called on key up and toggle "invalid style" if returns ```false``` */
-    isValidPredicate?: (inputValue: string) => boolean;
+    inputValidationWrappers?: InputValidationWrapper[]
 }
 
 /**
@@ -53,8 +50,7 @@ export default forwardRef(function Select(
         required,
         multiSelect = false,
         addEmptyOption = false,
-        invalidMessage = '',
-        isValidPredicate,
+        inputValidationWrappers = [],
         selectedOptions = new Set(),
         setSelectedOptions,
         ...props
@@ -256,8 +252,7 @@ export default forwardRef(function Select(
                         dontMoveFloatingLabel={multiSelect}
                         ref={textInputRef}
                         required={required}
-                        invalidMessage={invalidMessage}
-                        isValidPredicate={isValidPredicate}
+                        inputValidationWrappers={inputValidationWrappers}
                         triggerValidation={triggerValidation}
                         onFocus={handleTextInputFocus}
                         onBlur={handleTextInputBlur}

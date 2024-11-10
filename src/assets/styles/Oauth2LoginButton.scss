@@ -1,6 +1,7 @@
 @import "../styles/global/variables.scss";
 
 .Oauth2LoginButton {
+    background-color: var(--bs-gray-200); // default button background
     width: 100%;
 
     &-link {

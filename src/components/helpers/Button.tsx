@@ -43,7 +43,7 @@ export default forwardRef(function Button({
         _disabled = {},
         ...props
     }: Props, 
-    ref: Ref<HTMLElement>
+    ref: Ref<HTMLButtonElement>
 ) {
 
     const [isAwaitingPromise, setIsAwaitingPromise] = useState(false);

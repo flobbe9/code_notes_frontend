@@ -13,6 +13,8 @@ import Toast, { ToastSevirity } from './helpers/Toast';
 import Login from "./Login";
 import NavBar from './NavBar';
 import StartPageContainer from './StartPageContainer';
+import Register from "./Register";
+import { LOGIN_PATH, REGISTER_PATH } from "../helpers/constants";
 
 
 /**
@@ -272,8 +274,8 @@ export default function App() {
                         <div className="content">
                             <Routes>
                                 <Route path="/" element={<StartPageContainer />} />
-                                <Route path="/register" element={<div>Register</div>} />
-                                <Route path="/login" element={<Login />} />
+                                <Route path={REGISTER_PATH} element={<Register />} />
+                                <Route path={LOGIN_PATH} element={<Login />} />
                                 <Route path="*" element={<div>404</div>} />
                             </Routes>
                         </div>

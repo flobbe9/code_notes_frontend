@@ -2,17 +2,18 @@ import $ from "jquery";
 import React, { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
+import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
 import "../assets/styles/Login.scss";
+import { START_PAGE_PATH } from "../helpers/constants";
 import { isResponseError } from "../helpers/fetchUtils";
 import { isBlank, isNumberFalsy, setCsrfToken } from "../helpers/utils";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
+import Hr from "./helpers/Hr";
 import TextInput from "./helpers/TextInput";
 import Oauth2LoginButton from "./Oauth2LoginButton";
-import { START_PAGE_PATH } from "../helpers/constants";
-import Hr from "./helpers/Hr";
 
 
 interface Props extends DefaultProps {
@@ -25,31 +26,52 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 export default function Login({...props}: Props) {
-
+    
     const [email, setEmail] = useState<string>("");
+    const [triggerEmailValidation, setTriggerEmailValidation] = useState<boolean | undefined>(undefined);
+    
     const [password, setPassword] = useState<string>("");
+    const [triggerPasswordValidation, setTriggerPasswordValidation] = useState<boolean | undefined>(undefined);
+    
+    type InputName = "email" | "password";
+    const inputValidationWrappers: Record<InputName, InputValidationWrapper[]> = {
+        email: [
+            {
+                predicate: () => !isBlank(email),
+                errorMessage: "Please put in your E-Mail",
+                validateOnChange: true,
+            }
+        ],
+        password: [
+            {
+                predicate: () => !isBlank(password),
+                errorMessage: "Please set a password",
+                validateOnChange: true
+            }
+        ]
+    }
 
     const { toast } = useContext(AppContext);
     const { fetchLogin } = useContext(AppFetchContext);
     
     const navigate = useNavigate();
 
-    const emailInputRef = useRef(null);
-    const passwordInputRef = useRef(null);
-    const submitButtonRef = useRef(null);
+    const emailInputRef = useRef<HTMLInputElement>(null);
+    const passwordInputRef = useRef<HTMLInputElement>(null);
+    const submitButtonRef = useRef<HTMLButtonElement>(null);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Login", true);
 
 
     /**
-     * Fetch login and cache csrf token (encrypted) or toast error.
+     * Validate form, fetch login and cache csrf token (encrypted) or toast error.
      */
-    async function handleSubmit(): Promise<void> {
+    async function handleFormSubmit(): Promise<void> {
 
-        if (isBlank(email) || isBlank(password)) {
-            toast("Login failed", "Please fill out both email and password input.", "warn", 4000);
+        triggerFormValidation();
+
+        if (!isFormValid())
             return;
-        }
 
         const loginResponse = await fetchLogin(email, password);
 
@@ -105,11 +127,25 @@ export default function Login({...props}: Props) {
 
     function handleTextInputKeyDown(event: any): void {
 
-        if (isBlank(email) || isBlank(password))
-            return;
+        if (event.key === "Enter") {
+            event.preventDefault();
+            submitButtonRef.current!.click();
+        }
+    }
 
-        if (event.key === "Enter")
-            $(submitButtonRef.current!).trigger("click");
+    /**
+     * Make all inputs validate their current value and possibly display an error message.
+     */
+    function triggerFormValidation(): void {
+
+        setTriggerEmailValidation(!triggerEmailValidation);
+        setTriggerPasswordValidation(!triggerPasswordValidation);
+    }
+
+
+    function isFormValid(): boolean {
+
+        return isInputValidationWrapperRecordValid(inputValidationWrappers);
     }
 
 
@@ -123,28 +159,31 @@ export default function Login({...props}: Props) {
             {...otherProps}
         >
             <div className="Login-contentContainer">
-                <h1 className="Login-contentContainer-heading mb-4">Login</h1>
+                <h1 className="Login-contentContainer-heading mb-4">Login</h1> 
 
                 <div className="Login-contentContainer-formContainer mb-5">
                     {/* Email */}
                     <TextInput 
-                        className="mb-2"
-                        placeholder="Email"
+                        className="mb-4"
+                        placeholder="E-Mail"
                         name="email"
-                        isValidPredicate={(value) => !isBlank(value)}
-                        invalidMessage="Please put in your email address"
+                        type="email"
+                        inputValidationWrappers={inputValidationWrappers.email}
+                        triggerValidation={triggerEmailValidation}
+                        required
                         ref={emailInputRef}
                         onChange={handleEmailInputChange}
                         onKeyDown={handleTextInputKeyDown}
                     />
                     {/* Password */}
                     <TextInput 
-                        className="mb-2"
+                        className="mb-4"
                         placeholder="Password"
                         name="password"
                         type="password"
-                        isValidPredicate={(value) => !isBlank(value)}
-                        invalidMessage="Please put in your password"
+                        inputValidationWrappers={inputValidationWrappers.password}
+                        triggerValidation={triggerPasswordValidation}
+                        required
                         ref={passwordInputRef}
                         onChange={handlePasswordInputChange}
                         onKeyDown={handleTextInputKeyDown}
@@ -154,7 +193,7 @@ export default function Login({...props}: Props) {
                     <Button 
                         className="Login-contentContainer-formContainer-submitButton fullWidth mb-3"
                         ref={submitButtonRef}
-                        onClickPromise={handleSubmit}
+                        onClickPromise={handleFormSubmit}
                     >
                         Login
                     </Button>
@@ -165,7 +204,7 @@ export default function Login({...props}: Props) {
                     </Flex>
                 </div>
 
-                <Hr>Or</Hr>
+                <Hr><span className="mx-1">Or</span></Hr>
 
                 <div className="Login-contentContainer-oauth2Container mt-5">
                     {/* Google */}

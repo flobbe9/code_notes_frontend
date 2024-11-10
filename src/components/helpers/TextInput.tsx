@@ -1,27 +1,24 @@
 import $ from "jquery";
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef } from 'react';
-import '../../assets/styles/TextInput.scss';
+import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { getCleanDefaultProps } from '../../abstract/DefaultProps';
-import Flex from './Flex';
 import HelperProps from '../../abstract/HelperProps';
-import { isBlank, isBooleanFalsy, log } from '../../helpers/utils';
+import '../../assets/styles/TextInput.scss';
 import { INVALID_INPUT_CLASS_NAME } from '../../helpers/constants';
+import { isBlank, isBooleanFalsy } from '../../helpers/utils';
+import Flex from './Flex';
+import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
 
 interface Props extends HelperProps {
     /** Default is "" */
     placeholder?: string;
 
     /** Default is "text" */
-    type?: "text" | "password";
+    type?: "text" | "password" | "email";
 
     /** Default is "" */
     defaultValue?: string;
 
-    /** Will be called on key up and toggle "invalid style" if returns ```false``` */
-    isValidPredicate?: (inputValue: string) => boolean;
-
-    /** Default is "" */
-    invalidMessage?: string;
+    inputValidationWrappers?: InputValidationWrapper[];
 
     /** Default is ```false``` */
     required?: boolean;
@@ -32,7 +29,7 @@ interface Props extends HelperProps {
     /** Default is ```false``` */
     readonly?: boolean;
 
-    /** Component will validate when this value changes and  is not ```null``` */
+    /** Component will validate when this value changes and is not ```undefined``` */
     triggerValidation?: boolean;
 
     /**
@@ -53,8 +50,7 @@ export default forwardRef(function TextInput(
         title = '',
         name = '',
         type = "text",
-        isValidPredicate,
-        invalidMessage = '',
+        inputValidationWrappers,
         required = false,
         readonly,
         disabled,
@@ -71,24 +67,26 @@ export default forwardRef(function TextInput(
     }: Props,
     ref: Ref<HTMLInputElement>
 ) {
-    const { id, className, style, ...otherProps } = getCleanDefaultProps(props, 'TextInput');
+    const [invalidMessage, setInvalidMessage] = useState("_"); // always needs some non-blank value
+        
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, 'TextInput');
 
-    const inputRef = useRef(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const floatingLabelRef = useRef(null);
+
 
     useImperativeHandle(ref, () => inputRef.current!, []);
 
-    useEffect(() => {
-        updateFloatingLabel();
-    }, []);
 
     useEffect(() => {
         updateFloatingLabel();
     }, [defaultValue]);
 
+
     useEffect(() => {
-        if (!isBooleanFalsy(triggerValidation)) validateInput();
+        if (!isBooleanFalsy(triggerValidation)) validateInput(false);
     }, [triggerValidation]);
+
 
     function handleChange(event: any): void {
         if (disabled) return;
@@ -97,8 +95,9 @@ export default forwardRef(function TextInput(
 
         updateFloatingLabel();
 
-        validateInput();
+        validateInput(true);
     }
+
 
     /**
      * Move floating label up if input is not blank or down if it is.
@@ -111,12 +110,14 @@ export default forwardRef(function TextInput(
         else floatingLabel.removeClass(floatingLabelDownClass);
     }
 
+
     function isMoveFloatingLabelDown(): boolean {
         const input = $(inputRef.current!);
 
         // move down if value is blank and not focuesd or dontMoveFloatingLabel is true
         return (isBlank(input.prop('value')) && !input.is(':focus')) || dontMoveFloatingLabel;
     }
+
 
     function handleBlur(event: any): void {
         if (disabled) return;
@@ -126,6 +127,7 @@ export default forwardRef(function TextInput(
         updateFloatingLabel();
     }
 
+
     function handleFocus(event: any): void {
         if (disabled) return;
 
@@ -134,30 +136,60 @@ export default forwardRef(function TextInput(
         updateFloatingLabel();
     }
 
-    /**
-     * Call ```isValidPredicate``` if present and add {@link INVALID_INPUT_CLASS} class if it returns ```false```
-     */
-    function validateInput(): void {
-        if (!isValidPredicate) return;
 
-        const input = $(inputRef.current!);
-        const invalidInputClass = INVALID_INPUT_CLASS_NAME;
+    function handleFloatingLabelClick(event: React.MouseEvent): void {
 
-        if (isValidPredicate(input.prop('value'))) input.removeClass(invalidInputClass);
-        else input.addClass(invalidInputClass);
+        if (disabled) 
+            return;
+
+        inputRef.current!.focus();
     }
+
+    
+    function validateInput(isChangeEvent: boolean): void {
+
+        if (!inputValidationWrappers || !inputValidationWrappers.length)
+            return;
+
+        const input = inputRef.current!;
+
+        for (const validationWrapper of inputValidationWrappers) {
+            if (!validationWrapper)
+                continue;
+
+            // case: dont validate on change
+            if (isChangeEvent && !validationWrapper.validateOnChange)
+                continue;
+
+            // case: is valid
+            if (validationWrapper.predicate(input.value))
+                continue;
+
+            // case: is invalid
+            input.classList.add(INVALID_INPUT_CLASS_NAME);
+            setInvalidMessage(validationWrapper.errorMessage);
+
+            return;
+        }
+
+        input.classList.remove(INVALID_INPUT_CLASS_NAME);
+    }
+
 
     return (
         <Flex
             id={id}
             className={className}
             style={style}
-            verticalAlign="end" // necessary?
             rendered={rendered}
             {...otherProps}
         >
             <div className="fullWidth">
-                <div className="floatingLabel transition" ref={floatingLabelRef}>
+                <div 
+                    className="floatingLabel transition" 
+                    ref={floatingLabelRef} 
+                    onClick={handleFloatingLabelClick}
+                >
                     {placeholder} {required && <span className="requiredAsterisk">*</span>}
                 </div>
 
@@ -180,6 +212,8 @@ export default forwardRef(function TextInput(
 
                 <div className="textInputErrorMessage">{invalidMessage}</div>
             </div>
+
+            {children}
         </Flex>
     );
 });

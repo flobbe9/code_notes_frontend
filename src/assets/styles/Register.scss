@@ -1,11 +1,16 @@
 @import "./global/functions.scss";
 
+:root {
+    // set on render
+    --registerPasswordAdviceWidth: 0px;
+}
 
-.Login {
+
+.Register {
     $paddingX: 10px;
 
     min-height: 80vh;
-    margin-top: 2em;
+    margin: 2em 0;
 
     &-contentContainer {
         padding: 0 20px;
@@ -16,6 +21,19 @@
         }
 
         &-formContainer {
+            &-password {
+                .PasswordAdvice {
+                    font-size: .8em;
+                    // position on the left of password input
+                    left: calc(-1 * var(--registerPasswordAdviceWidth) - calc(var(--passwordAdviceArrowBoxSize) / 2) - 10px);
+                    top: -51px;
+
+                    &-nonDesktopWidth {
+                        margin: 15px 0;
+                    }
+                }
+            }
+
             &-submitButton {
                 background-color: var(--accentColor2);
                 background-color: var(--matteBlueLight);
