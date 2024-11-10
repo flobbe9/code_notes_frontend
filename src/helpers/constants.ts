@@ -7,6 +7,7 @@ import { isBlank } from "./utils";
 export const ENV: Env = process.env.NODE_ENV as Env;
 export const PROTOCOL = process.env.REACT_APP_PROTOCOL + "";
 export const VERSION = process.env.REACT_APP_VERSION + "";
+export const APP_NAME_PRETTY = "Code Notes";
 
 
 // URLs
@@ -50,7 +51,7 @@ export const EMAIL_REGEX = new RegExp(/^[\w\-.]+@([\w-]+.)+[\w-]{2,4}$/, "g");
  */
 export function getHeadTitleText(pageTitle?: string): string {
 
-    return isBlank(pageTitle) ? "Code Notes" : `${pageTitle} | Code Notes`; 
+    return isBlank(pageTitle) ? `${APP_NAME_PRETTY}` : `${pageTitle} | ${APP_NAME_PRETTY}`; 
 }
 
 

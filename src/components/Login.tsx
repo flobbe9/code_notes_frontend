@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
 import "../assets/styles/Login.scss";
-import { START_PAGE_PATH } from "../helpers/constants";
+import { APP_NAME_PRETTY, START_PAGE_PATH } from "../helpers/constants";
 import { isResponseError } from "../helpers/fetchUtils";
 import { isBlank, isNumberFalsy, setCsrfToken } from "../helpers/utils";
 import { AppContext } from "./App";
@@ -200,6 +200,7 @@ export default function Login({...props}: Props) {
 
                     <Flex horizontalAlign="center">
                         {/* Register */}
+                        <span>New to {APP_NAME_PRETTY}?</span>
                         <span className="hover Login-contentContainer-formContainer-createAccountLink">Create account</span>
                     </Flex>
                 </div>

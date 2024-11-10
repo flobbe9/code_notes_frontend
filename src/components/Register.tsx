@@ -160,7 +160,6 @@ export default function Register({...props}: Props) {
     }
 
     // TOOD: 
-        // enter key not working
         // login / register links for popups
             // pass boolean as prop
                 // either normal link or change popup content
