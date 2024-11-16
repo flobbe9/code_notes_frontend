@@ -1,8 +1,7 @@
-import CryptoJSImpl from "../abstract/CryptoJSImpl";
 import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
 import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
 import { BACKEND_BASE_URL, CSRF_TOKEN_HEADER_NAME } from "./constants";
-import { clearSensitiveCache, getCsrfToken, isNumberFalsy, log, logApiResponse } from "./utils";
+import { clearSensitiveCache, getCsrfToken, isNumberFalsy, logApiResponse } from "./utils";
 
 
 /** Http status code "Service Unavailable" 503, use this status when ```fetch()``` throws "failed to fetch" error */
@@ -26,10 +25,10 @@ export default async function fetchJson(url: string, method = "get", body?: any,
     // case: failed to fetch, already streamed to json
     if (!isHttpStatusCodeAlright(response.status)) {
         // case: actually did not stream response to json just yet 
-        if (!debug && response instanceof Response)
-            return await response.json() as CustomExceptionFormat;
+        if (!debug)
+            return await (response as Response).json();
 
-        return response as CustomExceptionFormat;
+        return response;
     }
 
     return await (response as Response).json();
@@ -53,7 +52,7 @@ export async function fetchAny(url: string, method = "get", body?: any, headers?
     // set headers
     const fetchConfig: RequestInit = {
         method: method,
-        headers: await getFetchHeaders(headers),
+        headers: getFetchHeaders(headers),
         credentials: "include"
     }
 
@@ -66,8 +65,11 @@ export async function fetchAny(url: string, method = "get", body?: any, headers?
         const response = await fetch(url, fetchConfig);
 
         // case: request failed
-        if (!isHttpStatusCodeAlright(response.status))
-            handleResponseError(response, debug);
+        if (!isHttpStatusCodeAlright(response.status)) {
+            const jsonResponse = await response.json();
+            handleResponseError(jsonResponse, debug);
+            return jsonResponse;
+        }
         
         return response;
 
@@ -163,26 +165,19 @@ function getFetchHeaders(headers?: HeadersInit): HeadersInit {
 /**
  * Possibly log error and clear sensitive data from cache.
  * 
- * @param response that has a bad status code
+ * @param errorResponse that has a bad status code
  * @param debug indicates whether to log the error
  */
-async function handleResponseError(response: Response, debug: boolean): Promise<void> {
+async function handleResponseError(errorResponse: CustomExceptionFormat, debug: boolean): Promise<void> {
 
-    if (!response)
+    if (!errorResponse)
         return;
 
-    try {
-        if (debug)
-            logApiResponse(await response.json());
-
-    // case: already read to json
-    } catch (e) {
-        if (debug)
-            logApiResponse(response as any as CustomExceptionFormat);
-    }
+    if (debug)
+        logApiResponse(errorResponse);
 
     // case: session may has become invalid
-    if (response.status === 401) 
+    if (errorResponse.status === 401) 
         clearSensitiveCache();
 }
 
