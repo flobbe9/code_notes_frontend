@@ -2,6 +2,7 @@ import $ from "jquery";
 import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
+import { LOGIN_PATH, REGISTER_PATH } from "../helpers/constants";
 import { getCssConstant, getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
@@ -12,9 +13,9 @@ import Popup from './helpers/Popup';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import Login from "./Login";
 import NavBar from './NavBar';
-import StartPageContainer from './StartPageContainer';
 import Register from "./Register";
-import { LOGIN_PATH, REGISTER_PATH } from "../helpers/constants";
+import StartPageContainer from './StartPageContainer';
+import RouteContext from "./RouteContext";
 
 
 /**
@@ -254,43 +255,45 @@ export default function App() {
     return (
         <AppContext.Provider value={context}>
             <BrowserRouter>
-                <AppFetchContextHolder>
-                    <div id="App" className="App">
-                        <Overlay 
-                            id="App"
-                            isOverlayVisible={isAppOverlayVisible} 
-                            setIsOverlayVisible={setIsAppOverlayVisible} 
-                            hideOnClick={isAppOverlayHideOnClick}
-                            hideOnEscape={isAppOverlayHideOnEscape}
-                            fitParent={false}
-                        >
-                            {appOverlayContent}
-                        </Overlay>
+                <RouteContext>
+                    <AppFetchContextHolder>
+                        <div id="App" className="App">
+                            <Overlay 
+                                id="App"
+                                isOverlayVisible={isAppOverlayVisible} 
+                                setIsOverlayVisible={setIsAppOverlayVisible} 
+                                hideOnClick={isAppOverlayHideOnClick}
+                                hideOnEscape={isAppOverlayHideOnEscape}
+                                fitParent={false}
+                            >
+                                {appOverlayContent}
+                            </Overlay>
 
-                        <Popup />
+                            <Popup />
 
-                        <NavBar />
+                            <NavBar />
 
-                        <div className="content">
-                            <Routes>
-                                <Route path="/" element={<StartPageContainer />} />
-                                <Route path={REGISTER_PATH} element={<Register />} />
-                                <Route path={LOGIN_PATH} element={<Login />} />
-                                <Route path="*" element={<div>404</div>} />
-                            </Routes>
+                            <div className="content">
+                                <Routes>
+                                    <Route path="/" element={<StartPageContainer />} />
+                                    <Route path={REGISTER_PATH} element={<Register />} />
+                                    <Route path={LOGIN_PATH} element={<Login />} />
+                                    <Route path="*" element={<div>404</div>} />
+                                </Routes>
+                            </div>
+
+                            <Footer />
+
+                            {/* Toast popup */}
+                            <Toast 
+                                summary={toastSummary}
+                                message={toastMessage}
+                                sevirity={toastSevirity}
+                                ref={toastRef} 
+                            />  
                         </div>
-
-                        <Footer />
-
-                        {/* Toast popup */}
-                        <Toast 
-                            summary={toastSummary}
-                            message={toastMessage}
-                            sevirity={toastSevirity}
-                            ref={toastRef} 
-                        />  
-                    </div>
-                </AppFetchContextHolder>
+                    </AppFetchContextHolder>
+                </RouteContext>
             </BrowserRouter>
         </AppContext.Provider>
     );
