@@ -90,11 +90,11 @@
     }
 }
 
-@mixin scrollBar($size: 3px) {
+@mixin scrollBar($size: 3px, $hoverSize: 7px) {
     &:hover {
         &::-webkit-scrollbar {
-            height: 7px;
-            width: 7px;
+            height: $hoverSize;
+            width: $hoverSize;
         }
     }
     

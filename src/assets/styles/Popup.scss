@@ -1,7 +1,8 @@
 @import "../styles/global/functions.scss";
 
 .Popup {
-    $scrollBarWidth: 3px;
+    $scrollBarWidth: 4px;
+    $scrollBarHoverSize: 7px;
     $contentContainerPadding: 10px;
 
     display: none;
@@ -24,10 +25,10 @@
             padding: $contentContainerPadding;
             z-index: calc(var(--overlayZIndex) + 1);
             
-            @include scrollBar($scrollBarWidth);
+            @include scrollBar($scrollBarWidth, $scrollBarHoverSize);
             
             @include customHover {
-                padding-right: calc($contentContainerPadding - $scrollBarWidth - 1px);
+                padding-right: calc($contentContainerPadding - (calc($scrollBarHoverSize - $scrollBarWidth)));
             }
             
             // Header
