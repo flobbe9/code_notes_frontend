@@ -159,6 +159,12 @@ export function getJQueryElementByClassName(className: string, debug = true): JQ
 }
 
 
+/**
+ * Wont throw if not a number.
+ * 
+ * @param str 
+ * @returns the number or -1
+ */
 export function stringToNumber(str: string | number | undefined): number {
 
     if (typeof str === "number")
@@ -1176,16 +1182,13 @@ export function clearUserCache(): void {
 
 
 /**
- * Removes given state from browser history. If no state is specified, this will simply remove the last entry.
+ * Removes current page from browser history and replaces it with given ```path```.
  * 
- * @param state to remove from browser history. Default is state before the current one
+ * @param path relative path to replace the current history entry with
  */
-export function removeFromBrowserHistory(state = window.history.state): void {
+export function replaceCurrentBrowserHistoryEntry(path: string = window.location.pathname): void {
 
-    if (!state)
-        return;
-
-    window.history.replaceState(state, "");
+    window.history.replaceState({}, "", path);
 }
 
 
