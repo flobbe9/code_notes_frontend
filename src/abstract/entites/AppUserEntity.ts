@@ -12,6 +12,8 @@ export interface AppUserEntity extends AbstractEntity {
 
     email: string;
 
+    oauth2Id: string;
+
     password: string;
 
     role: AppUserRole;

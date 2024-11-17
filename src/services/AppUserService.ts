@@ -10,8 +10,8 @@ import { AppUserEntity } from './../abstract/entites/AppUserEntity';
  */
 export class AppUserService {
     
-    /** List of app user fields that need to be encrypted before caching the app user */
-    private static SENSITIVE_FIELDS = ["email", "password"];
+    /** List of app user fields that need to be encrypted before caching the app user. Non-string fields will be ignored */
+    private static SENSITIVE_FIELDS: (keyof AppUserEntity)[] = ["email", "password", "oauth2Id"];
     
 
     /**
@@ -24,6 +24,7 @@ export class AppUserService {
             created: "", 
             updated: "", 
             email: "", 
+            oauth2Id: "",
             password: "", 
             role: "USER" ,
             tags: null, 
@@ -38,6 +39,7 @@ export class AppUserService {
             created: appUserEntity.created,
             updated: appUserEntity.updated,
             email: appUserEntity.email,
+            oauth2Id: appUserEntity.oauth2Id,
             password: appUserEntity.password,
             role: appUserEntity.role,
             tags: appUserEntity.tags || null,
@@ -54,8 +56,8 @@ export class AppUserService {
         const cryptoHelper = new CryptoJSImpl();
 
         this.SENSITIVE_FIELDS.forEach(prop => {
-            if (appUserEntity[prop])
-                appUserEntity[prop] = cryptoHelper.encrypt(appUserEntity[prop]);
+            if (appUserEntity[prop] && typeof appUserEntity[prop] === "string")
+                appUserEntity[prop.toString()] = cryptoHelper.encrypt(appUserEntity[prop]);
         });
 
         return appUserEntity;
@@ -73,8 +75,8 @@ export class AppUserService {
         const appUserEntityCopy = this.getInstance(appUserEntity);
 
         this.SENSITIVE_FIELDS.forEach(prop => {
-            if (appUserEntityCopy[prop])
-                appUserEntityCopy[prop] = cryptoHelper.decrypt(appUserEntityCopy[prop]);
+            if (appUserEntity[prop] && typeof appUserEntity[prop] === "string")
+                appUserEntityCopy[prop.toString()] = cryptoHelper.decrypt(appUserEntityCopy[prop] as string);
         });
 
         return appUserEntityCopy;
