@@ -1,30 +1,34 @@
-import React, { FormEvent, useContext, useRef, useState } from "react";
+import React, { FormEvent, MouseEvent, useContext, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
 import "../assets/styles/Register.scss";
 import { BACKEND_BASE_URL, EMAIL_REGEX, LOGIN_PATH, PASSWORD_REGEX } from "../helpers/constants";
+import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { isBlank } from "../helpers/utils";
+import { AppContext } from "./App";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import Hr from "./helpers/Hr";
 import TextInput from "./helpers/TextInput";
+import Login from "./Login";
 import Oauth2LoginButton from "./Oauth2LoginButton";
 import PasswordAdvice from "./PasswordAdvice";
-import { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
-import { AppContext } from "./App";
-import { useNavigate } from "react-router-dom";
+import ResendConfirmationEmail from "./ResendConfirmationEmail";
 
 
 interface Props extends DefaultProps {
 
+    /** Indicates whether this page is content of the ```<Popup>``` component. Default is ```false``` */
+    isPopupContent?: boolean
 }
 
 
 /**
  * @since 0.0.1
  */
-export default function Register({...props}: Props) {
+export default function Register({isPopupContent, ...props}: Props) {
     
     const [email, setEmail] = useState<string>("");
     const [triggerEmailValidation, setTriggerEmailValidation] = useState<boolean | undefined>(undefined);
@@ -35,7 +39,7 @@ export default function Register({...props}: Props) {
     const [repeatPassword, setRepeatPassword] = useState<string>("");
     const [triggerRepeatPasswordValidation, setTriggerRepeatPasswordValidation] = useState<boolean | undefined>(undefined);
 
-    const { toast } = useContext(AppContext);
+    const { toast, showPopup, replacePopupContent } = useContext(AppContext);
 
     const navigate = useNavigate();
 
@@ -120,14 +124,14 @@ export default function Register({...props}: Props) {
             return;
 
         const url = `${BACKEND_BASE_URL}/app-user/register?email=${email}&password=${password}`;
-        const response = await fetchAny(url, "post");
+        const jsonResponse = await fetchAny(url, "post");
 
-        if (isResponseError(response)) {
-            handleFormSubmitError(response);
+        if (isResponseError(jsonResponse)) {
+            handleFormSubmitError(jsonResponse);
             return;
         }
 
-        handleFormSubmitSuccess(response);
+        handleFormSubmitSuccess(jsonResponse);
     }
 
 
@@ -150,19 +154,45 @@ export default function Register({...props}: Props) {
 
     function handleFormSubmitSuccess(response: Response | CustomExceptionFormat): void {
 
-        navigate(LOGIN_PATH);
+        if (!isPopupContent)
+            navigate(LOGIN_PATH);
+
+        else
+            showPopup(<Login isPopupContent />);
+
+        toast(
+            "Successfully registered", 
+            "We've sent you an E-Mail to confirm your account. Please make sure you check the junk folder as well.", 
+            "success"
+        );
     }
 
 
     function handleFormSubmitError(response: CustomExceptionFormat): void {
 
-        toast("Failed to register", response.message, "error");
+        if (response.status === 409)
+            toast("Failed to register", "This E-Mail address is already registered. Please use a different one.", "warn");
+        else
+            toast("Failed to register", "", "error");
     }
 
-    // TOOD: 
-        // login / register links for popups
-            // pass boolean as prop
-                // either normal link or change popup content
+
+    function handleLoginClick(event: MouseEvent): void {
+
+        if (isPopupContent) {
+            // don't navigate
+            event.preventDefault();
+            replacePopupContent(<Login isPopupContent />);
+        }
+    }
+
+
+    function showResendConfirmationEmailPopup(event: MouseEvent): void {
+
+        if (isPopupContent) 
+            showPopup(<ResendConfirmationEmail />);
+    }
+
 
     return (
         <Flex 
@@ -173,7 +203,7 @@ export default function Register({...props}: Props) {
             verticalAlign="center"
             {...otherProps}
         >
-            <div className="Register-contentContainer">
+            <div className={`Register-contentContainer ${!isPopupContent && 'mt-5'}`}>
                 <h1 className="Register-contentContainer-heading mb-4">Create account</h1>
 
                 <div className="Register-contentContainer-formContainer mb-5">
@@ -212,6 +242,7 @@ export default function Register({...props}: Props) {
                                 // password pattern invalid
                                 !inputValidationWrappers.password[1].predicate(password)
                             }
+                            useMobileView={isPopupContent}
                         />
                     </TextInput>
 
@@ -239,11 +270,28 @@ export default function Register({...props}: Props) {
                         Create account
                     </Button>
 
-                    <Flex horizontalAlign="center">
-                        {/* Login */}
-                        <span>Already have an account? &nbsp;</span>
-                        <span className="hover Register-contentContainer-formContainer-createAccountLink"> Login</span>
-                    </Flex>
+                    {/* Resend email */}
+                    <div className="Register-contentContainer-formContainer-linkContainer textCenter mb-5">
+                        Didn't get a confirmation E-Mail? <br />
+                        <Button 
+                            className="hover Register-contentContainer-formContainer-linkContainer-linkButton"
+                            onClick={showResendConfirmationEmailPopup}
+                        >
+                            Resend confirmation email
+                        </Button>
+                    </div>
+                    
+                    {/* Login */}
+                    <Button className="Register-contentContainer-formContainer-loginButton mb-2" onClick={handleLoginClick}>
+                        <Link 
+                            to={isPopupContent ? "" : LOGIN_PATH} 
+                            className="Register-contentContainer-formContainer-loginButton-link simpleLink"
+                            title="Login"
+                            tabIndex={-1}
+                        >
+                            Login
+                        </Link>
+                    </Button>
                 </div>
 
                 <Hr><span className="mx-1">Or</span></Hr>
@@ -255,7 +303,7 @@ export default function Register({...props}: Props) {
                         clientRegistrationId="google"
                         iconSrc={"/img/google.png"}
                     >
-                        Continue with Google
+                        Register with Google
                     </Oauth2LoginButton>
 
                     {/* Github */}
@@ -264,7 +312,7 @@ export default function Register({...props}: Props) {
                         clientRegistrationId="github"
                         iconSrc={"/img/github.png"}
                     >
-                        Continue with GitHub
+                        Register with GitHub
                     </Oauth2LoginButton>
 
                     {/* Microsoft */}
@@ -273,7 +321,7 @@ export default function Register({...props}: Props) {
                         clientRegistrationId="azure"
                         iconSrc={"/img/microsoft.png"}
                     >
-                        Continue with Microsoft
+                        Register with Microsoft
                     </Oauth2LoginButton>
                 </div>
             </div>

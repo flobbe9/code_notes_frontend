@@ -35,6 +35,8 @@ export default function App() {
     
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [popupContent, setPopupContent] = useState<ReactNode>([]);
+    const [isPopup2Visible, setIsPopup2Visible] = useState(false);
+    const [popup2Content, setPopup2Content] = useState<ReactNode>([]);
     
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
@@ -64,12 +66,9 @@ export default function App() {
         showPendingOverlay,
         hidePendingOverlay,
 
-        isPopupVisible, 
-        setIsPopupVisible,
-        popupContent, 
-        setPopupContent,
         showPopup,
-        hidePopup
+        hidePopup,
+        replacePopupContent
     }
 
     const toastRef = useRef(null);
@@ -195,8 +194,10 @@ export default function App() {
 
         handleKeyDownUseKeyPress(event);
 
-        if (key === "Escape")
+        if (key === "Escape") {
             moveToast(true);
+            hidePopup();
+        }
     }
 
 
@@ -237,18 +238,112 @@ export default function App() {
     }
 
 
+    /**
+     * Show topmost visible popup and possibly set content. Hide app overlay.
+     * 
+     * @param popupContent will only update state if this is not ```undefined```
+     */
     function showPopup(popupContent?: ReactNode): void {
+
+        const { setIsPopupVisible, setPopupContent, isBottomMostPopup } = getPopupAfterTopMostVisiblePopup();
 
         if (popupContent !== undefined)
             setPopupContent(popupContent);
 
         setIsPopupVisible(true);
+        setIsAppOverlayVisible(true);
+        if (isBottomMostPopup)
+            setIsAppOverlayHideOnEscape(false);
     }
 
 
+    /**
+     * Hide topmost visible popup and app overlay.
+     */
     function hidePopup(): void {
 
+        const { setIsPopupVisible, isBottomMostPopup } = getTopMostVisiblePopup();
+
         setIsPopupVisible(false);
+
+        if (isBottomMostPopup) {
+            setIsAppOverlayVisible(false);
+            setIsAppOverlayHideOnEscape(true);
+        }
+    }
+
+
+    /**
+     * Update the popup content of the top most visible popup
+     * @param content 
+     */
+    function replacePopupContent(content: ReactNode): void {
+
+        const { setPopupContent } = getTopMostVisiblePopup();
+
+        setPopupContent(content);
+    }
+
+
+    /**
+     * @returns all states of the ```<Popup>``` that rendered last and visible
+     */
+    function getTopMostVisiblePopup(): { 
+        popupContent: ReactNode,
+        setPopupContent: (content: ReactNode) => void,
+        isPopupVisible: boolean,
+        setIsPopupVisible: (isVisible: boolean) => void,
+        isBottomMostPopup: boolean
+    } {
+
+        // case: popup2 is visible
+        if (document.querySelector("#Popup2")?.computedStyleMap().get("display")?.toString() !== "none")
+            return { 
+                popupContent: popup2Content,
+                setPopupContent: setPopup2Content,
+                isPopupVisible: isPopup2Visible,
+                setIsPopupVisible: setIsPopup2Visible,
+                isBottomMostPopup: false
+            };
+
+        return {
+            popupContent,
+            setPopupContent,
+            isPopupVisible,
+            setIsPopupVisible,
+            isBottomMostPopup: true
+        };
+    }
+    
+
+    /**
+     * @returns all states of the ```<Popup>``` after the topMost visible popup
+     */
+    function getPopupAfterTopMostVisiblePopup(): { 
+        popupContent: ReactNode,
+        setPopupContent: (content: ReactNode) => void,
+        isPopupVisible: boolean,
+        setIsPopupVisible: (isVisible: boolean) => void,
+        isBottomMostPopup: boolean
+    } {
+
+        // case: popup 1 is visible
+        if (document.querySelector("#Popup1")?.computedStyleMap().get("display")?.toString() === "none")
+            return {
+                popupContent,
+                setPopupContent,
+                isPopupVisible,
+                setIsPopupVisible,
+                isBottomMostPopup: true
+            };
+        
+        return { 
+            popupContent: popup2Content,
+            setPopupContent: setPopup2Content,
+            isPopupVisible: isPopup2Visible,
+            setIsPopupVisible: setIsPopup2Visible,
+            isBottomMostPopup: false
+        };
     }
     
 
@@ -269,7 +364,18 @@ export default function App() {
                                 {appOverlayContent}
                             </Overlay>
 
-                            <Popup />
+                            <Popup 
+                                id="1"
+                                isPopupVisible={isPopupVisible} 
+                                popupContent={popupContent}
+                                setPopupContent={setPopupContent}
+                            />
+                            <Popup
+                                id="2" 
+                                isPopupVisible={isPopup2Visible} 
+                                popupContent={popup2Content}
+                                setPopupContent={setPopup2Content}
+                             />
 
                             <NavBar />
 
@@ -321,10 +427,7 @@ export const AppContext = createContext({
     showPendingOverlay: (overlayContent?: ReactNode) => {},
     hidePendingOverlay: () => {},
 
-    isPopupVisible: false, 
-    setIsPopupVisible: (isVisible: boolean) => {},
-    popupContent: <></> as (ReactNode), 
-    setPopupContent: (content: ReactNode) => {},
     showPopup: (popupContent?: ReactNode) => {},
     hidePopup: () => {},
+    replacePopupContent: (content: ReactNode) => {}
 });

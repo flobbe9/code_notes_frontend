@@ -1,8 +1,7 @@
 @import "../styles/global/functions.scss";
 
 .Popup {
-    $scrollBarWidth: 4px;
-    $scrollBarHoverSize: 7px;
+    $scrollBarWidth: 8px;
     $contentContainerPadding: 10px;
 
     display: none;
@@ -12,7 +11,6 @@
     z-index: var(--overlayZIndex);
     
     &-flexContainer {
-        
         .popupContentContainer {
             max-height: 98vh;
             border: 1px solid var(--matteBlue);
@@ -25,11 +23,7 @@
             padding: $contentContainerPadding;
             z-index: calc(var(--overlayZIndex) + 1);
             
-            @include scrollBar($scrollBarWidth, $scrollBarHoverSize);
-            
-            @include customHover {
-                padding-right: calc($contentContainerPadding - (calc($scrollBarHoverSize - $scrollBarWidth)));
-            }
+            @include scrollBar($scrollBarWidth, $scrollBarWidth);
             
             // Header
             .popupXButton {

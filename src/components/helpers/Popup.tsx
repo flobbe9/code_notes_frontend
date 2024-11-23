@@ -1,15 +1,19 @@
 import $ from "jquery";
-import React, { useContext, useEffect, useRef } from "react";
+import React, { ReactNode, useContext, useEffect, useRef } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/Popup.scss";
 import { AppContext } from "../App";
 import Button from "./Button";
 import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";
+import { useLocation } from "react-router-dom";
+import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 
 
 interface Props extends DefaultProps {
-
+    popupContent: React.ReactNode,
+    isPopupVisible: boolean,
+    setPopupContent: (content: ReactNode) => void
 }
 
 
@@ -18,54 +22,59 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function Popup({...props}: Props) {
+export default function Popup({
+    popupContent,
+    isPopupVisible,
+    setPopupContent,
+    ...props
+}: Props) {
 
-    const {
-        isAppOverlayVisible,
-        setIsAppOverlayVisible,
-        isAppOverlayHideOnClick,
-        popupContent,
-        isPopupVisible,
-        setIsPopupVisible,
-        setPopupContent
-    } = useContext(AppContext);
+    const { hidePopup } = useContext(AppContext);
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props);
+    const location = useLocation();
+
+    const hasComponentMounted = useHasComponentMounted();
+
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Popup");
 
     const fadeDuration = 200;
 
     const componentRef = useRef<HTMLDivElement>(null);
+    const popupContainerRef = useRef<HTMLDivElement>(null);
+
+    
+    useEffect(() => {
+        if (hasComponentMounted)
+            hideThisPopup();
+    }, [location]);
 
 
     useEffect(() => {
-        if (!isAppOverlayVisible)
-            setIsPopupVisible(false);
-
-    }, [isAppOverlayVisible]);
+        popupContainerRef.current!.scrollTo({top: 0})
+    }, [popupContent]);
 
 
     useEffect(() => {
         if (isPopupVisible)
-            showPopup()
+            showThisPopup();
         else
-            hidePopup();
+            hideThisPopup();
 
     }, [isPopupVisible]);
 
 
     function handleXButtonClick(event): void {
 
-        setIsPopupVisible(false);
+        hidePopup();
     }
 
 
     /**
      * Fade out popup and reset content
      */
-    async function hidePopup(): Promise<void> {
+    async function hideThisPopup(): Promise<void> {
 
         $(componentRef.current!).fadeOut(fadeDuration);
-        setIsAppOverlayVisible(false);
         
         // wait for popup to be hidden
         await new Promise((res, rej) => {
@@ -76,12 +85,11 @@ export default function Popup({...props}: Props) {
     }
 
 
-    function showPopup(): void {
+    function showThisPopup(): void {
 
         const popup = $(componentRef.current!);
 
         popup.fadeIn(fadeDuration);
-        setIsAppOverlayVisible(true);
 
         popup.trigger("focus");
     }
@@ -89,30 +97,31 @@ export default function Popup({...props}: Props) {
 
     function handleOuterClick(event): void {
 
-        // immitate overlay click
-        if (event.target.className.includes("hidePopup") && isAppOverlayHideOnClick)
-            setIsAppOverlayVisible(false);
+        if (!event.target.className.includes(`hidePopup${id}`)) 
+            return;
+
+        hidePopup();
     }
 
 
     return (
         <HelperDiv
-            id="Popup"
-            className="Popup"
+            id={id} 
+            className={className}
+            style={style}
             ref={componentRef}
             tabIndex={0} 
+            {...otherProps}
         >
             <Flex 
-                className="Popup-flexContainer fullHeight hidePopup"
+                className={`Popup-flexContainer fullHeight hidePopup${id}`}
                 horizontalAlign="center"
                 verticalAlign="center"
                 onClick={handleOuterClick}
             >
                 <div 
-                    id={id} 
-                    className={className + " popupContentContainer"}
-                    style={style}
-                    {...otherProps}
+                    className={"popupContentContainer"}
+                    ref={popupContainerRef}
                 >
                     {/* Header */}
                     <Flex className="popupHeader" horizontalAlign="right" verticalAlign="start">
@@ -125,7 +134,7 @@ export default function Popup({...props}: Props) {
                     </Flex>
 
                     {/* Body */}
-                    <div className="popupContent">{popupContent}</div>
+                    <div className="popupContent">{id}{popupContent}</div>
 
                     {children}
                 </div>

@@ -1,11 +1,10 @@
 import $ from "jquery";
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
-import "../../assets/styles/Overlay.scss";
+import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import HelperDiv from "./HelperDiv";
-import { log } from "../../helpers/utils";
+import "../../assets/styles/Overlay.scss";
 import Flex from "./Flex";
+import HelperDiv from "./HelperDiv";
 
 
 interface Props extends HelperProps {

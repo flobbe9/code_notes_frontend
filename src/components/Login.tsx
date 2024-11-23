@@ -1,12 +1,12 @@
 import $ from "jquery";
-import React, { useContext, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
 import "../assets/styles/Login.scss";
-import { APP_NAME_PRETTY, START_PAGE_PATH } from "../helpers/constants";
+import { CONFIRM_ACCOUNT_STATUS_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { isResponseError } from "../helpers/fetchUtils";
-import { isBlank, isNumberFalsy, setCsrfToken } from "../helpers/utils";
+import { isBlank, isNumberFalsy, replaceCurrentBrowserHistoryEntry, setCsrfToken, stringToNumber } from "../helpers/utils";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
@@ -14,10 +14,13 @@ import Flex from "./helpers/Flex";
 import Hr from "./helpers/Hr";
 import TextInput from "./helpers/TextInput";
 import Oauth2LoginButton from "./Oauth2LoginButton";
+import Register from "./Register";
 
 
 interface Props extends DefaultProps {
 
+    /** Indicates whether this page is content of the ```<Popup>``` component. Default is ```false``` */
+    isPopupContent?: boolean
 }
 
 
@@ -25,13 +28,20 @@ interface Props extends DefaultProps {
  * @parent ```<App>```
  * @since 0.0.1
  */
-export default function Login({...props}: Props) {
+export default function Login({isPopupContent = false, ...props}: Props) {
     
     const [email, setEmail] = useState<string>("");
     const [triggerEmailValidation, setTriggerEmailValidation] = useState<boolean | undefined>(undefined);
     
     const [password, setPassword] = useState<string>("");
     const [triggerPasswordValidation, setTriggerPasswordValidation] = useState<boolean | undefined>(undefined);
+    
+    const { toast, hidePopup, showPopup, replacePopupContent } = useContext(AppContext);
+    const { fetchLogin, isLoggedInUseQueryResult } = useContext(AppFetchContext);
+    
+    const navigate = useNavigate();
+
+    const [urlQueryParams, setUrlSearchParams] = useSearchParams();
     
     type InputName = "email" | "password";
     const inputValidationWrappers: Record<InputName, InputValidationWrapper[]> = {
@@ -51,16 +61,16 @@ export default function Login({...props}: Props) {
         ]
     }
 
-    const { toast } = useContext(AppContext);
-    const { fetchLogin } = useContext(AppFetchContext);
-    
-    const navigate = useNavigate();
-
     const emailInputRef = useRef<HTMLInputElement>(null);
     const passwordInputRef = useRef<HTMLInputElement>(null);
     const submitButtonRef = useRef<HTMLButtonElement>(null);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Login", true);
+
+    
+    useEffect(() => {
+        handleConfirmAccountRedirect();
+    }, []);
 
 
     /**
@@ -75,7 +85,6 @@ export default function Login({...props}: Props) {
 
         const loginResponse = await fetchLogin(email, password);
 
-        // case: fetch error
         if (isResponseError(loginResponse)) {
             handleLoginFailure(loginResponse.status);
             return;
@@ -93,7 +102,7 @@ export default function Login({...props}: Props) {
             return;
 
         if (status === 401)
-            toast("Login failed", "Either wrong email or password.", "error", 5000);
+            toast("Login failed", "", "error", 5000);
 
         else
             toast("Login failed", "An unexpected error occured. Please try refreshing the page.", "error", 5000);
@@ -101,7 +110,9 @@ export default function Login({...props}: Props) {
 
 
     /**
-     * Encrypts and stores given csrf token to local storage. Navigates to start page.
+     * Encrypts and stores given csrf token to local storage. 
+     * 
+     * Either navigates to start page or (if ```isPopupContent```) just refreshes states
      * 
      * @param csrfToken to store
      */
@@ -109,7 +120,14 @@ export default function Login({...props}: Props) {
 
         setCsrfToken(csrfToken);
 
-        navigate(START_PAGE_PATH);
+        if (!isPopupContent)
+            // location change will refetch loggedin state
+            navigate(START_PAGE_PATH);
+
+        else {
+            isLoggedInUseQueryResult.refetch(); 
+            hidePopup();
+        }
     }
 
 
@@ -149,6 +167,72 @@ export default function Login({...props}: Props) {
     }
 
 
+    function handleRegisterClick(event: MouseEvent): void {
+
+        if (isPopupContent) {
+            // dont navigate
+            event.preventDefault();
+            replacePopupContent(<Register isPopupContent />);
+        }
+    }
+
+
+    /**
+     * If page was visited because of redirect for "/confirm-account" then retrieve http status code
+     * and toast.
+     * 
+     * Return if ```isPopupContent```.
+     */
+    function handleConfirmAccountRedirect(): void {
+
+        if (isPopupContent)
+            return;
+
+        const statusCodeString = urlQueryParams.get(CONFIRM_ACCOUNT_STATUS_PARAM);
+
+        if (!statusCodeString)
+            return;
+
+        const statusCode = stringToNumber(statusCodeString);
+
+        // case: invalid param value, clear query params
+        if (statusCode === -1) {
+            replaceCurrentBrowserHistoryEntry();
+            navigate(window.location.pathname);
+            return;
+        }
+
+        switch (statusCode) {
+            case 200: 
+                toast("Account confirmed successfully", "You can continue by logging in.", "success", 4000);
+                break;
+
+            case 202:
+                toast("Account confirmed already", "Nothing further to be done. You can continue by logging in.", "info");
+                break;
+            
+            case 400:
+                toast("Invalid confirmation link", "Please resend the confirmation mail and click the 'Confirm' button in it.", "error");
+                break;
+
+            case 404:
+                toast("Invalid confirmation link", "Please resend the confirmation mail and click the 'Confirm' button in it.", "error");
+                break;
+
+            case 406:
+                toast("Confirmation link expired", `Please resend the confirmation mail and click the 'Confirm' button within ${HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES} hours.`, "error");
+                break;
+
+            default:
+                toast("Failed to confirm account", "An unexpected error occurred. Please resend the confirmation mail and click the 'Confirm' button in it.", "error");
+        }
+
+        // clear query params from url and from history
+        replaceCurrentBrowserHistoryEntry();
+        navigate(window.location.pathname);
+    }
+
+
     return (
         <Flex 
             id={id} 
@@ -158,7 +242,7 @@ export default function Login({...props}: Props) {
             verticalAlign="center"
             {...otherProps}
         >
-            <div className="Login-contentContainer">
+            <div className={`Login-contentContainer ${!isPopupContent && 'mt-5'}`}>
                 <h1 className="Login-contentContainer-heading mb-4">Login</h1> 
 
                 <div className="Login-contentContainer-formContainer mb-5">
@@ -198,11 +282,26 @@ export default function Login({...props}: Props) {
                         Login
                     </Button>
 
-                    <Flex horizontalAlign="center">
-                        {/* Register */}
-                        <span>New to {APP_NAME_PRETTY}?</span>
-                        <span className="hover Login-contentContainer-formContainer-createAccountLink">Create account</span>
-                    </Flex>
+                    {/* Reset Password */}
+                    {/* TODO */}
+                    
+                    {/* Resend email */}
+                    <div className="Register-contentContainer-formContainer-linkContainer textCenter mb-5">
+                        Already registered but didn't get a confirmation E-Mail?&nbsp;
+                        <span className="hover Register-contentContainer-formContainer-linkContainer-link">Resend confirmation email</span>
+                    </div>
+
+                    {/* Register */}
+                    <Button className="Login-contentContainer-formContainer-createAccountButton mb-2" onClick={handleRegisterClick}>
+                        <Link 
+                            to={isPopupContent ? "" : REGISTER_PATH} 
+                            className="Login-contentContainer-formContainer-createAccountButton-link simpleLink"
+                            title="Create account"
+                            tabIndex={-1}
+                        >
+                            Create account
+                        </Link>
+                    </Button>
                 </div>
 
                 <Hr><span className="mx-1">Or</span></Hr>
@@ -214,7 +313,7 @@ export default function Login({...props}: Props) {
                         clientRegistrationId="google"
                         iconSrc={"/img/google.png"}
                     >
-                        Continue with Google
+                        Login with Google
                     </Oauth2LoginButton>
 
                     {/* Github */}
@@ -223,7 +322,7 @@ export default function Login({...props}: Props) {
                         clientRegistrationId="github"
                         iconSrc={"/img/github.png"}
                     >
-                        Continue with GitHub
+                        Login with GitHub
                     </Oauth2LoginButton>
 
                     {/* Microsoft */}
@@ -232,7 +331,7 @@ export default function Login({...props}: Props) {
                         clientRegistrationId="azure"
                         iconSrc={"/img/microsoft.png"}
                     >
-                        Continue with Microsoft
+                        Login with Microsoft
                     </Oauth2LoginButton>
                 </div>
             </div>
