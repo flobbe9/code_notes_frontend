@@ -9,70 +9,60 @@
     position: relative;
     transition: border var(--transitionTime);
 
+    // PlainTextNoteInput
     &:has(.PlainTextNoteInput) {
         border-left: $noteInputDefaultBorder var(--plainTextNoteInputColor);
     }
+    &:has(.PlainTextNoteInput:not(.fullScreen)) {
+        .ContentEditableDiv {
+            transition: var(--transitionTime);
+
+            @include customHover {
+                background-color: var(--matteBlackLight);
+            }
+
+            @include customFocus {
+                background-color: var(--matteBlackLight);
+            }
+        }
+    }
     
+    // CodeNoteInputWithVariables
     &:has(.CodeNoteInputWithVariables) {
         border-left: $noteInputDefaultBorder var(--codeNoteInputWithVariablesColor);
     }
+    &:has(.CodeNoteInputWithVariables:not(.fullScreen)) {
+        .ContentEditableDiv {
+            transition: var(--transitionTime);
+
+            @include customHover {
+                background-color: var(--matteBlackLight);
+            }
+
+            @include customFocus {
+                background-color: var(--matteBlackLight);
+            }
+        }
+    }
     
+    // CodeNoteInput
     &:has(.CodeNoteInput) {
         padding-left: 2px;
         border-left: $noteInputDefaultBorder var(--codeNoteInputColor);
     }
-
-    // case: hover or focus on code noteInput with vars
-    &:has(.PlainTextNoteInput:not(.fullScreen) .ContentEditableDiv:focus) {
-        .ContentEditableDiv {
-            transition: var(--transitionTime);
-            background-color: var(--matteBlackLight);
-        }
-        border-color: var(--plainTextNoteInputColor);
-    }
-    @include customHover {
-        &:has(.PlainTextNoteInput:not(.fullScreen)) {
-            .ContentEditableDiv {
-                transition: var(--transitionTime);
-                background-color: var(--matteBlackLight);
-            }
-            border-color: var(--plainTextNoteInputColor);
-        }
-    }
-
-    // case: hover or focus on code noteInput
-    &:has(.CodeNoteInput:not(.fullScreen) textarea:focus) {
+    &:has(.CodeNoteInput:not(.fullScreen)) {
         .view-lines {
             transition: var(--transitionTime);
-            background-color: var(--matteBlackLight);
-        }
-        border-color: var(--codeNoteInputColor);
-    }
-    @include customHover {
-        &:has(.CodeNoteInput:not(.fullScreen)) {
-            .view-lines {
-                transition: var(--transitionTime);
-                background-color: var(--matteBlackLight);
-            }
-            border-color: var(--codeNoteInputColor);
-        }
-    }
 
-    // case: hover or focus on code noteinput with variables
-    &:has(.CodeNoteInputWithVariables:not(.fullScreen) .ContentEditableDiv:focus) {
-        .ContentEditableDiv {
-            transition: var(--transitionTime);
-            background-color: var(--matteBlackLight);
-        }
-        border-color: var(--codeNoteInputWithVariablesColor);
-    }
-    @include customHover {
-        &:has(.CodeNoteInputWithVariables:not(.fullScreen)) {
-            .ContentEditableDiv {
-                transition: var(--transitionTime);
+            @include customHover {
                 background-color: var(--matteBlackLight);
             }
-            border-color: var(--codeNoteInputWithVariablesColor);
+        }
+
+        &:has(textarea:not([disabled]):focus) {
+            .view-lines {
+                background-color: var(--matteBlackLight);
+            }
         }
     }
 
