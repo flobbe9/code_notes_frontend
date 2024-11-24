@@ -406,7 +406,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
             zIndex: appOverlayZIndex + 1
         });
 
-        defaultCodeNoteInput.animate({top: "90px"}, 300);
+        defaultCodeNoteInput.animate({top: "10vh"}, 300);
 
         editor.animate({height: "80vh"});
 

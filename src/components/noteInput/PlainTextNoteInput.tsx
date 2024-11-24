@@ -269,7 +269,7 @@ export default function PlainTextNoteInput({
 
         plainTextNoteInput.animate({
             height: "80vh",
-            top: "90px",
+            top: "10vh",
             width: "90vw"
         });
     }

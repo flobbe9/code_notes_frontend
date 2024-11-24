@@ -11,6 +11,10 @@
         border-radius: var(--borderRadius); // for full screen mode
         box-shadow: 2px 2px 15px 2px var(--codeGrey);
         padding: 15px;
+
+        .plainTextInput {
+            max-height: unset;
+        }
     }
 
     .plainTextInput {

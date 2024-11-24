@@ -23,7 +23,7 @@
     }
 
     // case: hover or focus on code noteInput with vars
-    &:has(.PlainTextNoteInput .ContentEditableDiv:focus) {
+    &:has(.PlainTextNoteInput:not(.fullScreen) .ContentEditableDiv:focus) {
         .ContentEditableDiv {
             transition: var(--transitionTime);
             background-color: var(--matteBlackLight);
@@ -31,7 +31,7 @@
         border-color: var(--plainTextNoteInputColor);
     }
     @include customHover {
-        &:has(.PlainTextNoteInput) {
+        &:has(.PlainTextNoteInput:not(.fullScreen)) {
             .ContentEditableDiv {
                 transition: var(--transitionTime);
                 background-color: var(--matteBlackLight);
@@ -41,7 +41,7 @@
     }
 
     // case: hover or focus on code noteInput
-    &:has(.CodeNoteInput textarea:focus) {
+    &:has(.CodeNoteInput:not(.fullScreen) textarea:focus) {
         .view-lines {
             transition: var(--transitionTime);
             background-color: var(--matteBlackLight);
@@ -49,7 +49,7 @@
         border-color: var(--codeNoteInputColor);
     }
     @include customHover {
-        &:has(.CodeNoteInput) {
+        &:has(.CodeNoteInput:not(.fullScreen)) {
             .view-lines {
                 transition: var(--transitionTime);
                 background-color: var(--matteBlackLight);
@@ -59,7 +59,7 @@
     }
 
     // case: hover or focus on code noteinput with variables
-    &:has(.CodeNoteInputWithVariables .ContentEditableDiv:focus) {
+    &:has(.CodeNoteInputWithVariables:not(.fullScreen) .ContentEditableDiv:focus) {
         .ContentEditableDiv {
             transition: var(--transitionTime);
             background-color: var(--matteBlackLight);
@@ -67,7 +67,7 @@
         border-color: var(--codeNoteInputWithVariablesColor);
     }
     @include customHover {
-        &:has(.CodeNoteInputWithVariables) {
+        &:has(.CodeNoteInputWithVariables:not(.fullScreen)) {
             .ContentEditableDiv {
                 transition: var(--transitionTime);
                 background-color: var(--matteBlackLight);

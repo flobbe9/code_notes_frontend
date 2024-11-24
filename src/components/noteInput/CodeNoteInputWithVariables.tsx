@@ -564,7 +564,7 @@ export default function CodeNoteInputWithVariables({
         });
 
         defaultCodeNoteInput.animate({
-            top: "90px",
+            top: "10vh",
             width: "90vw"
         });
 
