@@ -5,7 +5,7 @@ import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps"
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import "../../assets/styles/CodeNoteInput.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
-import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, setClipboardText } from "../../helpers/utils";
+import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, log, setClipboardText, setCssConstant } from "../../helpers/utils";
 import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
 import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
@@ -329,7 +329,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
             "swing",
             () => setTimeout(() => 
                 getOuterEditorContainer().css("width", "98%"), 300) // wait for possible sidebar animations to finish, even though editor is done
-        )
+        );
     }
 
 
@@ -377,6 +377,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         const newFullEditorWidth = getOuterEditorContainer().width()!;
 
         setFullEditorWidth(newFullEditorWidth);
+        setCssConstant("fullEditorWidth", newFullEditorWidth + "px");
 
         return newFullEditorWidth;
     }

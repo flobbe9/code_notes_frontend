@@ -1,5 +1,7 @@
 @import "./global/functions.scss";
 
+
+
 .PlainTextNoteInput {
     background-color: var(--matteBlack);
     border-right: none;
@@ -23,7 +25,7 @@
         height: 100%;
         max-height: 20vh;
         overflow: auto;
-        padding: 8px 0;
+        padding: 8px var(--noteInputPaddingX);
         white-space: pre-wrap;
 
         @include scrollBar();

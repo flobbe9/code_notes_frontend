@@ -1,3 +1,10 @@
+@import "./global/functions.scss";
+
+:root {
+    // set on redner
+    --fullEditorWidth: 500px;
+}
+
 .CodeNoteInput {
     background-color: var(--matteBlack);
     
@@ -13,48 +20,55 @@
             color: white;
 
             .vsCodeEditor {
-                margin: 3px;
+                margin: 3px 0;
                 
                 .overflow-guard {
                     background-color: var(--matteBlack);
+                    padding: 0 var(--noteInputPaddingX);
 
-                    // line number container
-                    .margin {
-                        display: none;
-                        background-color: var(--matteBlack);
-                        left: -20px;
-                        
-                        .margin-view-overlays, .current-line.current-line-margin-both {
-                            left: -10px;
+                    .monaco-scrollable-element {
+
+                        // line number container
+                        .margin {
+                            display: none;
+                            background-color: var(--matteBlack);
+                            left: -20px;
+                            
+                            .margin-view-overlays, .current-line.current-line-margin-both {
+                                left: -10px;
+                            }
                         }
-                    }
 
-                    .decorationsOverviewRuler {
-                        display: none !important;
+                        .decorationsOverviewRuler {
+                            display: none !important;
 
-                    }
+                        }
 
-                    .iPadShowKeyboard {
-                        display: none;
-                    }
-                    
-                    .monaco-scrollable-element.editor-scrollable {
-                        left: 0 !important;
-                    }
-                    
-                    .lines-content {
-                        background-color: var(--matteBlack);
+                        .iPadShowKeyboard {
+                            display: none;
+                        }
+                        
+                        .monaco-scrollable-element.editor-scrollable {
+                            left: 0 !important;
+                        }
+                        
+                        .lines-content {
+                            background-color: var(--matteBlack);
 
-                        // line container
-                        .view-lines {
+                            // line container
+                            .view-lines {
+                                padding: 0 var(--noteInputPaddingX);
+                                transition: var(--transitionTime);
+                                width: var(--fullEditorWidth) !important;
 
-                            // line
-                            .view-line {
-                                
+                                // line
+                                .view-line {
+                                    
+                                }
                             }
                         }
                     }
-                    
+                        
                     .minimap {
                         display: none;
                     }

@@ -35,7 +35,7 @@
             max-height: var(--codeNoteInputWithVariablesMinHeight);
             min-height: 41px;
             overflow: auto;
-            padding: 10px 0;
+            padding: 10px var(--noteInputPaddingX);
             transition: border var(--transitionTime);
             white-space: pre-wrap;
 

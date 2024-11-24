@@ -110,7 +110,7 @@ export default forwardRef(function Confirm(
                 {message}
             </div>
 
-            <Flex className="Confirm-footer" horizontalAlign="center">
+            <Flex className="Confirm-footer" horizontalAlign="right">
                 {/* Cancel */}
                 <Button 
                     className="Confirm-footer-cancelButton hover" 
