@@ -7,6 +7,7 @@ import { INVALID_INPUT_CLASS_NAME } from '../../helpers/constants';
 import { isBlank, isBooleanFalsy, log } from '../../helpers/utils';
 import Flex from './Flex';
 import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
+import Button from "./Button";
 
 interface Props extends HelperProps {
     /** Default is "" */
@@ -68,11 +69,15 @@ export default forwardRef(function TextInput(
     ref: Ref<HTMLInputElement>
 ) {
     const [invalidMessage, setInvalidMessage] = useState("_"); // always needs some non-blank value
+
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
         
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, 'TextInput');
 
     const inputRef = useRef<HTMLInputElement>(null);
     const floatingLabelRef = useRef(null);
+
+    // state is password visible
 
 
     useImperativeHandle(ref, () => inputRef.current!, []);
@@ -178,6 +183,15 @@ export default forwardRef(function TextInput(
     }
 
 
+    function getInputType(): "text" | "password" | "email" {
+
+        if (type !== "password")
+            return type;
+
+        return isPasswordVisible ? "text" : "password";
+    }
+    
+
     return (
         <Flex
             id={id}
@@ -198,7 +212,7 @@ export default forwardRef(function TextInput(
                 <input
                     className="textInput"
                     disabled={disabled}
-                    type={type}
+                    type={getInputType()}
                     defaultValue={defaultValue}
                     name={name}
                     title={title}
@@ -211,6 +225,20 @@ export default forwardRef(function TextInput(
                     onKeyDownCapture={onKeyDownCapture}
                     onKeyUp={onKeyUp}
                 />
+
+                {/* Show password button */}
+                <Button 
+                    className="TextInput-showPasswordButton"
+                    rendered={type === "password"} 
+                    title={(isPasswordVisible ? "Hide" : "Show") + " password"}
+                    onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                >
+                    {
+                        isPasswordVisible ? 
+                            <i className="fa-regular fa-eye-slash"></i>:
+                            <i className="fa-regular fa-eye"></i> 
+                    }
+                </Button>
 
                 <div className="textInputErrorMessage">{invalidMessage}</div>
             </div>

@@ -54,36 +54,36 @@ export default function Register({isPopupContent = false, ...props}: Props) {
     const inputValidationWrappers: Record<InputName, InputValidationWrapper[]> = {
         email: [
             {
-                predicate: () => !isBlank(email),
+                predicate: (email) => !isBlank(email),
                 errorMessage: "Please put in your E-Mail",
                 validateOnChange: true
             },
             {
-                predicate: () => email.match(EMAIL_REGEX) !== null,
+                predicate: (email) => email.match(EMAIL_REGEX) !== null,
                 errorMessage: "Please put in a valid E-Mail",
                 validateOnChange: false
             }
         ],
         password: [
             {
-                predicate: () => !isBlank(password),
+                predicate: (password) => !isBlank(password),
                 errorMessage: "Please set a password",
                 validateOnChange: true
             },
             {
-                predicate: () => password.match(PASSWORD_REGEX) !== null,
+                predicate: (password) => password.match(PASSWORD_REGEX) !== null,
                 errorMessage: "Please set a password that complies with the requirements below (*)",
                 validateOnChange: false
             }
         ],
         repeatPassword: [
             {
-                predicate: () => !isBlank(repeatPassword),
+                predicate: (repeatPassword) => !isBlank(repeatPassword),
                 errorMessage: "Please repeat your password",
                 validateOnChange: true
             },
             {
-                predicate: () => repeatPassword === password,
+                predicate: (repeatPassword) => repeatPassword === password,
                 errorMessage: "Password inputs must match exactly",
                 validateOnChange: false
             }
@@ -148,7 +148,7 @@ export default function Register({isPopupContent = false, ...props}: Props) {
 
     function isFormValid(): boolean {
 
-        return isInputValidationWrapperRecordValid(inputValidationWrappers);
+        return isInputValidationWrapperRecordValid(inputValidationWrappers, [email, password, repeatPassword]);
     }
 
 

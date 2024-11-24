@@ -39,12 +39,12 @@ export default function ResendConfirmationEmail({isParentPopupContent, ...props}
     const inputValidationWrappers: Record<InputName, InputValidationWrapper[]> = {
         email: [
             {
-                predicate: () => !isBlank(email),
+                predicate: (email) => !isBlank(email),
                 errorMessage: "Please put in your E-Mail",
                 validateOnChange: true,
             },
             {
-                predicate: () => email.match(EMAIL_REGEX) !== null,
+                predicate: (email) => email.match(EMAIL_REGEX) !== null,
                 errorMessage: "Please put in a valid E-Mail",
                 validateOnChange: false
             }
@@ -138,7 +138,7 @@ export default function ResendConfirmationEmail({isParentPopupContent, ...props}
 
     function isFormValid(): boolean {
 
-        return isInputValidationWrapperRecordValid(inputValidationWrappers);
+        return isInputValidationWrapperRecordValid(inputValidationWrappers, [email]);
     }
 
 

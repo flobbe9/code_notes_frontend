@@ -48,14 +48,14 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     const inputValidationWrappers: Record<InputName, InputValidationWrapper[]> = {
         email: [
             {
-                predicate: () => !isBlank(email),
+                predicate: (email) => !isBlank(email),
                 errorMessage: "Please put in your E-Mail",
                 validateOnChange: true,
             }
         ],
         password: [
             {
-                predicate: () => !isBlank(password),
+                predicate: (password) => !isBlank(password),
                 errorMessage: "Please set a password",
                 validateOnChange: true
             }
@@ -164,7 +164,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
 
     function isFormValid(): boolean {
 
-        return isInputValidationWrapperRecordValid(inputValidationWrappers);
+        return isInputValidationWrapperRecordValid(inputValidationWrappers, [email, password]);
     }
 
 
