@@ -1,13 +1,19 @@
-.NavBarProfileSection {
-    #ButtonRegister {
-        background-color: transparent;
-        border: 1px solid white;
-        border-radius: 5px;
+@import "../styles/global/functions.scss";
 
-        &:hover {
-            a#Register {
+
+.NavBarProfileSection {
+    &-registerLink {
+        @include customHover {
+            .NavBarProfileSection-registerLink-button {
                 color: black !important;
             }
+        }
+
+        &-button {
+            background-color: transparent;
+            border: 1px solid white;
+            border-radius: 5px;
+            color: white;
         }
     }
 }

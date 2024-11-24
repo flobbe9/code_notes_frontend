@@ -4,7 +4,7 @@ import { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import HelperProps from '../../abstract/HelperProps';
 import '../../assets/styles/TextInput.scss';
 import { INVALID_INPUT_CLASS_NAME } from '../../helpers/constants';
-import { isBlank, isBooleanFalsy } from '../../helpers/utils';
+import { isBlank, isBooleanFalsy, log } from '../../helpers/utils';
 import Flex from './Flex';
 import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
 
@@ -89,9 +89,11 @@ export default forwardRef(function TextInput(
 
 
     function handleChange(event: any): void {
-        if (disabled) return;
+        if (disabled) 
+            return;
 
-        if (onChange) onChange(event);
+        if (onChange) 
+            onChange(event);
 
         updateFloatingLabel();
 

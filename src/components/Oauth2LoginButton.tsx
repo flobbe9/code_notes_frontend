@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLAttributeAnchorTarget } from "react";
 import "../assets/styles/Oauth2LoginButton.scss";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";
@@ -14,7 +14,8 @@ interface Props extends HelperProps {
     iconSrc?: string,
     /** Default is 30 */
     iconHeight?: number,
-    clientRegistrationId: Oauth2ClientRegistrationId
+    clientRegistrationId: Oauth2ClientRegistrationId,
+    target?: HTMLAttributeAnchorTarget
 }
 
 
@@ -23,6 +24,7 @@ interface Props extends HelperProps {
  */
 export default function Oauth2LoginButton({
     iconSrc,
+    target,
     iconHeight = 30,
     clientRegistrationId,
     ...props
@@ -55,6 +57,7 @@ export default function Oauth2LoginButton({
                 className="Oauth2LoginButton-link blackLink fullWidth"
                 to={getLink()}
                 tabIndex={-1}
+                target={target}
             >
                 <Flex flexWrap="nowrap" verticalAlign="center">
                     <img 

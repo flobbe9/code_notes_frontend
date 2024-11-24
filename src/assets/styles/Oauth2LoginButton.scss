@@ -2,9 +2,11 @@
 
 .Oauth2LoginButton {
     background-color: var(--bs-gray-200); // default button background
+    padding: 0;
     width: 100%;
 
     &-link {
+        padding: 10px 15px;
         position: relative;
 
         &-icon {

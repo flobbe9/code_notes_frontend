@@ -1,0 +1,21 @@
+@import "./global/functions.scss";
+
+
+.ResendConfirmationEmail {
+
+    &-emailInput {
+        width: 100%;
+
+        .textInput {
+            width: 100%;
+
+            @include customFocus {
+                border-color: var(--accentColor);
+            }
+        }
+    }
+
+    &-submitButton {
+        @include buttonContained();
+    }
+}

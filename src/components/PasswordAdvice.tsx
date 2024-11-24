@@ -13,7 +13,9 @@ import { AppContext } from "./App";
 interface Props extends HelperProps {
 
     /** The password user input to validate */
-    password: string
+    password: string,
+    /** Forces the mobile view even if is desktop width. Default is false  */
+    useMobileView?: boolean
 }
 
 
@@ -24,7 +26,7 @@ interface Props extends HelperProps {
  * 
  * @since 0.0.1
  */
-export default function PasswordAdvice({password, ...props}: Props) {
+export default function PasswordAdvice({password, useMobileView = false, ...props}: Props) {
 
     const [hasUpperCaseLetter, setHasUpperCaseLetter] = useState(false);
     const [hasLowerCaseLetter, setHasLowerCaseLetter] = useState(false);
@@ -111,7 +113,10 @@ export default function PasswordAdvice({password, ...props}: Props) {
         <HelperDiv 
             id={id} 
             className={className}
-            style={style}
+            style={{
+                position: (isDesktopWidth && !useMobileView) ? "absolute" : undefined,
+                ...style
+            }}
             ref={componentRef}
             {...otherProps}
         >
@@ -120,7 +125,7 @@ export default function PasswordAdvice({password, ...props}: Props) {
                 className="PasswordAdvice-desktopWidth" 
                 flexWrap="nowrap" 
                 verticalAlign="center"
-                rendered={isDesktopWidth}
+                rendered={isDesktopWidth && !useMobileView}
             >
                 <div className="PasswordAdvice-desktopWidth-contentContainer">
                     <div>Password must contain at least:</div>
@@ -148,7 +153,7 @@ export default function PasswordAdvice({password, ...props}: Props) {
             </Flex>
 
             {/* Tablet / Mobile */}
-            <HelperDiv className="PasswordAdvice-nonDesktopWidth" rendered={!isDesktopWidth}>
+            <HelperDiv className="PasswordAdvice-nonDesktopWidth" rendered={!isDesktopWidth || useMobileView}>
                 <div>* Password needs to contain at least</div> 
                 <ul className="PasswordAdvice-nonDesktopWidth-contentContainer-regexList">
                     <li className={`PasswordAdvice-regexList-item ${hasUpperCaseLetter ? "validRegex" : "invalidRegex"}`}>

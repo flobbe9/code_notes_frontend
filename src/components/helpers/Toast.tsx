@@ -1,9 +1,9 @@
-import $ from "jquery";
 import React, { forwardRef, LegacyRef, useContext } from "react";
-import "../../assets/styles/Toast.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import Flex from "./Flex";
+import "../../assets/styles/Toast.scss";
+import { isBlank } from "../../helpers/utils";
 import { AppContext } from "../App";
+import Flex from "./Flex";
 
 
 interface Props extends DefaultProps {
@@ -35,7 +35,7 @@ export default forwardRef(function Toast({summary, message = "", sevirity = "inf
             {...otherProps}
         >
             <div className={"textContainer " + sevirity}>
-                <div className="summary">
+                <div className={`summary ${isBlank(message) ? '' : 'mb-3'}`}>
                     <Flex>
                         <div className="col-10"><strong>{summary}</strong></div>
                         <span className="col-2 textRight hover" onClick={() => moveToast(true)}>

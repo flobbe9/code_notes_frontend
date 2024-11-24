@@ -1,9 +1,9 @@
 .Toast {
     bottom: -1000px;
     left: 30px;
-    max-width: 300px;
+    max-width: 400px;
     position: fixed;
-    z-index: var(--zIndexToast);
+    z-index: var(--toastZindex);
 
     h3, h4, h5 {
         margin: 0 0 10px 0;
@@ -12,7 +12,7 @@
     .textContainer {
         border-radius: var(--borderRadius);
         color: white;
-        width: 250px;
+        min-width: 250px;
         padding: 10px;
     }
 

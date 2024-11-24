@@ -90,17 +90,13 @@
     }
 }
 
-@mixin scrollBar($size: 3px, $hoverSize: 7px) {
-    &:hover {
-        &::-webkit-scrollbar {
-            height: $hoverSize;
-            width: $hoverSize;
-        }
-    }
-    
+@mixin scrollBar($size: 3px, $hoverWidth: 7px) {
     &::-webkit-scrollbar {
-        height: $size;
         width: $size;
+
+        @include customHover {
+            width: $hoverWidth;
+        }
     }
 
     &::-webkit-scrollbar-track {
@@ -110,12 +106,12 @@
     &::-webkit-scrollbar-thumb {
         background: #888; 
         border-radius: 10px;
+
+        &:hover {
+            background: #555; 
+            cursor: default;
+        }
     }
-    
-    &::-webkit-scrollbar-thumb:hover {
-        background: #555; 
-        cursor: default;
-    } 
 }
 
 @mixin focusOutline($color: currentColor) {
@@ -150,4 +146,26 @@
     align-items: center;
     display: flex;
     justify-content: center;
+}
+
+@mixin buttonOutline($color, $hoverColor: white) {
+    background-color: $hoverColor;
+    border: 1px solid $color;
+    color: $color;
+    transition: var(--transitionTime);
+
+    @include customHover {
+        background-color: $color;
+        border-color: $hoverColor;
+        color: $hoverColor;
+    }
+}
+
+
+@mixin buttonContained($color: white, $hoverColor: var(--matteBlueLight)) {
+    background-color: $hoverColor;
+    color: $color;
+    
+    @include hover();
+    @include buttonFocus(var(--accentColor));
 }

@@ -29,11 +29,15 @@ export const OAUTH2_AUTH_LINK_AZURE = `${OAUTH2_AUTH_LINK}/azure`;
 export const OAUTH2_AUTH_LINK_GITHUB = `${OAUTH2_AUTH_LINK}/github`;
 /** The url query param the csrf token value will be assigned to. */
 export const CSRF_TOKEN_QUERY_PARAM = process.env.REACT_APP_CSRF_TOKEN_QUERY_PARAM as string;
+/** The url query param key used for redirect after successful or unsucessful account confirmation. Also hard coded in "AppUserController.java" */
+export const CONFIRM_ACCOUNT_STATUS_PARAM = "confirm-account-status-code";
 
 
 // Other
 /** Time the noteInput settings slide animation takes (in ms). */
 export const BLOCK_SETTINGS_ANIMATION_DURATION = 150;
+/** In ms. See ```<Popup>``` */
+export const POPUP_FADE_DURATION = 200;
 export const INVALID_INPUT_CLASS_NAME = "invalidInput";
 export const MAX_TAG_INPUT_VALUE_LENGTH = 50;
 export const MAX_NOTE_TITLE_VALUE_LENGTH = 255;
@@ -42,6 +46,8 @@ export const CSRF_TOKEN_HEADER_NAME = "X-CSRF-TOKEN";
 export const DEFAULT_ERROR_MESSAGE = "An unexpected error occurred. Please copy your unsaved contents and refresh the page.";
 export const PASSWORD_REGEX = new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[.,;_!#$%&@€*+=?´`"'\\/{|}()~^-])(.{8,72})$/, "g");
 export const EMAIL_REGEX = new RegExp(/^[\w\-.]+@([\w-]+.)+[\w-]{2,4}$/, "g");
+/** Also hard coded in "ConfirmationToken.java" */
+export const HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES = 12;
 
 /**
  * Get the text for the ```<title>```.

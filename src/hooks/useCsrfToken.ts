@@ -3,7 +3,7 @@ import { useContext, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppFetchContext } from "../components/AppFetchContextHolder";
 import { CSRF_TOKEN_QUERY_PARAM } from "../helpers/constants";
-import { getCsrfToken, removeFromBrowserHistory, setCsrfToken } from "../helpers/utils";
+import { getCsrfToken, replaceCurrentBrowserHistoryEntry, setCsrfToken } from "../helpers/utils";
 
 
 /**
@@ -63,7 +63,7 @@ export function useCsrfToken() {
         navigate(window.location.pathname);
 
         // remove last history entry (that is then one with the csrf token)
-        removeFromBrowserHistory();
+        replaceCurrentBrowserHistoryEntry();
 
         return csrfToken;
     }

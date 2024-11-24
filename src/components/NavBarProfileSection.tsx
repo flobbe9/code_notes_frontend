@@ -75,16 +75,15 @@ export default function NavBarProfileSection({...props}: Props) {
 
                 <HelperDiv rendered={!isMobileWidth}>
                     {/* Register */}
-                    <Button 
-                        id="Register" 
-                        className="me-4 transition" 
-                        tabIndex={-1}
-                        _hover={{backgroundColor: "white"}} 
-                    >
-                        <Link to="/register" id="Register" className="whiteLink">
+                    <Link to="/register" className="NavBarProfileSection-registerLink me-4">
+                        <Button 
+                            className="NavBarProfileSection-registerLink-button transition" 
+                            tabIndex={-1}
+                            _hover={{backgroundColor: "white"}} 
+                        >
                             Create Account
-                        </Link>
-                    </Button>
+                        </Button>
+                    </Link>
 
                     {/* Login */}
                     <Link to="/login" className="whiteLink hover dontSelectText">Login</Link>

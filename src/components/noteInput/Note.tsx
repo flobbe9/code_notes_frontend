@@ -167,7 +167,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         // );
 
         showPopup(
-            <Login />
+            <Login isPopupContent />
         )
     }
 

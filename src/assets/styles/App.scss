@@ -16,6 +16,12 @@
     min-height: 101vh;
     position: relative;
 
+    * {
+        @include selectText {
+            background-color: var(--accentColor);
+        }
+    }
+
     .content {
         padding-bottom: calc(var(--footerHeight));
     }

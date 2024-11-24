@@ -15,6 +15,7 @@ import Hr from "./helpers/Hr";
 import TextInput from "./helpers/TextInput";
 import Oauth2LoginButton from "./Oauth2LoginButton";
 import Register from "./Register";
+import ResendConfirmationEmail from "./ResendConfirmationEmail";
 
 
 interface Props extends DefaultProps {
@@ -231,6 +232,12 @@ export default function Login({isPopupContent = false, ...props}: Props) {
         replaceCurrentBrowserHistoryEntry();
         navigate(window.location.pathname);
     }
+    
+    
+    function showResendConfirmationEmailPopup(event: MouseEvent): void {
+
+        showPopup(<ResendConfirmationEmail isParentPopupContent={isPopupContent} />);
+    }
 
 
     return (
@@ -286,18 +293,26 @@ export default function Login({isPopupContent = false, ...props}: Props) {
                     {/* TODO */}
                     
                     {/* Resend email */}
-                    <div className="Register-contentContainer-formContainer-linkContainer textCenter mb-5">
-                        Already registered but didn't get a confirmation E-Mail?&nbsp;
-                        <span className="hover Register-contentContainer-formContainer-linkContainer-link">Resend confirmation email</span>
+                    <div className="Login-contentContainer-formContainer-linkContainer textCenter mb-5">
+                        Didn't get a confirmation E-Mail? <br />
+                        <Button 
+                            className="hover Login-contentContainer-formContainer-linkContainer-linkButton"
+                            onClick={showResendConfirmationEmailPopup}
+                        >
+                            Resend confirmation email
+                        </Button>                    
                     </div>
 
                     {/* Register */}
-                    <Button className="Login-contentContainer-formContainer-createAccountButton mb-2" onClick={handleRegisterClick}>
+                    <Button 
+                        className="Login-contentContainer-formContainer-createAccountButton mb-2" 
+                        tabIndex={-1}
+                    >
                         <Link 
                             to={isPopupContent ? "" : REGISTER_PATH} 
                             className="Login-contentContainer-formContainer-createAccountButton-link simpleLink"
                             title="Create account"
-                            tabIndex={-1}
+                            onClick={handleRegisterClick}
                         >
                             Create account
                         </Link>

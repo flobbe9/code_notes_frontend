@@ -47,7 +47,7 @@ export default function PlainTextNoteInput({
         isFullScreen
     } = useContext(DefaultNoteInputContext);
 
-    const inputDivRef = useRef(null);
+    const inputDivRef = useRef<HTMLDivElement>(null);
 
     
     useInitialStyles(inputDivJQuery, [["max-width", "width"]], 100);
@@ -251,22 +251,7 @@ export default function PlainTextNoteInput({
 
         animateCopyIcon();
 
-        setClipboardText(getInputDivValueWithoutAnyHightlights());
-    }
-
-
-    /**
-     * @returns the input div's inner html without the ```<code>``` or ``` highlights.
-     */
-    function getInputDivValueWithoutAnyHightlights(): string {
-
-        const inputDiv = $(inputDivRef.current!);
-        let inputDivHtml = inputDiv.html();
-
-        inputDivHtml = inputDivHtml.replaceAll("<code>", "");
-        inputDivHtml = inputDivHtml.replaceAll("</code>", "");
-
-        return inputDivHtml;
+        setClipboardText(inputDivRef.current!.textContent || "");
     }
 
 

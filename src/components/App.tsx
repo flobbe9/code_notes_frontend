@@ -3,7 +3,7 @@ import React, { createContext, ReactNode, useEffect, useRef, useState } from 're
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
 import { LOGIN_PATH, REGISTER_PATH } from "../helpers/constants";
-import { getCssConstant, getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
+import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, log, logDebug } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
 import Footer from "./Footer";

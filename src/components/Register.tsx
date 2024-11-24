@@ -28,7 +28,7 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-export default function Register({isPopupContent, ...props}: Props) {
+export default function Register({isPopupContent = false, ...props}: Props) {
     
     const [email, setEmail] = useState<string>("");
     const [triggerEmailValidation, setTriggerEmailValidation] = useState<boolean | undefined>(undefined);
@@ -189,8 +189,7 @@ export default function Register({isPopupContent, ...props}: Props) {
 
     function showResendConfirmationEmailPopup(event: MouseEvent): void {
 
-        if (isPopupContent) 
-            showPopup(<ResendConfirmationEmail />);
+        showPopup(<ResendConfirmationEmail isParentPopupContent={isPopupContent} />);
     }
 
 
@@ -282,12 +281,15 @@ export default function Register({isPopupContent, ...props}: Props) {
                     </div>
                     
                     {/* Login */}
-                    <Button className="Register-contentContainer-formContainer-loginButton mb-2" onClick={handleLoginClick}>
+                    <Button 
+                        className="Register-contentContainer-formContainer-loginButton mb-2" 
+                        tabIndex={-1}
+                    >
                         <Link 
                             to={isPopupContent ? "" : LOGIN_PATH} 
                             className="Register-contentContainer-formContainer-loginButton-link simpleLink"
                             title="Login"
-                            tabIndex={-1}
+                            onClick={handleLoginClick}
                         >
                             Login
                         </Link>

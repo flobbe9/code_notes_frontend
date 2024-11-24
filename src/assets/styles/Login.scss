@@ -41,6 +41,15 @@
                 
             }
             
+            &-linkContainer {
+                font-size: .9em;
+
+                &-linkButton {
+                    padding: 2px;
+                    text-decoration: underline;
+                }
+            }
+            
             &-createAccountButton {
                 padding: 0;
                 width: 100%;

@@ -158,7 +158,6 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
         if (!tagElements?.length)
             return false;
 
-        log(getTagElementIndex(propsKey), tagElements.length)
         return getTagElementIndex(propsKey) < tagElements.length - 1;
     }
 

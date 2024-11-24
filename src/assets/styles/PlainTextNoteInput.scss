@@ -22,10 +22,6 @@
         padding: 8px 0;
         white-space: pre-wrap;
 
-        &:has(code) {
-            padding: 0;
-        }
-
         @include scrollBar();
 
         &:focus {

@@ -1,5 +1,5 @@
 import $ from "jquery";
-import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { CSSProperties, forwardRef, MouseEvent, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { ButtonType } from "../../abstract/CSSTypes";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
@@ -18,7 +18,7 @@ interface Props extends HelperProps {
      * Button will be disabled and show "spinner" while awaiting the promise. 
      * Remember to set this button's color explicitly for the "spinner" to match children's color.
      */
-    onClickPromise?: (event?) => Promise<any>,
+    onClickPromise?: (event?: MouseEvent) => Promise<any>,
     /** Styles on click */
     _click?: CSSProperties,
 }
@@ -61,7 +61,7 @@ export default forwardRef(function Button({
 
     
     // set min width for promise buttons
-    useInitialStyles(componentJQuery, (onClickPromise ? [["min-width", "font-size"]] : []), 200);
+    useInitialStyles(componentJQuery, (onClickPromise ? [["min-width", "width"], ["min-height", "height"]] : []), 200);
 
 
     useEffect(() => {
