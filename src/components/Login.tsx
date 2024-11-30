@@ -15,7 +15,8 @@ import Hr from "./helpers/Hr";
 import TextInput from "./helpers/TextInput";
 import Oauth2LoginButton from "./Oauth2LoginButton";
 import Register from "./Register";
-import ResendConfirmationEmail from "./ResendConfirmationEmail";
+import ResendConfirmationMail from "./ResendConfirmationMail";
+import SendPasswordResetMail from "./SendPasswordResetMail";
 
 
 interface Props extends DefaultProps {
@@ -234,9 +235,15 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     }
     
     
-    function showResendConfirmationEmailPopup(event: MouseEvent): void {
+    function showResendConfirmationMailPopup(event: MouseEvent): void {
 
-        showPopup(<ResendConfirmationEmail isParentPopupContent={isPopupContent} />);
+        showPopup(<ResendConfirmationMail isParentPopupContent={isPopupContent} />);
+    }
+
+        
+    function showSendPasswordResetMailPopup(event: MouseEvent): void {
+
+        showPopup(<SendPasswordResetMail isParentPopupContent={isPopupContent} />);
     }
 
 
@@ -292,15 +299,28 @@ export default function Login({isPopupContent = false, ...props}: Props) {
                     {/* Reset Password */}
                     {/* TODO */}
                     
-                    {/* Resend email */}
                     <div className="Login-contentContainer-formContainer-linkContainer textCenter mb-5">
-                        Didn't get a confirmation E-Mail? <br />
-                        <Button 
-                            className="hover Login-contentContainer-formContainer-linkContainer-linkButton"
-                            onClick={showResendConfirmationEmailPopup}
-                        >
-                            Resend confirmation email
-                        </Button>                    
+                        {/* Send reset-password mail */}
+                        <div>
+                            <Button 
+                                className="hover Login-contentContainer-formContainer-linkContainer-linkButton mb-3"
+                                onClick={showSendPasswordResetMailPopup}
+                            >
+                                Forgot my password
+                            </Button> 
+                        </div>
+
+                        {/* Resend email */}
+                        <div>
+                            Didn't get the confirmation E-Mail? <br />
+
+                            <Button 
+                                className="hover Login-contentContainer-formContainer-linkContainer-linkButton"
+                                onClick={showResendConfirmationMailPopup}
+                            >
+                                Resend confirmation email
+                            </Button>       
+                        </div>                 
                     </div>
 
                     {/* Register */}

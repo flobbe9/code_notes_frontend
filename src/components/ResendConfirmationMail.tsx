@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
-import "../assets/styles/ResendConfirmationEmail.scss";
+import "../assets/styles/ResendConfirmationMail.scss";
 import { BACKEND_BASE_URL, EMAIL_REGEX, LOGIN_PATH, POPUP_FADE_DURATION } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { isBlank } from "../helpers/utils";
@@ -22,7 +22,7 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-export default function ResendConfirmationEmail({isParentPopupContent, ...props}: Props) {
+export default function ResendConfirmationMail({isParentPopupContent, ...props}: Props) {
 
     const [email, setEmail] = useState("");
     const [triggerEmailValidation, setTriggerEmailValidation] = useState<boolean | undefined>(undefined);
@@ -34,7 +34,7 @@ export default function ResendConfirmationEmail({isParentPopupContent, ...props}
 
     const navigate = useNavigate();
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ResendConfirmationEmail", true);
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ResendConfirmationMail", true);
     type InputName = "email";
     const inputValidationWrappers: Record<InputName, InputValidationWrapper[]> = {
         email: [
@@ -75,8 +75,7 @@ export default function ResendConfirmationEmail({isParentPopupContent, ...props}
         handleFormSubmitSuccess(jsonResponse);
     }
 
-    // TODO: continue here
-        // see TODOs in notes and BUGs
+
     function handleFormSubmitError(jsonResponse: CustomExceptionFormat): void {
 
         // should not happen
@@ -99,19 +98,16 @@ export default function ResendConfirmationEmail({isParentPopupContent, ...props}
         }
     }
 
+
     function handleFormSubmitSuccess(jsonResponse: Response): void {
 
         switch (jsonResponse.status) {
-            case 200: 
-                toast("Mail resent", "We've resent the confirmation mail. Please check the junk folder as well.", "success", 4000);
-                break;
-
             case 202:
                 toast("Already confirmed", "Your account already has been confirmed. Nothing else to be done, you can continue by logging in.", "success");
                 break;
 
             default:
-                toast("Mail resent", "We've resent the confirmation mail. Please check the junk folder as well.", "success", 4000);
+                toast("Mail resent", "We've resent the confirmation mail. Please check the junk folder as well.", "success", 8000);
         }
 
         hidePopup();
@@ -174,7 +170,7 @@ export default function ResendConfirmationEmail({isParentPopupContent, ...props}
             <h4 className="mb-4">Resend confirmation E-Mail</h4>
 
             <TextInput
-                className="ResendConfirmationEmail-emailInput mb-3"
+                className="ResendConfirmationMail-emailInput mb-3"
                 placeholder="E-Mail"
                 type="email"
                 inputValidationWrappers={inputValidationWrappers.email}
@@ -185,7 +181,7 @@ export default function ResendConfirmationEmail({isParentPopupContent, ...props}
             />
 
             <Button
-                className="ResendConfirmationEmail-submitButton fullWidth textCenter"
+                className="ResendConfirmationMail-submitButton fullWidth textCenter"
                 type="submit"
                 title="Resend"
                 ref={submitButtonRef}
