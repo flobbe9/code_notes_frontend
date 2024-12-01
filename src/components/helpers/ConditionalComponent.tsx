@@ -1,11 +1,12 @@
 import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { START_PAGE_PATH } from "../../helpers/constants";
+import { isBlank, isPathRelative, replaceCurrentBrowserHistoryEntry } from "../../helpers/utils";
 
 
 interface Props {
     condition: boolean,
     element: ReactNode
+    /** Relative path to redirect to if ```condition``` is ```false``` */
     redirectPath?: string
 }
 
@@ -13,14 +14,22 @@ interface Props {
 /**
  * Render given ```element``` or redirect if ```condition``` is not ```true```.
  * 
+ * Will go back to last page by default or redirect to given ```redirectPath``` if not blank.
+ * 
  * @since 0.0.1
  */
-export default function ConditionalComponent({condition, element, redirectPath = START_PAGE_PATH}: Props) {
+export default function ConditionalComponent({condition, element, redirectPath}: Props) {
 
     const navigate = useNavigate();
 
     if (!condition) {
-        navigate(redirectPath);
+        if (!isBlank(redirectPath) && isPathRelative(redirectPath)) {
+            replaceCurrentBrowserHistoryEntry(redirectPath);
+            navigate(redirectPath!);
+
+        } else 
+            window.history.back();
+
         return;
     }
 

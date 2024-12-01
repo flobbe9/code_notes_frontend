@@ -1,11 +1,5 @@
 @import "./global/functions.scss";
 
-:root {
-    // set on render
-    --registerPasswordAdviceWidth: 0px;
-}
-
-
 .Register {
     $paddingX: 10px;
 
@@ -22,7 +16,7 @@
                 .PasswordAdvice {
                     font-size: .8em;
                     // position on the left of password input
-                    left: calc(-1 * var(--registerPasswordAdviceWidth) - calc(var(--passwordAdviceArrowBoxSize) / 2) - 10px);
+                    left: calc(-1 * var(--passwordAdviceWidth) - calc(var(--passwordAdviceArrowBoxSize) / 2) - 10px);
                     top: -51px;
 
                     &-nonDesktopWidth {

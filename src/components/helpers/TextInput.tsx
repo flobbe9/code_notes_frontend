@@ -231,6 +231,7 @@ export default forwardRef(function TextInput(
                     className="TextInput-showPasswordButton"
                     rendered={type === "password"} 
                     title={(isPasswordVisible ? "Hide" : "Show") + " password"}
+                    tabIndex={-1}
                     onClick={() => setIsPasswordVisible(!isPasswordVisible)}
                 >
                     {

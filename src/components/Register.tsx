@@ -16,7 +16,6 @@ import Login from "./Login";
 import Oauth2LoginButton from "./Oauth2LoginButton";
 import PasswordAdvice from "./PasswordAdvice";
 import ResendConfirmationMail from "./ResendConfirmationMail";
-import SendPasswordResetMail from "./SendPasswordResetMail";
 
 
 interface Props extends DefaultProps {
@@ -73,7 +72,7 @@ export default function Register({isPopupContent = false, ...props}: Props) {
             },
             {
                 predicate: (password) => password.match(PASSWORD_REGEX) !== null,
-                errorMessage: "Please set a password that complies with the requirements below (*)",
+                errorMessage: "Please set a password that complies with the requirements (*)",
                 validateOnChange: false
             }
         ],
@@ -192,13 +191,6 @@ export default function Register({isPopupContent = false, ...props}: Props) {
 
         showPopup(<ResendConfirmationMail isParentPopupContent={isPopupContent} />);
     }
-    
-        
-    function showSendPasswordResetMailPopup(event: MouseEvent): void {
-
-        showPopup(<SendPasswordResetMail isParentPopupContent={isPopupContent} />);
-    }
-
 
     return (
         <Flex 
@@ -278,16 +270,6 @@ export default function Register({isPopupContent = false, ...props}: Props) {
 
                     {/* Resend email */}
                     <div className="Register-contentContainer-formContainer-linkContainer textCenter mb-5">
-                        {/* Send reset-password mail */}
-                        <div>
-                            <Button 
-                                className="hover Login-contentContainer-formContainer-linkContainer-linkButton mb-3"
-                                onClick={showSendPasswordResetMailPopup}
-                            >
-                                Forgot my password
-                            </Button> 
-                        </div>
-
                         {/* Resend email */}
                         <div>
                             Didn't get the confirmation E-Mail? <br />

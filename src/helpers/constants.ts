@@ -6,6 +6,7 @@ import { isBlank } from "./utils";
 // App
 export const ENV: Env = process.env.NODE_ENV as Env;
 export const PROTOCOL = process.env.REACT_APP_PROTOCOL + "";
+export const HOST = process.env.REACT_APP_HOST + "";
 export const VERSION = process.env.REACT_APP_VERSION + "";
 export const APP_NAME_PRETTY = "Code Notes";
 
@@ -21,6 +22,8 @@ export const ABOUT_PATH = "/about";
 export const DATA_POLICY_PATH = "/data-policy";
 export const LOGIN_PATH = `/login`;
 export const REGISTER_PATH = `/register`;
+export const RESET_PASSWORD_PATH = `/reset-password`;
+export const RESET_PASSWORD_BY_TOKEN_PATH = `/reset-password-by-token`;
 export const LOGOUT_URL = `${BACKEND_BASE_URL}/logout`;
 /** The link that will trigger the oauth2 flow. This link is useless without the provider name appended. E.g. append "/google" */
 const OAUTH2_AUTH_LINK = `${BACKEND_BASE_URL}/oauth2/authorization`;
@@ -28,9 +31,12 @@ export const OAUTH2_AUTH_LINK_GOOGLE = `${OAUTH2_AUTH_LINK}/google`;
 export const OAUTH2_AUTH_LINK_AZURE = `${OAUTH2_AUTH_LINK}/azure`;
 export const OAUTH2_AUTH_LINK_GITHUB = `${OAUTH2_AUTH_LINK}/github`;
 /** The url query param the csrf token value will be assigned to. */
-export const CSRF_TOKEN_QUERY_PARAM = process.env.REACT_APP_CSRF_TOKEN_QUERY_PARAM as string;
+export const CSRF_TOKEN_URL_QUERY_PARAM = "csrf";
 /** The url query param key used for redirect after successful or unsucessful account confirmation. Also hard coded in "AppUserController.java" */
-export const CONFIRM_ACCOUNT_STATUS_PARAM = "confirm-account-status-code";
+export const CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM = "confirm-account-status-code";
+/** Also hard coded in "Utils.java" */
+export const RESET_PASSWORD_TOKEN_URL_QUERY_PARAM = "token";
+export const RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY = "reset-password-token";
 
 
 // Other

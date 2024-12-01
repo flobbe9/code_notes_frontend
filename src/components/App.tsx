@@ -2,20 +2,22 @@ import $ from "jquery";
 import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
-import { LOGIN_PATH, REGISTER_PATH } from "../helpers/constants";
-import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, log, logDebug } from '../helpers/utils';
+import { LOGIN_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_PATH } from "../helpers/constants";
+import { getCssConstant, getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
 import Footer from "./Footer";
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
+import LoggedInComponent from "./helpers/LoggedInComponent";
 import Overlay from './helpers/Overlay';
 import Popup from './helpers/Popup';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import Login from "./Login";
 import NavBar from './NavBar';
 import Register from "./Register";
-import StartPageContainer from './StartPageContainer';
+import ResetPassword from "./ResetPassword";
 import RouteContext from "./RouteContext";
+import StartPageContainer from './StartPageContainer';
 
 
 /**
@@ -80,10 +82,6 @@ export default function App() {
         window.addEventListener("resize", handleWindowResize);
 
     }, []);
-
-
-    useEffect(() => {
-    }, [windowSize]);
 
 
     /**
@@ -384,6 +382,8 @@ export default function App() {
                                     <Route path="/" element={<StartPageContainer />} />
                                     <Route path={REGISTER_PATH} element={<Register />} />
                                     <Route path={LOGIN_PATH} element={<Login />} />
+                                    <Route path={RESET_PASSWORD_PATH} element={<LoggedInComponent element={<ResetPassword />} />} />
+                                    <Route path={RESET_PASSWORD_BY_TOKEN_PATH} element={<ResetPassword />} />
                                     <Route path="*" element={<div>404</div>} />
                                 </Routes>
                             </div>

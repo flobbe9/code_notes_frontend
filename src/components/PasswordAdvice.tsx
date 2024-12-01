@@ -105,7 +105,7 @@ export default function PasswordAdvice({password, useMobileView = false, ...prop
 
         const componentWidth = $(componentRef.current!).outerWidth() || 0;
 
-        setCssConstant("registerPasswordAdviceWidth", componentWidth + "px");
+        setCssConstant("passwordAdviceWidth", componentWidth + "px");
     }
 
 

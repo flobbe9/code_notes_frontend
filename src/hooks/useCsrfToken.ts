@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppFetchContext } from "../components/AppFetchContextHolder";
-import { CSRF_TOKEN_QUERY_PARAM } from "../helpers/constants";
+import { CSRF_TOKEN_URL_QUERY_PARAM } from "../helpers/constants";
 import { getCsrfToken, replaceCurrentBrowserHistoryEntry, setCsrfToken } from "../helpers/utils";
 
 
@@ -53,7 +53,7 @@ export function useCsrfToken() {
      */
     function getCsrfTokenFromUrl(): string | null {
 
-        const csrfToken = queryParams.get(CSRF_TOKEN_QUERY_PARAM);
+        const csrfToken = queryParams.get(CSRF_TOKEN_URL_QUERY_PARAM);
 
         // case: no csrf token in url
         if (!csrfToken) 
@@ -83,5 +83,5 @@ export function useCsrfToken() {
     }
 }
 
-/** For useQuery cache, dont confuse with ```CSRF_TOKEN_QUERY_PARAM``` :) */
+/** For useQuery cache, dont confuse with ```CSRF_TOKEN_URL_QUERY_PARAM``` :) */
 export const CSRF_TOKEN_QUERY_KEY = ["csrf"];

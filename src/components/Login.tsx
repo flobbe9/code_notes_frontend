@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
 import "../assets/styles/Login.scss";
-import { CONFIRM_ACCOUNT_STATUS_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, START_PAGE_PATH } from "../helpers/constants";
+import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { isResponseError } from "../helpers/fetchUtils";
 import { isBlank, isNumberFalsy, replaceCurrentBrowserHistoryEntry, setCsrfToken, stringToNumber } from "../helpers/utils";
 import { AppContext } from "./App";
@@ -190,7 +190,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
         if (isPopupContent)
             return;
 
-        const statusCodeString = urlQueryParams.get(CONFIRM_ACCOUNT_STATUS_PARAM);
+        const statusCodeString = urlQueryParams.get(CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM);
 
         if (!statusCodeString)
             return;

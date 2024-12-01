@@ -1,7 +1,7 @@
 import $ from "jquery";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
-import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
+import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
 import { CSSProperties } from "react";
 import parse, { Element } from "html-react-parser";
 import sanitize from "sanitize-html";
@@ -1184,7 +1184,7 @@ export function clearUserCache(): void {
 /**
  * Removes current page from browser history and replaces it with given ```path```.
  * 
- * @param path relative path to replace the current history entry with
+ * @param path relative path to replace the current history entry with. Default is the current path
  */
 export function replaceCurrentBrowserHistoryEntry(path: string = window.location.pathname): void {
 
@@ -1227,4 +1227,21 @@ export function setCsrfToken(csrfToken: string): void {
     const encryptedCsrfToken = new CryptoJSImpl().encrypt(csrfToken);
 
     queryClient.setQueryData<string>(CSRF_TOKEN_QUERY_KEY, encryptedCsrfToken);
+}
+
+
+/**
+ * Indicates whether given ```path``` is relative. Will return ```true``` if ```path``` does not look absolute.
+ * 
+ * @param path to check
+ * @returns true if given path is blank or does not start with "http", "www" or the current {@link HOST}
+ */
+export function isPathRelative(path: string | undefined | null): boolean {
+
+    if (isBlank(path))
+        return true;
+
+    return !path!.startsWith("http") &&
+            !path!.startsWith("www") && 
+            !path!.startsWith(HOST);
 }
