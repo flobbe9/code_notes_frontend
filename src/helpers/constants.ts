@@ -34,6 +34,8 @@ export const OAUTH2_AUTH_LINK_GITHUB = `${OAUTH2_AUTH_LINK}/github`;
 export const CSRF_TOKEN_URL_QUERY_PARAM = "csrf";
 /** The url query param key used for redirect after successful or unsucessful account confirmation. Also hard coded in "AppUserController.java" */
 export const CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM = "confirm-account-status-code";
+/** The url query param key that is appended to the redirect url after requesting a reset-password mail externally. Also hard coded in "AppUserController.java" */
+export const SEND_RESET_PASSWORD_MAIL_STATUS_PARAM = "send-reset-password-mail";
 /** Also hard coded in "Utils.java" */
 export const RESET_PASSWORD_TOKEN_URL_QUERY_PARAM = "token";
 export const RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY = "reset-password-token";

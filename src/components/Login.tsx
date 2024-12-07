@@ -1,12 +1,13 @@
 import $ from "jquery";
-import React, { MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { MouseEvent, useContext, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
 import "../assets/styles/Login.scss";
-import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, getHeadTitleText, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, START_PAGE_PATH } from "../helpers/constants";
+import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, getHeadTitleText, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM, START_PAGE_PATH } from "../helpers/constants";
 import { isResponseError } from "../helpers/fetchUtils";
 import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, replaceCurrentBrowserHistoryEntry, setCsrfToken, stringToNumber } from "../helpers/utils";
+import { useFormInput } from "../hooks/useFormInput";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Head from "./Head";
@@ -18,7 +19,6 @@ import Oauth2LoginButton from "./Oauth2LoginButton";
 import Register from "./Register";
 import ResendConfirmationMail from "./ResendConfirmationMail";
 import SendPasswordResetMail from "./SendPasswordResetMail";
-import { useFormInput } from "../hooks/useFormInput";
 
 
 interface Props extends DefaultProps {
@@ -82,6 +82,8 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     
     useEffect(() => {
         handleConfirmAccountRedirect();
+        handleRequestResetPasswordMailRedirect();
+        
     }, []);
 
 
@@ -239,6 +241,57 @@ export default function Login({isPopupContent = false, ...props}: Props) {
                 toast("Failed to confirm account", "An unexpected error occurred. Please resend the confirmation mail and click the 'Confirm' button in it.", "error");
         }
 
+        // clear query params from url and from history
+        replaceCurrentBrowserHistoryEntry();
+        navigate(window.location.pathname);
+    }
+
+
+    /**
+     * Handle redirect from backend to frontend, if a reset-password mail has been requested by clicking an external link.
+     */
+    function handleRequestResetPasswordMailRedirect(): void {
+
+        if (isPopupContent)
+            return;
+
+        const statusCodeString = urlQueryParams.get(SEND_RESET_PASSWORD_MAIL_STATUS_PARAM);
+
+        if (!statusCodeString)
+            return;
+
+        const statusCode = stringToNumber(statusCodeString);
+
+        // case: invalid param value, clear query params
+        if (statusCode === -1) {
+            replaceCurrentBrowserHistoryEntry();
+            navigate(window.location.pathname);
+            return;
+        }
+
+        const summary = "Request a reset password mail";
+
+        switch (statusCode) {
+            case 200: 
+                toast(summary, "We've sent you an E-Mail to reset your password. Please check the junk folder as well.", "success", 8000);
+                break;
+                
+            case 404:
+                toast(summary, "This E-Mail is not registered", "warn");
+                break;
+
+            case 409:
+                toast(summary, "This account has not been confirmed yet. Please click the 'Confirm' button in the confirmation E-Mail that we've sent you.", "error");
+                break;
+
+            case 417:
+                toast(summary, "Cannot reset the password for this account. If you have registered using a third party provider like Google or Github, please refer to their account settings instead.", "warn");
+                break;
+
+            default:
+                toast(summary, "An unexpected error has occurred. Please try again by clicking 'Forgot my password'.", "error", 8000);
+        }
+        
         // clear query params from url and from history
         replaceCurrentBrowserHistoryEntry();
         navigate(window.location.pathname);
