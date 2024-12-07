@@ -6,7 +6,7 @@ import { isBlank, isPathRelative, replaceCurrentBrowserHistoryEntry } from "../.
 interface Props {
     condition: boolean,
     element: ReactNode
-    /** Relative path to redirect to if ```condition``` is ```false``` */
+    /** Relative path to redirect to if ```condition``` is ```false```. If blank will go back one history entry (refreshing the page) */
     redirectPath?: string
 }
 

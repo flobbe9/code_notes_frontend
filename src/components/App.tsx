@@ -18,6 +18,7 @@ import Register from "./Register";
 import ResetPassword from "./ResetPassword";
 import RouteContext from "./RouteContext";
 import StartPageContainer from './StartPageContainer';
+import LoggedOutComponent from "./helpers/LoggedOutComponent";
 
 
 /**
@@ -381,7 +382,7 @@ export default function App() {
                                 <Routes>
                                     <Route path="/" element={<StartPageContainer />} />
                                     <Route path={REGISTER_PATH} element={<Register />} />
-                                    <Route path={LOGIN_PATH} element={<Login />} />
+                                    <Route path={LOGIN_PATH} element={<LoggedOutComponent element={<Login />} />} />
                                     <Route path={RESET_PASSWORD_PATH} element={<LoggedInComponent element={<ResetPassword />} />} />
                                     <Route path={RESET_PASSWORD_BY_TOKEN_PATH} element={<ResetPassword />} />
                                     <Route path="*" element={<div>404</div>} />
