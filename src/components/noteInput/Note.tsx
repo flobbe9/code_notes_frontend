@@ -132,6 +132,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     }
 
 
+    // TODO: is parsing done at this point, like with input buttons?
     async function handleSave(event): Promise<void> {
 
         // case: invalid input
