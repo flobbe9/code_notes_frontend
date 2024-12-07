@@ -97,8 +97,8 @@
         .defaultNoteInputButton {
             background-color: var(--matteBlack);
             color: var(--codeGrey);
-            padding: 0 0.7rem;
-            margin-top: .3em;
+            margin: .3em .7rem 0;
+            padding: 0 .2em;
             transition: var(--transitionTime);
 
             @include customHover {
@@ -111,14 +111,18 @@
         }
 
         .copyButton {
-            .fa-copy {
-                position: absolute;
+            .buttonContentContainer {
+                min-width: 15px;
+                
+                .fa-copy {
+                    position: absolute;
+                }
             }
         }
+    }
 
-        .fullScreenButton {
-            padding: 0 0.6rem 0 0.2rem;
-        }
+    pre {
+        position: relative;
     }
 
     .noteInputOverlay {

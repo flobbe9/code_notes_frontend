@@ -17,6 +17,7 @@ import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import Flex from "../helpers/Flex";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import NoteInputSettings from "./NoteInputSettings";
+import Overlay from "../helpers/Overlay";
 
 
 interface Props extends HelperProps {
@@ -31,9 +32,6 @@ interface Props extends HelperProps {
  * @since 0.0.1
  * 
  */
-// IDEA:
-    // switch between higlighting styles (settings)
-    // disable highlighting option (settings (?))
 export default function CodeNoteInputWithVariables({
     noteInputEntity,
     disabled,
@@ -44,8 +42,6 @@ export default function CodeNoteInputWithVariables({
     const [inputDivValue, setInputDivValue] = useState<any>()
     
     const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
-
-    const [isParsing, setIsParsing] = useState(false);
 
     const [hasComponentRendered, sethasComponentRendered] = useState(false);
 
@@ -59,7 +55,8 @@ export default function CodeNoteInputWithVariables({
 
     const { 
         codeNoteInputWithVariablesLanguage, 
-        setNoteInputOverlayVisible, 
+        isNoteInputOverlayVisible,
+        setIsNoteInputOverlayVisible, 
         areNoteInputSettingsDisabled, 
         animateCopyIcon,
         setActivateFullScreenStyles,
@@ -88,7 +85,7 @@ export default function CodeNoteInputWithVariables({
     useEffect(() => {
         handleLanguageChange();
 
-    }, [codeNoteInputWithVariablesLanguage])
+    }, [codeNoteInputWithVariablesLanguage]);
     
     
     /**
@@ -117,8 +114,7 @@ export default function CodeNoteInputWithVariables({
      */
     async function highlightInputDivContent(): Promise<string> {
 
-        setIsParsing(true);
-        setNoteInputOverlayVisible(true);
+        setIsNoteInputOverlayVisible(true);
 
         const highlightPromise = await new Promise<string>((res, rej) => {
             setTimeout(() => {
@@ -173,8 +169,7 @@ export default function CodeNoteInputWithVariables({
         
         setInputHighlighted(true);
 
-        setIsParsing(false);
-        setNoteInputOverlayVisible(false);
+        setIsNoteInputOverlayVisible(false);
 
         updateAppUserEntity();
 
@@ -256,7 +251,7 @@ export default function CodeNoteInputWithVariables({
         // result string
         let highlightedtext = "";
 
-        while(alteredText.includes(VARIABLE_INPUT_START_SEQUENCE) && alteredText.includes(VARIABLE_INPUT_END_SEQUENCE)) {
+        while (alteredText.includes(VARIABLE_INPUT_START_SEQUENCE) && alteredText.includes(VARIABLE_INPUT_END_SEQUENCE)) {
             highlightedtext += highlightAndSanitizeWithVariableInput(alteredText);
 
             alteredText = alteredText.substring(alteredText.indexOf(VARIABLE_INPUT_END_SEQUENCE) + 2);
@@ -483,7 +478,7 @@ export default function CodeNoteInputWithVariables({
     }
 
 
-    async function handleBlur(event): Promise<void> {
+    async function handleBlurCapture(event): Promise<void> {
 
         if (disabled)
             return;
@@ -667,11 +662,21 @@ export default function CodeNoteInputWithVariables({
                         onKeyDownCapture={handleKeyDownCapture}
                         onKeyUp={handleKeyUp}
                         onFocus={handleFocus}
-                        onBlur={handleBlur}
+                        onBlurCapture={handleBlurCapture}
                     >
                         { inputDivValue }
                     </ContentEditableDiv> 
                 </code>
+                
+                <Overlay 
+                    className="noteInputOverlay flexCenter" 
+                    hideOnClick={false}
+                    fadeInDuration={0}
+                    isOverlayVisible={isNoteInputOverlayVisible} 
+                    setIsOverlayVisible={setIsNoteInputOverlayVisible}
+                >
+                    <i className={"fa-solid fa-circle-notch rotating"}></i>
+                </Overlay>
             </pre>
 
             <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
@@ -703,7 +708,6 @@ export default function CodeNoteInputWithVariables({
                 <Button
                     className="defaultNoteInputButton copyButton"
                     title="Copy with variables"
-                    disabled={areNoteInputSettingsDisabled}
                     onClick={handleCopyClick}
                 >
                     <i className="fa-solid fa-copy"></i>

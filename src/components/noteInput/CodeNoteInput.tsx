@@ -120,7 +120,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
         setAreNoteInputSettingsDisabled(false);
 
-
     }, [isEditorMounted]);
 
 

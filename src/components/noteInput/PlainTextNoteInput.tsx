@@ -13,6 +13,7 @@ import Button from "../helpers/Button";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import Flex from "../helpers/Flex";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
+import Overlay from '../helpers/Overlay';
 
 
 interface Props extends HelperProps {
@@ -33,13 +34,13 @@ export default function PlainTextNoteInput({
     ...props}: Props) {
     
     const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
-    const [isParsing, setIsParsing] = useState(false);
     const [inputDivValue, setInputDivValue] = useState<any>()
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
 
     const { 
-        setNoteInputOverlayVisible, 
+        isNoteInputOverlayVisible,
+        setIsNoteInputOverlayVisible, 
         animateCopyIcon,
         setActivateFullScreenStyles,
         setDeactivateFullScreenStyles,
@@ -99,9 +100,7 @@ export default function PlainTextNoteInput({
      */
     async function parseCodeTextToCodeHtml(): Promise<string> {
 
-        // notify isParsing process has started (should not take long here)
-        setIsParsing(true);
-        setNoteInputOverlayVisible(true);
+        setIsNoteInputOverlayVisible(true);
 
         const parsedText = await new Promise<string>((res, rej) => {
             setTimeout(() => {
@@ -138,8 +137,7 @@ export default function PlainTextNoteInput({
         
         updateAppUserEntity();
         
-        setIsParsing(false);
-        setNoteInputOverlayVisible(false);
+        setIsNoteInputOverlayVisible(false);
 
         return sanitizedInputDivValue;
     }
@@ -320,17 +318,29 @@ export default function PlainTextNoteInput({
             flexWrap="nowrap"
             {...otherProps}
         >
-            <ContentEditableDiv 
-                className="plainTextInput fullWidth" 
-                spellCheck={false} 
-                ref={inputDivRef}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                onKeyDownCapture={handleKeyDownCapture}
-                onKeyUp={handleKeyUp}
-            >
-                {inputDivValue}
-            </ContentEditableDiv>
+            <pre className="inputDivContainer fullWidth">
+                <ContentEditableDiv 
+                    className="plainTextInput fullWidth" 
+                    spellCheck={false} 
+                    ref={inputDivRef}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    onKeyDownCapture={handleKeyDownCapture}
+                    onKeyUp={handleKeyUp}
+                >
+                    {inputDivValue}
+                </ContentEditableDiv>
+                                
+                <Overlay 
+                    className="noteInputOverlay flexCenter" 
+                    hideOnClick={false}
+                    fadeInDuration={0}
+                    isOverlayVisible={isNoteInputOverlayVisible} 
+                    setIsOverlayVisible={setIsNoteInputOverlayVisible}
+                >
+                    <i className={"fa-solid fa-circle-notch rotating"}></i>
+                </Overlay>
+            </pre>
 
             {/* Fullscreen */}
             <Button 
@@ -347,7 +357,6 @@ export default function PlainTextNoteInput({
             {/* Copy button */}
             <Button
                 className="defaultNoteInputButton copyButton"
-                disabled={isParsing}
                 title="Copy"
                 onClick={handleCopyClick}
             >

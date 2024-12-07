@@ -301,7 +301,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
 
             {/* Programming Language button */}
             <Button 
-                className="toggleLanguageSearchBarButton defaultNoteInputButton transition ms-1" 
+                className="toggleLanguageSearchBarButton defaultNoteInputButton transition" 
                 title="Programming Language"
                 disabled={areNoteInputSettingsDisabled}
                 onClick={() => toggleNoteInputSettings()}

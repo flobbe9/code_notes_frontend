@@ -36,7 +36,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
     const [codeNoteInputLanguage, setCodeNoteInputLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_DEFAULT_LANGUAGE);
     const [codeNoteInputWithVariablesLanguage, setCodeNoteInputcodeNoteInputWithVariablesLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE);
 
-    const [noteInputOverlayVisible, setNoteInputOverlayVisible] = useState(false);
+    const [isNoteInputOverlayVisible, setIsNoteInputOverlayVisible] = useState(false);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultNoteInput");
 
@@ -58,8 +58,8 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         codeNoteInputWithVariablesLanguage, 
         setCodeNoteInputcodeNoteInputWithVariablesLanguage,
 
-        noteInputOverlayVisible,
-        setNoteInputOverlayVisible,
+        isNoteInputOverlayVisible,
+        setIsNoteInputOverlayVisible,
 
         animateCopyIcon,
 
@@ -209,17 +209,6 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
                         <i className="fa-solid fa-xmark fa-lg"></i>
                     </Button>
                 </Flex>
-
-                {/* Overlay */}
-                <Overlay 
-                    className="noteInputOverlay flexCenter" 
-                    hideOnClick={false}
-                    fadeInDuration={0}
-                    isOverlayVisible={noteInputOverlayVisible} 
-                    setIsOverlayVisible={setNoteInputOverlayVisible}
-                >
-                    <i className={"fa-solid fa-circle-notch rotating"}></i>
-                </Overlay>
             </Flex>
 
         </DefaultNoteInputContext.Provider>
@@ -239,8 +228,8 @@ export const DefaultNoteInputContext = createContext({
     codeNoteInputWithVariablesLanguage: "", 
     setCodeNoteInputcodeNoteInputWithVariablesLanguage: (language: string) => {},
 
-    noteInputOverlayVisible: false,
-    setNoteInputOverlayVisible: (isVisible: boolean) => {},
+    isNoteInputOverlayVisible: false,
+    setIsNoteInputOverlayVisible: (isVisible: boolean) => {},
 
     animateCopyIcon: () => {},
 

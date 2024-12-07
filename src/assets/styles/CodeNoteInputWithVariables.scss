@@ -18,6 +18,10 @@
     &.fullScreen {
         border-radius: var(--borderRadius); // for full screen mode
         padding: 15px;
+        
+        .inputDiv {
+            max-height: unset;
+        }
     }
 
     .inputDivContainer {
@@ -31,6 +35,7 @@
         .inputDiv {
             border-left: 2px solid transparent;
             line-height: 1.6em;
+            height: 100%;
             margin: 0;
             max-height: var(--codeNoteInputWithVariablesMinHeight);
             min-height: 41px;
@@ -69,10 +74,5 @@
                 }
             }
         }
-    }
-
-    .appendVariableButton {
-        padding-left: 0.6rem !important;
-        padding-right: 0.8rem !important;
     }
 }
