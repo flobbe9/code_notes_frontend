@@ -18,6 +18,7 @@ import Oauth2LoginButton from "./Oauth2LoginButton";
 import Register from "./Register";
 import ResendConfirmationMail from "./ResendConfirmationMail";
 import SendPasswordResetMail from "./SendPasswordResetMail";
+import { useFormInput } from "../hooks/useFormInput";
 
 
 interface Props extends DefaultProps {
@@ -33,12 +34,24 @@ interface Props extends DefaultProps {
  */
 export default function Login({isPopupContent = false, ...props}: Props) {
     
-    const [email, setEmail] = useState<string>("");
-    const [triggerEmailValidation, setTriggerEmailValidation] = useState<boolean | undefined>(undefined);
-    
-    const [password, setPassword] = useState<string>("");
-    const [triggerPasswordValidation, setTriggerPasswordValidation] = useState<boolean | undefined>(undefined);
-    
+    const {
+        inputValue: email, 
+        setInputValue: setEmail,
+        triggerInputValidation: triggerEmailValidation,
+        setTriggerInputValidation: setTriggerEmailValidation,
+        inputRef: emailInputRef
+    } = useFormInput<string, HTMLInputElement>("");
+        
+    const {
+        inputValue: password, 
+        setInputValue: setPassword,
+        triggerInputValidation: triggerPasswordValidation,
+        setTriggerInputValidation: setTriggerPasswordValidation,
+        inputRef: passwordInputRef
+    } = useFormInput<string, HTMLInputElement>("");
+
+    const submitButtonRef = useRef<HTMLButtonElement>(null);
+
     const { toast, hidePopup, showPopup, replacePopupContent } = useContext(AppContext);
     const { fetchLogin, isLoggedInUseQueryResult } = useContext(AppFetchContext);
     
@@ -63,10 +76,6 @@ export default function Login({isPopupContent = false, ...props}: Props) {
             }
         ]
     }
-
-    const emailInputRef = useRef<HTMLInputElement>(null);
-    const passwordInputRef = useRef<HTMLInputElement>(null);
-    const submitButtonRef = useRef<HTMLButtonElement>(null);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Login", true);
 

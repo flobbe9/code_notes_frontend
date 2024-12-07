@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
@@ -7,6 +7,7 @@ import "../assets/styles/ResendConfirmationMail.scss";
 import { BACKEND_BASE_URL, EMAIL_REGEX, LOGIN_PATH, POPUP_FADE_DURATION } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { isBlank } from "../helpers/utils";
+import { useFormInput } from "../hooks/useFormInput";
 import { AppContext } from "./App";
 import Button from "./helpers/Button";
 import TextInput from "./helpers/TextInput";
@@ -24,13 +25,17 @@ interface Props extends DefaultProps {
  */
 export default function ResendConfirmationMail({isParentPopupContent, ...props}: Props) {
 
-    const [email, setEmail] = useState("");
-    const [triggerEmailValidation, setTriggerEmailValidation] = useState<boolean | undefined>(undefined);
+    const {
+        inputValue: email, 
+        setInputValue: setEmail,
+        triggerInputValidation: triggerEmailValidation,
+        setTriggerInputValidation: setTriggerEmailValidation,
+        inputRef: emailInputRef
+    } = useFormInput<string, HTMLInputElement>("");
 
-    const { toast, replacePopupContent, hidePopup } = useContext(AppContext);
-
-    const emailInputRef = useRef<HTMLInputElement>(null);
     const submitButtonRef = useRef<HTMLButtonElement>(null);
+        
+    const { toast, replacePopupContent, hidePopup } = useContext(AppContext);
 
     const navigate = useNavigate();
 

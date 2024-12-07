@@ -1,4 +1,4 @@
-import React, { FormEvent, MouseEvent, useContext, useRef, useState } from "react";
+import React, { FormEvent, MouseEvent, useContext, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
@@ -7,7 +7,9 @@ import "../assets/styles/Register.scss";
 import { BACKEND_BASE_URL, EMAIL_REGEX, getHeadTitleText, LOGIN_PATH, PASSWORD_REGEX } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { getCurrentUrlWithoutWWW, isBlank } from "../helpers/utils";
+import { useFormInput } from "../hooks/useFormInput";
 import { AppContext } from "./App";
+import Head from "./Head";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import Hr from "./helpers/Hr";
@@ -16,7 +18,6 @@ import Login from "./Login";
 import Oauth2LoginButton from "./Oauth2LoginButton";
 import PasswordAdvice from "./PasswordAdvice";
 import ResendConfirmationMail from "./ResendConfirmationMail";
-import Head from "./Head";
 
 
 interface Props extends DefaultProps {
@@ -31,25 +32,37 @@ interface Props extends DefaultProps {
  */
 export default function Register({isPopupContent = false, ...props}: Props) {
     
-    const [email, setEmail] = useState<string>("");
-    const [triggerEmailValidation, setTriggerEmailValidation] = useState<boolean | undefined>(undefined);
+    const {
+        inputValue: email, 
+        setInputValue: setEmail,
+        triggerInputValidation: triggerEmailValidation,
+        setTriggerInputValidation: setTriggerEmailValidation,
+        inputRef: emailInputRef
+    } = useFormInput<string, HTMLInputElement>("");
+        
+    const {
+        inputValue: password, 
+        setInputValue: setPassword,
+        triggerInputValidation: triggerPasswordValidation,
+        setTriggerInputValidation: setTriggerPasswordValidation,
+        inputRef: passwordInputRef
+    } = useFormInput<string, HTMLInputElement>("");
 
-    const [password, setPassword] = useState<string>("");
-    const [triggerPasswordValidation, setTriggerPasswordValidation] = useState<boolean | undefined>(undefined);
+    const {
+        inputValue: repeatPassword, 
+        setInputValue: setRepeatPassword,
+        triggerInputValidation: triggerRepeatPasswordValidation,
+        setTriggerInputValidation: setTriggerRepeatPasswordValidation,
+        inputRef: repeatPasswordInputRef
+    } = useFormInput<string, HTMLInputElement>("");
 
-    const [repeatPassword, setRepeatPassword] = useState<string>("");
-    const [triggerRepeatPasswordValidation, setTriggerRepeatPasswordValidation] = useState<boolean | undefined>(undefined);
-
+    const submitButtonRef = useRef<HTMLButtonElement>(null);
+    
     const { toast, showPopup, replacePopupContent } = useContext(AppContext);
 
     const navigate = useNavigate();
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Register", true);
-
-    const emailInputRef = useRef<HTMLInputElement>(null);
-    const passwordInputRef = useRef<HTMLInputElement>(null);
-    const repeatPasswordInputRef = useRef<HTMLInputElement>(null);
-    const submitButtonRef = useRef<HTMLButtonElement>(null);
     
     type InputName = "email" | "password" | "repeatPassword";
     const inputValidationWrappers: Record<InputName, InputValidationWrapper[]> = {

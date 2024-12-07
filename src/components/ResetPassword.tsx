@@ -12,6 +12,7 @@ import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import TextInput from "./helpers/TextInput";
 import PasswordAdvice from "./PasswordAdvice";
+import { useFormInput } from "../hooks/useFormInput";
 
 
 interface Props extends DefaultProps {
@@ -27,14 +28,31 @@ interface Props extends DefaultProps {
  */
 export default function ResetPassword({isPopupContent = false, ...props}: Props) {
     
-    const [oldPassword, setOldPassword] = useState<string>("");
-    const [triggerOldPasswordValidation, setTriggerOldPasswordValidation] = useState<boolean | undefined>(undefined);
+    const {
+        inputValue: oldPassword, 
+        setInputValue: setOldPassword,
+        triggerInputValidation: triggerOldPasswordValidation,
+        setTriggerInputValidation: setTriggerOldPasswordValidation,
+        inputRef: oldPasswordRef
+    } = useFormInput<string, HTMLInputElement>("");
+        
+    const {
+        inputValue: newPassword, 
+        setInputValue: setNewPassword,
+        triggerInputValidation: triggerNewPasswordValidation,
+        setTriggerInputValidation: setTriggerNewPasswordValidation,
+        inputRef: newPasswordRef
+    } = useFormInput<string, HTMLInputElement>("");
 
-    const [newPassword, setNewPassword] = useState<string>("");
-    const [triggerNewPasswordValidation, setTriggerNewPasswordValidation] = useState<boolean | undefined>(undefined);
-
-    const [repeatNewPassword, setRepeatNewPassword] = useState<string>("");
-    const [triggerRepeatNewPasswordValidation, setTriggerRepeatNewPasswordValidation] = useState<boolean | undefined>(undefined);
+    const {
+        inputValue: repeatNewPassword, 
+        setInputValue: setRepeatNewPassword,
+        triggerInputValidation: triggerRepeatNewPasswordValidation,
+        setTriggerInputValidation: setTriggerRepeatNewPasswordValidation,
+        inputRef: repeatNewPasswordRef
+    } = useFormInput<string, HTMLInputElement>("");
+    
+    const submitButtonRef = useRef<HTMLButtonElement>(null);
 
     const [isResetByToken, setIsResetByToken] = useState(window.location.pathname === RESET_PASSWORD_BY_TOKEN_PATH);
     
@@ -77,11 +95,6 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
             }
         ]
     }
-
-    const oldPasswordRef = useRef<HTMLInputElement>(null);
-    const newPasswordRef = useRef<HTMLInputElement>(null);
-    const repeatNewPasswordRef = useRef<HTMLInputElement>(null);
-    const submitButtonRef = useRef<HTMLButtonElement>(null);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ResetPassword", true);
 
