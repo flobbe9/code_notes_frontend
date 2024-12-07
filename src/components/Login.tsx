@@ -4,11 +4,12 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
 import "../assets/styles/Login.scss";
-import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, START_PAGE_PATH } from "../helpers/constants";
+import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, getHeadTitleText, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { isResponseError } from "../helpers/fetchUtils";
-import { isBlank, isNumberFalsy, replaceCurrentBrowserHistoryEntry, setCsrfToken, stringToNumber } from "../helpers/utils";
+import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, replaceCurrentBrowserHistoryEntry, setCsrfToken, stringToNumber } from "../helpers/utils";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
+import Head from "./Head";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import Hr from "./helpers/Hr";
@@ -256,8 +257,17 @@ export default function Login({isPopupContent = false, ...props}: Props) {
             verticalAlign="center"
             {...otherProps}
         >
+            <Head 
+                headTagStrings={[
+                    `<link rel='canonical' href='${getCurrentUrlWithoutWWW()}' />`,
+                    `<title>${getHeadTitleText("Login")}</title>`,
+                    `<meta name="description" content="Login with your credentials or just use Google, Github or Microsoft" />`
+                ]}
+                rendered={!isPopupContent}
+            />
+            
             <div className={`Login-contentContainer ${!isPopupContent && 'mt-5'}`}>
-                <h1 className="Login-contentContainer-heading mb-4">Login</h1> 
+                <h2 className="Login-contentContainer-heading mb-4">Login</h2> 
 
                 <div className="Login-contentContainer-formContainer mb-5">
                     {/* Email */}

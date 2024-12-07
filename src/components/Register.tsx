@@ -4,9 +4,9 @@ import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
 import "../assets/styles/Register.scss";
-import { BACKEND_BASE_URL, EMAIL_REGEX, LOGIN_PATH, PASSWORD_REGEX } from "../helpers/constants";
+import { BACKEND_BASE_URL, EMAIL_REGEX, getHeadTitleText, LOGIN_PATH, PASSWORD_REGEX } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { isBlank } from "../helpers/utils";
+import { getCurrentUrlWithoutWWW, isBlank } from "../helpers/utils";
 import { AppContext } from "./App";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
@@ -16,6 +16,7 @@ import Login from "./Login";
 import Oauth2LoginButton from "./Oauth2LoginButton";
 import PasswordAdvice from "./PasswordAdvice";
 import ResendConfirmationMail from "./ResendConfirmationMail";
+import Head from "./Head";
 
 
 interface Props extends DefaultProps {
@@ -201,8 +202,17 @@ export default function Register({isPopupContent = false, ...props}: Props) {
             verticalAlign="center"
             {...otherProps}
         >
+            <Head 
+                headTagStrings={[
+                    `<link rel='canonical' href='${getCurrentUrlWithoutWWW()}' />`,
+                    `<title>${getHeadTitleText("Create account")}</title>`,
+                    `<meta name="description" content="Create an account with your E-Mail address or just continue with Google, Github or Microsoft" />`
+                ]}
+                rendered={!isPopupContent}
+            />
+
             <div className={`Register-contentContainer ${!isPopupContent && 'mt-5'}`}>
-                <h1 className="Register-contentContainer-heading mb-4">Create account</h1>
+                <h2 className="Register-contentContainer-heading mb-4">Create account</h2>
 
                 <div className="Register-contentContainer-formContainer mb-5">
                     {/* Email */}

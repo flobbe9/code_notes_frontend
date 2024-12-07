@@ -35,10 +35,10 @@ export default function NavBar({...props}: Props) {
                         <img src="/img/favicon.ico" alt="favicon" className="invertColor" height={45} />
 
                         {/* Label */}
-                        <div className="ms-3 iconLabel">
+                        <h1 className="ms-3 iconLabel">
                             <span><code>Code</code></span>
                             <span style={{fontFamily: "noteFont"}}> Notes</span>
-                        </div>
+                        </h1>
                     </Flex>
                 </Link>
             </Flex>

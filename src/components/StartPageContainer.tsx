@@ -135,6 +135,7 @@ export default function StartPageContainer({children, ...props}: Props) {
             <Head headTagStrings={[
                 `<link rel='canonical' href='${getCurrentUrlWithoutWWW()}' />`,
                 `<title>${getHeadTitleText()}</title>`,
+                `<meta name="description" content="Edit, save and manage your coding notes. Save code snippets with variables and quickly insert values to copy your custom command. Use build in VSCode editor to comfortably edit your notes." />`
             ]} />
 
             <Flex flexWrap="nowrap">

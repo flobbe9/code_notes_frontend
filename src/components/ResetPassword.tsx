@@ -3,10 +3,11 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
 import "../assets/styles/ResetPassword.scss";
-import { BACKEND_BASE_URL, LOGIN_PATH, PASSWORD_REGEX, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY, RESET_PASSWORD_TOKEN_URL_QUERY_PARAM, START_PAGE_PATH } from "../helpers/constants";
+import { BACKEND_BASE_URL, getHeadTitleText, LOGIN_PATH, PASSWORD_REGEX, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY, RESET_PASSWORD_TOKEN_URL_QUERY_PARAM, START_PAGE_PATH } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { isBlank, replaceCurrentBrowserHistoryEntry } from "../helpers/utils";
+import { getCurrentUrlWithoutWWW, isBlank, replaceCurrentBrowserHistoryEntry } from "../helpers/utils";
 import { AppContext } from "./App";
+import Head from "./Head";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import TextInput from "./helpers/TextInput";
@@ -262,8 +263,16 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
             verticalAlign="center"
             {...otherProps}
         >
+            <Head 
+                headTagStrings={[
+                    `<link rel='canonical' href='${getCurrentUrlWithoutWWW()}' />`,
+                    `<title>${getHeadTitleText("Reset password")}</title>`,
+                ]}
+                rendered={!isPopupContent}
+            />
+            
             <div className={`ResetPassword-contentContainer ${!isPopupContent && 'mt-5'}`}>
-                <h1 className="ResetPassword-contentContainer-heading mb-4">Reset password</h1> 
+                <h2 className="ResetPassword-contentContainer-heading mb-4">Reset password</h2> 
 
                 <div className="ResetPassword-contentContainer-formContainer mb-5">
                     {/* Old password */}

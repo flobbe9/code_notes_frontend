@@ -7,6 +7,8 @@ interface Props {
 
     /** Array of valid html tags as string to append to head. E.g. ```"<title>mypge</title>"``` */
     headTagStrings?: string[],
+
+    rendered?: boolean
 }
 
 
@@ -17,7 +19,7 @@ interface Props {
  * 
  * @since 0.2.0
  */
-export default function Head({headTagStrings = []}: Props) {
+export default function Head({headTagStrings = [], rendered = true}: Props) {
 
     const location = useLocation();
 
@@ -34,6 +36,9 @@ export default function Head({headTagStrings = []}: Props) {
      */
     function addToHead(): void {
 
+        if (!rendered)
+            return;
+
         headTagStrings.forEach(headTagString => {
             const headTag = $(headTagString);
 
@@ -49,6 +54,9 @@ export default function Head({headTagStrings = []}: Props) {
      * Remove all tags added by {@link addToHead}.
      */
     function removeFromHead(): void {
+        
+        if (!rendered)
+            return;
 
         $(".headTag").remove();
     }
