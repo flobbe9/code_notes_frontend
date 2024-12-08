@@ -54,6 +54,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     const { toast, showPopup } = useContext(AppContext);
     const { 
         appUserEntity, 
+        isLoggedIn,
         noteEntities, 
         setNoteEntities, 
         appUserEntityUseQueryResult,
@@ -132,15 +133,18 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     }
 
 
-    // TODO: is parsing done at this point, like with input buttons?
     async function handleSave(event): Promise<void> {
 
         // case: invalid input
         if (!isNoteValid())
             return;
 
-        const jsonResponse = await fetchSaveNoteEntity(noteEntity);
+        if (!isLoggedIn) {
+            showPopup(<Login isPopupContent />);
+            return;
+        }
 
+        const jsonResponse = await fetchSaveNoteEntity(noteEntity);
         if (isResponseError(jsonResponse)) {
             toast("Failed to save note", DEFAULT_ERROR_MESSAGE, "error");
             return;
@@ -158,18 +162,14 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     function handleDeleteNoteClick(event): void {
 
-        // showPopup(
-        //     <Confirm
-        //         heading={<h3>Delete Note?</h3>}
-        //         message={`Are you sure you want to delete '${noteEntity.title}'?`}
-        //         style={{maxWidth: "50vw"}}
-        //         onConfirm={event => {deleteNote()}}
-        //     />
-        // );
-
         showPopup(
-            <Login isPopupContent />
-        )
+            <Confirm
+                heading={<h3>Delete Note?</h3>}
+                message={`Are you sure you want to delete '${noteEntity.title}'?`}
+                style={{maxWidth: "50vw"}}
+                onConfirm={event => {deleteNote()}}
+            />
+        );
     }
 
 
@@ -181,13 +181,15 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         if (!appUserEntity)
             return;
         
-        const response = await fetchDeleteNoteEntity(noteEntity);
-        if (isResponseError(response)) {
-            toast("Failed to delete note", DEFAULT_ERROR_MESSAGE, "error");
-            return;
+        if (isLoggedIn) {
+            const response = await fetchDeleteNoteEntity(noteEntity);
+            if (isResponseError(response)) {
+                toast("Failed to delete note", DEFAULT_ERROR_MESSAGE, "error");
+                return;
+            }
+            
+            appUserEntityUseQueryResult.refetch();
         }
-
-        appUserEntityUseQueryResult.refetch();
 
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
 

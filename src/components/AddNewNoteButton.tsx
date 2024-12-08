@@ -40,17 +40,16 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
             tags: []
         }
 
-        // wont save if not logged in but that's fine here
-        const jsonResponse = await fetchSaveNoteEntity(newNoteEntity);
-
-        // only point out fetch error if is logged in
-        if (isResponseError(jsonResponse) && isLoggedIn) {
-            toast("Failed to save note", DEFAULT_ERROR_MESSAGE, "error");
-            return;
+        if (isLoggedIn) {
+            const jsonResponse = await fetchSaveNoteEntity(newNoteEntity);
+            if (isResponseError(jsonResponse)) {
+                toast("Failed to save note", DEFAULT_ERROR_MESSAGE, "error");
+                return;
+            }
+            
+            newNoteEntity.id = (jsonResponse as NoteEntity).id;
+            newNoteEntity.created = (jsonResponse as NoteEntity).created;
         }
-
-        newNoteEntity.id = (jsonResponse as NoteEntity).id;
-        newNoteEntity.created = (jsonResponse as NoteEntity).created;
 
         // update note entities
         setNoteEntities([newNoteEntity, ...noteEntities]);
