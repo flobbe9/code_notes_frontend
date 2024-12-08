@@ -145,7 +145,7 @@ export default function Register({isPopupContent = false, ...props}: Props) {
             return;
         }
 
-        handleFormSubmitSuccess(jsonResponse);
+        handleFormSubmitSuccess();
     }
 
 
@@ -166,18 +166,19 @@ export default function Register({isPopupContent = false, ...props}: Props) {
     }
 
 
-    function handleFormSubmitSuccess(response: Response | CustomExceptionFormat): void {
+    function handleFormSubmitSuccess(): void {
 
         if (!isPopupContent)
             navigate(LOGIN_PATH);
 
         else
-            showPopup(<Login isPopupContent />);
+            replacePopupContent(<Login isPopupContent />);
 
         toast(
             "Successfully registered", 
             "We've sent you an E-Mail to confirm your account. Please make sure you check the junk folder as well.", 
-            "success"
+            "success",
+            8000
         );
     }
 

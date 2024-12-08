@@ -21,7 +21,7 @@ export function log(message?: any, ...optionalParams: any[]): void {
 
 export function logDebug(message?: any, ...optionalParams: any[]): void {
 
-    console.log(new Error(message), ...optionalParams);
+    console.log(getTimeStamp(), new Error(message), ...optionalParams);
 }
 
 

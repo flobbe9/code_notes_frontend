@@ -100,17 +100,17 @@ export default function Login({isPopupContent = false, ...props}: Props) {
         const loginResponse = await fetchLogin(email, password);
 
         if (isResponseError(loginResponse)) {
-            handleLoginFailure(loginResponse.status);
+            handleFormFailure(loginResponse.status);
             return;
         }
 
         const csrfToken = await loginResponse.text();
 
-        handleLoginSuccess(csrfToken);
+        handleFormSuccess(csrfToken);
     }
 
 
-    function handleLoginFailure(status: number): void {
+    function handleFormFailure(status: number): void {
 
         if (isNumberFalsy(status))
             return;
@@ -130,7 +130,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
      * 
      * @param csrfToken to store
      */
-    function handleLoginSuccess(csrfToken: string): void {
+    function handleFormSuccess(csrfToken: string): void {
 
         setCsrfToken(csrfToken);
 
