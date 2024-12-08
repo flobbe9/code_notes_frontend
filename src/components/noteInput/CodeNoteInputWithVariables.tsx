@@ -9,7 +9,7 @@ import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import "../../assets/styles/CodeNoteInputWithVariables.scss";
 import "../../assets/styles/highlightJs/vs.css";
 import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../helpers/constants";
-import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, setClipboardText } from "../../helpers/utils";
+import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, log, setClipboardText } from "../../helpers/utils";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 import { AppContext } from "../App";
 import Button from "../helpers/Button";
@@ -233,7 +233,7 @@ export default function CodeNoteInputWithVariables({
      */
     function includesVariableInputSequence(str: string): boolean {
 
-        return !isBlank(str) && str.replace("\n", "\\n").match(VARIABLE_INPUT_SEQUENCE_REGEX) !== null;
+        return !isBlank(str) && str.replaceAll("\n", "\\n").match(VARIABLE_INPUT_SEQUENCE_REGEX) !== null;
     }
 
 
