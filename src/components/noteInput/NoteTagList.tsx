@@ -111,6 +111,21 @@ export default function NoteTagList({...props}: Props) {
 
 
     /**
+     * Removes tag at given ```index``` from ```noteEntity.tags```.
+     * 
+     * @param index of the tag to remove
+     */
+    function removeTag(index: number): void {
+
+        const tagToRemove = noteEntity.tags!.splice(index, 1)[0];
+
+        removeTagFromAppUserEntityEntity(tagToRemove);
+
+        removeTagElement(index);
+    }
+
+
+    /**
      * Remove the ```<TagInput />``` with given ```key``` from ```tagElements``` state.
      * 
      * @param key of the tagInput to remove
@@ -127,21 +142,6 @@ export default function NoteTagList({...props}: Props) {
 
         // update state
         setTagElements([...tagsState]);
-    }
-
-
-    /**
-     * Removes tag at given ```index``` from ```noteEntity.tags```.
-     * 
-     * @param index of the tag to remove
-     */
-    function removeTag(index: number): void {
-
-        const tagToRemove = noteEntity.tags!.splice(index, 1)[0];
-
-        removeTagFromAppUserEntityEntity(tagToRemove);
-
-        removeTagElement(index);
     }
 
 

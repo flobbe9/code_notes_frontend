@@ -4,14 +4,14 @@ import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { TagEntity } from "../abstract/entites/TagEntity";
 import "../assets/styles/TagInput.scss";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../helpers/constants";
-import { isBlank, log } from "../helpers/utils";
+import { isBlank } from "../helpers/utils";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
-import { NoteContext } from "./noteInput/Note";
 import { NoteTagListContext } from "./noteInput/NoteTagList";
 import { StartPageContainerContext } from "./StartPageContainer";
+import { NoteContext } from "./noteInput/Note";
 
 
 interface Props extends DefaultProps {
@@ -38,7 +38,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     const { toast } = useContext(AppContext);
     const { noteEntities, appUserEntity } = useContext(AppFetchContext);
     const { updateStartPageSideBarTagList } = useContext(StartPageContainerContext);
-    const { noteEntity } = useContext(NoteContext);
+    const { noteEdited } = useContext(NoteContext);
 
     const { 
         getTagElementIndex, 
@@ -70,6 +70,8 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     function handleChange(event): void {
 
         tag.name = $(inputRef.current!).prop("value");
+
+        noteEdited();
     }
 
 
@@ -121,6 +123,8 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
         removeTag(getTagElementIndex(propsKey));
 
         updateStartPageSideBarTagList();
+
+        noteEdited();
     }
 
 

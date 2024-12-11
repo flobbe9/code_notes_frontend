@@ -12,6 +12,7 @@ import Flex from "../helpers/Flex";
 import { StartPageContainerContext } from "../StartPageContainer";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import NoteInputSettings from "./NoteInputSettings";
+import { NoteContext } from "./Note";
 
 
 interface Props extends DefaultProps {
@@ -50,7 +51,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     const [editorHeight, setEditorHeight] = useState(0);
 
     const { isShowSideBar, getStartPageSideBarWidth } = useContext(StartPageContainerContext);
-
+    const { noteEdited } = useContext(NoteContext);
     const { 
         isShowNoteInputSettings, 
         areNoteInputSettingsDisabled, 
@@ -141,6 +142,8 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
             setTimeout(() => setNumEditorLines(getNumEditorValueLines(value)), 5);
 
         updateAppUserEntity();
+
+        noteEdited();
     }
 
 

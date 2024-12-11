@@ -430,26 +430,28 @@ export function getTextWidth(text: string, fontSize: string, fontFamily: string,
 
 
 /**
- * Confirm page refresh, tab close and window close with browser popup. Will show browser confirm alert first, 
- * then execute given callback.
+ * Register "beforeunload" event. By default the handler will just be a confirm popup by browser
  * 
- * Do nothing if ```API_ENV``` is "dev".
- * 
- * @param callback with "beforeunload" event param to execute after default has been prevnted
+ * @param handler Default is ```event.preventDefault()```
  * @param dontConfirmInDev indicates whether to avoid confirm alert if env is "development". Defautl is ```true```
  */
-export function confirmPageUnload(callback?: (event) => void, dontConfirmInDev = true): void {
+export function confirmPageUnload(handler: (event: BeforeUnloadEvent) => void = (event) => event.preventDefault(), dontConfirmInDev = true): void {
 
     if (ENV === "development" && dontConfirmInDev)
         return;
 
-    // confirm page refresh / tab close / window close
-    window.addEventListener("beforeunload", (event) => {
-        event.preventDefault();
+    window.addEventListener("beforeunload", handler);
+}
 
-        if (callback)
-            callback(event);
-    });
+
+/**
+ * Unegister "beforeunload" event. 
+ * 
+ * @param handler
+ */
+export function removeConfirmPageUnload(handler: (event: BeforeUnloadEvent) => void): void {
+
+    window.removeEventListener("beforeunload", handler);
 }
 
 

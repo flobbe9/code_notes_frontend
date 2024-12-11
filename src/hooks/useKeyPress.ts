@@ -66,7 +66,7 @@ export default function useKeyPress(checkAllKeys = false) {
     /**
      * Indicates whether a key should be considered for the ```pressedKeys``` list or not. 
      * 
-     * In order to prevent to many state changes only "control kind of keys" are considered, e.g. "Control" or "Meta".
+     * In order to prevent too many state changes only "control kind of keys" are considered, e.g. "Control" or "Meta".
      * This applies only if ```checkAllKeys === false``` (which is the default).
      * 
      * @param keyName name of key to check

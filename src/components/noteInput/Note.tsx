@@ -6,7 +6,7 @@ import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityS
 import "../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE, MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString } from '../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, isNumberFalsy } from '../../helpers/utils';
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 import { AppContext } from "../App";
 import { AppFetchContext } from "../AppFetchContextHolder";
@@ -14,6 +14,8 @@ import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
 import Confirm from "../helpers/Confirm";
 import Flex from "../helpers/Flex";
 import HelperDiv from "../helpers/HelperDiv";
+import Login from "../Login";
+import { StartPageContainerContext } from "../StartPageContainer";
 import { StartPageContentContext } from "../StartPageContent";
 import { NoteEntityService } from './../../abstract/services/NoteEntityService';
 import { TagEntityService } from './../../abstract/services/TagEntityService';
@@ -25,7 +27,6 @@ import DefaultNoteInput from "./DefaultNoteInput";
 import NoteTagList from "./NoteTagList";
 import NoteTitle from "./NoteTitle";
 import PlainTextNoteInput from "./PlainTextNoteInput";
-import Login from "../Login";
 
 
 interface Props extends DefaultProps {
@@ -52,6 +53,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
     const { toast, showPopup } = useContext(AppContext);
+    const { editedNoteIds, setEditedNoteIds } = useContext(StartPageContainerContext);
     const { 
         appUserEntity, 
         isLoggedIn,
@@ -72,7 +74,9 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         noteInputs, 
         setNoteInputs,
 
-        getNoteInputByNoteInputType
+        getNoteInputByNoteInputType,
+
+        noteEdited
     }
 
     const hasComponentMounted = useHasComponentMounted();
@@ -156,6 +160,8 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         // update sidebar
         setNoteEntities([...noteEntities]);
 
+        noteEdited(false);
+
         toast("Save", "Successfully saved note", "success", 5000);
     }
 
@@ -167,7 +173,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
                 heading={<h3>Delete Note?</h3>}
                 message={`Are you sure you want to delete '${noteEntity.title}'?`}
                 style={{maxWidth: "50vw"}}
-                onConfirm={event => {deleteNote()}}
+                onConfirm={event => deleteNote()}
             />
         );
     }
@@ -200,6 +206,10 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         // update notes
         notes.splice(noteIndex, 1);
         setNotes([...notes]);
+
+        noteEdited(false);
+
+        noteEdited(false);
     }
 
 
@@ -235,6 +245,26 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     function handleNoteEntityInvalid(): void {
 
         toast("Note title invalid", `The note title cannot be longer than ${MAX_NOTE_TITLE_VALUE_LENGTH} characters.`, "warn");
+    }
+
+
+    /**
+     * Mark ```noteEntity``` as edited or saved. Wont do anything if ```noteEntity.id``` is falsy.
+     * 
+     * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```
+     */
+    function noteEdited(edited = true): void {
+
+        // case: propably not rendered yet, or never saved (hence not logged in)
+        if (!noteEntity || isNumberFalsy(noteEntity.id))
+            return;
+
+        if (edited)
+            editedNoteIds.add(noteEntity.id!);
+        else 
+            editedNoteIds.delete(noteEntity.id!);
+        
+        setEditedNoteIds(new Set(editedNoteIds));
     }
 
 
@@ -298,5 +328,10 @@ export const NoteContext = createContext({
 
     noteInputs: [<></>],
     setNoteInputs: (noteInputs: JSX.Element[]) => {},
-    getNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity, index: number) => {return <></>}
+    getNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity, index: number) => {return <></>},
+
+    /**
+     * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```
+     */
+    noteEdited: (edited = true) => {}
 })

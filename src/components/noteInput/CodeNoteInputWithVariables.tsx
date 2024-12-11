@@ -1,7 +1,7 @@
 import hljs from "highlight.js";
 import parse from 'html-react-parser';
 import $ from "jquery";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { ClipboardEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
@@ -9,7 +9,7 @@ import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import "../../assets/styles/CodeNoteInputWithVariables.scss";
 import "../../assets/styles/highlightJs/vs.css";
 import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../helpers/constants";
-import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, log, setClipboardText } from "../../helpers/utils";
+import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../helpers/utils";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 import { AppContext } from "../App";
 import Button from "../helpers/Button";
@@ -18,6 +18,7 @@ import Flex from "../helpers/Flex";
 import Overlay from "../helpers/Overlay";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import NoteInputSettings from "./NoteInputSettings";
+import { NoteContext } from "./Note";
 
 
 interface Props extends HelperProps {
@@ -51,8 +52,8 @@ export default function CodeNoteInputWithVariables({
     
     const inputDivRef = useRef(null);
 
-    const { isKeyPressed } = useContext(AppContext);
-
+    const { isKeyPressed, isControlKeyPressed } = useContext(AppContext);
+    const { noteEdited } = useContext(NoteContext);
     const { 
         codeNoteInputWithVariablesLanguage, 
         isNoteInputOverlayVisible,
@@ -499,7 +500,23 @@ export default function CodeNoteInputWithVariables({
         if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
             event.preventDefault();
             appendVariableInputSequence();
+            noteEdited();
         }
+
+        if (isEventKeyTakingUpSpace(keyName) && !isControlKeyPressed())
+            noteEdited();
+    }
+    
+
+    function handleCut(event: ClipboardEvent): void {
+        
+        noteEdited();
+    }
+
+
+    function handlePaste(event: ClipboardEvent): void {
+
+        noteEdited();
     }
 
  
@@ -661,6 +678,8 @@ export default function CodeNoteInputWithVariables({
                         onKeyUp={handleKeyUp}
                         onFocus={handleFocus}
                         onBlurCapture={handleBlurCapture}
+                        onCut={handleCut}
+                        onPaste={handlePaste}
                     >
                         {inputDivValue}
                     </ContentEditableDiv> 

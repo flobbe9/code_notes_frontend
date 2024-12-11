@@ -11,6 +11,7 @@ import Flex from "../helpers/Flex";
 import SearchBar from "../helpers/SearchBar";
 import LanguageSearchResults from "../LanguageSearchResults";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
+import { NoteContext } from "./Note";
 
 
 interface Props extends DefaultProps {
@@ -36,19 +37,20 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
     /** List of results after searching. Init value is all results */
     const [languageSearchResults, setLanguageSearchResults] = useState<string[]>(mapLanguageNames(allLanguageSearchResults));
 
+    const { noteEdited } = useContext(NoteContext);
     const { 
         isShowNoteInputSettings, 
         setIsShowNoteInputSettings,
 
         setCodeNoteInputLanguage,
-        setCodeNoteInputcodeNoteInputWithVariablesLanguage
+        setCodeNoteInputWithVariablesLanguage
         
     } = useContext(DefaultNoteInputContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteInputSettings");
 
     const componentRef = useRef(null);
-    const noteInputSwitchRef = useRef(null);
+    // const noteInputSwitchRef = useRef(null);
     const languageSearchBarRef = useRef(null);
 
     // IDEA: make custom colors and pass them to buttons as border color
@@ -178,7 +180,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
             setCodeNoteInputLanguage(language);
 
         else if (noteInputEntity.type === "CODE_WITH_VARIABLES")
-            setCodeNoteInputcodeNoteInputWithVariablesLanguage(language);
+            setCodeNoteInputWithVariablesLanguage(language);
 
         // hide result box
         setShowLanguageSearchResults(false);
@@ -188,6 +190,8 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
 
         // set searchbar value to selected language
         $(languageSearchBarRef.current!).prop("value", language);
+
+        noteEdited();
     }
 
 

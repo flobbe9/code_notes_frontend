@@ -1,11 +1,11 @@
 import $ from "jquery";
 import React, { useContext, useRef } from "react";
-import "../../assets/styles/NoteTitle.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { NoteContext } from "./Note";
+import "../../assets/styles/NoteTitle.scss";
 import { INVALID_INPUT_CLASS_NAME, MAX_NOTE_TITLE_VALUE_LENGTH } from "../../helpers/constants";
-import { AppContext } from "../App";
 import { isEventKeyTakingUpSpace } from "../../helpers/utils";
+import { AppContext } from "../App";
+import { NoteContext } from "./Note";
 
 
 interface Props extends DefaultProps {
@@ -24,7 +24,7 @@ export default function NoteTitle({...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteTitle");
 
     const { toast, isControlKeyPressed } = useContext(AppContext);
-    const { noteEntity } = useContext(NoteContext);
+    const { noteEntity, noteEdited } = useContext(NoteContext);
 
     const inputRef = useRef(null);
 
@@ -32,6 +32,8 @@ export default function NoteTitle({...props}: Props) {
     function handleChange(event): void {
 
         noteEntity.title = $(inputRef.current!).prop("value");
+
+        noteEdited();
     }
 
 

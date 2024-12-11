@@ -3,7 +3,7 @@ import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps"
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { NoteInputType } from "../../abstract/NoteInputType";
 import "../../assets/styles/AddNewNoteInput.scss";
-import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../helpers/constants";
+import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../helpers/constants";
 import { AppFetchContext } from "../AppFetchContextHolder";
 import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
 import Flex from "../helpers/Flex";
@@ -25,7 +25,7 @@ export default function AddNewNoteInput({...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInput");
 
     const { noteEntities } = useContext(AppFetchContext);
-    const { noteEntity, noteInputs, setNoteInputs, getNoteInputByNoteInputType } = useContext(NoteContext);
+    const { noteEntity, noteInputs, setNoteInputs, getNoteInputByNoteInputType, noteEdited } = useContext(NoteContext);
 
 
     function handleAddCodeNoteInput(event): void {
@@ -136,6 +136,8 @@ export default function AddNewNoteInput({...props}: Props) {
         const newNoteInputEntity = getNoteInputByNoteInputType(noteInputEntityEntity, noteInputs.length);
         newNoteInputEntitys = [...newNoteInputEntitys, newNoteInputEntity];
         setNoteInputs(newNoteInputEntitys);
+
+        noteEdited();
     }
  
 

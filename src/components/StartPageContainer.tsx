@@ -1,14 +1,16 @@
 import $ from "jquery";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import DefaultProps from "../abstract/DefaultProps";
 import { getHeadTitleText } from "../helpers/constants";
-import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, log } from "../helpers/utils";
+import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, log, removeConfirmPageUnload } from "../helpers/utils";
 import { AppContext } from "./App";
 import Head from "./Head";
 import StartPageContent from "./StartPageContent";
 import StartPageSideBar from "./StartPageSideBar";
 import Confirm from "./helpers/Confirm";
 import Flex from "./helpers/Flex";
+import { AppFetchContext } from "./AppFetchContextHolder";
+import { useNavigate } from "react-router-dom";
 
 
 interface Props extends DefaultProps {
@@ -32,7 +34,13 @@ export default function StartPageContainer({children, ...props}: Props) {
     /** List of tag entities inside ```<StartPageSideBarTagList>``` that are checked */
     const [selectedTagEntityNames, setSelectedTagEntityNames] = useState<Set<string>>(new Set());
 
+    /** List of note ids that have been edited since they were last saved. Remove a note id from this list, once the note gets saved */
+    const [editedNoteIds, setEditedNoteIds] = useState<Set<Number>>(new Set());
+
     const { windowSize, isMobileWidth, showPopup } = useContext(AppContext);
+    const { isLoggedIn, noteEntities } = useContext(AppFetchContext);
+
+    const navigate = useNavigate();
 
     const context = {
         isShowSideBar, 
@@ -45,20 +53,27 @@ export default function StartPageContainer({children, ...props}: Props) {
         getStartPageSideBarWidth,
 
         selectedTagEntityNames, 
-        setSelectedTagEntityNames
+        setSelectedTagEntityNames,
+
+        editedNoteIds,
+        setEditedNoteIds
     }
-
-
-    useEffect(() => {
-        confirmPageUnload(handlePageUnload);
-
-    }, []);
 
 
     useEffect(() => {
         updateStartPageContentWidth();
 
     }, [isShowSideBar, windowSize]);
+
+
+    useEffect(() => {
+        addOrRemovePageUnloadEvent();
+
+        return () => {
+            removeConfirmPageUnload(handlePageUnload);
+        }
+
+    }, [editedNoteIds, noteEntities]);
 
 
     /**
@@ -112,21 +127,43 @@ export default function StartPageContainer({children, ...props}: Props) {
 
         return getCSSValueAsNumber(getCssConstant("startPageSideBarWidth"), 2);
     }
+
+
+    function addOrRemovePageUnloadEvent(): void {
+
+        if (hasUnsavedChanges()) 
+            confirmPageUnload(handlePageUnload, false); 
+
+        else 
+            removeConfirmPageUnload(handlePageUnload);
+    }
     
 
-    // TODO: somehow know whether changes have been made :)
-    function handlePageUnload(event: Event): void {
+    const handlePageUnload = useCallback((event: BeforeUnloadEvent) => {
 
-        showPopup(
-            <Confirm
-                heading={<h3>Save changes?</h3>}
-                message={"There are some unsaved changes. Would you like to save them?"}
-                confirmLabel="Save"
-                cancelLabel="Don't save"
-                focusConfirmOnRender
-                onConfirm={(event) => log("saving...")} // TODO: implement save
-            />
-        );
+        event.preventDefault();
+
+        window.scrollTo(0, 1000)
+
+        // showPopup(
+        //     <Confirm
+        //         heading={<h3>Save all changes?</h3>}
+        //         message={"There are some unsaved changes. Would you like to save them?"}
+        //         confirmLabel="Save"
+        //         cancelLabel="Don't save"
+        //         focusConfirmOnRender
+        //         onConfirm={(event) => {log("saving..."); setEditedNoteIds(new Set())}} // TODO: implement save
+        //     />
+        // );
+    }, []);
+
+
+    function hasUnsavedChanges(): boolean {
+
+        if (isLoggedIn) 
+            return !!editedNoteIds.size;
+
+        return !!noteEntities.length;
     }
 
 
@@ -161,5 +198,8 @@ export const StartPageContainerContext = createContext({
     getStartPageSideBarWidth: () => {return 0 as number},
 
     selectedTagEntityNames: new Set() as Set<string>, 
-    setSelectedTagEntityNames: (tagEntities: Set<string>) => {}
+    setSelectedTagEntityNames: (tagEntities: Set<string>) => {},
+
+    editedNoteIds: new Set<Number>(),
+    setEditedNoteIds: (editedNoteIds: Set<Number>) => {}
 });

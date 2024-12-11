@@ -1,6 +1,5 @@
-import { NoteEntity } from "../entites/NoteEntity";
 import { MAX_NOTE_TITLE_VALUE_LENGTH } from "../../helpers/constants";
-import { AbstractService } from "./AbstractService";
+import { NoteEntity } from "../entites/NoteEntity";
 
 
 /**

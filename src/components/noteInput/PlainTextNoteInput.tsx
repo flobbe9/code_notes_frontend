@@ -1,19 +1,21 @@
 import parse from 'html-react-parser';
 import $ from "jquery";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { ClipboardEvent, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/PlainTextNoteInput.scss";
 import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
-import { getClipboardText, getCssConstant, isBlank, setClipboardText } from "../../helpers/utils";
+import { getClipboardText, getCssConstant, isBlank, isEventKeyTakingUpSpace, log, setClipboardText } from "../../helpers/utils";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 import Button from "../helpers/Button";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import Flex from "../helpers/Flex";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import Overlay from '../helpers/Overlay';
+import { NoteContext } from './Note';
+import { AppContext } from '../App';
 
 
 interface Props extends HelperProps {
@@ -37,7 +39,8 @@ export default function PlainTextNoteInput({
     const [inputDivValue, setInputDivValue] = useState<any>()
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
-
+    const { isControlKeyPressed } = useContext(AppContext);
+    const { noteEdited } = useContext(NoteContext);
     const { 
         isNoteInputOverlayVisible,
         setIsNoteInputOverlayVisible, 
@@ -209,6 +212,9 @@ export default function PlainTextNoteInput({
 
         if (keyName === "Control")
             sanitizeClipboardText();
+
+        if (isEventKeyTakingUpSpace(keyName) && !isControlKeyPressed())
+            noteEdited();
     }
 
 
@@ -224,6 +230,18 @@ export default function PlainTextNoteInput({
 
         if (keyName === "Backspace" || keyName === "Delete")
             cleanUpEmptyInputDiv(event);
+    }
+
+
+    function handleCut(event: ClipboardEvent): void {
+        
+        noteEdited();
+    }
+
+
+    function handlePaste(event: ClipboardEvent): void {
+
+        noteEdited();
     }
 
 
@@ -327,6 +345,8 @@ export default function PlainTextNoteInput({
                     onBlur={handleBlur}
                     onKeyDownCapture={handleKeyDownCapture}
                     onKeyUp={handleKeyUp}
+                    onCut={handleCut}
+                    onPaste={handlePaste}
                 >
                     {inputDivValue}
                 </ContentEditableDiv>

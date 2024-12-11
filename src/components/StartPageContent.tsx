@@ -14,6 +14,8 @@ import PendingFetchHelper from "./helpers/PendingFetchHelper";
 import SearchBar from "./helpers/SearchBar";
 import Note from "./noteInput/Note";
 import { StartPageContainerContext } from "./StartPageContainer";
+import Button from "./helpers/Button";
+import SaveAllNotesButton from "./SaveAllNotesButton";
 
 
 interface Props extends DefaultProps {
@@ -170,6 +172,20 @@ export default function StartPageContent({...props}: Props) {
 
                 {/* Notes */}
                 {notes}
+
+                <Flex horizontalAlign="right">
+                    <SaveAllNotesButton 
+                        id="save-all" 
+                        style={{border: "1px solid black"}}
+                    >
+                        <i className="fa-solid fa-floppy-disk me-2"></i> <span className="mt-1">Save all</span>
+                    </SaveAllNotesButton>
+                </Flex>
+                {/* save all */}
+                    {
+                        // TODO continue here
+                        // pass id
+                    }
 
                 {children}
             </div>

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { MouseEvent, useContext } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";
@@ -59,7 +59,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
     }
 
 
-    async function handleClick(event: React.MouseEvent<any, MouseEvent>): Promise<void> {
+    async function handleClick(event: MouseEvent): Promise<void> {
 
         if (disabled)
             return;

@@ -8,8 +8,6 @@ import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
-import { log } from "../helpers/utils";
-import { useHasComponentMounted } from "./useHasComponentMounted";
 
 
 export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {

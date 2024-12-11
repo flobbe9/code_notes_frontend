@@ -9,6 +9,7 @@ import AppFetchContextHolder from "./AppFetchContextHolder";
 import Footer from "./Footer";
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
 import LoggedInComponent from "./helpers/LoggedInComponent";
+import LoggedOutComponent from "./helpers/LoggedOutComponent";
 import Overlay from './helpers/Overlay';
 import Popup from './helpers/Popup';
 import Toast, { ToastSevirity } from './helpers/Toast';
@@ -18,7 +19,6 @@ import Register from "./Register";
 import ResetPassword from "./ResetPassword";
 import RouteContext from "./RouteContext";
 import StartPageContainer from './StartPageContainer';
-import LoggedOutComponent from "./helpers/LoggedOutComponent";
 
 
 /**

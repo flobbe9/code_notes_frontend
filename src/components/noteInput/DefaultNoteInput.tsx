@@ -9,7 +9,6 @@ import { AppContext } from "../App";
 import Button from "../helpers/Button";
 import Confirm from "../helpers/Confirm";
 import Flex from "../helpers/Flex";
-import Overlay from "../helpers/Overlay";
 import { NoteContext } from "./Note";
 
 
@@ -34,7 +33,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
     const [deactivateFullScreenStyles, setDeactivateFullScreenStyles] = useState<Function>(() => {});
 
     const [codeNoteInputLanguage, setCodeNoteInputLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_DEFAULT_LANGUAGE);
-    const [codeNoteInputWithVariablesLanguage, setCodeNoteInputcodeNoteInputWithVariablesLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE);
+    const [codeNoteInputWithVariablesLanguage, setCodeNoteInputWithVariablesLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE);
 
     const [isNoteInputOverlayVisible, setIsNoteInputOverlayVisible] = useState(false);
 
@@ -44,7 +43,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     const { isAppOverlayVisible, setIsAppOverlayVisible, showPopup } = useContext(AppContext);
 
-    const { noteEntity, noteInputs, setNoteInputs } = useContext(NoteContext);
+    const { noteEntity, noteInputs, setNoteInputs, noteEdited } = useContext(NoteContext);
 
     const context = {
         isShowNoteInputSettings, 
@@ -56,7 +55,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         setCodeNoteInputLanguage,
 
         codeNoteInputWithVariablesLanguage, 
-        setCodeNoteInputcodeNoteInputWithVariablesLanguage,
+        setCodeNoteInputWithVariablesLanguage,
 
         isNoteInputOverlayVisible,
         setIsNoteInputOverlayVisible,
@@ -111,6 +110,8 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         const newNoteInputEntitys = noteInputs;
         newNoteInputEntitys.splice(noteInputEntityIndex, 1);
         setNoteInputs([...newNoteInputEntitys]);
+
+        noteEdited();
     }
 
 
@@ -226,7 +227,7 @@ export const DefaultNoteInputContext = createContext({
     setCodeNoteInputLanguage: (language: string) => {},
 
     codeNoteInputWithVariablesLanguage: "", 
-    setCodeNoteInputcodeNoteInputWithVariablesLanguage: (language: string) => {},
+    setCodeNoteInputWithVariablesLanguage: (language: string) => {},
 
     isNoteInputOverlayVisible: false,
     setIsNoteInputOverlayVisible: (isVisible: boolean) => {},
