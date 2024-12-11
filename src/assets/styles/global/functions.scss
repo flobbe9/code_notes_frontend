@@ -90,13 +90,9 @@
     }
 }
 
-@mixin scrollBar($size: 3px, $hoverWidth: 7px) {
+@mixin scrollBar($size: 5px) {
     &::-webkit-scrollbar {
-        width: $size;
-
-        @include customHover {
-            width: $hoverWidth;
-        }
+        height: $size;
     }
 
     &::-webkit-scrollbar-track {

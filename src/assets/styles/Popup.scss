@@ -23,7 +23,7 @@
             padding: $contentContainerPadding;
             z-index: calc(var(--overlayZIndex) + 1);
             
-            @include scrollBar($scrollBarWidth, $scrollBarWidth);
+            @include scrollBar($scrollBarWidth);
             
             // Header
             .popupXButton {
