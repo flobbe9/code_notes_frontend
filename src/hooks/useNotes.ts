@@ -8,11 +8,16 @@ import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
+import { log } from "../helpers/utils";
+import { useHasComponentMounted } from "./useHasComponentMounted";
 
 
 export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     const [noteEntities, setNoteEntities] = useState<NoteEntity[]>([]);
+
+    /** Notes created prior to login, these will be set right after logging in and then added to the ```noteEntities``` */
+    const [noteEntitiesNotLoggedIn, setNoteEntitiesNotLoggedIn] = useState<NoteEntity[]>([]);
 
     const { toast } = useContext(AppContext);
 
@@ -31,8 +36,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     
     useEffect(() => {
-        if (useQueryResult.data)
-            setNoteEntities(useQueryResult.data);
+        handleFetchedDataChange();
 
     }, [useQueryResult.data]);
 
@@ -42,6 +46,14 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
             useQueryResult.refetch();
 
     }, [isLoggedIn, appUserEntity])
+
+
+    useEffect(() => {
+        if (isLoggedIn && noteEntities.length)
+            // cache notes created before loggedIn. This will also be called on page load but at that point ```noteEntities``` wont have elements
+            setNoteEntitiesNotLoggedIn([...noteEntities]);
+            
+    }, [isLoggedIn])
 
 
     async function fetchNotes(): Promise<NoteEntity[]> {
@@ -113,6 +125,19 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
         return response;
     }
+    
+
+    /**
+     * Update ```noteEntities``` state with fetched data and possibly add notes created prior to login.
+     */
+    function handleFetchedDataChange(): void {
+
+        // case: not done fetching yet
+        if (!useQueryResult.data) 
+            return;
+
+        setNoteEntities([...useQueryResult.data, ...noteEntitiesNotLoggedIn]);
+    }    
 
 
     return {
