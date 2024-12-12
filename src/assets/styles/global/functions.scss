@@ -92,7 +92,10 @@
 
 @mixin scrollBar($size: 5px) {
     &::-webkit-scrollbar {
+        // for horizontal scroll bar
         height: $size;
+        // for vertical scroll bar
+        width: $size;
     }
 
     &::-webkit-scrollbar-track {
