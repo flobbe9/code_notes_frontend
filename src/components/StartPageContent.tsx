@@ -40,7 +40,7 @@ export default function StartPageContent({...props}: Props) {
     
     const { isKeyPressed } = useContext(AppContext);
     const { noteEntities, isFetchNoteEntitiesTakingLonger, noteUseQueryResult } = useContext(AppFetchContext);
-    const { selectedTagEntityNames } = useContext(StartPageContainerContext);
+    const { selectedTagEntityNames, editedNoteIds } = useContext(StartPageContainerContext);
     const searchNoteHelper = new SearchNoteHelper(noteEntities, selectedTagEntityNames);
     
     const searchInputRef = useRef(null);
@@ -148,7 +148,6 @@ export default function StartPageContent({...props}: Props) {
                 style={style}
                 {...otherProps}
             >
-                {/* SearchBar */}
                 <Flex className="mt-3" flexWrap="nowrap" verticalAlign="center">
                     <SearchBar 
                         id="StartPage"
@@ -165,27 +164,12 @@ export default function StartPageContent({...props}: Props) {
                     />
                 </Flex>
 
-                {/* New Note Button */}
                 <Flex className="mt-2 mb-5" horizontalAlign="right">
-                    <AddNewNoteButton className={notes.length ? "" : "hover"} />
+                    <SaveAllNotesButton disabled={!editedNoteIds.size} rendered={noteEntities.length > 1} />
+                    <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-4`} />
                 </Flex>
 
-                {/* Notes */}
                 {notes}
-
-                <Flex horizontalAlign="right">
-                    <SaveAllNotesButton 
-                        id="save-all" 
-                        style={{border: "1px solid black"}}
-                    >
-                        <i className="fa-solid fa-floppy-disk me-2"></i> <span className="mt-1">Save all</span>
-                    </SaveAllNotesButton>
-                </Flex>
-                {/* save all */}
-                    {
-                        // TODO continue here
-                        // pass id
-                    }
 
                 {children}
             </div>

@@ -1,7 +1,6 @@
 @import "../styles/global/functions.scss";
 
 .Popup {
-    $scrollBarWidth: 8px;
     $contentContainerPadding: 10px;
 
     display: none;
@@ -23,7 +22,7 @@
             padding: $contentContainerPadding;
             z-index: calc(var(--overlayZIndex) + 1);
             
-            @include scrollBar($scrollBarWidth);
+            @include scrollBar();
             
             // Header
             .popupXButton {

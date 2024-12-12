@@ -7,7 +7,6 @@ import { isResponseError } from "../helpers/fetchUtils";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
-import ButtonWithSlideLabel from "./helpers/ButtonWithSlideLabel";
 import { StartPageContentContext } from "./StartPageContent";
 
 
@@ -72,35 +71,16 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
 
     return (
-        <>
-            {
-                notes.length ? 
-                    <ButtonWithSlideLabel 
-                        id={id} 
-                        className={className}
-                        style={style}
-                        label="New note"
-                        onClickPromise={handleClick}
-                        {...otherProps}
-                        
-                    >
-                        <i className="fa-solid fa-plus"></i>
+        <Button
+            id={id} 
+            className={className + " hover"}
+            style={style}
+            onClickPromise={handleClick}
+            {...otherProps}
+        >
+            <i className="fa-solid fa-plus me-2"></i> <span>New note</span>
 
-                        {children}
-                    </ButtonWithSlideLabel>
-                    :
-                    <Button
-                        id={id} 
-                        className={className + " fullWidth"}
-                        style={style}
-                        onClickPromise={handleClick}
-                        {...otherProps}
-                    >
-                        <i className="fa-solid fa-plus me-1"></i> New Note
-
-                        {children}
-                    </Button>
-            }
-        </>
+            {children}
+        </Button>
     )
 }

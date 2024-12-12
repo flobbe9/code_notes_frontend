@@ -1,26 +1,14 @@
 import $ from "jquery";
-import React, { CSSProperties, forwardRef, MouseEvent, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { ButtonType } from "../../abstract/CSSTypes";
+import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { ButtonProps } from "../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/Button.scss";
 import { isObjectFalsy } from "../../helpers/utils";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 
 
-interface Props extends HelperProps {
+interface Props extends ButtonProps {
 
-    /** Button type (e.g. "submit") */
-    type?: ButtonType,
-    tabIndex?: number,
-    onSubmit?: (event?) => void,
-    /** 
-     * Button will be disabled and show "spinner" while awaiting the promise. 
-     * Remember to set this button's color explicitly for the "spinner" to match children's color.
-     */
-    onClickPromise?: (event?: MouseEvent) => Promise<any>,
-    /** Styles on click */
-    _click?: CSSProperties,
 }
 
 

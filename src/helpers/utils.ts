@@ -21,13 +21,17 @@ export function log(message?: any, ...optionalParams: any[]): void {
 
 export function logDebug(message?: any, ...optionalParams: any[]): void {
 
-    console.log(getTimeStamp(), new Error(message), ...optionalParams);
+    const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
+    
+    console.log(getTimeStamp(), errorObj, message, ...optionalParams);
 }
 
 
 export function logWarn(message?: any, ...optionalParams: any[]): void {
 
-    console.warn(new Error(message), ...optionalParams);
+    const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
+
+    console.warn(getTimeStamp(), errorObj, message, ...optionalParams);
 }
 
 
@@ -39,7 +43,9 @@ export function logWarnFiltered(message?: any, ...optionalParams: any[]): void {
 
 export function logError(message?: any, ...optionalParams: any[]): void {
 
-    console.error(Error(message), ...optionalParams);
+    const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
+
+    console.error(getTimeStamp(), errorObj, message, ...optionalParams);
 }
 
 

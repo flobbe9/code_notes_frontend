@@ -1,14 +1,15 @@
 import $ from "jquery";
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
-import "../../assets/styles/ButtonWithSlideLabel.scss"; 
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import Button from "./Button";
+import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
+import "../../assets/styles/ButtonWithSlideLabel.scss";
+import Button from "./Button";
 
 
 interface Props extends HelperProps {
     /** The text inside the button that will be slide toggled on hover */
     label: string,
+    labelClassName?: string,
 
     onClickPromise?: (event?) => Promise<any>,
 }
@@ -20,8 +21,9 @@ interface Props extends HelperProps {
  * @since 0.0.1
  */
 export default forwardRef(function ButtonWithSlideLabel(
-    {label, title, onClickPromise, ...props}: Props,
-    ref: Ref<HTMLElement>) {
+    {label, labelClassName, title, onClickPromise, ...props}: Props,
+    ref: Ref<HTMLElement>
+) {
 
     const [initialNoteInputButtonLabelWidth, setInitialNoteInputButtonLabelWidth] = useState<string | number>();
 
@@ -110,7 +112,7 @@ export default forwardRef(function ButtonWithSlideLabel(
             {children}
 
             <span className="addNoteInputButtonLabelContainer">
-                <span className="addNoteInputButtonLabel">{label}</span>
+                <span className={`${labelClassName} addNoteInputButtonLabel`}>{label}</span>
             </span>
         </Button>
     )

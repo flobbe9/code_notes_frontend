@@ -1,4 +1,3 @@
-import { log } from "../../helpers/utils";
 import { AbstractEntity } from "../entites/AbstractEntity";
 
 
@@ -7,30 +6,40 @@ import { AbstractEntity } from "../entites/AbstractEntity";
  */
 export abstract class AbstractService {
 
-    entities: AbstractEntity[];
-
-    constructor(entities: AbstractEntity[]) {
-
-        this.entities = entities;
-    }
-
-
-    abstract isEntityValid(entity: AbstractEntity): boolean;
+    /**
+     * Will validate given entities fields, not including referenced entities.
+     * 
+     * @param entity to validate
+     * @returns ```false``` if at least one field is invalid, else ```true```
+     */
+    protected abstract isValid(entity: AbstractEntity): boolean;
 
 
     /**
-     * Validates entities. Stops at first invalid one and toasts a message.
+     * @param i index of invalid entity
+     * @param toast exact same function from "App.tsx" in order to show small popup
+     */
+    protected abstract handleInvalid(i: number, toast: CallableFunction): void;
+
+
+    /**
+     * Validates given ```entities``` using {@link isValid} and will call {@link handleInvalid} if an entity is invalid. 
+     * Stops at first invalid one and toasts a message.
      * 
      * @param invalidHandler callback to execute on the first invalid tag. Passing the index as arg
+     * @param toast exact same function from "App.tsx" in order to show small popup
      * @returns ```true``` if all entites are valid, else ```false```
      */
-    areEntitiesValid(invalidHandler: (i: number) => void): boolean {
+    areEntitiesValid(entities: AbstractEntity[], toast: CallableFunction): boolean {
 
-        for (let i = 0; i < this.entities.length; i++) {
-            const tagEntity = this.entities[i];
+        if (!entities)
+            return false;
 
-            if (!this.isEntityValid(tagEntity)) {
-                invalidHandler(i);
+        for (let i = 0; i < entities.length; i++) {
+            const tagEntity = entities[i];
+
+            if (!this.isValid(tagEntity)) {
+                this.handleInvalid(i, toast);
                 return false;
             }
         }

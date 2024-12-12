@@ -23,13 +23,11 @@ export function getCleanDefaultProps(props: DefaultProps, componentName?: string
 
     componentName = componentName || "";
 
-    let { id, className, children, style, ...otherProps } = props;
+    let { id, className, ...otherProps } = props;
 
     return {
         id: id || componentNameAsId ? componentName + (id || "") : undefined,
         className: (componentName || "") + " " + (className || ""),
-        children: children || "",
-        style: style || {},
         ...otherProps
     };
 }

@@ -2,9 +2,8 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { NoteEntity } from "../../abstract/entites/NoteEntity";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { NoteInputEntityService } from "../../abstract/services/NoteInputEntityService";
 import "../../assets/styles/Note.scss";
-import { DEFAULT_ERROR_MESSAGE, MAX_NOTE_TITLE_VALUE_LENGTH, MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
+import { DEFAULT_ERROR_MESSAGE } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
 import { getJsxElementIndexByKey, getRandomString, isNumberFalsy } from '../../helpers/utils';
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
@@ -18,7 +17,6 @@ import Login from "../Login";
 import { StartPageContainerContext } from "../StartPageContainer";
 import { StartPageContentContext } from "../StartPageContent";
 import { NoteEntityService } from './../../abstract/services/NoteEntityService';
-import { TagEntityService } from './../../abstract/services/TagEntityService';
 import AddNewNoteInput from "./AddNewNoteInput";
 import CodeNoteInput from "./CodeNoteInput";
 import CodeNoteInputWithVariables from "./CodeNoteInputWithVariables";
@@ -139,14 +137,14 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
     async function handleSave(event): Promise<void> {
 
-        // case: invalid input
-        if (!isNoteValid())
-            return;
-
         if (!isLoggedIn) {
             showPopup(<Login isPopupContent />);
             return;
         }
+
+        // case: invalid input
+        if (!isNoteValid())
+            return;
 
         const jsonResponse = await fetchSaveNoteEntity(noteEntity);
         if (isResponseError(jsonResponse)) {
@@ -220,31 +218,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
      */
     function isNoteValid(): boolean {
 
-        const noteEntityService = new NoteEntityService(noteEntity);
-        const tagEntityService = new TagEntityService(noteEntity.tags);
-        const noteInputEntityService = new NoteInputEntityService(noteEntity.noteInputs);
-
-        return noteEntityService.isEntityValid(handleNoteEntityInvalid) &&
-               tagEntityService.areEntitiesValid(handleTagEntityInvalid) && 
-               noteInputEntityService.areEntitiesValid(handleNoteInputEntityInvalid);
-    }
-
-
-    function handleTagEntityInvalid(i: number): void {
-
-        toast(`Tag ${i + 1} invalid`, `Tags cannot be longer than ${MAX_TAG_INPUT_VALUE_LENGTH} characters.`, "warn");
-    }
-
-
-    function handleNoteInputEntityInvalid(i: number): void {
-
-        toast("Note section invalid", `The content of note section number ${i + 1} is too long. Please shorten it a bit.`, "warn");
-    }
-
-
-    function handleNoteEntityInvalid(): void {
-
-        toast("Note title invalid", `The note title cannot be longer than ${MAX_NOTE_TITLE_VALUE_LENGTH} characters.`, "warn");
+        return new NoteEntityService().areValidIncludeReferences(toast, noteEntity);
     }
 
 
@@ -298,6 +272,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
                     <ButtonWithSlideLabel 
                         className="me-4 transition deleteNoteButton" 
                         label="Delete Note"
+                        labelClassName="ms-2"
                         title="Delete note" 
                         onClick={handleDeleteNoteClick}
                     >
@@ -307,8 +282,10 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
                     {/* Save */}
                     <ButtonWithSlideLabel 
                         label="Save Note"
+                        labelClassName="ms-2"
                         className="saveNoteButton saveNoteButton" 
                         title="Save note"
+                        disabled={!editedNoteIds.has(noteEntity.id || -1)}
                         ref={saveButtonRef}
                         onClickPromise={handleSave}
                     >

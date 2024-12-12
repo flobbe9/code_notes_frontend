@@ -1,0 +1,8 @@
+@import "./global/functions.scss";
+
+
+.SaveAllNotesButton {
+    background-color: var(--matteBlackLight);
+    color: var(--saveColor);
+    transition: var(--transitionTime);
+}
