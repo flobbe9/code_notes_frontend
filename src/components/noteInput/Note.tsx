@@ -242,6 +242,16 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     }
 
 
+    function isSaveButtonDisabled(): boolean {
+
+        // case: not logged in, no note ids anyway
+        if (!isLoggedIn)
+            return false;
+
+        return !editedNoteIds.has(noteEntity.id || -1)
+    }
+
+
     return (
         <NoteContext.Provider value={context}>
             <HelperDiv 
@@ -285,7 +295,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
                         labelClassName="ms-2"
                         className="saveNoteButton saveNoteButton" 
                         title="Save note"
-                        disabled={!editedNoteIds.has(noteEntity.id || -1)}
+                        disabled={isSaveButtonDisabled()}
                         ref={saveButtonRef}
                         onClickPromise={handleSave}
                     >

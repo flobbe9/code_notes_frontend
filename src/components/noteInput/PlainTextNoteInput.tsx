@@ -1,21 +1,21 @@
 import parse from 'html-react-parser';
 import $ from "jquery";
-import React, { ClipboardEvent, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { ClipboardEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/PlainTextNoteInput.scss";
 import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
-import { getClipboardText, getCssConstant, isBlank, isEventKeyTakingUpSpace, log, setClipboardText } from "../../helpers/utils";
+import { getClipboardText, getCssConstant, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../helpers/utils";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
+import { AppContext } from '../App';
 import Button from "../helpers/Button";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import Flex from "../helpers/Flex";
-import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import Overlay from '../helpers/Overlay';
+import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from './Note';
-import { AppContext } from '../App';
 
 
 interface Props extends HelperProps {
@@ -48,7 +48,8 @@ export default function PlainTextNoteInput({
         setActivateFullScreenStyles,
         setDeactivateFullScreenStyles,
         toggleFullScreen,
-        isFullScreen
+        isFullScreen,
+        handleDeleteNote
     } = useContext(DefaultNoteInputContext);
 
     const inputDivRef = useRef<HTMLDivElement>(null);
@@ -364,7 +365,7 @@ export default function PlainTextNoteInput({
 
             {/* Fullscreen */}
             <Button 
-                className="fullScreenButton defaultNoteInputButton ms-2"
+                className="fullScreenButton defaultNoteInputButton"
                 title={isFullScreen ? "Normal screen" : "Fullscreen"}
                 onClick={toggleFullScreen}
             >
@@ -382,6 +383,14 @@ export default function PlainTextNoteInput({
             >
                 <i className="fa-solid fa-copy"></i>
                 <i className="fa-solid fa-copy"></i>
+            </Button>
+
+            <Button 
+                className="deleteNoteButton defaultNoteInputButton" 
+                title="Delete section"
+                onClick={handleDeleteNote}
+            >
+                <i className="fa-solid fa-xmark fa-lg"></i>
             </Button>
 
             {children}

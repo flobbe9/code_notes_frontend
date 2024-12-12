@@ -5,14 +5,14 @@ import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps"
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import "../../assets/styles/CodeNoteInput.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
-import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, log, setClipboardText, setCssConstant } from "../../helpers/utils";
+import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, setClipboardText, setCssConstant } from "../../helpers/utils";
 import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
 import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
 import { StartPageContainerContext } from "../StartPageContainer";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
-import NoteInputSettings from "./NoteInputSettings";
 import { NoteContext } from "./Note";
+import NoteInputSettings from "./NoteInputSettings";
 
 
 interface Props extends DefaultProps {
@@ -61,7 +61,8 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         setActivateFullScreenStyles,
         setDeactivateFullScreenStyles,
         toggleFullScreen,
-        isFullScreen
+        isFullScreen,
+        handleDeleteNote
     } = useContext(DefaultNoteInputContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeNoteInput");
@@ -330,7 +331,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
             editorTransition,
             "swing",
             () => setTimeout(() => 
-                getOuterEditorContainer().css("width", "98%"), 300) // wait for possible sidebar animations to finish, even though editor is done
+                getOuterEditorContainer().css("width", "100%"), 300) // wait for possible sidebar animations to finish, even though editor is done
         );
     }
 
@@ -500,7 +501,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
                 <Editor 
                     className="vsCodeEditor" 
                     height={editorHeight} 
-                    width={"98%"}
                     language={codeNoteInputLanguage.toLowerCase()}
                     theme="vs-dark"
                     defaultValue={editorValue}
@@ -509,34 +509,48 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
                 />
             </div>
 
-            {/* NoteInput Settings */}
-            <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
+            <div className="CodeNoteInput-buttonContainer">
+                <Flex flexWrap="nowrap" horizontalAlign="right">
+                    {/* Fullscreen */}
+                    <Button 
+                        className={"fullScreenButton defaultNoteInputButton"}
+                        title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                        disabled={areNoteInputSettingsDisabled}
+                        ref={fullScreenButtonRef}
+                        onClick={toggleFullScreen}
+                    >
+                        {isFullScreen ?
+                            <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                            <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        }
+                    </Button>
 
-            {/* Fullscreen button */}
-            <Button 
-                className={"fullScreenButton defaultNoteInputButton"}
-                title={isFullScreen ? "Normal screen" : "Fullscreen"}
-                disabled={areNoteInputSettingsDisabled}
-                ref={fullScreenButtonRef}
-                onClick={toggleFullScreen}
-            >
-                {isFullScreen ?
-                    <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
-                    <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
-                }
-            </Button>
-            
-            {/* Copy button */}
-            <Button
-                className="defaultNoteInputButton copyButton"
-                title="Copy"
-                disabled={areNoteInputSettingsDisabled}
-                ref={copyButtonRef}
-                onClick={handleCopyClick}
-            >
-                <i className="fa-solid fa-copy"></i>
-                <i className="fa-solid fa-copy"></i>
-            </Button>
+                    {/* Copy */}
+                    <Button
+                        className="defaultNoteInputButton copyButton"
+                        title="Copy"
+                        disabled={areNoteInputSettingsDisabled}
+                        ref={copyButtonRef}
+                        onClick={handleCopyClick}
+                    >
+                        <i className="fa-solid fa-copy"></i>
+                        <i className="fa-solid fa-copy"></i>
+                    </Button>
+
+                    {/* Delete */}
+                    <Button 
+                        className="deleteNoteButton defaultNoteInputButton" 
+                        title="Delete section"
+                        onClick={handleDeleteNote}
+                    >
+                        <i className="fa-solid fa-xmark fa-lg"></i>
+                    </Button>
+                </Flex>
+
+                <Flex className="fullWidth" horizontalAlign="right">
+                    <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
+                </Flex>
+            </div>
                 
             {children}
         </Flex>

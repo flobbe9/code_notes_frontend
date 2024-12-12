@@ -6,7 +6,6 @@ import "../../assets/styles/DefaultNoteInput.scss";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
 import { getJsxElementIndexByKey } from "../../helpers/utils";
 import { AppContext } from "../App";
-import Button from "../helpers/Button";
 import Confirm from "../helpers/Confirm";
 import Flex from "../helpers/Flex";
 import { NoteContext } from "./Note";
@@ -65,7 +64,9 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         isFullScreen,
         setActivateFullScreenStyles,
         setDeactivateFullScreenStyles,
-        toggleFullScreen
+        toggleFullScreen,
+
+        handleDeleteNote
     }
 
 
@@ -195,21 +196,10 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
                 ref={componentRef}
                 {...otherProps}
             >
-                <Flex className="noteInputContent fullWidth" flexWrap="nowrap" verticalAlign="start">
+                <div className="DefaultNoteInput-content fullWidth">
                     {/* NoteInput */}
-                    <div className="defaultNoteInputChildren fullWidth">
-                        {children}
-                    </div>
-
-                    {/* Delete button */}
-                    <Button 
-                        className="deleteNoteButton defaultNoteInputButton" 
-                        title="Delete section"
-                        onClick={handleDeleteNote}
-                    >
-                        <i className="fa-solid fa-xmark fa-lg"></i>
-                    </Button>
-                </Flex>
+                    {children}
+                </div>
             </Flex>
 
         </DefaultNoteInputContext.Provider>
@@ -237,5 +227,7 @@ export const DefaultNoteInputContext = createContext({
     isFullScreen: false as boolean,
     setActivateFullScreenStyles: ({} as Function),
     setDeactivateFullScreenStyles: ({} as Function),
-    toggleFullScreen: (event) => {}
+    toggleFullScreen: (event) => {},
+
+    handleDeleteNote: (event) => {}
 });

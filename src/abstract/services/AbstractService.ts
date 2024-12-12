@@ -26,7 +26,7 @@ export abstract class AbstractService {
      * Validates given ```entities``` using {@link isValid} and will call {@link handleInvalid} if an entity is invalid. 
      * Stops at first invalid one and toasts a message.
      * 
-     * @param invalidHandler callback to execute on the first invalid tag. Passing the index as arg
+     * @param invalidHandler callback to execute on the first invalid entity. Passing the index as arg
      * @param toast exact same function from "App.tsx" in order to show small popup
      * @returns ```true``` if all entites are valid, else ```false```
      */
@@ -36,9 +36,9 @@ export abstract class AbstractService {
             return false;
 
         for (let i = 0; i < entities.length; i++) {
-            const tagEntity = entities[i];
+            const entity = entities[i];
 
-            if (!this.isValid(tagEntity)) {
+            if (!this.isValid(entity)) {
                 this.handleInvalid(i, toast);
                 return false;
             }

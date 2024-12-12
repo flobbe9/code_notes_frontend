@@ -63,7 +63,8 @@ export default function CodeNoteInputWithVariables({
         setActivateFullScreenStyles,
         setDeactivateFullScreenStyles,
         toggleFullScreen,
-        isFullScreen
+        isFullScreen,
+        handleDeleteNote
     } = useContext(DefaultNoteInputContext);
 
 
@@ -696,41 +697,54 @@ export default function CodeNoteInputWithVariables({
                 </Overlay>
             </pre>
 
-            <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
-                {/* NoteInput Settings */}
-                <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
+            <div className="CodeNoteInputWithVariables-buttonContainer">
+                <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
+                    {/* Fullscreen */}
+                    <Button 
+                        className="fullScreenButton defaultNoteInputButton"
+                        title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                        onClick={toggleFullScreen}
+                    >
+                        {isFullScreen ?
+                            <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                            <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        }
+                    </Button>
+                    
+                    {/* Copy */}
+                    <Button
+                        className="defaultNoteInputButton copyButton"
+                        title="Copy with variables"
+                        onClick={handleCopyClick}
+                    >
+                        <i className="fa-solid fa-copy"></i>
+                        <i className="fa-solid fa-copy"></i>
+                    </Button>
 
-                {/* Add variable */}
-                <Button 
-                    className="appendVariableButton defaultNoteInputButton" 
-                    title="Append variable (Ctrl + Shift + V)"
-                    onClick={handleAppendVariableButtonClick}
-                >
-                    <i className="fa-solid fa-dollar-sign"></i>
-                </Button>
-                
-                {/* Fullscreen */}
-                <Button 
-                    className="fullScreenButton defaultNoteInputButton"
-                    title={isFullScreen ? "Normal screen" : "Fullscreen"}
-                    onClick={toggleFullScreen}
-                >
-                    {isFullScreen ?
-                        <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
-                        <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
-                    }
-                </Button>
-                
-                {/* Copy */}
-                <Button
-                    className="defaultNoteInputButton copyButton"
-                    title="Copy with variables"
-                    onClick={handleCopyClick}
-                >
-                    <i className="fa-solid fa-copy"></i>
-                    <i className="fa-solid fa-copy"></i>
-                </Button>
-            </Flex>
+                    {/* Delete */}
+                    <Button 
+                        className="deleteNoteButton defaultNoteInputButton" 
+                        title="Delete section"
+                        onClick={handleDeleteNote}
+                    >
+                        <i className="fa-solid fa-xmark fa-lg"></i>
+                    </Button>
+                </Flex>
+
+                <Flex horizontalAlign="right" flexWrap="nowrap">
+                    {/* Add variable */}
+                    <Button 
+                        className="appendVariableButton defaultNoteInputButton" 
+                        title="Append variable (Ctrl + Shift + V)"
+                        onClick={handleAppendVariableButtonClick}
+                    >
+                        <i className="fa-solid fa-dollar-sign"></i>
+                    </Button>
+
+                    {/* NoteInput Settings */}
+                    <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
+                </Flex>
+            </div>
             
             {children}
         </Flex>

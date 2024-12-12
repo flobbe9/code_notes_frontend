@@ -274,7 +274,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
             id={id} 
             className={className}
             style={style}
-            verticalAlign="start"
+            verticalAlign="center"
             flexWrap={"nowrap"}
             ref={componentRef}
             {...otherProps}

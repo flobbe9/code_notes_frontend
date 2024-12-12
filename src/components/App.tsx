@@ -43,6 +43,9 @@ export default function App() {
     
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
+    /** Whether to prompt confirm on logout click, e.g. because there are unsaved changes */
+    const [isConfirmLogout, setIsConfirmLogout] = useState(false);
+
     const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress();
 
     /** Time the toast popup takes to slide up and down in ms. */
@@ -71,7 +74,9 @@ export default function App() {
 
         showPopup,
         hidePopup,
-        replacePopupContent
+        replacePopupContent,
+
+        isConfirmLogout, setIsConfirmLogout
     }
 
     const toastRef = useRef(null);
@@ -430,5 +435,8 @@ export const AppContext = createContext({
 
     showPopup: (popupContent?: ReactNode) => {},
     hidePopup: () => {},
-    replacePopupContent: (content: ReactNode) => {}
+    replacePopupContent: (content: ReactNode) => {},
+
+    isConfirmLogout: false as boolean, 
+    setIsConfirmLogout: (isConfirm: boolean) => {}
 });

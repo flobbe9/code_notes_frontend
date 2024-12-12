@@ -35,7 +35,7 @@ export default function StartPageContainer({children, ...props}: Props) {
     /** List of note ids that have been edited since they were last saved. Remove a note id from this list, once the note gets saved */
     const [editedNoteIds, setEditedNoteIds] = useState<Set<Number>>(new Set());
 
-    const { windowSize, isMobileWidth } = useContext(AppContext);
+    const { windowSize, isMobileWidth, setIsConfirmLogout } = useContext(AppContext);
     const { isLoggedIn, noteEntities } = useContext(AppFetchContext);
 
     const context = {
@@ -64,6 +64,8 @@ export default function StartPageContainer({children, ...props}: Props) {
 
     useEffect(() => {
         addOrRemovePageUnloadEvent();
+
+        setIsConfirmLogout(!!editedNoteIds.size);
 
         return () => {
             removeConfirmPageUnload(handlePageUnload);

@@ -27,7 +27,7 @@ export class NoteEntityService extends AbstractService {
             return;
         }
 
-        toast("Note title invalid", `The note title cannot be longer than ${MAX_NOTE_TITLE_VALUE_LENGTH} characters.`, "warn");
+        toast(`Note ${i + 1} invalid title`, `The note title cannot be longer than ${MAX_NOTE_TITLE_VALUE_LENGTH} characters.`, "warn");
     }
 
     

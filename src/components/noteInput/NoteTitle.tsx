@@ -26,7 +26,7 @@ export default function NoteTitle({...props}: Props) {
     const { toast, isControlKeyPressed } = useContext(AppContext);
     const { noteEntity, noteEdited } = useContext(NoteContext);
 
-    const inputRef = useRef(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     
     function handleChange(event): void {
@@ -62,7 +62,7 @@ export default function NoteTitle({...props}: Props) {
      * 
      * @param event the key event that triggered this method
      */
-    function handleTitleTooLong(event: Event): void {
+    function handleTitleTooLong(event): void {
 
         event.preventDefault();
 

@@ -21,7 +21,7 @@ export default function NavBarProfileSection({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NavBarProfileSection", true);
 
-    const { isMobileWidth } = useContext(AppContext);
+    const { isMobileWidth, isConfirmLogout } = useContext(AppContext);
     const { isLoggedIn, isLoggedInUseQueryResult, logout } = useContext(AppFetchContext);
 
     
@@ -30,6 +30,12 @@ export default function NavBarProfileSection({...props}: Props) {
 
 
     async function handleLogout(): Promise<void> {
+
+        if (isConfirmLogout) {
+            const doLogout = window.confirm("Delete unsaved changes and logout?");
+            if (!doLogout)
+                return;
+        }
         
         await logout();
     }

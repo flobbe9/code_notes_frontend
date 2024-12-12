@@ -6,7 +6,6 @@ import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import "../assets/styles/SaveAllNotesButton.scss";
 import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
 import fetchJson, { isResponseError } from "../helpers/fetchUtils";
-import { logDebug } from "../helpers/utils";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
@@ -83,6 +82,7 @@ export default function SaveAllNotesButton({...props}: Props) {
     return (
         <Button 
             className={`${className} hover`} 
+            title={props.disabled ? "No changes yet" : "Save all notes"}
             onClickPromise={handleSave}
             {...otherProps}
         >
