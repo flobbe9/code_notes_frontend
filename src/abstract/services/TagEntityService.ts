@@ -24,4 +24,26 @@ export class TagEntityService extends AbstractService {
 
         toast(`Tag ${i + 1} invalid`, `Tags cannot be longer than ${MAX_TAG_INPUT_VALUE_LENGTH} characters.`, "warn");
     }
+    
+
+    /**
+     * @param tags to search ```tag``` in
+     * @param tag to get index for
+     * @returns index of given ```tag``` in given ```tags```, matching by ```tag.name```
+     */
+    public static getTagIndex(tags: TagEntity[], tag: TagEntity): number {
+
+        if (!tags || !tag)
+            return -1;
+
+        let tagIndex = -1;
+        tags.forEach((existingTag, i) => {
+            if (existingTag.name === tag.name) {
+                tagIndex = i;
+                return;
+            }
+        });
+
+        return tagIndex;
+    }
 }

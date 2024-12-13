@@ -2,6 +2,8 @@
 import CryptoJSImpl from '../abstract/CryptoJSImpl';
 import { NoteEntity } from '../abstract/entites/NoteEntity';
 import { TagEntity } from '../abstract/entites/TagEntity';
+import { TagEntityService } from '../abstract/services/TagEntityService';
+import { logWarn } from '../helpers/utils';
 import { AppUserEntity } from './../abstract/entites/AppUserEntity';
 
 
@@ -111,7 +113,11 @@ export class AppUserService {
         if (!tag || !appUserEntity.tags)
             return;
 
-        const tagIndex = appUserEntity.tags.indexOf(tag);
+        const tagIndex = TagEntityService.getTagIndex(appUserEntity.tags, tag);
+        if (tagIndex === -1) {
+            logWarn(`Could not find index for tag '${tag.name}' in appUserEntity.tags`);
+            return;
+        }
 
         appUserEntity.tags.splice(tagIndex, 1);
     }
