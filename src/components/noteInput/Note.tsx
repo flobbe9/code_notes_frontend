@@ -16,7 +16,6 @@ import HelperDiv from "../helpers/HelperDiv";
 import Login from "../Login";
 import { StartPageContainerContext } from "../StartPageContainer";
 import { StartPageContentContext } from "../StartPageContent";
-import { NoteEntityService } from './../../abstract/services/NoteEntityService';
 import AddNewNoteInput from "./AddNewNoteInput";
 import CodeNoteInput from "./CodeNoteInput";
 import CodeNoteInputWithVariables from "./CodeNoteInputWithVariables";
@@ -135,17 +134,18 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     }
 
 
+    /**
+     * Fetch method will validate and toast.
+     * 
+     * @param event 
+     */
     async function handleSave(event): Promise<void> {
 
         if (!isLoggedIn) {
             showPopup(<Login isPopupContent />);
             return;
         }
-
-        // case: invalid input
-        if (!isNoteValid())
-            return;
-
+        
         const jsonResponse = await fetchSaveNoteEntity(noteEntity);
         if (isResponseError(jsonResponse)) {
             toast("Failed to save note", DEFAULT_ERROR_MESSAGE, "error");
@@ -155,7 +155,9 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         // call this before updating side bar, need to get fresh app user tags first
         appUserEntityUseQueryResult.refetch();
 
-        // update sidebar
+        // update saved note in state, update sidebar
+        const noteIndex = getJsxElementIndexByKey(notes, propsKey);
+        noteEntities.splice(noteIndex, 1, jsonResponse);
         setNoteEntities([...noteEntities]);
 
         noteEdited(false);
@@ -185,7 +187,8 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         if (!appUserEntity)
             return;
         
-        if (isLoggedIn) {
+        // case: note was never saved in the first place, dont fetch delete
+        if (!isNumberFalsy(noteEntity.id)) {
             const response = await fetchDeleteNoteEntity(noteEntity);
             if (isResponseError(response)) {
                 toast("Failed to delete note", DEFAULT_ERROR_MESSAGE, "error");
@@ -212,17 +215,6 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
 
     /**
-     * Validate and handle invalid note parts.
-     * 
-     * @returns ```false``` if at least one part of this ```noteEntity``` is invalid
-     */
-    function isNoteValid(): boolean {
-
-        return new NoteEntityService().areValidIncludeReferences(toast, noteEntity);
-    }
-
-
-    /**
      * Mark ```noteEntity``` as edited or saved. Wont do anything if ```noteEntity.id``` is falsy.
      * 
      * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```
@@ -242,13 +234,12 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
     }
 
 
+    /**
+     * @returns ```true``` if note has a valid id (saved already) and is not edited
+     */
     function isSaveButtonDisabled(): boolean {
 
-        // case: not logged in, no note ids anyway
-        if (!isLoggedIn)
-            return false;
-
-        return !editedNoteIds.has(noteEntity.id || -1)
+        return !isNumberFalsy(noteEntity.id) && !editedNoteIds.has(noteEntity.id || -1);
     }
 
 

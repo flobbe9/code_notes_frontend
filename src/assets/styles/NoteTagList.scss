@@ -7,7 +7,6 @@
     padding-right: 5px;
     
     .tagInputContainer {
-        // depends on "scrollBar()" mixin
         overflow: auto;
         @include scrollBar();
     }

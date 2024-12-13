@@ -2,10 +2,9 @@ import React, { MouseEvent, useContext } from "react";
 import { ButtonProps } from "../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
-import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import "../assets/styles/SaveAllNotesButton.scss";
-import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
-import fetchJson, { isResponseError } from "../helpers/fetchUtils";
+import { isResponseError } from "../helpers/fetchUtils";
+import { isNumberFalsy, stringToNumber } from './../helpers/utils';
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
@@ -24,12 +23,17 @@ interface Props extends ButtonProps {
 export default function SaveAllNotesButton({...props}: Props) {
 
     const { toast, showPopup } = useContext(AppContext);
-    const { noteEntities, isLoggedIn } = useContext(AppFetchContext);
+    const { noteEntities, setNoteEntities, isLoggedIn, fetchSaveAllNoteEntities } = useContext(AppFetchContext);
     const { editedNoteIds, setEditedNoteIds } = useContext(StartPageContainerContext);
 
     const {className, children, ...otherProps} = getCleanDefaultProps(props, "SaveAllNotesButton", true);
 
 
+    /**
+     * Fetch method will validate and toast.
+     * 
+     * @param event 
+     */
     async function handleSave(event: MouseEvent): Promise<void> {
         
         if (!isLoggedIn) {
@@ -37,19 +41,18 @@ export default function SaveAllNotesButton({...props}: Props) {
             return;
         }
 
-        if (!areNotesValid())
-            // handled by areNotesValid()
+        const editedNoteEntitiesAndIndices: Record<number, NoteEntity> = getEditedNoteEntities();
+
+        const jsonResponse = await fetchSaveAllNoteEntities(Object.values(editedNoteEntitiesAndIndices));
+        if (isResponseError(jsonResponse))
+            // error handled by fetch method
             return;
 
-        const editedNotes = getNoteEntitiesByIds();
-
-        const url = `${BACKEND_BASE_URL}/note/save-all`;
-        const jsonResponse = await fetchJson(url, "post", editedNotes);
-
-        if (isResponseError(jsonResponse)) {
-            toast("Failed to save notes", DEFAULT_ERROR_MESSAGE, "error");
-            return;
-        }
+        // replace unsaved notes with saved ones before updating the state. Assumes that fetch response keeps the order
+        Object.entries(editedNoteEntitiesAndIndices)
+            .forEach(([noteEntityIndex, noteEntity], i) => 
+                noteEntities.splice(stringToNumber(noteEntityIndex), 1, jsonResponse[i]));
+        setNoteEntities([...noteEntities]);
 
         toast("Save all notes", "All notes saved successfully", "success", 4000);
 
@@ -58,24 +61,23 @@ export default function SaveAllNotesButton({...props}: Props) {
     }
 
 
-    function getNoteEntitiesByIds(): NoteEntity[] {
+    /**
+     * @returns object formatted like <noteEntityIndex, noteEntity>. Contains the noteEntities matching ```editedNoteIds``` or having no id (not beeing saved once yet)
+     */
+    function getEditedNoteEntities(): Record<number, NoteEntity> { 
 
         if (!noteEntities || !editedNoteIds)
             return [];
 
-        return noteEntities
-            .filter(noteEntity => editedNoteIds.has(noteEntity.id || -1));
-    }
+        const editedNoteEntitiesAndIndices: Record<number, NoteEntity> = {};
 
+        noteEntities
+            .forEach((noteEntity, i) => {
+                if (isNumberFalsy(noteEntity.id) || editedNoteIds.has(noteEntity.id!))
+                    editedNoteEntitiesAndIndices[i] = noteEntity;
+            });
 
-    /**
-     * Validate and handle invalid note parts.
-     * 
-     * @returns ```false``` if at least one part of this ```noteEntity``` is invalid
-     */
-    function areNotesValid(): boolean {
-
-        return new NoteEntityService().areValidIncludeReferences(toast, ...noteEntities);
+        return editedNoteEntitiesAndIndices;
     }
     
 

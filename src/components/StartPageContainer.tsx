@@ -35,8 +35,8 @@ export default function StartPageContainer({children, ...props}: Props) {
     /** List of note ids that have been edited since they were last saved. Remove a note id from this list, once the note gets saved */
     const [editedNoteIds, setEditedNoteIds] = useState<Set<Number>>(new Set());
 
-    const { windowSize, isMobileWidth, setIsConfirmLogout } = useContext(AppContext);
-    const { isLoggedIn, noteEntities } = useContext(AppFetchContext);
+    const { windowSize, isMobileWidth, setHasAnyNoteBeenEdited, hasAnyNoteBeenEdited } = useContext(AppContext);
+    const { noteEntities } = useContext(AppFetchContext);
 
     const context = {
         isShowSideBar, 
@@ -52,7 +52,7 @@ export default function StartPageContainer({children, ...props}: Props) {
         setSelectedTagEntityNames,
 
         editedNoteIds,
-        setEditedNoteIds
+        setEditedNoteIds,
     }
 
 
@@ -63,15 +63,19 @@ export default function StartPageContainer({children, ...props}: Props) {
 
 
     useEffect(() => {
+        updateHasAnyNoteBeenEdited();
+        
+    }, [editedNoteIds, noteEntities]);
+    
+    
+    useEffect(() => {
         addOrRemovePageUnloadEvent();
-
-        setIsConfirmLogout(!!editedNoteIds.size);
 
         return () => {
             removeConfirmPageUnload(handlePageUnload);
         }
 
-    }, [editedNoteIds, noteEntities]);
+    }, [hasAnyNoteBeenEdited])
 
 
     /**
@@ -127,7 +131,7 @@ export default function StartPageContainer({children, ...props}: Props) {
 
     function addOrRemovePageUnloadEvent(): void {
 
-        if (hasUnsavedChanges()) 
+        if (hasAnyNoteBeenEdited) 
             confirmPageUnload(handlePageUnload, false); 
 
         else 
@@ -136,16 +140,18 @@ export default function StartPageContainer({children, ...props}: Props) {
     
 
     const handlePageUnload = useCallback((event: BeforeUnloadEvent) => {
+
         event.preventDefault();
     }, []);
 
 
-    function hasUnsavedChanges(): boolean {
+    function updateHasAnyNoteBeenEdited(): void {
 
-        if (isLoggedIn) 
-            return !!editedNoteIds.size;
+        const hasEditedNotes = !!editedNoteIds.size;
 
-        return !!noteEntities.length;
+        const hasNewNotes = !!noteEntities.find(noteEntity => isNumberFalsy(noteEntity.id));
+
+        setHasAnyNoteBeenEdited(hasEditedNotes || hasNewNotes);
     }
 
 
@@ -183,5 +189,5 @@ export const StartPageContainerContext = createContext({
     setSelectedTagEntityNames: (tagEntities: Set<string>) => {},
 
     editedNoteIds: new Set<Number>(),
-    setEditedNoteIds: (editedNoteIds: Set<Number>) => {}
+    setEditedNoteIds: (editedNoteIds: Set<Number>) => {},
 });

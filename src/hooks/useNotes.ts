@@ -8,6 +8,8 @@ import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
+import { log } from "../helpers/utils";
+import { NoteEntityService } from "../abstract/services/NoteEntityService";
 
 
 export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
@@ -34,7 +36,8 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     
     useEffect(() => {
-        handleFetchedDataChange();
+        if (useQueryResult.data)
+            setNoteEntities([...useQueryResult.data, ...noteEntitiesNotLoggedIn]);
 
     }, [useQueryResult.data]);
 
@@ -48,8 +51,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     useEffect(() => {
         if (isLoggedIn && noteEntities.length)
-            // cache notes created before loggedIn. This will also be called on page load but at that point ```noteEntities``` wont have elements
-            setNoteEntitiesNotLoggedIn([...noteEntities]);
+            transferNotesLoggedOutToLoggedIn();
             
     }, [isLoggedIn])
 
@@ -87,18 +89,52 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         if (!isLoggedIn)
             return CustomExceptionFormatService.getInstanceAndLog(401, "Failed to save note entity. UNAUTHORIZED");
 
+        if (!new NoteEntityService().areValidIncludeReferences(toast, noteEntity))
+            return CustomExceptionFormatService.getInstanceAndLog(400, "Failed to save note entity. BAD_REQUEST");
+
         const url = `${BACKEND_BASE_URL}/note/save`;
 
         const jsonResponse = await fetchJson(url, "post", noteEntity);
 
         if (isResponseError(jsonResponse)) {
-            toast("Failed to save note", "An unexpected error has occurred. Please secure your unsaved contents and refresh the page.", "error");
-
+            toast("Failed to save note", DEFAULT_ERROR_MESSAGE, "error");
             return CustomExceptionFormatService.getInstance(jsonResponse.status, jsonResponse.message);
         }
 
         return jsonResponse;
     }
+
+
+    /**
+     * Save given ```noteEntities``` or return error obj. Will toast on fetch error.
+     * 
+     * @param noteEntities to save
+     * @returns the saved note entity or an error obj
+     */
+    async function fetchSaveAll(noteEntities: NoteEntity[]): Promise<NoteEntity[] | CustomExceptionFormat> {
+
+        if (!noteEntities)
+            return CustomExceptionFormatService.getInstanceAndLog(500, "Failed to save note entities. 'noteEntity' cannot be falsy");
+
+        if (!isLoggedIn)
+            return CustomExceptionFormatService.getInstanceAndLog(401, "Failed to save note entities. UNAUTHORIZED");
+
+        if (!noteEntities.length)
+            return CustomExceptionFormatService.getInstanceAndLog(204, "Failed to save note entities. NO_CONTENT");
+
+        if (!new NoteEntityService().areValidIncludeReferences(toast, ...noteEntities))
+            return CustomExceptionFormatService.getInstanceAndLog(400, "Failed to save note entity. BAD_REQUEST");
+
+        const url = `${BACKEND_BASE_URL}/note/save-all`;
+        const jsonResponse = await fetchJson(url, "post", noteEntities);
+
+        if (isResponseError(jsonResponse)) {
+            toast("Failed to save notes", DEFAULT_ERROR_MESSAGE, "error");
+            return CustomExceptionFormatService.getInstance(jsonResponse.status, jsonResponse.message);
+        }
+
+        return jsonResponse;
+    } 
 
 
     async function fetchDelete(noteEntity: NoteEntity): Promise<CustomExceptionFormat | Response> {
@@ -112,30 +148,31 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
             return CustomExceptionFormatService.getInstanceAndLog(401, `${defaultErrorMessage} UNAUTHORIZED`);
 
         const url = `${BACKEND_BASE_URL}/note/delete?id=${noteEntity.id}`;
-
         const response = await fetchAny(url, "delete", noteEntity);
 
         if (isResponseError(response)) {
             toast(defaultErrorMessage, DEFAULT_ERROR_MESSAGE, "error");
-
             return CustomExceptionFormatService.getInstance(response.status, response.message);
         }
 
         return response;
     }
-    
+
 
     /**
-     * Update ```noteEntities``` state with fetched data and possibly add notes created prior to login.
+     * Put notes created prior to login into ```noteEntitiesNotLoggedIn``` state.
      */
-    function handleFetchedDataChange(): void {
+    function transferNotesLoggedOutToLoggedIn(): void {
 
-        // case: not done fetching yet
-        if (!useQueryResult.data) 
+        if (!noteEntities || !noteEntities.length)
             return;
 
-        setNoteEntities([...useQueryResult.data, ...noteEntitiesNotLoggedIn]);
-    }    
+        setTimeout(() => {
+            window.scrollTo(0, document.getElementById("StartPageContent")?.offsetHeight || 0);
+        }, 1000); // wait for startpagecontent to load
+
+        setNoteEntitiesNotLoggedIn([...noteEntities]);
+    }
 
 
     return {
@@ -145,6 +182,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         isFetchTakingLonger,
 
         fetchSave,
+        fetchSaveAll,
         fetchDelete
     }
 }

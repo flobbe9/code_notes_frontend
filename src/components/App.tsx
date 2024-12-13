@@ -44,7 +44,7 @@ export default function App() {
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
     /** Whether to prompt confirm on logout click, e.g. because there are unsaved changes */
-    const [isConfirmLogout, setIsConfirmLogout] = useState(false);
+    const [hasAnyNoteBeenEdited, setHasAnyNoteBeenEdited] = useState(false);
 
     const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress();
 
@@ -76,7 +76,7 @@ export default function App() {
         hidePopup,
         replacePopupContent,
 
-        isConfirmLogout, setIsConfirmLogout
+        hasAnyNoteBeenEdited, setHasAnyNoteBeenEdited
     }
 
     const toastRef = useRef(null);
@@ -437,6 +437,6 @@ export const AppContext = createContext({
     hidePopup: () => {},
     replacePopupContent: (content: ReactNode) => {},
 
-    isConfirmLogout: false as boolean, 
-    setIsConfirmLogout: (isConfirm: boolean) => {}
+    hasAnyNoteBeenEdited: false as boolean, 
+    setHasAnyNoteBeenEdited: (isConfirm: boolean) => {}
 });

@@ -1,11 +1,11 @@
-import React, { ReactNode, useContext, useEffect } from "react";
+import React, { Fragment, ReactNode, useContext, useEffect } from "react";
 import "../../assets/styles/App.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { DefinedUseQueryResult } from "@tanstack/react-query";
 import { AppContext } from "../App";
 
 
-interface Props extends DefaultProps {
+interface Props {
     /** Returned by the ```useQuery``` hook. Contains what is currently fetching */
     useQueryResult: DefinedUseQueryResult
     /** See ```useIsFetchTakingLong``` */
@@ -18,18 +18,17 @@ interface Props extends DefaultProps {
 /**
  * Will display the app pending overlay (see {@link showPendingOverlay}) fetch is taking too long.
  * 
+ * Wont render content.
+ * 
  * @since 0.0.1
  */
 export default function PendingFetchHelper({
     useQueryResult,
     isFetchTakingLong,
-    overlayContent,
-    ...props
+    overlayContent
 }: Props) {
 
     const { showPendingOverlay, hidePendingOverlay } = useContext(AppContext);
-
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PendingFetchHelper");
 
 
     useEffect(() => {
@@ -51,14 +50,5 @@ export default function PendingFetchHelper({
     }
 
 
-    return (
-        <div 
-            id={id} 
-            className={className}
-            style={style}
-            {...otherProps}
-        >
-            {children}
-        </div>
-    )
+    return (<Fragment />)
 }
