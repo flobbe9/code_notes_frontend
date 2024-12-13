@@ -48,7 +48,7 @@ export default function NoteTagList({...props}: Props) {
     useEffect(() => {
         setTagElements(mapTagsToJsx());
 
-    }, []);
+    }, [noteEntity]);
 
 
     function mapTagsToJsx(): JSX.Element[] {

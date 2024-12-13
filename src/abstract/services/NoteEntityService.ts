@@ -18,6 +18,22 @@ export class NoteEntityService extends AbstractService {
 
         return noteEntity.title.length <= MAX_NOTE_TITLE_VALUE_LENGTH;
     }
+        
+
+    /**
+     * @returns instance with default values (mostly ```null```)
+     */
+    public static getDefaultInstance(): NoteEntity {
+
+        return {
+            id: -1,
+            created: "",
+            updated: "",
+            tags: null,
+            title: "",
+            noteInputs: null,
+        };
+    }
 
     
     protected handleInvalid(i: number, toast: CallableFunction): void {

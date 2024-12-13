@@ -117,7 +117,7 @@ export default function AppFetchContextHolder({ children }) {
 export const AppFetchContext = createContext({
     appUserEntity: AppUserService.getDefaultInstance() as AppUserEntity,
     setAppUserEntity: (appUserEntity: AppUserEntity) => {},
-    appUserEntityUseQueryResult: {} as DefinedUseQueryResult,
+    appUserEntityUseQueryResult: {} as DefinedUseQueryResult<AppUserEntity>,
     fetchSaveAppUserEntity: async (appUserToSave?: AppUserEntity, decrypt = true) => {return {} as Promise<AppUserEntity | CustomExceptionFormat> },
     fetchLogin: async (email: string, password: string) => {return {} as Promise<CustomExceptionFormat | Response>},
 
@@ -127,10 +127,10 @@ export const AppFetchContext = createContext({
     fetchSaveAllNoteEntities: async (noteEntities: NoteEntity[]) => {return {} as Promise<NoteEntity[] | CustomExceptionFormat>},
     fetchDeleteNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<Response | CustomExceptionFormat>},
     isFetchNoteEntitiesTakingLonger: false as boolean,
-    noteUseQueryResult: {} as DefinedUseQueryResult,
+    noteUseQueryResult: {} as DefinedUseQueryResult<NoteEntity[]>,
 
     isLoggedIn: false,
-    isLoggedInUseQueryResult: {} as DefinedUseQueryResult,
+    isLoggedInUseQueryResult: {} as DefinedUseQueryResult<boolean>,
 
     logout: async () => {}
 })

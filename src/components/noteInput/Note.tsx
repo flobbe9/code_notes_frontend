@@ -5,7 +5,7 @@ import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import "../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString, isNumberFalsy } from '../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, log } from '../../helpers/utils';
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 import { AppContext } from "../App";
 import { AppFetchContext } from "../AppFetchContextHolder";
@@ -24,12 +24,10 @@ import DefaultNoteInput from "./DefaultNoteInput";
 import NoteTagList from "./NoteTagList";
 import NoteTitle from "./NoteTitle";
 import PlainTextNoteInput from "./PlainTextNoteInput";
+import { NoteEntityService } from "../../abstract/services/NoteEntityService";
 
 
 interface Props extends DefaultProps {
-
-    /** Assuming that this object is taken from ```appUserEntity```. */
-    noteEntity: NoteEntity,
 
     propsKey: string
 }
@@ -41,12 +39,12 @@ interface Props extends DefaultProps {
  * @parent ```<StartPageContent>```
  * @since 0.0.1
  */
-export default function Note({noteEntity, propsKey, ...props}: Props) {
+export default function Note({propsKey, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Note");
 
+    const [noteEntity, setNoteEntity] = useState(NoteEntityService.getDefaultInstance());
     const [isNoteInSearchResults, setIsNoteInSearchResults] = useState(true);
-
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
     const { toast, showPopup } = useContext(AppContext);
@@ -71,7 +69,7 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         noteInputs, 
         setNoteInputs,
 
-        getNoteInputByNoteInputType,
+        createNoteInputByNoteInputType,
 
         noteEdited
     }
@@ -80,9 +78,23 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
 
     useEffect(() => {
-        setNoteInputs(mapNoteInputsToJsx());
+        if (!noteInputs.length)
+            setNoteInputs(mapNoteInputsToJsx());
 
-    }, []);
+    }, [noteEntity]);
+
+
+    useEffect(() => {
+        const noteEntityIndex = getJsxElementIndexByKey(notes, propsKey);
+        // check out of bounds and -1
+        const noteEntity = noteEntities[noteEntityIndex];
+        setNoteEntity(noteEntity)
+
+    }, [noteEntities]);
+    // on noteentities change (?)
+        // update noteentity
+            // get index by props key
+            // get noteentity by index
 
 
     useEffect(() => {
@@ -98,11 +110,11 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
             return [];
 
         return noteEntity.noteInputs.map(noteInputEntity =>
-            getNoteInputByNoteInputType(noteInputEntity));
+            createNoteInputByNoteInputType(noteInputEntity));
     }
 
 
-    function getNoteInputByNoteInputType(noteInputEntity: NoteInputEntity): JSX.Element {
+    function createNoteInputByNoteInputType(noteInputEntity: NoteInputEntity): JSX.Element {
 
         const key = getRandomString();
         switch (noteInputEntity.type) {
@@ -154,6 +166,11 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
 
         // call this before updating side bar, need to get fresh app user tags first
         appUserEntityUseQueryResult.refetch();
+
+        // TODO: make this cleaner
+        noteEntity.id = jsonResponse.id;
+        noteEntity.created = jsonResponse.created;
+        noteEntity.updated = jsonResponse.updated;
 
         // update saved note in state, update sidebar
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
@@ -207,8 +224,6 @@ export default function Note({noteEntity, propsKey, ...props}: Props) {
         // update notes
         notes.splice(noteIndex, 1);
         setNotes([...notes]);
-
-        noteEdited(false);
 
         noteEdited(false);
     }
@@ -306,7 +321,7 @@ export const NoteContext = createContext({
 
     noteInputs: [<></>],
     setNoteInputs: (noteInputs: JSX.Element[]) => {},
-    getNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity, index: number) => {return <></>},
+    createNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity, index: number) => {return <></>},
 
     /**
      * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```

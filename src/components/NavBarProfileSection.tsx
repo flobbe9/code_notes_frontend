@@ -62,6 +62,7 @@ export default function NavBarProfileSection({...props}: Props) {
 
                 {/* TODO: move this somewhere else */}
                 <Button
+                    className="hover"
                     style={{color: "white"}}
                     onClickPromise={handleLogout}
                 >

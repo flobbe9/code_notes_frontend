@@ -3,13 +3,12 @@ import { useContext, useEffect, useState } from "react";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { NoteEntity } from '../abstract/entites/NoteEntity';
+import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
-import { log } from "../helpers/utils";
-import { NoteEntityService } from "../abstract/services/NoteEntityService";
 
 
 export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
@@ -37,7 +36,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
     
     useEffect(() => {
         if (useQueryResult.data)
-            setNoteEntities([...useQueryResult.data, ...noteEntitiesNotLoggedIn]);
+            setNoteEntities([...noteEntitiesNotLoggedIn, ...useQueryResult.data]);
 
     }, [useQueryResult.data]);
 
@@ -51,7 +50,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     useEffect(() => {
         if (isLoggedIn && noteEntities.length)
-            transferNotesLoggedOutToLoggedIn();
+            setNoteEntitiesNotLoggedIn([...noteEntities]);
             
     }, [isLoggedIn])
 
@@ -158,23 +157,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         return response;
     }
 
-
-    /**
-     * Put notes created prior to login into ```noteEntitiesNotLoggedIn``` state.
-     */
-    function transferNotesLoggedOutToLoggedIn(): void {
-
-        if (!noteEntities || !noteEntities.length)
-            return;
-
-        setTimeout(() => {
-            window.scrollTo(0, document.getElementById("StartPageContent")?.offsetHeight || 0);
-        }, 1000); // wait for startpagecontent to load
-
-        setNoteEntitiesNotLoggedIn([...noteEntities]);
-    }
-
-
+    
     return {
         noteEntities,
         setNoteEntities,

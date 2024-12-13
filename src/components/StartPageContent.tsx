@@ -27,12 +27,11 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-// TODO: 
-    // move selected tags?
 export default function StartPageContent({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageContent", true);
     
+    /** Make sure that ```notes``` and ```noteEntities``` are ordered the same at all times! */
     const [notes, setNotes] = useState<JSX.Element[]>([]);
     const [noteSearchValue, setNoteSearchValue] = useState("");
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[]>([]);
@@ -60,7 +59,9 @@ export default function StartPageContent({...props}: Props) {
     useEffect(() => {
         $(window).on("keydown", handleKeyDown);
 
-        setNotes(mapNoteEntitiesToJsx());
+        // only update the whole state if no notes are rendered yet
+        if (!notes.length)
+            setNotes(mapNoteEntitiesToJsx());
 
         return () => {
             $(window).off("keydown", handleKeyDown);
@@ -84,21 +85,20 @@ export default function StartPageContent({...props}: Props) {
     }
 
 
-    // TOOD: map in revers for last to be on top?
     function mapNoteEntitiesToJsx(): JSX.Element[] {
 
-        if (!noteEntities)
+        if (!noteEntities || !noteEntities.length)
             return [];
 
-        return noteEntities.map(noteEntity => 
-            getNoteByNoteEntity(noteEntity));
+        return noteEntities.map((noteEntity) => 
+            getNoteByNoteEntity());
     }
 
 
-    function getNoteByNoteEntity(noteEntity: NoteEntity): JSX.Element {
+    function getNoteByNoteEntity(): JSX.Element {
 
         const key = getRandomString();
-        return <Note noteEntity={noteEntity} key={key} propsKey={String(key)} />
+        return <Note key={key} propsKey={String(key)} />
     }
 
 

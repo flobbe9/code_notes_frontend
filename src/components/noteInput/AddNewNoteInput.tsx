@@ -25,7 +25,7 @@ export default function AddNewNoteInput({...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInput");
 
     const { noteEntities } = useContext(AppFetchContext);
-    const { noteEntity, noteInputs, setNoteInputs, getNoteInputByNoteInputType, noteEdited } = useContext(NoteContext);
+    const { noteEntity, noteInputs, setNoteInputs, createNoteInputByNoteInputType, noteEdited } = useContext(NoteContext);
 
 
     function handleAddCodeNoteInput(event): void {
@@ -128,14 +128,10 @@ export default function AddNewNoteInput({...props}: Props) {
         if (!noteEntity.noteInputs)
             return;
     
-        // update app user
         noteEntity.noteInputs = [...noteEntity.noteInputs, noteInputEntityEntity];
 
-        // update noteInputEntitys
-        let newNoteInputEntitys = noteInputs;
-        const newNoteInputEntity = getNoteInputByNoteInputType(noteInputEntityEntity, noteInputs.length);
-        newNoteInputEntitys = [...newNoteInputEntitys, newNoteInputEntity];
-        setNoteInputs(newNoteInputEntitys);
+        const newNoteInput = createNoteInputByNoteInputType(noteInputEntityEntity, noteInputs.length);
+        setNoteInputs([...noteInputs, newNoteInput]);
 
         noteEdited();
     }
