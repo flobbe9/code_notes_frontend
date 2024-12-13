@@ -2,10 +2,11 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { NoteEntity } from "../../abstract/entites/NoteEntity";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
+import { NoteEntityService } from "../../abstract/services/NoteEntityService";
 import "../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, log } from '../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, logWarn } from '../../helpers/utils';
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 import { AppContext } from "../App";
 import { AppFetchContext } from "../AppFetchContextHolder";
@@ -24,7 +25,6 @@ import DefaultNoteInput from "./DefaultNoteInput";
 import NoteTagList from "./NoteTagList";
 import NoteTitle from "./NoteTitle";
 import PlainTextNoteInput from "./PlainTextNoteInput";
-import { NoteEntityService } from "../../abstract/services/NoteEntityService";
 
 
 interface Props extends DefaultProps {
@@ -85,16 +85,9 @@ export default function Note({propsKey, ...props}: Props) {
 
 
     useEffect(() => {
-        const noteEntityIndex = getJsxElementIndexByKey(notes, propsKey);
-        // check out of bounds and -1
-        const noteEntity = noteEntities[noteEntityIndex];
-        setNoteEntity(noteEntity)
+        updateNoteEntity();
 
     }, [noteEntities]);
-    // on noteentities change (?)
-        // update noteentity
-            // get index by props key
-            // get noteentity by index
 
 
     useEffect(() => {
@@ -166,11 +159,6 @@ export default function Note({propsKey, ...props}: Props) {
 
         // call this before updating side bar, need to get fresh app user tags first
         appUserEntityUseQueryResult.refetch();
-
-        // TODO: make this cleaner
-        noteEntity.id = jsonResponse.id;
-        noteEntity.created = jsonResponse.created;
-        noteEntity.updated = jsonResponse.updated;
 
         // update saved note in state, update sidebar
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
@@ -255,6 +243,24 @@ export default function Note({propsKey, ...props}: Props) {
     function isSaveButtonDisabled(): boolean {
 
         return !isNumberFalsy(noteEntity.id) && !editedNoteIds.has(noteEntity.id || -1);
+    }
+
+
+    function updateNoteEntity(): void {
+
+        const noteEntityIndex = getJsxElementIndexByKey(notes, propsKey);
+        if (noteEntityIndex === -1) {
+            logWarn("Cannot find noteEntity index");
+            return;
+        }
+
+        if (noteEntityIndex >= noteEntities.length) {
+            logWarn(`Note entity index ${noteEntityIndex} out of bounds for 'noteEntities' length ${noteEntities.length}`);
+            return;
+        }
+
+        const noteEntity = noteEntities[noteEntityIndex];
+        setNoteEntity(noteEntity)
     }
 
 

@@ -55,8 +55,7 @@ export function useAppUser(isLoggedIn: boolean) {
 
         // case: fetch error
         if (isResponseError(jsonResponse)) {
-            // TODO: handle 401 differently here?
-                toast("Unexpected Error", "The page could not be loaded completely. Please refresh the page.", "error");
+            toast("Unexpected Error", "The page could not be loaded completely. Please refresh the page.", "error");
             return initAppUserEntity;
         }
 

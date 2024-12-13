@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppFetchContext } from "../components/AppFetchContextHolder";
@@ -21,8 +20,6 @@ export function useCsrfToken() {
     const navigate = useNavigate();
 
     const { isLoggedIn, isLoggedInUseQueryResult } = useContext(AppFetchContext);
-
-    const queryClient = useQueryClient();
 
 
     useEffect(() => {
@@ -83,5 +80,5 @@ export function useCsrfToken() {
     }
 }
 
-/** For useQuery cache, dont confuse with ```CSRF_TOKEN_URL_QUERY_PARAM``` :) */
-export const CSRF_TOKEN_QUERY_KEY = ["csrf"];
+/** For cache, dont confuse with ```CSRF_TOKEN_URL_QUERY_PARAM``` :) */
+export const CSRF_TOKEN_QUERY_KEY = "csrfToken";

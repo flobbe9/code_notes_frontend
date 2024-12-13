@@ -1,16 +1,16 @@
-import $ from "jquery";
-import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
-import { fetchAnyReturnBlobUrl } from "./fetchUtils";
-import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
-import { CSSProperties } from "react";
 import parse, { Element } from "html-react-parser";
+import $ from "jquery";
+import { CSSProperties } from "react";
 import sanitize from "sanitize-html";
 import { useQueryClientObj } from "..";
-import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
-import { AppUserEntity } from "../abstract/entites/AppUserEntity";
-import { NOTE_QUERY_KEY } from "../hooks/useNotes";
-import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import CryptoJSImpl from "../abstract/CryptoJSImpl";
+import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
+import { AppUserEntity } from "../abstract/entites/AppUserEntity";
+import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
+import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
+import { NOTE_QUERY_KEY } from "../hooks/useNotes";
+import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
+import { fetchAnyReturnBlobUrl } from "./fetchUtils";
 
 
 export function log(message?: any, ...optionalParams: any[]): void {
@@ -1169,8 +1169,7 @@ export function clearSensitiveCache(): void {
     if (useQueryClientObj.getQueryData<AppUserEntity>(APP_USER_QUERY_KEY))
         useQueryClientObj.removeQueries({queryKey: APP_USER_QUERY_KEY});
 
-    if (useQueryClientObj.getQueryData<string>(CSRF_TOKEN_QUERY_KEY))
-        useQueryClientObj.removeQueries({queryKey: CSRF_TOKEN_QUERY_KEY});
+    localStorage.removeItem(CSRF_TOKEN_QUERY_KEY);
 }
 
 
@@ -1207,16 +1206,12 @@ export function replaceCurrentBrowserHistoryEntry(path: string = window.location
  */
 export function getCsrfToken(): string {
 
-    const queryClient = useQueryClientObj;
-    if (!queryClient)
-        return "";
-
-    const encryptedCsrfToken = queryClient.getQueryData<string>(CSRF_TOKEN_QUERY_KEY) || "";
+    const encryptedCsrfToken = localStorage.getItem(CSRF_TOKEN_QUERY_KEY);
 
     if (isBlank(encryptedCsrfToken))
         return "";
 
-    return new CryptoJSImpl().decrypt(encryptedCsrfToken);
+    return new CryptoJSImpl().decrypt(encryptedCsrfToken!);
 }
 
 
@@ -1228,13 +1223,9 @@ export function getCsrfToken(): string {
  */
 export function setCsrfToken(csrfToken: string): void {
     
-    const queryClient = useQueryClientObj;
-    if (!queryClient)
-        return;
-
     const encryptedCsrfToken = new CryptoJSImpl().encrypt(csrfToken);
 
-    queryClient.setQueryData<string>(CSRF_TOKEN_QUERY_KEY, encryptedCsrfToken);
+    localStorage.setItem(CSRF_TOKEN_QUERY_KEY, encryptedCsrfToken);
 }
 
 

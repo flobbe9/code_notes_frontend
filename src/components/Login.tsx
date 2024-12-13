@@ -368,9 +368,6 @@ export default function Login({isPopupContent = false, ...props}: Props) {
                         Login
                     </Button>
 
-                    {/* Reset Password */}
-                    {/* TODO */}
-                    
                     <div className="Login-contentContainer-formContainer-linkContainer textCenter mb-5">
                         {/* Send reset-password mail */}
                         <div>

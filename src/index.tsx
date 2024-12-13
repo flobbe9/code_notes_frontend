@@ -14,7 +14,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 export const useQueryClientObj = new QueryClient();
 
 const persister = createSyncStoragePersister({
-    storage: localStorage
+    storage: sessionStorage
 })
 
 // hide some error messages
