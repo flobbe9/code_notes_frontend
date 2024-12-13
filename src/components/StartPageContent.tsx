@@ -59,8 +59,8 @@ export default function StartPageContent({...props}: Props) {
     useEffect(() => {
         $(window).on("keydown", handleKeyDown);
 
-        // only update the whole state if no notes are rendered yet
-        if (!notes.length)
+        // only update the whole state if no notes are rendered yet or notes have been cleared
+        if (!notes.length || !noteEntities.length)
             setNotes(mapNoteEntitiesToJsx());
 
         return () => {

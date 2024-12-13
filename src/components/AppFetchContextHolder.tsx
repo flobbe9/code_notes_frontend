@@ -100,7 +100,7 @@ export default function AppFetchContextHolder({ children }) {
      */
     async function logout(): Promise<void> {
 
-        await fetchJson(LOGOUT_URL);
+        await fetchJson(LOGOUT_URL, "post");
 
         isLoggedInUseQueryResult.refetch();
     }
