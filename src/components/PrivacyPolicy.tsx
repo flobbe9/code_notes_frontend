@@ -36,9 +36,10 @@ export default function PrivacyPolicy({...props}: Props) {
                 <p>
                     Mr. Florin Schikarski <br />
                     Bäckerklint 4 <br />
-                    38100 Braunschweig <br /><br />
+                    38100 Braunschweig <br />
+                    Germany<br /><br />
 
-                    Email: support.code-notes@gmail.com
+                    Email: <a href="mailto:support.code-notes@gmail.com" className="blueLink" rel={LINK_DEFAULT_REL}>support.code-notes@gmail.com</a>
                 </p>
 
                 <h3>User Data</h3>

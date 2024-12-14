@@ -126,7 +126,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     /**
      * Encrypts and stores given csrf token to local storage. 
      * 
-     * Either navigates to start page or (if ```isPopupContent```) just refreshes states
+     * Either navigates to last page or (if ```isPopupContent```) just refreshes states
      * 
      * @param csrfToken to store
      */
@@ -135,8 +135,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
         setCsrfToken(csrfToken);
 
         if (!isPopupContent)
-            // location change will refetch loggedin state
-            navigate(START_PAGE_PATH);
+            window.history.back();
 
         else {
             isLoggedInUseQueryResult.refetch(); 

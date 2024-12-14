@@ -2,7 +2,7 @@ import $ from "jquery";
 import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
-import { LOGIN_PATH, PRIVACY_POLICY_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_PATH, START_PAGE_PATH } from "../helpers/constants";
+import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { getCssConstant, getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
@@ -20,6 +20,7 @@ import ResetPassword from "./ResetPassword";
 import RouteContext from "./RouteContext";
 import StartPageContainer from './StartPageContainer';
 import PrivacyPolicy from "./PrivacyPolicy";
+import Contact from "./Contact";
 
 
 /**
@@ -392,6 +393,7 @@ export default function App() {
                                     <Route path={RESET_PASSWORD_PATH} element={<LoggedInComponent element={<ResetPassword />} />} />
                                     <Route path={RESET_PASSWORD_BY_TOKEN_PATH} element={<ResetPassword />} />
                                     <Route path={PRIVACY_POLICY_PATH} element={<PrivacyPolicy />} />
+                                    <Route path={CONTACT_PATH} element={<Contact />} />
                                     <Route path="*" element={<div>404</div>} />
                                 </Routes>
                             </div>
