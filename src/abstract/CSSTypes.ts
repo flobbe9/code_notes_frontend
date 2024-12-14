@@ -12,3 +12,5 @@ export type JQueryEasing = "swing" | "linear" | "default" | "easeInQuad" | "ease
                             "easeInOutExpo" | "easeInCirc" | "easeOutCirc" | "easeInOutCirc" | "easeInElastic" |
                             "easeOutElastic" | "easeInOutElastic" | "easeInBack" | "easeOutBack" | "easeInOutBack" | 
                             "easeInBounce" | "easeOutBounce" | "easeInOutBounce";
+/** Possible values for ```element.animate()``` easing prop. Docs: https://udn.realityripple.com/docs/Web/API/EffectTiming/easing#:~:text=The%20EffectTiming%20dictionary */
+export type AnimationEasing = "ease" | "ease-in" | "ease-out" | "ease-in-out";

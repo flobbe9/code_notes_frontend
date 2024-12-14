@@ -11,6 +11,7 @@ import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTE_QUERY_KEY } from "../hooks/useNotes";
 import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
+import { AnimationEasing } from "../abstract/CSSTypes";
 
 
 export function log(message?: any, ...optionalParams: any[]): void {
@@ -1243,4 +1244,76 @@ export function isPathRelative(path: string | undefined | null): boolean {
     return !path!.startsWith("http") &&
             !path!.startsWith("www") && 
             !path!.startsWith(HOST);
+}
+
+
+/**
+ * Animate element from transparent to solid and set ```display = 'block'```.
+ * 
+ * @param element to fade in
+ * @param duration time the animation will take in ms
+ * @param easing animation function, see {@link AnimationEasing}
+ * @param options more animation options, see {@link KeyframeAnimationOptions}
+ * @param onComplete callback to execute on animation completion
+ */
+export function fadeIn(element: HTMLElement, duration = 100, easing?: AnimationEasing, options?: KeyframeAnimationOptions, onComplete?: () => void): void {
+
+    if (!element)
+        return;
+
+    element.style.display = "block";
+    element.animate(
+        [
+            { opacity: 0 }, 
+            { opacity: 1 }
+        ],
+        { 
+            duration, 
+            easing, 
+            ...(options || {}) 
+        }
+    );
+
+    if (onComplete)
+        setTimeout(() => onComplete(), duration);
+}
+
+
+/**
+ * Animate element to transparent, then set ```display = 'none'```.
+ * 
+ * @param element to fade out
+ * @param duration time the animation will take in ms
+ * @param easing animation function, see {@link AnimationEasing}
+ * @param options more animation options, see {@link KeyframeAnimationOptions}
+ * @param onComplete callback to execute on animation completion
+ */
+export function fadeOut(element: HTMLElement, duration = 100, easing?: AnimationEasing, options?: KeyframeAnimationOptions, onComplete?: () => void): void {
+
+    if (!element)
+        return;
+
+    if (isNumberFalsy(duration))
+        duration = 100;
+
+    const opacity = stringToNumber(element.style.opacity);
+    element.animate(
+        [
+            { opacity: opacity === -1 ? 1 : opacity }, 
+            { opacity: 0 }
+        ],
+        { 
+            duration, 
+            easing, 
+            ...(options || {}) 
+        }
+    );
+
+    setTimeout(() => {
+        element.style.display = "none";
+
+        if (onComplete)
+            onComplete();
+        
+    }, duration);
 }

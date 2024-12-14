@@ -39,7 +39,7 @@ export default function App() {
     const [isAppOverlayHideOnEscape, setIsAppOverlayHideOnEscape] = useState(true);
     
     const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const [popupContent, setPopupContent] = useState<ReactNode>([]);
+    const [popupContent, setPopupContent] = useState<ReactNode | undefined>([]);
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
     const [popup2Content, setPopup2Content] = useState<ReactNode>([]);
     
@@ -249,7 +249,7 @@ export default function App() {
      * 
      * @param popupContent will only update state if this is not ```undefined```
      */
-    function showPopup(popupContent?: ReactNode): void {
+    function showPopup(popupContent?: ReactNode | undefined): void {
 
         const { setIsPopupVisible, setPopupContent, isBottomMostPopup } = getPopupAfterTopMostVisiblePopup();
 
@@ -295,8 +295,8 @@ export default function App() {
      * @returns all states of the ```<Popup>``` that rendered last and visible
      */
     function getTopMostVisiblePopup(): { 
-        popupContent: ReactNode,
-        setPopupContent: (content: ReactNode) => void,
+        popupContent: ReactNode | undefined,
+        setPopupContent: (content: ReactNode | undefined) => void,
         isPopupVisible: boolean,
         setIsPopupVisible: (isVisible: boolean) => void,
         isBottomMostPopup: boolean
@@ -326,8 +326,8 @@ export default function App() {
      * @returns all states of the ```<Popup>``` after the topMost visible popup
      */
     function getPopupAfterTopMostVisiblePopup(): { 
-        popupContent: ReactNode,
-        setPopupContent: (content: ReactNode) => void,
+        popupContent: ReactNode | undefined,
+        setPopupContent: (content: ReactNode | undefined) => void,
         isPopupVisible: boolean,
         setIsPopupVisible: (isVisible: boolean) => void,
         isBottomMostPopup: boolean
@@ -437,9 +437,9 @@ export const AppContext = createContext({
     showPendingOverlay: (overlayContent?: ReactNode) => {},
     hidePendingOverlay: () => {},
 
-    showPopup: (popupContent?: ReactNode) => {},
+    showPopup: (popupContent?: ReactNode | undefined) => {},
     hidePopup: () => {},
-    replacePopupContent: (content: ReactNode) => {},
+    replacePopupContent: (content: ReactNode | undefined) => {},
 
     hasAnyNoteBeenEdited: false as boolean, 
     setHasAnyNoteBeenEdited: (isConfirm: boolean) => {}

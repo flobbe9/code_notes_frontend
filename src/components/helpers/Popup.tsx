@@ -1,9 +1,9 @@
-import $ from "jquery";
 import React, { ReactNode, useContext, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/Popup.scss";
 import { POPUP_FADE_DURATION } from "../../helpers/constants";
+import { fadeIn, fadeOut } from "../../helpers/utils";
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 import { AppContext } from "../App";
 import Button from "./Button";
@@ -12,7 +12,7 @@ import HelperDiv from "./HelperDiv";
 
 
 interface Props extends DefaultProps {
-    popupContent: React.ReactNode,
+    popupContent: React.ReactNode | undefined,
     isPopupVisible: boolean,
     setPopupContent: (content: ReactNode) => void
 }
@@ -52,7 +52,8 @@ export default function Popup({
 
 
     useEffect(() => {
-        popupContainerRef.current!.scrollTo({top: 0})
+        if (popupContent)
+            popupContainerRef.current!.scrollTo({top: 0})
     }, [popupContent]);
 
 
@@ -76,12 +77,12 @@ export default function Popup({
      */
     async function hideThisPopup(): Promise<void> {
 
-        $(componentRef.current!).fadeOut(POPUP_FADE_DURATION);
+        fadeOut(componentRef.current!, POPUP_FADE_DURATION);
         
         // wait for popup to be hidden
         await new Promise((res, rej) => {
             setTimeout(() => {
-                res(setPopupContent(<></>));
+                res(setPopupContent(undefined));
             }, POPUP_FADE_DURATION);   
         });
     }
@@ -89,11 +90,8 @@ export default function Popup({
 
     function showThisPopup(): void {
 
-        const popup = $(componentRef.current!);
-
-        popup.fadeIn(POPUP_FADE_DURATION);
-
-        popup.trigger("focus");
+        fadeIn(componentRef.current!, POPUP_FADE_DURATION);
+        componentRef.current!.focus();
     }
 
 

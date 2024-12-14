@@ -132,7 +132,7 @@ export default function StartPageContainer({children, ...props}: Props) {
     function addOrRemovePageUnloadEvent(): void {
 
         if (hasAnyNoteBeenEdited) 
-            confirmPageUnload(handlePageUnload, false); 
+            confirmPageUnload(handlePageUnload); 
 
         else 
             removeConfirmPageUnload(handlePageUnload);
