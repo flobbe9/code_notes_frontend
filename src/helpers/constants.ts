@@ -14,16 +14,16 @@ export const APP_NAME_PRETTY = "Code Notes";
 // URLs
 export const BASE_URL = process.env.REACT_APP_BASE_URL as string;
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL + "";
-/** Default rel attr to pass to any link */
+/** Default rel attr to pass to any external link */
 export const LINK_DEFAULT_REL = "noopener noreferrer nofollow";
 export const START_PAGE_PATH = "/";
 export const PROFILE_PATH = "/profile";
 export const ABOUT_PATH = "/about";
-export const DATA_POLICY_PATH = "/data-policy";
 export const LOGIN_PATH = `/login`;
 export const REGISTER_PATH = `/register`;
 export const RESET_PASSWORD_PATH = `/reset-password`;
 export const RESET_PASSWORD_BY_TOKEN_PATH = `/reset-password-by-token`;
+export const PRIVACY_POLICY_PATH = `/privacy-policy`;
 export const LOGOUT_URL = `${BACKEND_BASE_URL}/logout`;
 /** The link that will trigger the oauth2 flow. This link is useless without the provider name appended. E.g. append "/google" */
 const OAUTH2_AUTH_LINK = `${BACKEND_BASE_URL}/oauth2/authorization`;
