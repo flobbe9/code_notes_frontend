@@ -16,9 +16,9 @@ export default class CryptoJSImpl {
 
 
     /**
-     * @param key secret string used by alogrithm. Needs to be 22 chars long. Default is {@link CRYPTO_KEY}.
+     * @param key secret string used by alogrithm. Needs to be 8 chars long. Default is {@link CRYPTO_KEY}.
      * @param iv secret string used by alogrithm. Necessary for encryption to always return the same value. Default is {@link CRYPTO_IV}
-     *           Needs to be 22 chars long
+     *           Needs to be 8 chars long
      */
     constructor(key = CRYPTO_KEY, iv = CRYPTO_IV) {
 
@@ -28,8 +28,8 @@ export default class CryptoJSImpl {
             return;
         }
 
-        this.key = CryptoJS.enc.Base64.parse(key);
-        this.iv = CryptoJS.enc.Base64.parse(iv);
+        this.key = CryptoJS.lib.WordArray.create(new TextEncoder().encode(key))
+        this.iv = CryptoJS.lib.WordArray.create(new TextEncoder().encode(iv))
     }
 
     
@@ -102,8 +102,8 @@ export default class CryptoJSImpl {
             return false;
         }
 
-        // length necessary for algorithm to work
-        if (key.length !== 22 || iv.length !== 22) {
+        // case: too short, insecure (I guess)
+        if (key.length < 8 || iv.length < 8) {
             logError("Either key or iv length are unexpected.");
             return false;
         }
