@@ -14,9 +14,10 @@ import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     const [noteEntities, setNoteEntities] = useState<NoteEntity[]>([]);
-
     /** Notes created prior to login, these will be set right after logging in and then added to the ```noteEntities``` */
     const [noteEntitiesNotLoggedIn, setNoteEntitiesNotLoggedIn] = useState<NoteEntity[]>([]);
+    /** Is a toggle state, meaning that the boolean does not reflect the states meaning. Is toggled everytime useQueryResult.data updates */
+    const [gotNewData, setGotNewData] = useState(false);
 
     const { toast } = useContext(AppContext);
 
@@ -35,8 +36,12 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     
     useEffect(() => {
-        if (useQueryResult.data)
+        if (useQueryResult.data) {
             setNoteEntities([...noteEntitiesNotLoggedIn, ...useQueryResult.data]);
+            setNoteEntitiesNotLoggedIn([]);
+            // this is to notify the component to map all notes again
+            setGotNewData(!gotNewData);
+        }
 
     }, [useQueryResult.data]);
 
@@ -163,6 +168,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         setNoteEntities,
         useQueryResult,
         isFetchTakingLonger,
+        gotNewData, setGotNewData,
 
         fetchSave,
         fetchSaveAll,

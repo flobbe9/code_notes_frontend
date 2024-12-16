@@ -36,7 +36,7 @@ export default function StartPageContent({...props}: Props) {
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[]>([]);
     
     const { isKeyPressed, hasAnyNoteBeenEdited } = useContext(AppContext);
-    const { noteEntities, isFetchNoteEntitiesTakingLonger, noteUseQueryResult } = useContext(AppFetchContext);
+    const { noteEntities, isFetchNoteEntitiesTakingLonger, noteUseQueryResult, gotNewNoteEntities } = useContext(AppFetchContext);
     const { selectedTagEntityNames } = useContext(StartPageContainerContext);
     const searchNoteHelper = new SearchNoteHelper(noteEntities, selectedTagEntityNames);
     
@@ -58,14 +58,16 @@ export default function StartPageContent({...props}: Props) {
     useEffect(() => {
         window.addEventListener("keydown",  handleKeyDown);
 
-        // only update the whole state if no notes are rendered yet or notes have been cleared
-        if (!notes.length || !noteEntities.length)
-            setNotes(mapNoteEntitiesToJsx());
-
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         }
-    }, [noteEntities]);
+    }, []);
+
+
+    useEffect(() => {
+        setNotes(mapNoteEntitiesToJsx());
+
+    }, [gotNewNoteEntities]);
 
 
     useEffect(() => {

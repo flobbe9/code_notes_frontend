@@ -46,6 +46,8 @@ export default function AppFetchContextHolder({ children }) {
         fetchSave: fetchSaveNoteEntity, 
         fetchSaveAll: fetchSaveAllNoteEntities,
         fetchDelete: fetchDeleteNoteEntity, 
+        gotNewData: gotNewNoteEntities, 
+        setGotNewData: setGotNewNoteEntities
     } = useNotes(isLoggedIn, appUserEntity);
 
     const context = {
@@ -62,6 +64,8 @@ export default function AppFetchContextHolder({ children }) {
         fetchSaveNoteEntity, 
         fetchSaveAllNoteEntities,
         fetchDeleteNoteEntity, 
+        gotNewNoteEntities,
+        setGotNewNoteEntities,
 
         isLoggedIn, 
         isLoggedInUseQueryResult,
@@ -128,6 +132,8 @@ export const AppFetchContext = createContext({
     fetchDeleteNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<Response | CustomExceptionFormat>},
     isFetchNoteEntitiesTakingLonger: false as boolean,
     noteUseQueryResult: {} as DefinedUseQueryResult<NoteEntity[]>,
+    gotNewNoteEntities: false as boolean,
+    setGotNewNoteEntities: (newNoteEntities: boolean) => {},
 
     isLoggedIn: false,
     isLoggedInUseQueryResult: {} as DefinedUseQueryResult<boolean>,

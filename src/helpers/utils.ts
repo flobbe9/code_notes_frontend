@@ -1212,7 +1212,7 @@ export async function fadeOut(element: HTMLElement | undefined | null, duration 
     if (isNumberFalsy(duration))
         duration = 100;
 
-    const opacity = stringToNumber(element.style.opacity);
+    const opacity = stringToNumber(window.getComputedStyle(element).getPropertyValue("opacity"));
     const animation = element.animate(
         [
             { opacity: opacity === -1 ? 1 : opacity }, 

@@ -246,7 +246,14 @@ export default function Note({propsKey, ...props}: Props) {
     }
 
 
+    /**
+     * Update ```noteEntity``` state retrieving the correct note entity from ```noteEntities``` using the jsx element index of this note
+     */
     function updateNoteEntity(): void {
+
+        // may happen on login / logout
+        if (!noteEntities.length)
+            return;
 
         const noteEntityIndex = getJsxElementIndexByKey(notes, propsKey);
         if (noteEntityIndex === -1) {

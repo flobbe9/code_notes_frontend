@@ -38,15 +38,24 @@ export default forwardRef(function ButtonWithSlideLabel(
     useEffect(() => {
         // wait for adjacent elements to render as well
         setTimeout(
-            () => setInitialNoteInputButtonLabelWidth(getNoteInputButtonLabelWidth())
-            , 200);
+            () => setInitialNoteInputButtonLabelWidth(getNoteInputButtonLabelWidth()), 
+            200
+        );
         
     }, []);
 
 
     function handleMouseEnter(event: MouseEvent): void {
 
+        // case: initial width not set yet
+        if (!initialNoteInputButtonLabelWidth)
+            return;
+
         const buttonLabelElement = (event.target as HTMLElement).querySelector(".addNoteInputButtonLabelContainer") as HTMLButtonElement;
+
+        // case: not finished rendered yet (?)
+        if (!buttonLabelElement)
+            return;
 
         // prepare for animation
         buttonLabelElement.style.position = "relative";
@@ -95,6 +104,9 @@ export default forwardRef(function ButtonWithSlideLabel(
 
 
     function getNoteInputButtonLabelWidth(): string {
+
+        if (!componentRef.current)
+            return "0";
 
         const buttonLabelElement = componentRef.current!.querySelector(".addNoteInputButtonLabelContainer") as HTMLButtonElement;
         return buttonLabelElement?.offsetWidth + "px";
