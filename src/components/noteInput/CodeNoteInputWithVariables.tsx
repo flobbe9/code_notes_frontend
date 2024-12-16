@@ -1,6 +1,5 @@
 import hljs from "highlight.js";
 import parse from 'html-react-parser';
-import $ from "jquery";
 import React, { ClipboardEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
@@ -8,17 +7,18 @@ import HelperProps from "../../abstract/HelperProps";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import "../../assets/styles/CodeNoteInputWithVariables.scss";
 import "../../assets/styles/highlightJs/vs.css";
-import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../helpers/constants";
-import { cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../helpers/utils";
+import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../helpers/constants";
+import { animateAndCommit, cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../helpers/utils";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 import { AppContext } from "../App";
 import Button from "../helpers/Button";
 import ContentEditableDiv from "../helpers/ContentEditableDiv";
 import Flex from "../helpers/Flex";
 import Overlay from "../helpers/Overlay";
+import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
-import NoteInputSettings from "./NoteInputSettings";
 import { NoteContext } from "./Note";
+import NoteInputSettings from "./NoteInputSettings";
 
 
 interface Props extends HelperProps {
@@ -42,15 +42,14 @@ export default function CodeNoteInputWithVariables({
 
     const [inputDivValue, setInputDivValue] = useState<any>()
     
-    const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
-
     const [hasComponentRendered, sethasComponentRendered] = useState(false);
 
     const [inputHighlighted, setInputHighlighted] = useState(true);
     
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeNoteInputWithVariables");
     
-    const inputDivRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
+    const inputDivRef = useRef<HTMLDivElement>(null);
 
     const { isKeyPressed, isControlKeyPressed } = useContext(AppContext);
     const { noteEdited } = useContext(NoteContext);
@@ -66,13 +65,13 @@ export default function CodeNoteInputWithVariables({
         isFullScreen,
         handleDeleteNote
     } = useContext(DefaultNoteInputContext);
+    const { componentRef: defaultCodeNoteInputRef } = useContext(DefaultCodeNoteInputContext);
 
 
-    useInitialStyles(inputDivJQuery, [["max-width", "width"]], 100);
+    useInitialStyles(inputDivRef.current, [["max-width", "width"]], 100);
 
     
     useEffect(() => {
-        setInputDivJQuery($(inputDivRef.current!));
 
         setInputDivValue(parse(sanitize(noteInputEntity.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
 
@@ -120,8 +119,8 @@ export default function CodeNoteInputWithVariables({
 
         const highlightPromise = await new Promise<string>((res, rej) => {
             setTimeout(() => {
-                const inputDiv = $(inputDivRef.current!);
-                const inputChildren = inputDiv.children();
+                const inputDiv = inputDivRef.current!;
+                const inputChildren = inputDiv.children;
 
                 // case: first line is not a node
                 const firstLine = getFirstInputDivContentLine();
@@ -139,7 +138,8 @@ export default function CodeNoteInputWithVariables({
                     highlightedHtmlString += "</div>";
 
                 // iterate lines after first line
-                Array.from(inputChildren).forEach(child => {
+                Array.from(inputChildren).forEach(inputChild => {
+                    const child = inputChild as HTMLElement;
                     let innerText = child.innerText;
                     const innerHtml = child.innerHTML;
 
@@ -163,7 +163,7 @@ export default function CodeNoteInputWithVariables({
                     highlightedHtmlString += "</div>";
                 });
 
-                inputDiv.html(highlightedHtmlString);
+                inputDiv.innerHTML = highlightedHtmlString;
 
                 res(highlightedHtmlString); 
             }, 0); // somehow necessary for states to update properly, 0 milliseconds is fine
@@ -185,8 +185,8 @@ export default function CodeNoteInputWithVariables({
     async function unHighlightInputDivContent(): Promise<string> {
 
         const unHighlightedContent = await new Promise<string>((res, rej) => {
-            const inputDiv = $(inputDivRef.current!);
-            const inputHtml = inputDiv.html();
+            const inputDiv = inputDivRef.current!;
+            const inputHtml = inputDiv.innerHTML;
 
             // remove highlights
             let sanitizedInputHtml = sanitizeForInputDiv(inputHtml);
@@ -194,7 +194,7 @@ export default function CodeNoteInputWithVariables({
             // convert inputs
             sanitizedInputHtml = parseVariableInputToVariableInputSequence(sanitizedInputHtml);
 
-            inputDiv.html(sanitizedInputHtml);
+            inputDiv.innerHTML = sanitizedInputHtml;
 
             setInputHighlighted(false);
             
@@ -210,12 +210,12 @@ export default function CodeNoteInputWithVariables({
      */
     function getFirstInputDivContentLine(): string {
 
-        const inputDiv = $(inputDivRef.current!);
-        let inputHtml = inputDiv.html();
+        const inputDiv = inputDivRef.current!;
+        let inputHtml = inputDiv.innerHTML;
 
         // case: no html tags inside inputDiv
         if (!inputHtml.includes("<"))
-            inputHtml = inputDiv.text();
+            inputHtml = inputDiv.innerText;
         
         else {
             // get text until first tag
@@ -322,11 +322,11 @@ export default function CodeNoteInputWithVariables({
      */
     function appendVariableInput(): void {
 
-        const inputDiv = $(inputDivRef.current!);
-        const inputDivChildDivs = inputDiv.find("div")
-        const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.last() : inputDiv;
+        const inputDiv = inputDivRef.current!;
+        const inputDivChildDivs = inputDiv.querySelectorAll("div");
+        const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.item(inputDivChildDivs.length - 1) : inputDiv;
 
-        lastChildDiv.html(lastChildDiv.html() + getDefaultVariableInput(VARIABLE_INPUT_DEFAULT_PLACEHOLDER, getDefaultVariableInputWidth()));
+        lastChildDiv.innerHTML = (lastChildDiv.innerHTML + getDefaultVariableInput(VARIABLE_INPUT_DEFAULT_PLACEHOLDER, getDefaultVariableInputWidth()));
     }
 
         
@@ -335,11 +335,11 @@ export default function CodeNoteInputWithVariables({
      */
     function appendVariableInputSequence(): void {
 
-        const inputDiv = $(inputDivRef.current!);
-        const inputDivChildDivs = inputDiv.find("div")
-        const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.last() : inputDiv;
+        const inputDiv = inputDivRef.current!;
+        const inputDivChildDivs = inputDiv.querySelectorAll("div");
+        const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.item(inputDivChildDivs.length - 1) : inputDiv;
 
-        lastChildDiv.html(lastChildDiv.html() + VARIABLE_INPUT_START_SEQUENCE + VARIABLE_INPUT_DEFAULT_PLACEHOLDER + VARIABLE_INPUT_END_SEQUENCE);
+        lastChildDiv.innerHTML = lastChildDiv.innerHTML + VARIABLE_INPUT_START_SEQUENCE + VARIABLE_INPUT_DEFAULT_PLACEHOLDER + VARIABLE_INPUT_END_SEQUENCE;
     }
 
 
@@ -404,8 +404,8 @@ export default function CodeNoteInputWithVariables({
      */
     async function copyInputDivContentToClipboard(): Promise<void> {
 
-        const inputDiv = $(inputDivRef.current!);
-        let inputDivHtml = inputDiv.html();
+        const inputDiv = inputDivRef.current!;
+        let inputDivHtml = inputDiv.innerHTML;
 
         // get varialbeInput values
         const variableInputValues = getVariableInputValues();
@@ -441,22 +441,14 @@ export default function CodeNoteInputWithVariables({
 
         let values: string[] = [];
 
-        $(inputDivRef.current!).find("input")
-                               .each((i, input) => {
-                                    if (input.type === "text")
-                                        values.push(input.value)
-                                });
+        inputDivRef.current!.querySelectorAll("input")
+            .forEach((element) => {
+                const input = element as HTMLInputElement;
+                if (input.type === "text")
+                    values.push(input.value)
+            });
 
         return values;
-    }
-
-
-    /**
-     * @returns ```true``` if input div contains the placeholder, else ```false```
-     */
-    function hasPlaceholder(): boolean {
-
-        return $(inputDivRef.current!).children().first().is(".placeholderInput");
     }
 
 
@@ -466,7 +458,7 @@ export default function CodeNoteInputWithVariables({
     function updateAppUserEntity(): void {
 
         // value
-        noteInputEntity.value = $(inputDivRef.current!).html();
+        noteInputEntity.value = inputDivRef.current!.innerHTML;
 
         // programmingLanguage
         noteInputEntity.programmingLanguage = codeNoteInputWithVariablesLanguage;
@@ -475,7 +467,7 @@ export default function CodeNoteInputWithVariables({
 
     async function handleFocus(event): Promise<void> {
 
-        if (event.target.className !== "variableInput" && !hasPlaceholder())
+        if (event.target.className !== "variableInput")
             await unHighlightInputDivContent();
     }
 
@@ -489,7 +481,7 @@ export default function CodeNoteInputWithVariables({
             onBlur(event);
 
         // case: focus was not on a variable input or the placeholder textarea
-        if (!inputHighlighted && !hasPlaceholder())
+        if (!inputHighlighted)
             await highlightInputDivContent();
     }
     
@@ -532,24 +524,24 @@ export default function CodeNoteInputWithVariables({
 
     function cleanUpEmptyInputDiv(event): void {
 
-        const inputDiv = $(inputDivRef.current!);
-        const inputBreaks = inputDiv.find("br");
+        const inputDiv = inputDivRef.current!;
+        const inputBreaks = inputDiv.querySelectorAll("br");
         
         // case: no content left
-        if (isBlank(inputDiv.text()) && inputBreaks.length <= 1)
+        if (isBlank(inputDiv.innerText) && inputBreaks.length <= 1)
             // clean up empty tags
-            inputDiv.html("");
+            inputDiv.innerHTML = "";
     }
 
 
     function handleInputDivContainerClick(event): void {
 
-        const inputDiv = $(inputDivRef.current!);
+        const inputDiv = inputDivRef.current!;
 
         // case: not focuesd yet and not clicking a variableInput
-        if (!inputDiv.is(":focus") && event.target.className !== "variableInput")
+        if (!inputDiv.matches(":focus") && event.target.className !== "variableInput")
             // focus input div
-            inputDiv.trigger("focus");
+            inputDiv.focus();
     }
 
 
@@ -563,69 +555,58 @@ export default function CodeNoteInputWithVariables({
 
     function activateFullScreenStyles(): void {
 
-        const inputDiv = $(inputDivRef.current!);
-        const defaultCodeNoteInput = inputDiv.parents(".DefaultCodeNoteInput");
-        const inputDivContainer = inputDiv.parents(".inputDivContainer");
+        const inputDiv = inputDivRef.current!;
+        const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
+        const inputDivContainer = componentRef.current!.querySelector(".inputDivContainer") as HTMLElement;
 
         const appOverlayZIndex = getCssConstant("overlayZIndex");
 
-        defaultCodeNoteInput.css({
-            position: "fixed",
-            zIndex: appOverlayZIndex + 1
-        });
+        defaultCodeNoteInput.style.position = "fixed";
+        defaultCodeNoteInput.style.zIndex = appOverlayZIndex + 1;
+        defaultCodeNoteInput.style.width = "90vw";
 
-        defaultCodeNoteInput.animate({
-            top: "10vh",
-            width: "90vw"
-        });
+        animateAndCommit(
+            defaultCodeNoteInput,
+            [{ top: window.getComputedStyle(defaultCodeNoteInput).getPropertyValue("top") }, { top: "10vh" }], 
+            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION }
+        );
 
-        inputDivContainer.animate({
-            height: "80vh"
-        })
+        animateAndCommit(
+            inputDivContainer, 
+            [{ height: window.getComputedStyle(defaultCodeNoteInput).getPropertyValue("height") }, { height: "80vh" }], 
+            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION}
+        );
 
-        inputDiv.animate({
-            maxHeight: "80vh"
-        })
+        animateAndCommit(inputDiv, { maxHeight: "80vh" });
     }
 
 
     function deactivateFullScreenStyles(): void {
 
-        const inputDiv = $(inputDivRef.current!);
-        const defaultCodeNoteInput = inputDiv.parents(".DefaultCodeNoteInput");
-        const inputDivContainer = inputDiv.parents(".inputDivContainer");
-        
+        const inputDiv = inputDivRef.current!;
+        const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
+        const inputDivContainer = componentRef.current!.querySelector(".inputDivContainer") as HTMLElement;
+
         // move up just a little bit
-        defaultCodeNoteInput.css({
-            position: "relative",
-            top: "30px",
-        });
+        defaultCodeNoteInput.style.position = "relative";
+        defaultCodeNoteInput.style.top = "30px";
         
         // resize quickly
-        defaultCodeNoteInput.css({
-            width: "100%"
-        });
-        inputDivContainer.css({
-            height: "100%"
-        });
-        inputDiv.css({
-            maxHeight: "var(--codeNoteInputWithVariablesMinHeight)"
-        })
+        defaultCodeNoteInput.style.width = "100%";
+
+        inputDivContainer.style.height = "100%";
+        inputDiv.style.maxHeight = "var(--codeNoteInputWithVariablesMinHeight)";
 
         // animate to start pos
-        defaultCodeNoteInput.animate(
-            {
-                top: 0,
-            },
-            300,
-            "swing", 
+        animateAndCommit(
+            defaultCodeNoteInput,
+            { top: 0 },
+            { duration: 300 },
             () => {
                 // reset to initial styles
-                defaultCodeNoteInput.css({
-                    position: "static",
-                    top: "auto",
-                    zIndex: 0
-                });
+                defaultCodeNoteInput.style.position = "static";
+                defaultCodeNoteInput.style.top = "auto";
+                defaultCodeNoteInput.style.zIndex = "0";
             }
         )
     }
@@ -663,6 +644,7 @@ export default function CodeNoteInputWithVariables({
             className={className + " fullWidth " + (isFullScreen && "fullScreen")}
             style={style}
             flexWrap="nowrap"
+            ref={componentRef}
             {...otherProps}
         >
             <pre 

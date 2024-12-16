@@ -1,4 +1,4 @@
-import React, { createContext, useRef } from "react";
+import React, { createContext, RefObject, useRef } from "react";
 import { DefaultNoteInputProps } from "../../abstract/DefaultNoteInputProps";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/DefaultCodeNoteInput.scss";
@@ -18,10 +18,10 @@ export default function DefaultCodeNoteInput({noteInputEntity, propsKey, ...prop
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultCodeNoteInput");
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
 
     const context = {
-        
+        componentRef
     }
 
     
@@ -36,7 +36,6 @@ export default function DefaultCodeNoteInput({noteInputEntity, propsKey, ...prop
                     {...otherProps}
                 >
                     <Flex flexWrap="nowrap">
-                        {/* CodeNoteInput */}
                         {children}
                     </Flex>
                 </div>
@@ -47,4 +46,5 @@ export default function DefaultCodeNoteInput({noteInputEntity, propsKey, ...prop
 
 
 export const DefaultCodeNoteInputContext = createContext({
+    componentRef: {} as RefObject<HTMLDivElement>
 });

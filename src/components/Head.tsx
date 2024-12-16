@@ -1,6 +1,6 @@
-import $ from "jquery";
 import React, { useEffect } from "react";
 import { useLocation } from "react-router";
+import { addClass, stringToHtmlElement } from "../helpers/utils";
 
 
 interface Props {
@@ -22,6 +22,7 @@ interface Props {
 export default function Head({headTagStrings = [], rendered = true}: Props) {
 
     const location = useLocation();
+    const headTagClassName = "headTag";
 
 
     useEffect(() => {
@@ -40,12 +41,12 @@ export default function Head({headTagStrings = [], rendered = true}: Props) {
             return;
 
         headTagStrings.forEach(headTagString => {
-            const headTag = $(headTagString);
+            const headTag = stringToHtmlElement(headTagString);
 
             // add class in order to remove this later
-            headTag.addClass("headTag");
+            addClass(headTag, headTagClassName);
 
-            $("head").append(headTag);
+            document.head.append(headTag);
         });
     }
 
@@ -58,7 +59,8 @@ export default function Head({headTagStrings = [], rendered = true}: Props) {
         if (!rendered)
             return;
 
-        $(".headTag").remove();
+        document.querySelectorAll(`.${headTagClassName}`)
+            .forEach(headTag => headTag.remove());
     }
 
 

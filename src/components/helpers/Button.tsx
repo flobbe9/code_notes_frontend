@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { ButtonProps } from "../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
@@ -38,25 +37,21 @@ export default forwardRef(function Button({
     const [isDisabled, setIsDisabled] = useState(disabled);
     const [isHover, setIsHover] = useState(false);
     const [isMouseDown, setIsMouseDown] = useState(false);
-    // state with jquery
-    const [componentJQuery, setComponentJQuery] = useState<JQuery>();
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Button");
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLButtonElement>(null);
 
     useImperativeHandle(ref, () => componentRef.current!, []);
 
     
     // set min width for promise buttons
-    useInitialStyles(componentJQuery, (onClickPromise ? [["min-width", "width"], ["min-height", "height"]] : []), 200);
+    useInitialStyles(componentRef.current, (onClickPromise ? [["min-width", "width"], ["min-height", "height"]] : []), 200);
 
 
     useEffect(() => {
         if (onRender) 
             onRender();
-
-        setComponentJQuery($(componentRef.current!));
 
     }, []);
 

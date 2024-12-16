@@ -32,6 +32,10 @@
             @include customHover {
                 cursor: pointer;
             }
+
+            @include customFocus {
+                background: red;
+            }
         }
 
         .textInputErrorMessage {
@@ -47,6 +51,7 @@
 
     .selectOptionsContainer {
         background-color: rgb(230, 230, 230);
+        display: none;
         margin-top: 2px;
         position: absolute;
         width: 100%;

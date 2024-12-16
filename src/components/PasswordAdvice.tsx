@@ -1,13 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import $ from "jquery";
-import "../assets/styles/PasswordAdvice.scss";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
-import HelperDiv from "./helpers/HelperDiv";
-import Flex from "./helpers/Flex";
-import { isBlank, setCssConstant } from "../helpers/utils";
-import { useHasComponentMounted } from "../hooks/useHasComponentMounted";
 import HelperProps from "../abstract/HelperProps";
+import "../assets/styles/PasswordAdvice.scss";
+import { isBlank, setCssConstant } from "../helpers/utils";
 import { AppContext } from "./App";
+import Flex from "./helpers/Flex";
+import HelperDiv from "./helpers/HelperDiv";
 
 
 interface Props extends HelperProps {
@@ -38,16 +36,13 @@ export default function PasswordAdvice({password, useMobileView = false, ...prop
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PasswordAdvice", true);
 
-    const componentRef = useRef(null);
-
-    const hasComponentMounted = useHasComponentMounted();
+    const componentRef = useRef<HTMLDivElement>(null);
 
 
     useEffect(() => {
-        if (hasComponentMounted)
-            initComponentWidth();
+        initComponentWidth();
 
-    }, [hasComponentMounted]);
+    }, [props.rendered]);
 
 
     useEffect(() => {
@@ -103,7 +98,7 @@ export default function PasswordAdvice({password, useMobileView = false, ...prop
 
     function initComponentWidth(): void {
 
-        const componentWidth = $(componentRef.current!).outerWidth() || 0;
+        const componentWidth = componentRef.current!.offsetWidth;
 
         setCssConstant("passwordAdviceWidth", componentWidth + "px");
     }

@@ -1,10 +1,9 @@
-import $ from "jquery";
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, RefObject, useContext, useEffect, useRef, useState } from "react";
 import { DefaultNoteInputProps } from "../../abstract/DefaultNoteInputProps";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/DefaultNoteInput.scss";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../helpers/constants";
-import { getJsxElementIndexByKey } from "../../helpers/utils";
+import { animateAndCommit, getJsxElementIndexByKey } from "../../helpers/utils";
 import { AppContext } from "../App";
 import Confirm from "../helpers/Confirm";
 import Flex from "../helpers/Flex";
@@ -38,7 +37,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultNoteInput");
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
 
     const { isAppOverlayVisible, setIsAppOverlayVisible, showPopup } = useContext(AppContext);
 
@@ -66,15 +65,17 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         setDeactivateFullScreenStyles,
         toggleFullScreen,
 
-        handleDeleteNote
+        handleDeleteNote,
+
+        componentRef
     }
 
 
     useEffect(() => {
-        $(window).on("keydown", handleGlobalKeyDown);
+        window.addEventListener("keydown", handleGlobalKeyDown);
 
         return () => {
-            $(window).off("keydown", handleGlobalKeyDown);
+            window.removeEventListener("keydown", handleGlobalKeyDown);
         }
 
     }, [isFullScreen, isAppOverlayVisible]);
@@ -121,18 +122,18 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
      */
     function animateCopyIcon(): void {
 
-        const copyIcon = $(componentRef.current!).find(".copyButton .fa-copy").first();
+        const copyIcon = componentRef.current!.querySelector(".copyButton .fa-copy") as HTMLElement;
 
-        copyIcon.animate(
+        animateAndCommit(
+            copyIcon,
             {
                 opacity: 0,
                 fontSize: "3em"
             },
-            400,
-            "easeOutSine",
+            { duration: 400, easing: "ease-out" },
             () => {
-                copyIcon.css("opacity", 1);
-                copyIcon.css("fontSize", "1em");
+                copyIcon.style.opacity = "1";
+                copyIcon.style.fontSize = "1em";
             }
         );
     } 
@@ -229,5 +230,7 @@ export const DefaultNoteInputContext = createContext({
     setDeactivateFullScreenStyles: ({} as Function),
     toggleFullScreen: (event) => {},
 
-    handleDeleteNote: (event) => {}
+    handleDeleteNote: (event) => {},
+
+    componentRef: {} as RefObject<HTMLDivElement>
 });

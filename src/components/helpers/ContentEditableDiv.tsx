@@ -1,11 +1,10 @@
-import $ from "jquery";
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
-import "../../assets/styles/ContentEditableDiv.scss";
+import React, { ClipboardEvent, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import HelperDiv from "./HelperDiv";
 import HelperProps from "../../abstract/HelperProps";
+import "../../assets/styles/ContentEditableDiv.scss";
+import { getClipboardText, includesIgnoreCase, isBlank, isEmpty, isEventKeyTakingUpSpace } from "../../helpers/utils";
+import HelperDiv from "./HelperDiv";
 import HiddenInput from "./HiddenInput";
-import { getClipboardText, includesIgnoreCase, isBlank, isEmpty, isEventKeyTakingUpSpace, log } from "../../helpers/utils";
 
 
 interface Props extends HelperProps {
@@ -47,8 +46,8 @@ export default forwardRef(function ContentEditableDiv(
     
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ContentEditableDiv");
 
-    const componentRef = useRef(null);
-    const hiddencomponentRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
+    const hiddencomponentRef = useRef<HTMLInputElement>(null);
     
     useImperativeHandle(ref, () => componentRef.current!, []);
 
@@ -72,7 +71,7 @@ export default forwardRef(function ContentEditableDiv(
             onFocus(event);
 
         if (includesIgnoreCase(event.target.className, "placeholderInput"))
-            $(componentRef.current!).trigger("focus");
+            componentRef.current!.focus();
     }
 
 
@@ -90,7 +89,7 @@ export default forwardRef(function ContentEditableDiv(
 
     function preventFocus(): void {
 
-        $(hiddencomponentRef.current!).trigger("focus")
+        hiddencomponentRef.current!.focus()
     }
 
 
@@ -100,22 +99,27 @@ export default forwardRef(function ContentEditableDiv(
      *                        Default is ```true```
      * @returns ```true``` if input div has no text (or white space) and no html (except possibly the placeholder ```<input>```)
      */
+    // TODO: does not work
+        // improove innerText/Html is empty conditons
     function isInputDivEmpty(withPlaceholder = true): boolean {
 
-        const inputDiv = $(componentRef.current!);
-        const innerText = inputDiv.text();
-        const innerHtml = inputDiv.html();
-        const inputDivChildren = inputDiv.children();
-        const firstInputDivChild = inputDivChildren.first();
+        const inputDiv = componentRef.current!;
+        const innerText = inputDiv.innerText;
+        const innerHtml = inputDiv.innerHTML;
+        const inputDivChildren = inputDiv.children;
+        const firstInputDivChild = inputDivChildren.length ? inputDivChildren[0] : undefined;
 
-        const isInnerHtmlConsideredEmpty = !inputDivChildren.length || firstInputDivChild.is(".placeholderInput");
+        const isInnerHtmlConsideredEmpty = !inputDivChildren.length || !!firstInputDivChild?.matches(".placeholderInput");
+        // const isInnerHtmlConsideredEmpty = firstInputDivChild?.matches("br") || !!firstInputDivChild?.matches(".placeholderInput");
 
         // case: empty only without inner text and a placeholder input
         if (withPlaceholder)
             return isEmpty(innerText) && isInnerHtmlConsideredEmpty;
+            // return innerText === "\n" && isInnerHtmlConsideredEmpty;
 
         // case: actually empty
         return isEmpty(innerText) && isEmpty(innerHtml);
+        // return (isBlank(innerText) || innerText === "\n") && (isBlank(innerHtml) || innerHtml === "<br>");
     }
 
 
@@ -174,25 +178,25 @@ export default forwardRef(function ContentEditableDiv(
         placeholderInput.className = "placeholderInput";
         placeholderInput.placeholder = placeholder;
 
-        $(componentRef.current!).html(placeholderInput);
+        componentRef.current!.append(placeholderInput);
     }
 
 
     function removePlaceholderInput(): void {
 
-        $(componentRef.current!).html("");
+        componentRef.current!.innerHTML = "";
     }
 
 
     /**
      * Works only if reading clipboard data is permitted.
      */
-    async function handleCut(event: React.ClipboardEvent<any>): Promise<void> {
+    async function handleCut(event: ClipboardEvent): Promise<void> {
 
         if (disabled)
             return;
 
-        const innerText = $(componentRef.current!).text();
+        const innerText = componentRef.current!.innerText;
         const clipboardText = await getClipboardText();
 
         // case: cut all content

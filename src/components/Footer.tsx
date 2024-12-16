@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
@@ -24,15 +23,10 @@ export default function Footer({...props}: Props) {
 
     
     useEffect(() => {
-        setCssConstant("footerHeight", getFooterHeight());
+        setCssConstant("footerHeight", componentRef.current!.offsetHeight + "px");
 
     }, []);
 
-
-    function getFooterHeight(): string {
-
-        return ($(componentRef.current!).outerHeight()?.toString() || "0") + "px";
-    }
 
     return (
         <Flex 

@@ -1,9 +1,7 @@
-import $ from "jquery";
-import React, { CSSProperties, forwardRef, HTMLAttributes, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
-import "../../assets/styles/RadioButton.scss";
+import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import { log } from "../../helpers/utils";
+import "../../assets/styles/RadioButton.scss";
 import Flex from "./Flex";
 import HiddenInput from "./HiddenInput";
 
@@ -59,7 +57,7 @@ export default forwardRef(function RadioButton(
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "RadioButton");
 
-    const inputRef = useRef(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useImperativeHandle(ref, () => inputRef.current!, []);
 
@@ -100,7 +98,7 @@ export default forwardRef(function RadioButton(
         if (disabled)
             return;
         
-        $(inputRef.current!).prop("checked", true);
+        inputRef.current!.checked = true;
     }
 
 

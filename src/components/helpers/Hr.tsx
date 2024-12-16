@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { useEffect, useRef } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/Hr.scss";
@@ -61,16 +60,16 @@ export default function Hr({
      */
     function makeBackgroundNonTransparent(): void {
 
-        const textContainer = $(textContainerRef.current!);
-        const parentBackgroundColor = $(componentRef.current!).parent().css("backgroundColor");
+        const textContainer = textContainerRef.current!;
+        const parentBackgroundColor = window.getComputedStyle(componentRef.current!.parentElement!).getPropertyValue("background-color");
 
         // case: parent background is completely opque
-        if (isBlank(parentBackgroundColor) || !parentBackgroundColor.includes("rgba"))
+        if (isBlank(parentBackgroundColor) || !parentBackgroundColor!.includes("rgba"))
             return;
 
         // case: parent background is completely transparent
-        if (parentBackgroundColor.includes("0)"))
-            textContainer.css("backgroundColor", "rgb(255, 255, 255)");
+        if (parentBackgroundColor!.includes("0)"))
+            textContainer.style.backgroundColor = "rgb(255, 255, 255)";
     }
 
 

@@ -1,8 +1,8 @@
-import $ from "jquery";
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, MouseEvent, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/ButtonWithSlideLabel.scss";
+import { animateAndCommit, stopAnimations } from "../../helpers/utils";
 import Button from "./Button";
 
 
@@ -25,11 +25,11 @@ export default forwardRef(function ButtonWithSlideLabel(
     ref: Ref<HTMLElement>
 ) {
 
-    const [initialNoteInputButtonLabelWidth, setInitialNoteInputButtonLabelWidth] = useState<string | number>();
+    const [initialNoteInputButtonLabelWidth, setInitialNoteInputButtonLabelWidth] = useState<string>();
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ButtonWithSlideLabel");
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLButtonElement>(null);
 
 
     useImperativeHandle(ref, () => componentRef.current!, []);
@@ -37,63 +37,67 @@ export default forwardRef(function ButtonWithSlideLabel(
 
     useEffect(() => {
         // wait for adjacent elements to render as well
-        setTimeout(() => {
-            setInitialNoteInputButtonLabelWidth(getNoteInputButtonLabelWidth());
-        }, 200);
+        setTimeout(
+            () => setInitialNoteInputButtonLabelWidth(getNoteInputButtonLabelWidth())
+            , 200);
         
     }, []);
 
 
-    function handleMouseEnter(event): void {
+    function handleMouseEnter(event: MouseEvent): void {
 
-        const buttonLabelElement = $(event.target).find(".addNoteInputButtonLabelContainer");
+        const buttonLabelElement = (event.target as HTMLElement).querySelector(".addNoteInputButtonLabelContainer") as HTMLButtonElement;
 
         // prepare for animation
-        buttonLabelElement.css("position", "relative");
-        buttonLabelElement.css("width", "0");
-        buttonLabelElement.css("zIndex", "0");
+        buttonLabelElement.style.position = "relative";
+        buttonLabelElement.style.width = "0";
+        buttonLabelElement.style.zIndex = "0";
 
-        buttonLabelElement.stop();
+        stopAnimations(buttonLabelElement);
 
         // show button label
-        buttonLabelElement.animate(
+        animateAndCommit(
+            buttonLabelElement,
             {
                 opacity: 1,
                 width: initialNoteInputButtonLabelWidth,
             },
-            300
-        )
+            { duration: 300 }
+        );
     }
 
 
     function handleMouseLeave(event): void {
 
-        const buttonLabelElement = $(event.target).find(".addNoteInputButtonLabelContainer");
+        const buttonLabelElement = event.target.querySelector(".addNoteInputButtonLabelContainer") as HTMLButtonElement;
 
-        buttonLabelElement.stop();
+        stopAnimations(buttonLabelElement);
 
         // hide button label
-        buttonLabelElement.animate(
+        animateAndCommit(
+            buttonLabelElement,
             {
                 opacity: 0,
                 width: 0,
             },
-            300,
-            "easeOutSine",
+            {
+                duration: 300,
+                easing: "ease-out"
+            },
             // reset label style
             () => {
-                buttonLabelElement.css("position", "absolute");
-                buttonLabelElement.css("zIndex", "-1");
-                buttonLabelElement.css("width", initialNoteInputButtonLabelWidth || "");        
+                buttonLabelElement.style.position = "absolute";
+                buttonLabelElement.style.zIndex = "-1";
+                buttonLabelElement.style.width = initialNoteInputButtonLabelWidth || "";        
             }
         )
     }
 
 
-    function getNoteInputButtonLabelWidth(): string | number | undefined {
+    function getNoteInputButtonLabelWidth(): string {
 
-        const buttonLabelElement = $(componentRef.current!).find(".addNoteInputButtonLabelContainer");
-        return buttonLabelElement.outerWidth();
+        const buttonLabelElement = componentRef.current!.querySelector(".addNoteInputButtonLabelContainer") as HTMLButtonElement;
+        return buttonLabelElement?.offsetWidth + "px";
     }
     
 

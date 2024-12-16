@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
@@ -30,7 +29,7 @@ export default forwardRef(function HelperDiv(
     
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props);
 
-    const componentRef = useRef(null)
+    const componentRef = useRef<HTMLDivElement>(null);
 
     // make "ref" usable inside this component
     useImperativeHandle(ref, () => componentRef.current!, []);
@@ -47,10 +46,10 @@ export default forwardRef(function HelperDiv(
 
     function toggleIsHover(): void {
 
-        const component = $(componentRef.current!);
+        const component = componentRef.current!;
 
-        component.on("mouseenter", () => setIsHover(true))
-                 .on("mouseleave", () => setIsHover(false));
+        component.addEventListener("mouseenter", () => setIsHover(true));
+        component.addEventListener("mouseleave", () => setIsHover(false));
     }
 
     

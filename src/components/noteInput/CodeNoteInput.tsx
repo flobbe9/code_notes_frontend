@@ -1,15 +1,15 @@
 import { Editor } from "@monaco-editor/react";
-import $ from "jquery";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import "../../assets/styles/CodeNoteInput.scss";
-import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
-import { getCssConstant, getCSSValueAsNumber, isNumberFalsy, setClipboardText, setCssConstant } from "../../helpers/utils";
+import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION } from "../../helpers/constants";
+import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, setClipboardText, setCssConstant } from "../../helpers/utils";
 import useWindowResizeCallback from "../../hooks/useWindowResizeCallback";
 import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
 import { StartPageContainerContext } from "../StartPageContainer";
+import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from "./Note";
 import NoteInputSettings from "./NoteInputSettings";
@@ -62,12 +62,13 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         setDeactivateFullScreenStyles,
         toggleFullScreen,
         isFullScreen,
-        handleDeleteNote
+        handleDeleteNote,
     } = useContext(DefaultNoteInputContext);
+    const { componentRef: defaultCodeNoteInputRef } = useContext(DefaultCodeNoteInputContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeNoteInput");
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef(null);
     const copyButtonRef = useRef(null);
     const fullScreenButtonRef = useRef(null);
@@ -326,12 +327,12 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
         const editor = getOuterEditorContainer();
 
-        editor.animate(
+        animateAndCommit(
+            editor,
             { width: editorWidth },
-            editorTransition,
-            "swing",
+            { duration: editorTransition },
             () => setTimeout(() => 
-                getOuterEditorContainer().css("width", "100%"), 300) // wait for possible sidebar animations to finish, even though editor is done
+                getOuterEditorContainer().style.width = "100%", 300) // wait for possible sidebar animations to finish, even though editor is done
         );
     }
 
@@ -339,7 +340,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     function handleWindowResize(): void {
 
         if (isShowNoteInputSettings)
-            setFullEditorWidth(getOuterEditorContainer().width()! - getNoteInputSettingsWidth());
+            setFullEditorWidth(getOuterEditorContainer().offsetWidth! - getNoteInputSettingsWidth());
 
         else
             updateFullEditorWidth();
@@ -349,9 +350,9 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     /**
      * @returns the most outer container (a ```<section>```) of the monaco editor. The ```editorRef``` is somewhere deeper inside
      */
-    function getOuterEditorContainer(): JQuery {
+    function getOuterEditorContainer(): HTMLElement {
 
-        return $(componentRef.current!).find("section").first();
+        return componentRef.current!.querySelector("section") as HTMLElement;
     }
 
 
@@ -377,7 +378,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
      */
     function updateFullEditorWidth(): number {
 
-        const newFullEditorWidth = getOuterEditorContainer().width()!;
+        const newFullEditorWidth = getOuterEditorContainer().offsetWidth;
 
         setFullEditorWidth(newFullEditorWidth);
         setCssConstant("fullEditorWidth", newFullEditorWidth + "px");
@@ -389,72 +390,54 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     function activateFullScreenStyles(): void {
 
         const editor = getOuterEditorContainer();
-        const defaultCodeNoteInput = editor.parents(".DefaultCodeNoteInput");
+        const defaultCodeNoteInput = defaultCodeNoteInputRef!.current!
 
         const appOverlayZIndex = getCssConstant("overlayZIndex");
+
+        defaultCodeNoteInput.style.position = "fixed"; // hardcoded in css
+        defaultCodeNoteInput.style.zIndex = appOverlayZIndex + 1;
+        defaultCodeNoteInput.style.width = "90vw";
+        editor.style.width = "100%";
+        updateFullEditorWidth();
         
-        defaultCodeNoteInput.animate(
-            { width: "90vw" },
-            100,
-            "swing",
-            () => {
-                editor.css({
-                    width: "100%"
-                });
-                updateFullEditorWidth();
-            }
+        animateAndCommit(
+            defaultCodeNoteInput, 
+            [{ top: window.getComputedStyle(defaultCodeNoteInput).getPropertyValue("top") }, { top: "10vh" }], 
+            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION }
         );
+        animateAndCommit(editor, {height: "80vh"}, {duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION});
 
-        defaultCodeNoteInput.css({
-            position: "fixed", // hardcoded in css
-            zIndex: appOverlayZIndex + 1
-        });
-
-        defaultCodeNoteInput.animate({top: "10vh"}, 300);
-
-        editor.animate({height: "80vh"});
-
-        $(editorRef.current!).trigger("focus");
+        getEditorTextArea()!.focus();
     }
 
 
     function deactivateFullScreenStyles(): void {
 
         const editor = getOuterEditorContainer();
-        const defaultCodeNoteInput = editor.parents(".DefaultCodeNoteInput");
+        const defaultCodeNoteInput = defaultCodeNoteInputRef!.current!
         
         // move up just a little bit
-        defaultCodeNoteInput.css({
-            position: "relative",
-            top: "30px",
-        });
+        defaultCodeNoteInput.style.position = "relative";
+        defaultCodeNoteInput.style.top = "30px";
         
         // resize quickly
-        defaultCodeNoteInput.css({
-            width: "100%"
-        });
+        defaultCodeNoteInput.style.width = "100%";
         updateFullEditorWidth();
         updateActualEditorWidth();
 
-        editor.css({
-            height: editorHeight,
-            width: isShowNoteInputSettings ? editorWidth : fullEditorWidth
-        });
+        editor.style.height = editorHeight + "px";
+        editor.style.width = (isShowNoteInputSettings ? editorWidth : fullEditorWidth) + "px";
 
         // animate to start pos
-        defaultCodeNoteInput.animate(
-            {
-                top: 0,
-            },
-            300,
-            "swing", 
+        animateAndCommit(
+            defaultCodeNoteInput,
+            { top: 0 },
+            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION },
             () => {
                 // reset to initial styles
-                defaultCodeNoteInput.css({
-                    position: "static",
-                    top: "auto",
-                    zIndex: 0
-                });
+                defaultCodeNoteInput.style.position = "static";
+                defaultCodeNoteInput.style.top = "auto";
+                defaultCodeNoteInput.style.zIndex = "0";
             }
         )
     }
@@ -480,9 +463,15 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         if (!isEditorMounted)
             return "";
 
-        const textArea = $(componentRef.current!).find("textarea.inputarea");
+        const textArea = getEditorTextArea()!;
 
-        return textArea.prop("value");
+        return textArea.value;
+    }
+
+
+    function getEditorTextArea(): HTMLTextAreaElement | null {
+        
+        return componentRef.current!.querySelector("textarea.inputarea") as HTMLTextAreaElement;
     }
 
 

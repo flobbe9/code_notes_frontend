@@ -1,13 +1,12 @@
 import parse from 'html-react-parser';
-import $ from "jquery";
 import React, { ClipboardEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/PlainTextNoteInput.scss";
-import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
-import { getClipboardText, getCssConstant, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../helpers/utils";
+import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
+import { animateAndCommit, getClipboardText, getCssConstant, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../helpers/utils";
 import { useInitialStyles } from "../../hooks/useInitialStyles";
 import { AppContext } from '../App';
 import Button from "../helpers/Button";
@@ -35,7 +34,6 @@ export default function PlainTextNoteInput({
     onKeyUp,
     ...props}: Props) {
     
-    const [inputDivJQuery, setInputDivJQuery] = useState<JQuery>($());
     const [inputDivValue, setInputDivValue] = useState<any>()
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
@@ -52,15 +50,14 @@ export default function PlainTextNoteInput({
         handleDeleteNote
     } = useContext(DefaultNoteInputContext);
 
+    const componentRef = useRef<HTMLDivElement>(null);
     const inputDivRef = useRef<HTMLDivElement>(null);
 
     
-    useInitialStyles(inputDivJQuery, [["max-width", "width"]], 100);
+    useInitialStyles(inputDivRef.current, [["max-width", "width"]], 100);
 
 
     useEffect(() => {
-        setInputDivJQuery($(inputDivRef.current!));
-
         setInputDivValue(parse(sanitize(noteInputEntity.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
 
         setActivateFullScreenStyles(() => {return activateFullScreenStyles});
@@ -75,7 +72,7 @@ export default function PlainTextNoteInput({
             onFocus(event);
 
         // convert <code> sequences to ```
-        $(inputDivRef.current!).html(parseCodeHtmlToCodeText());
+        inputDivRef.current!.innerHTML = parseCodeHtmlToCodeText();
     }
 
 
@@ -84,12 +81,12 @@ export default function PlainTextNoteInput({
         if (onBlur)
             onBlur(event);
 
-        const inputDiv = $(inputDivRef.current!);
+        const inputDiv = inputDivRef.current!;
 
         // case: no placeholder present
-        if (!isBlank(inputDiv.text())) {
+        if (!isBlank(inputDiv.innerText)) {
             const parsedText = await parseCodeTextToCodeHtml();
-            inputDiv.html(parsedText);
+            inputDiv.innerHTML = parsedText;
         }
     }
 
@@ -108,8 +105,8 @@ export default function PlainTextNoteInput({
 
         const parsedText = await new Promise<string>((res, rej) => {
             setTimeout(() => {
-                const inputDiv = $(inputDivRef.current!);
-                const inputText = inputDiv.html();
+                const inputDiv = inputDivRef.current!;
+                const inputText = inputDiv.innerHTML;
                 const inputTextArray = inputText.split("```");
             
                 // case: too short to have code noteInputs or no code noteInputs at all
@@ -156,10 +153,10 @@ export default function PlainTextNoteInput({
      */
     function parseCodeHtmlToCodeText(): string {
 
-        const inputDiv = $(inputDivRef.current!);
-        let inputHtml = inputDiv.html();
+        const inputDiv = inputDivRef.current!;
+        let inputHtml = inputDiv.innerHTML;
 
-        let newInputText = inputHtml
+        let newInputText = inputHtml;
         newInputText = newInputText.replaceAll("<code>", "```");
         newInputText = newInputText.replaceAll("</code>", "```");
 
@@ -248,19 +245,19 @@ export default function PlainTextNoteInput({
 
     function updateAppUserEntity(): void {
 
-        noteInputEntity.value = $(inputDivRef.current!).html();
+        noteInputEntity.value = inputDivRef.current!.innerHTML;
     }
 
 
     function cleanUpEmptyInputDiv(event): void {
 
-        const inputDiv = $(inputDivRef.current!);
-        const inputBreaks = inputDiv.find("br");
+        const inputDiv = inputDivRef.current!;
+        const inputBreaks = inputDiv.querySelectorAll("br");
         
         // case: no content left
-        if (isBlank(inputDiv.text()) && inputBreaks.length <= 1)
+        if (isBlank(inputDiv.innerText) && inputBreaks.length <= 1)
             // clean up empty tags
-            inputDiv.html("");
+            inputDiv.innerHTML = "";
     }
 
 
@@ -274,55 +271,45 @@ export default function PlainTextNoteInput({
 
     function activateFullScreenStyles(): void {
 
-        const inputDiv = $(inputDivRef.current!);
-        const plainTextNoteInput = inputDiv.parents(".PlainTextNoteInput");
+        const plainTextNoteInput = componentRef.current!;
 
         const appOverlayZIndex = getCssConstant("overlayZIndex");
 
-        plainTextNoteInput.css({
-            position: "fixed",
-            zIndex: appOverlayZIndex + 1
-        });
+        plainTextNoteInput.style.position = "fixed";
+        plainTextNoteInput.style.width = "90vw";
+        plainTextNoteInput.style.zIndex = appOverlayZIndex + 1;
 
-        plainTextNoteInput.animate({
-            height: "80vh",
-            top: "10vh",
-            width: "90vw"
-        });
+        animateAndCommit(
+            plainTextNoteInput,
+            [
+                { height: window.getComputedStyle(plainTextNoteInput).getPropertyValue("height"), top: window.getComputedStyle(plainTextNoteInput).getPropertyValue("top") }, 
+                { height: "80vh", top: "10vh" }
+            ], 
+            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION },
+        );
     }
 
 
     function deactivateFullScreenStyles(): void {
 
-        const inputDiv = $(inputDivRef.current!);
-        const plainTextNoteInput = inputDiv.parents(".PlainTextNoteInput");
+        const plainTextNoteInput = componentRef.current!;
         
         // move up just a little bit
-        plainTextNoteInput.css({
-            height: "unset",
-            position: "relative",
-            top: "30px",
-        });
+        plainTextNoteInput.style.height = "unset";
+        plainTextNoteInput.style.position = "relative";
+        plainTextNoteInput.style.top = "30px";
+        plainTextNoteInput.style.width = "100%";
         
-        // resize quickly
-        plainTextNoteInput.css({
-            width: "100%"
-        });
-
         // animate to start pos
-        plainTextNoteInput.animate(
-            {
-                top: 0,
-            },
-            300,
-            "swing", 
+        animateAndCommit(
+            plainTextNoteInput,
+            { top: 0 },
+            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION },
             () => {
                 // reset to initial styles
-                plainTextNoteInput.css({
-                    position: "static",
-                    top: "auto",
-                    zIndex: 0
-                });
+                plainTextNoteInput.style.position = "static";
+                plainTextNoteInput.style.top = "auto";
+                plainTextNoteInput.style.zIndex = "0";
             }
         )
     }
@@ -335,6 +322,7 @@ export default function PlainTextNoteInput({
             style={style}
             verticalAlign="start"
             flexWrap="nowrap"
+            ref={componentRef}
             {...otherProps}
         >
             <pre className="inputDivContainer fullWidth">

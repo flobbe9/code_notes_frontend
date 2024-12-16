@@ -1,9 +1,8 @@
-import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import "../assets/styles/StartPageSideBar.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../helpers/constants";
-import { getCssConstant } from "../helpers/utils";
+import { animateAndCommit, getCssConstant } from "../helpers/utils";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import { StartPageContainerContext } from "./StartPageContainer";
@@ -40,8 +39,8 @@ export default function StartPageSideBar({...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
 
     const componentRef = useRef(null);
-    const tagFilterContainerRef = useRef(null);
-    const searchBarRef = useRef(null);
+    const tagFilterContainerRef = useRef<HTMLDivElement>(null);
+    const searchBarRef = useRef<HTMLInputElement>(null);
 
     const context = {
         searchValue
@@ -63,53 +62,58 @@ export default function StartPageSideBar({...props}: Props) {
     }, [selectedTagEntityNames]);
 
 
-    function slideInTagFilterContainer(): void {
+    function slideRightTagFilterContainer(): void {
 
         setIsShowSideBar(true);
 
-        const tagFilterContainer = $(tagFilterContainerRef.current!);
+        const tagFilterContainer = tagFilterContainerRef.current!;
 
-        tagFilterContainer.show();
+        tagFilterContainer.style.display = "block";
 
-        tagFilterContainer.animate(
+        animateAndCommit(tagFilterContainer, 
             {
                 width: getMaxWidth(), 
                 paddingRight: getCssConstant("tagFilterContainerPadding"),
                 paddingLeft: getCssConstant("tagFilterContainerPadding"),
             },
-            BLOCK_SETTINGS_ANIMATION_DURATION,
-            "easeOutSine",
+            { 
+                duration: BLOCK_SETTINGS_ANIMATION_DURATION,
+                easing: "ease-out",
+            }
         );
     }
 
 
-    function slideOutTagFilterContainer(): void {
+    function slideLeftTagFilterContainer(): void {
 
         setIsShowSideBar(false);
 
-        const tagFilterContainer = $(tagFilterContainerRef.current!);
+        const tagFilterContainer = tagFilterContainerRef.current!;
 
-        tagFilterContainer.animate(
+        animateAndCommit(
+            tagFilterContainer,
             {
                 width: 0, 
                 paddingRight: 0,
                 paddingLeft: 0
             },
-            BLOCK_SETTINGS_ANIMATION_DURATION,
-            "easeInSine",
-            () => tagFilterContainer.hide()
+            {
+                duration: BLOCK_SETTINGS_ANIMATION_DURATION,
+                easing: "ease-in"
+            },
+            () => tagFilterContainer.style.display = "none"
         );
     }
 
 
     function toggleTagFilterContainer(): void {
 
-        const tagFilterContainer = $(tagFilterContainerRef.current!);
+        const display = tagFilterContainerRef.current!.style.display;
 
-        if (tagFilterContainer.is(":visible"))
-            slideOutTagFilterContainer();
+        if (display === "block") 
+            slideLeftTagFilterContainer();
         else
-            slideInTagFilterContainer();
+            slideRightTagFilterContainer();
     }
 
 
@@ -124,7 +128,7 @@ export default function StartPageSideBar({...props}: Props) {
         const keyName = event.key;
 
         if (keyName === "Escape")
-            slideOutTagFilterContainer();
+            slideLeftTagFilterContainer();
 
         if (isKeyPressed("Control") && keyName === "b") {
             event.preventDefault();
@@ -148,7 +152,7 @@ export default function StartPageSideBar({...props}: Props) {
     function handleResetClick(event): void {
 
         setSelectedTagEntityNames(new Set());
-        $(searchBarRef.current!).val("");
+        searchBarRef.current!.value = "";
         setSearchValue("");
     }
 

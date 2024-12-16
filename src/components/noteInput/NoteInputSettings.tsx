@@ -1,11 +1,10 @@
-import $ from "jquery";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
 import { ProgrammingLanguage } from "../../abstract/ProgrammingLanguage";
 import "../../assets/styles/NoteInputSettings.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES } from "../../helpers/constants";
-import { getCssConstant, getCSSValueAsNumber, includesIgnoreCaseTrim, isEventKeyTakingUpSpace } from "../../helpers/utils";
+import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTakingUpSpace } from "../../helpers/utils";
 import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
 import SearchBar from "../helpers/SearchBar";
@@ -49,9 +48,9 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteInputSettings");
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
     // const noteInputSwitchRef = useRef(null);
-    const languageSearchBarRef = useRef(null);
+    const languageSearchBarRef = useRef<HTMLInputElement>(null);
 
     // IDEA: make custom colors and pass them to buttons as border color
 
@@ -102,25 +101,22 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
      */
     function toggleLanguageSearchBar(hide = isShowNoteInputSettings): void {
 
-        const languageSearchBar = $(componentRef.current!).find(".languageSearchBar");
-        const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
+        const languageSearchBar = componentRef.current!.querySelector(".languageSearchBar") as HTMLElement;
+        const languageSearchBarWidth = getCssConstant("languageSearchBarWidth");
 
         if (!hide) {
-            languageSearchBar.css("position", "relative");
-            languageSearchBar.css("zIndex", 1);
+            languageSearchBar.style.position = "relative";
+            languageSearchBar.style.zIndex = "1";
         }
 
         // fake "toggle slide"
-        languageSearchBar.animate(
-            {
-                width: hide ? 0 : languageSearchBarWidth,
-                opacity: hide ? 0 : 1,
-            }, 
-            BLOCK_SETTINGS_ANIMATION_DURATION,
-            "swing",
+        animateAndCommit(
+            languageSearchBar,
+            { width: hide ? 0 : languageSearchBarWidth, opacity: hide ? 0 : 1 }, 
+            { duration: BLOCK_SETTINGS_ANIMATION_DURATION },
             () => {
-                languageSearchBar.css("position", (hide ? "absolute" : "relative"));
-                languageSearchBar.css("zIndex", hide ? -1 : 1);
+                languageSearchBar.style.position = (hide ? "absolute" : "relative");
+                languageSearchBar.style.zIndex = hide ? "-1" : "1";
             }
         )
     }
@@ -147,13 +143,13 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
         if (keyName === "ArrowDown") {
             event.preventDefault();
 
-            const firstLanguageSearchResult = $(componentRef.current!).find(".LanguageSearchResults input").first();
-            firstLanguageSearchResult.trigger("focus");
+            const firstLanguageSearchResult = componentRef.current!.querySelector(".LanguageSearchResults input") as HTMLInputElement;
+            firstLanguageSearchResult.focus();
             
             setShowLanguageSearchResults(true);
         
         } else if (keyName === "Escape") {
-            $(languageSearchBarRef.current!).trigger("blur");
+            languageSearchBarRef.current!.blur();
             setShowLanguageSearchResults(false);
 
         } else if (keyName === "Tab")
@@ -189,7 +185,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
         toggleNoteInputSettings(true);
 
         // set searchbar value to selected language
-        $(languageSearchBarRef.current!).prop("value", language);
+        languageSearchBarRef.current!.value = language;
 
         noteEdited();
     }
@@ -209,7 +205,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
 
     function handleLanguageSearch(event): void {
 
-        const currentSearchInputValue: string = $(languageSearchBarRef.current!).prop("value");
+        const currentSearchInputValue: string = languageSearchBarRef.current!.value;
 
         const newLanguageSearchResults: string[] = [];
 

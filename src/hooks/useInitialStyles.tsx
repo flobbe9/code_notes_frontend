@@ -1,5 +1,4 @@
-import { Ref, useContext, useEffect } from "react";
-import { log, logWarn } from "../helpers/utils";
+import { useContext, useEffect } from "react";
 import { AppContext } from "../components/App";
 
 
@@ -11,12 +10,12 @@ import { AppContext } from "../components/App";
  * 
  * Uses {@link AppContext}.
  * 
- * @param element to set the styles for. May be an uninitialized jquery object from a state
+ * @param element to set the styles for
  * @param cssAttributes touples formatted like ```[cssAttributeToChange, cssAttributeToUse]```.
  * @param timeout milliseconds after which to set the styles. Default is 0
  */
 export function useInitialStyles(
-    element: JQuery | undefined,
+    element: HTMLElement | undefined | null,
     cssAttributes: [string, string][],
     timeout = 0
 ) {
@@ -42,8 +41,8 @@ export function useInitialStyles(
     function setInitialStyle(): void {
 
         setTimeout(() => {
-            attributesCallback((cssAttributeToChange: string, cssAttributeToUse: string, element: JQuery) =>
-                element.css(cssAttributeToChange, element.css(cssAttributeToUse)))
+            attributesCallback((cssAttributeToChange: string, cssAttributeToUse: string, element: HTMLElement) => 
+                element.style[cssAttributeToChange] = window.getComputedStyle(element).getPropertyValue(cssAttributeToUse))
 
         }, timeout);
     }
@@ -52,8 +51,8 @@ export function useInitialStyles(
     function handleWindowResize(): void {
 
         // unset attributes to change in order to cleanly set them again
-        attributesCallback((cssAttributeToChange: string, cssAttributeToUse: string, element: JQuery) => 
-            element.css(cssAttributeToChange, "unset"));
+        attributesCallback((cssAttributeToChange: string, cssAttributeToUse: string, element: HTMLElement) => 
+            element.style[cssAttributeToChange] = "unset");
 
         setInitialStyle();
     }
@@ -64,10 +63,10 @@ export function useInitialStyles(
      * 
      * @param callback to execute
      */
-    function attributesCallback(callback: (cssAttributeToChange: string, cssAttributeToUse: string, element: JQuery) => any): any {
+    function attributesCallback(callback: (cssAttributeToChange: string, cssAttributeToUse: string, element: HTMLElement) => any): any {
 
         // case: element not present (yet)
-        if (!element || !element.length)
+        if (!element)
             return;
 
         cssAttributes.forEach(touple => {

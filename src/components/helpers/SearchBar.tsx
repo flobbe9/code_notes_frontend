@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { CSSProperties, forwardRef, Ref, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
@@ -59,8 +58,8 @@ export default forwardRef(function SearchBar(
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "SearchBar");
 
-    const componentRef = useRef(null);
-    const inputRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useImperativeHandle(ref, () => inputRef.current!, []);
 
@@ -79,7 +78,7 @@ export default forwardRef(function SearchBar(
 
     function clearInputValue(): void {
 
-        getSearchBarInput().val("");
+        getSearchBarInput().value = "";
     }
 
 
@@ -90,7 +89,7 @@ export default forwardRef(function SearchBar(
 
         setIsFocus(true);
 
-        $(inputRef.current!).trigger("focus");
+        inputRef.current!.focus();
 
         if (onClick)
             onClick(event);
@@ -121,9 +120,9 @@ export default forwardRef(function SearchBar(
     }
 
 
-    function getSearchBarInput(): JQuery {
+    function getSearchBarInput(): HTMLInputElement {
 
-        return $(componentRef.current!).children(".searchInput");
+        return componentRef.current!.querySelector(".searchInput") as HTMLInputElement;
     }
     
     
@@ -188,6 +187,7 @@ export default forwardRef(function SearchBar(
             >
                 <i className="fa-solid fa-xmark m-1" style={_xIcon}></i>
             </Button>
+            
             {children}
         </Flex>
     )

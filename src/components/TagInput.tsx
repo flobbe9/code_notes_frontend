@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { useContext, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { TagEntity } from "../abstract/entites/TagEntity";
@@ -9,9 +8,9 @@ import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
+import { NoteContext } from "./noteInput/Note";
 import { NoteTagListContext } from "./noteInput/NoteTagList";
 import { StartPageContainerContext } from "./StartPageContainer";
-import { NoteContext } from "./noteInput/Note";
 
 
 interface Props extends DefaultProps {
@@ -32,8 +31,8 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagInput");
 
-    const inputRef = useRef(null);
-    const componentRef = useRef(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const componentRef = useRef<HTMLDivElement>(null);
 
     const { toast } = useContext(AppContext);
     const { noteEntities, appUserEntity } = useContext(AppFetchContext);
@@ -63,13 +62,13 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     function handleEnterKey(event: React.KeyboardEvent<HTMLInputElement>): void {
 
         event.preventDefault();
-        $(inputRef.current!).trigger("blur");
+        inputRef.current!.blur();
     }
 
 
     function handleChange(event): void {
 
-        tag.name = $(inputRef.current!).prop("value");
+        tag.name = inputRef.current!.value;
 
         noteEdited();
     }
@@ -130,13 +129,13 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
     function focusNextTagInput(): void {
 
-        $(componentRef.current!).next().find("input").trigger("focus");
+        componentRef.current!.nextElementSibling?.querySelector("input")?.focus();
     }
 
 
     function getTagElementValue(): string {
 
-        return $(inputRef.current!).prop("value");
+        return inputRef.current!.value;
     }
 
 
@@ -184,7 +183,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     function handleDuplicateTag(): void {
 
         const tagValue = getTagElementValue();
-        $(inputRef.current!).val("");
+        inputRef.current!.value = "";
 
         toast("Duplicate Tag", "This note already has a tag with the name '" + tagValue + "'.", "warn", 7000);     
     }

@@ -1,8 +1,7 @@
-import $ from "jquery";
 import React, { forwardRef, HTMLInputTypeAttribute, Ref } from "react";
-import "../../assets/styles/HiddenInput.scss";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
+import "../../assets/styles/HiddenInput.scss";
 
 
 interface Props extends HelperProps {

@@ -1,11 +1,11 @@
-import $ from "jquery";
 import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
 import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_PATH, START_PAGE_PATH } from "../helpers/constants";
-import { getCssConstant, getCSSValueAsNumber, isNumberFalsy } from '../helpers/utils';
+import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, stopAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
+import Contact from "./Contact";
 import Footer from "./Footer";
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
 import LoggedInComponent from "./helpers/LoggedInComponent";
@@ -15,12 +15,11 @@ import Popup from './helpers/Popup';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import Login from "./Login";
 import NavBar from './NavBar';
+import PrivacyPolicy from "./PrivacyPolicy";
 import Register from "./Register";
 import ResetPassword from "./ResetPassword";
 import RouteContext from "./RouteContext";
 import StartPageContainer from './StartPageContainer';
-import PrivacyPolicy from "./PrivacyPolicy";
-import Contact from "./Contact";
 
 
 /**
@@ -81,7 +80,7 @@ export default function App() {
         hasAnyNoteBeenEdited, setHasAnyNoteBeenEdited
     }
 
-    const toastRef = useRef(null);
+    const toastRef = useRef<HTMLDivElement>(null);
 
     
     useEffect(() => {
@@ -93,7 +92,7 @@ export default function App() {
 
 
     /**
-     * Set given text to toast and call ```toggle()``` on it.
+     * Set given text to toast and slide it up. Interrupt ongoing animation if any.
      * 
      * @param summary serves like a small heading
      * @param message to display in tost body
@@ -111,9 +110,9 @@ export default function App() {
         if (!isNumberFalsy(screenTime)) {
             // stop toast animation
             clearTimeout(toastScreenTimeTimeout);
-            $(toastRef.current!).stop();
+            stopAnimations(toastRef.current!);
 
-            // restart toast animation
+            // hide toast
             const toastTimeout = setTimeout(() => moveToast(true), screenTime);
             setToastScreenTimeTimeout(toastTimeout);
         }
@@ -125,33 +124,34 @@ export default function App() {
 
 
     /**
-     * Show toast or hide it if ```hideToast``` is ```true```. Has a 100 milliseconds delay.
+     * Show toast or hide it if ```hideToast``` is ```true```. Has a 10 milliseconds delay.
      * 
      * @param hideToast if true, toast will definitely by hidden regardless of it's state before. Default is ```false```
      */
     async function moveToast(hideToast = false): Promise<void> {
 
-        const toast = $(toastRef.current!);
+        let targetBottom = "30px";
 
-        // space between toast and window bottom
-        let targetBottom = 30;
+        // toast height including message
+        const currentToastHeight = toastRef.current!.offsetHeight;
 
-        // toast height with message
-        const currentToastHeight = getCSSValueAsNumber(toast.css("height"), 2);
+        if (!hideToast)
+            // move toast just below window bottom prior to animation
+            toastRef.current!.style.bottom = `-${currentToastHeight}px`;
+        else
+            // animate toast just below window bottom
+            targetBottom = `-${currentToastHeight}px`;
 
-        // case: hide
-        if (hideToast) 
-            // make sure toast is completely hidden
-            targetBottom = -currentToastHeight;
-
-        // case: show
-        else 
-            // move toast back to start pos
-            toast.css("bottom", -currentToastHeight);
-
-        // wait for css to complete
-        setTimeout(() => 
-            toast.animate({bottom: targetBottom}, {duration: toastSlideDuration, easing: "easeOutSine"}), 100);
+        setTimeout(
+            () => {
+                animateAndCommit(
+                    toastRef.current!, 
+                    { bottom: targetBottom }, 
+                    { duration: toastSlideDuration, easing: "ease-out" }
+                );
+            },
+            10
+        ); // wait for css to complete
     }
     
 
@@ -365,6 +365,7 @@ export default function App() {
                                 setIsOverlayVisible={setIsAppOverlayVisible} 
                                 hideOnClick={isAppOverlayHideOnClick}
                                 hideOnEscape={isAppOverlayHideOnEscape}
+                                fadeInDuration={100}
                                 fitParent={false}
                             >
                                 {appOverlayContent}

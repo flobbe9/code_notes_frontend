@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { AppUserEntity } from "../../abstract/entites/AppUserEntity";
@@ -29,7 +28,7 @@ export default function NoteTagList({...props}: Props) {
 
     const [tagElements, setTagElements] = useState<JSX.Element[]>([]);
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
 
     const { appUserEntity, noteEntities } = useContext(AppFetchContext);
     const { noteEntity } = useContext(NoteContext);
@@ -190,11 +189,11 @@ export default function NoteTagList({...props}: Props) {
 
 
     /**
-     * @returns jquery of all tag ```<input />``` elements inside this component
+     * @returns list of all tag ```<input />``` elements inside this component
      */
-    function getTagInputElements(): JQuery {
+    function getTagInputElements(): NodeList {
 
-        return $(componentRef.current!).find(".TagInput input");
+        return componentRef.current!.querySelectorAll(".TagInput input");
     }
 
 

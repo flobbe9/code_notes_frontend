@@ -1,9 +1,8 @@
-import $ from "jquery";
-import React, { useEffect, useRef, useState } from "react";
+import React, { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";
 import "../assets/styles/LanguageSearchResults.scss";
-import { moveCursor, toUpperCaseFirstChar } from "../helpers/utils";
+import { logWarn, toUpperCaseFirstChar } from "../helpers/utils";
 import HelperDiv from "./helpers/HelperDiv";
 import HiddenInput from "./helpers/HiddenInput";
 
@@ -34,8 +33,8 @@ export default function LanguageSearchResults({
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "LanguageSearchResults");
 
-    const componentRef = useRef(null);
-    const hiddenCheckboxRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
+    const hiddenCheckboxRef = useRef<HTMLInputElement>(null);
 
 
     useEffect(() => {
@@ -46,11 +45,14 @@ export default function LanguageSearchResults({
 
     function handleSearchResultFocus(event): void {
 
-        // prevent input text select on focus
-        moveCursor($(event.target), 0);
-
         // set searcbar value to result value
-        getSearchBar().prop("value", event.target.value)
+        const searchBarInputElement = getSearchBarInputElement();
+        if (!searchBarInputElement) {
+            logWarn("Failed to find searchBarInputElement")
+            return;
+        }
+
+        searchBarInputElement.value = event.target.value;
     }
 
 
@@ -83,31 +85,31 @@ export default function LanguageSearchResults({
     }
 
 
-    function handleArrowDown(event): void {
+    function handleArrowDown(event: KeyboardEvent): void {
 
         event.preventDefault();
 
         setArrowKeyPressed(true);
 
-        $(event.target).next().trigger("focus");
+        ((event.target as HTMLElement).nextElementSibling as HTMLElement).focus();
     }
     
 
-    function handleArrowUp(event): void {
+    function handleArrowUp(event: KeyboardEvent): void {
 
-        const focusedInput = $(event.target);
-        const prevResult = focusedInput.prev();
+        const focusedInput = event.target;
+        const prevResult = (focusedInput as HTMLInputElement).previousElementSibling as HTMLElement;
 
         event.preventDefault();
 
         setArrowKeyPressed(true);
 
         // case: is first result
-        if (!prevResult.length) 
-            getSearchBar().trigger("focus");
+        if (!prevResult) 
+            getSearchBarInputElement()?.focus();
         
         else
-            prevResult.trigger("focus");
+            prevResult.focus();
     }
 
 
@@ -161,7 +163,7 @@ export default function LanguageSearchResults({
      */
     function setArrowKeyPressed(keyPressed: boolean): void {
 
-        $(hiddenCheckboxRef.current!).prop("checked", keyPressed)
+        hiddenCheckboxRef.current!.checked = keyPressed;
     }
 
 
@@ -172,16 +174,23 @@ export default function LanguageSearchResults({
      */
     function isArrowKeyPressed(): boolean {
         
-        return $(hiddenCheckboxRef.current!).prop("checked")
+        return hiddenCheckboxRef.current!.checked;
     }
 
 
     /**
-     * @returns the language searchbar for this component
+     * Assumes that this component is an immediate child of ```#languageSearchBar```.
+     * 
+     * @returns the language searchbar for this component or ```undefined```
      */
-    function getSearchBar(): JQuery {
+    function getSearchBarInputElement(): HTMLInputElement | undefined {
 
-        return $(componentRef.current!).parents(".languageSearchBar").find(".searchInput");
+        const languageSearchBarChildren = componentRef.current!.parentElement?.children;
+        if (!languageSearchBarChildren)
+            return undefined;
+
+        return Array.from(languageSearchBarChildren)
+            .find(child => child.classList.contains("searchInput")) as HTMLInputElement
     }
 
 

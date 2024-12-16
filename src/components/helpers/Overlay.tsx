@@ -1,8 +1,8 @@
-import $ from "jquery";
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/Overlay.scss";
+import { animateAndCommit } from "../../helpers/utils";
 import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";
 
@@ -51,19 +51,19 @@ export default forwardRef(function Overlay(
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Overlay");
 
-    const componentRef = useRef(null);
-    const backgroundRef = useRef(null);
-    const childrenRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
+    const backgroundRef = useRef<HTMLDivElement>(null);
+    const childrenRef = useRef<HTMLDivElement>(null);
 
 
     useImperativeHandle(ref, () => componentRef.current!, []);
 
 
     useEffect(() => {
-        $(window).on("keydown", handleKeyDown);
+        window.addEventListener("keydown", handleKeyDown);
 
         return () => {
-            $(window).off("keydown", handleKeyDown);
+            window.removeEventListener("keydown", handleKeyDown);
         }
     }, [hideOnEscape]);
 
@@ -76,61 +76,44 @@ export default forwardRef(function Overlay(
 
     function hideOverlay(): void {
 
-        const overlay = $(componentRef.current!);
-        const background = $(backgroundRef.current!);
-        const children = $(childrenRef.current!);
+        const overlay = componentRef.current!;
+        const background = backgroundRef.current!;
+        const children = childrenRef.current!;
 
         setIsOverlayVisible(false);
 
         // hide children
-        children.animate(
-            {
-            opacity: 0
-            },
-            fadeOutDuration,
-            "swing"
-        )
+        children.style.opacity = "0";
 
         // hide background
-        background.animate(
-            {
-                opacity: 0,
-            },
-            fadeOutDuration,
-            "swing",
-            // hide component
-            () => overlay.hide()
-        );
-
+        animateAndCommit(
+            background,
+            { opacity: 0},
+            { duration: fadeOutDuration, easing: "ease-out" },
+            () => overlay.style.display = "none"
+        )
     }
 
 
     function showOverlay(): void {
 
-        const overlay = $(componentRef.current!);
-        const background = $(backgroundRef.current!);
-        const children = $(childrenRef.current!);
+        const overlay = componentRef.current!;
+        const background = backgroundRef.current!;
+        const children = childrenRef.current!;
 
         setIsOverlayVisible(true);
 
-        // show component
-        overlay.show();
+        overlay.style.display = "block";
 
         // show background
-        background.animate(
-            {
-                opacity: 0.5
-            },
-            fadeInDuration
+        animateAndCommit(
+            background,
+            { opacity: 0.5 },
+            { duration: fadeInDuration }
         );
 
         // show children
-        children.animate(
-            {
-                opacity: 1
-            },
-            fadeInDuration
-        )
+        children.style.opacity = "1";
     }
 
 

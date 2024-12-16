@@ -1,9 +1,8 @@
-import $ from "jquery";
 import React, { useContext, useRef } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/NoteTitle.scss";
 import { INVALID_INPUT_CLASS_NAME, MAX_NOTE_TITLE_VALUE_LENGTH } from "../../helpers/constants";
-import { isEventKeyTakingUpSpace } from "../../helpers/utils";
+import { flashClass, isEventKeyTakingUpSpace } from "../../helpers/utils";
 import { AppContext } from "../App";
 import { NoteContext } from "./Note";
 
@@ -31,7 +30,7 @@ export default function NoteTitle({...props}: Props) {
     
     function handleChange(event): void {
 
-        noteEntity.title = $(inputRef.current!).prop("value");
+        noteEntity.title = inputRef.current!.value;
 
         noteEdited();
     }
@@ -50,8 +49,8 @@ export default function NoteTitle({...props}: Props) {
      */
     function isTitleValueTooLong(event): boolean {
 
-        const noteInput = $(inputRef.current!);
-        const noteInputValue = noteInput.prop("value") + event.key;
+        const noteInput = inputRef.current!;
+        const noteInputValue = noteInput.value + event.key;
 
         return noteInputValue.length > MAX_NOTE_TITLE_VALUE_LENGTH;
     }
@@ -79,14 +78,7 @@ export default function NoteTitle({...props}: Props) {
      */
     function toggleTitleInvalid(duration = 300): void {
 
-        // get element
-        const noteTitle = $(inputRef.current!);
-
-        noteTitle.addClass(INVALID_INPUT_CLASS_NAME);
-
-        setTimeout(() => {
-            noteTitle.removeClass(INVALID_INPUT_CLASS_NAME);
-        }, duration);
+        flashClass(inputRef.current!, INVALID_INPUT_CLASS_NAME, "", duration);
     }
 
 

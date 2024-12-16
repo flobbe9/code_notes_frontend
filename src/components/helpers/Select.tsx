@@ -1,10 +1,10 @@
-import $ from "jquery";
-import React, { createContext, forwardRef, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { createContext, forwardRef, KeyboardEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import HelperProps from '../../abstract/HelperProps';
 import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
 import '../../assets/styles/Select.scss';
-import { getRandomString } from "../../helpers/utils";
+import { addClass, getRandomString, slideDown, slideUp } from "../../helpers/utils";
+import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 import { AppContext } from '../App';
 import Flex from './Flex';
 import HelperDiv from './HelperDiv';
@@ -57,7 +57,6 @@ export default forwardRef(function Select(
     }: Props,
     ref: Ref<HTMLInputElement>
 ) {
-    const [hasComponentMounted, setHasComponentMounted] = useState(false);
     const [optionElements, setOptionElements] = useState<JSX.Element[]>([]);
     const [isOptionsContainerVisible, setIsOptionsContainerVisible] = useState(false);
     const [triggerValidation, setTriggerValidation] = useState<boolean>();
@@ -66,10 +65,12 @@ export default forwardRef(function Select(
 
     const { isKeyPressed } = useContext(AppContext);
 
+    const hasComponentMounted = useHasComponentMounted();
+
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, 'Select');
 
-    const textInputRef = useRef(null);
-    const optionsContainerRef = useRef(null);
+    const textInputRef = useRef<HTMLInputElement>(null);
+    const optionsContainerRef = useRef<HTMLDivElement>(null);
 
     const context = {
         selectedOptions
@@ -77,9 +78,6 @@ export default forwardRef(function Select(
 
     useImperativeHandle(ref, () => textInputRef.current!, []);
 
-    useEffect(() => {
-        setHasComponentMounted(true);
-    }, []);
 
     useEffect(() => {
         if (hasComponentMounted) {
@@ -87,26 +85,35 @@ export default forwardRef(function Select(
             setOptionElements(optionElements);
             setSelectedOptions(optionElements.length ? new Set([optionElements[0].props.label]) : new Set());
         }
-    }, [options]);
+    }, [options, hasComponentMounted]);
+
 
     useEffect(() => {
-        if (hasComponentMounted) updateTriggerValidation();
+        if (hasComponentMounted) 
+            updateTriggerValidation();
     }, [selectedOptions]);
 
+
     useEffect(() => {
-        // toggle options container
-        if (isOptionsContainerVisible) showOptionsContainer() 
-        else hideOptionsContainer();
+        if (isOptionsContainerVisible) 
+            showOptionsContainer() 
+        else 
+            hideOptionsContainer();
+
     }, [isOptionsContainerVisible]);
 
+
     function mapOptionElements(): JSX.Element[] {
-        if (!options) return [];
+
+        if (!options) 
+            return [];
 
         const optionElements: JSX.Element[] = [];
 
         options.forEach((optionName, i) => {
             // add empty option at the top
-            if (i === 0 && addEmptyOption) optionElements.push(getSingleOption(''));
+            if (i === 0 && addEmptyOption) 
+                optionElements.push(getSingleOption(''));
 
             optionElements.push(getSingleOption(optionName));
         });
@@ -143,58 +150,77 @@ export default forwardRef(function Select(
         setIsOptionsContainerVisible(false);
     }
 
-    function handleOptionsKeyDown(event: any, optionName: string): void {
-        const textInput = $(textInputRef.current!);
-        const thisOption = $(event.target);
+    function handleOptionsKeyDown(event: KeyboardEvent, optionName: string): void {
+        const textInput = textInputRef.current!;
+        const thisOption = event.target as HTMLElement;
 
         event.preventDefault();
 
-        if (event.key === 'ArrowDown') thisOption.next().trigger('focus');
+        if (event.key === 'ArrowDown') 
+            (thisOption.nextElementSibling as HTMLElement)?.focus();
+
         else if (event.key === 'ArrowUp') {
-            const prevOption = thisOption.prev();
+            const prevOption = (thisOption.previousElementSibling as HTMLElement);
+            prevOption?.focus();
 
             // case: no previous option
-            if (!prevOption.length) textInput.trigger('focus');
+            if (!prevOption) 
+                textInput.focus();
+
             // focus previous option
-            else prevOption.trigger('focus');
-        } else if (event.key === 'Tab') textInput.trigger('focus');
-        else if (event.key === 'Enter') handleOptionSelect(optionName);
+            else 
+                prevOption.focus();
+
+        } else if (event.key === 'Tab') 
+            textInput.focus();
+
+        else if (event.key === 'Enter') 
+            handleOptionSelect(optionName);
     }
 
     function handleArrowMouseDownCapture(event: any): void {
-        const textInput = $(textInputRef.current!);
+
+        const textInput = textInputRef.current!;
 
         // case: text input not focused
-        if (!textInput.is(':focus')) {
+        if (!textInput.matches(':focus')) {
             // hide via state
-            if (isOptionsContainerVisible) setIsOptionsContainerVisible(false);
+            if (isOptionsContainerVisible) 
+                setIsOptionsContainerVisible(false);
+
             // focus and prevent default blur
             else {
                 event.preventDefault();
-                textInput.trigger('focus');
+                textInput.focus();
             }
         }
     }
 
     function handleTextInputBlur(): void {
+
         // hide options except arrow down selects them
-        if (!isArrowDownKeyPressed) setIsOptionsContainerVisible(false);
+        if (!isArrowDownKeyPressed) 
+            setIsOptionsContainerVisible(false);
     }
 
     function handleTextInputKeyDownCapture(event: any): void {
-        if (event.key === 'ArrowDown') setIsArrowDownKeyPressed(true);
+
+        if (event.key === 'ArrowDown') 
+            setIsArrowDownKeyPressed(true);
     }
 
     function handleTextInputKeyUp(): void {
-        if (!isKeyPressed('ArrowDown')) setIsArrowDownKeyPressed(false);
+        if (!isKeyPressed('ArrowDown')) 
+            setIsArrowDownKeyPressed(false);
     }
+
 
     function handleTextInputKeyDown(event: any): void {
         if (event.key === 'ArrowDown') {
             event.preventDefault();
             // focus first option
-            const firstOption = $(optionsContainerRef.current!).find('.SelectOption').first();
-            firstOption.trigger('focus');
+            const firstOption = optionsContainerRef.current!.querySelector('.SelectOption') as HTMLElement;
+            firstOption.focus();
         }
     }
 
@@ -202,16 +228,17 @@ export default forwardRef(function Select(
         setIsOptionsContainerVisible(true);
 
         // prevent option text select
-        $(textInputRef.current!).prop('selectionEnd', 0);
+        textInputRef.current!.selectionEnd = 0;
     }
 
+
     function handleTextInputMouseDownCapture(event: any): void {
-        const textInput = $(textInputRef.current!);
+        const textInput = textInputRef.current!;
 
         // case: text input is focused
-        if (textInput.is(':focus')) {
+        if (textInput.matches(':focus')) {
             event.preventDefault();
-            textInput.trigger('blur');
+            textInput.blur();
 
             // case: options visible but text input not focused
         } else if (isOptionsContainerVisible) {
@@ -220,13 +247,18 @@ export default forwardRef(function Select(
         }
     }
 
+
     function hideOptionsContainer(): void {
-        $(optionsContainerRef.current!).slideUp(100);
+
+        slideUp(optionsContainerRef.current);
+    }
+    
+    
+    function showOptionsContainer(): void {
+
+        slideDown(optionsContainerRef.current)
     }
 
-    function showOptionsContainer(): void {
-        $(optionsContainerRef.current!).slideDown(100);
-    }
 
     /**
      * Will toggle the ```triggerValidation``` state except if the state has not changed yet.
@@ -234,11 +266,16 @@ export default forwardRef(function Select(
      * Called in ```useEffect``` hook on ```selectedOption``` change.
      */
     function updateTriggerValidation(): void {
+
         // case: option has been changed at least once
-        if ($(textInputRef.current!).hasClass('touched')) setTriggerValidation(!triggerValidation);
+        if (textInputRef.current!.classList.contains('touched')) 
+            setTriggerValidation(!triggerValidation);
+
         // case: option has been changed for the first time
-        else $(textInputRef.current!).addClass('touched');
+        else 
+            addClass(textInputRef.current!, 'touched');
     }
+
 
     return (
         <SelectContext.Provider value={context}>

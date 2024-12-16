@@ -1,9 +1,9 @@
 import parse, { Element } from "html-react-parser";
-import $ from "jquery";
 import { CSSProperties } from "react";
 import sanitize from "sanitize-html";
 import { useQueryClientObj } from "..";
 import CryptoJSImpl from "../abstract/CryptoJSImpl";
+import { AnimationEasing } from "../abstract/CSSTypes";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
@@ -11,7 +11,6 @@ import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTE_QUERY_KEY } from "../hooks/useNotes";
 import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
-import { AnimationEasing } from "../abstract/CSSTypes";
 
 
 export function log(message?: any, ...optionalParams: any[]): void {
@@ -105,64 +104,6 @@ function logColored(sevirity: LogSevirity, obj?: any, ...optionalParams: any[]):
 export function logApiResponse(response: CustomExceptionFormat): void {
 
     logError(response.timestamp + " (" + response.status + "): " + response.message + (response.path ? " " + response.path : ""));
-}
-
-
-/**
- * @param id to find in html document, excluding the jquery prefix "#"
- * @param debug if true a warn log will be displayed in case of falsy id, default is true
- * @returns a JQuery with all matching elements or null if no results
- */
-export function getJQueryElementById(id: string, debug = true): JQuery | null {
-
-    // case: blank
-    if (isBlank(id)) {
-        if (debug)
-            logWarn("id blank: " + id);
-
-        return null;
-    }
-
-    const element = $("#"  + id);
-
-    // case: not present
-    if (!element.length) {
-        if (debug)
-            logWarn("falsy id: " + id);
-
-        return null;
-    }
-
-    return element;
-}
-
-
-/**
- * @param className to find in html document, excluding the jquery prefix "."
- * @param debug if true a warn log will be displayed in case of falsy id, default is true
- * @returns a JQuery with all matching elements or null if no results
- */
-export function getJQueryElementByClassName(className: string, debug = true): JQuery | null {
-
-    // case: blank
-    if (isBlank(className)) {
-        if (debug)
-            logWarn("className blank: " + className);
-        
-        return null;
-    }
-
-    const element = $("."  + className);
-
-    // case: not present
-    if (!element.length) {
-        if (debug)
-            logWarn("falsy className: " + className);
-
-        return null;
-    }
-
-    return element;
 }
 
 
@@ -285,30 +226,30 @@ export function insertString(targetString: string, insertionString: string, inse
  * Move cursor a text input element. If ```start === end``` the cursor will be shifted normally to given position.
  * If ```start !== end``` the text between the indices will be marked.
  * 
- * @param textInput jquery text input element to move the cursor in
+ * @param textInput text input element to move the cursor in
  * @param start index of selection start, default is 0
  * @param end index of selection end, default is ```start``` param
- * @param debug if true a warn log will be displayed in case of falsy id, default is true
  */
-export function moveCursor(textInput: JQuery, start = 0, end = start, debug = false): void {
+export function moveCursor(textInput: HTMLInputElement, start = 0, end = start): void {
 
     if (!textInput)
         return;
 
-    textInput.prop("selectionStart", start);
-    textInput.prop("selectionEnd", end);
+    textInput.selectionStart = start;
+    textInput.selectionEnd = end;
 }
 
 
 /**
- * @param textInputId of text input element to check
+ * @param inputElement to get the cursor for (I believe this only works for "text" input)
  * @returns the current index of the cursor of given text input element or -1. If text is marked, the index of selection start is returned
  */
-export function getCursorIndex(textInputId: string): number {
+export function getCursorIndex(inputElement: HTMLInputElement): number {
 
-    const textInput = getJQueryElementById(textInputId);
+    if (!inputElement)
+        return -1;
 
-    return textInput ? textInput.prop("selectionStart") : -1;
+    return inputElement.selectionStart || -1;
 }
 
 
@@ -374,26 +315,6 @@ export async function downloadFileByUrl(url: string,
 
 
 /**
- * @param width of element as css value, possibly with unit appended
- * @param unitDigits to cut from width in order to get the plain number
- * @returns width in percent relative to window width as string with a '%' appended
- */
-export function getElementWidthRelativeToWindow(width: string | number, unitDigits: number): string {
-
-    const windowWidth = $(window).width();
-    if (!windowWidth) {
-        logError("Failed to get width in percent. 'windowWidth' is falsy");
-        return "";
-    }
-
-    // NOTE: will this work if one line has not the same width as the window?
-    const widhInPercent = (getCSSValueAsNumber(width.toString(), unitDigits) / windowWidth) * 100;
-
-    return widhInPercent + "%";
-}
-
-
-/**
  * @param text to measure
  * @param fontSize of text, unit should be included
  * @param fontFamily of text
@@ -405,10 +326,10 @@ export function getTextWidth(text: string, fontSize: string, fontFamily: string,
     if (isEmpty(text))
         return 0;
 
-    // create hidden inputDiv
-    let hiddenInputDiv = $(
+    const elementId = getRandomString();
+    document.body.append(stringToHtmlElement(
         `<div
-            id="hiddenInputDivElement"
+            id="${elementId}"
             style='
                 border: none; 
                 width: fit-content;
@@ -420,19 +341,14 @@ export function getTextWidth(text: string, fontSize: string, fontFamily: string,
         >
             ${text}
         </div>`
-    );
+    ));
+    const hiddenInputDiv2 = document.getElementById(elementId);
     
-    // render
-    $("body").append(hiddenInputDiv);
-    hiddenInputDiv = $("#hiddenInputDivElement");
+    const hiddenInputDivWidth2 = hiddenInputDiv2?.offsetWidth;
 
-    // get width
-    const hiddenInputDivWidth = (hiddenInputDiv.width());
+    hiddenInputDiv2?.remove();
 
-    // clean up
-    $(hiddenInputDiv).remove();    
-
-    return hiddenInputDivWidth || 0;
+    return hiddenInputDivWidth2 || 0;
 }
 
 
@@ -463,36 +379,35 @@ export function removeConfirmPageUnload(handler: (event: BeforeUnloadEvent) => v
 
 
 /**
- * Remove given ```removeClass``` className from given ```element```, add given ```addClass``` and then
+ * Remove given ```classToRemove``` className from given ```element```, add given ```classToAdd``` and then
  * after given ```holdTime``` undo both operations.
  * 
- * @param elementId id of element to flash the className of
- * @param addClass className the element has while flashing 
- * @param removeClass className the element should loose while flashing and get back afterwards
- * @param holdTime time in ms that the border stays with given addClass and without given removeClass, default is 1000
+ * @param element element to flash the className of
+ * @param classToAdd className the element has while flashing 
+ * @param classToRemove className the element should loose while flashing and get back afterwards
+ * @param holdTime time in ms that the border stays with given classToAdd and without given classToRemove, default is 1000
  * @return promise that resolves once animation is finished
  */
-export async function flashClass(elementId: string, addClass: string, removeClass?: string, holdTime = 1000) {
+export async function flashClass(element: HTMLElement, classToAdd: string, classToRemove?: string, holdTime = 1000) {
 
     return new Promise((res, rej) => {
-        const element = getJQueryElementById(elementId);
         if (!element) {
-            rej("'elementId' falsy: " + elementId);
+            rej("'element' falsy");
             return;
         }
         // remove old class
-        element.removeClass(removeClass);
+        removeClass(element, classToRemove || "");
 
         // add flash class shortly
-        element.addClass(addClass);
+        addClass(element, classToAdd);
         
-        const resetCallback = () => {
-            element.removeClass(addClass)
-            element.addClass(removeClass || "");
-        }
-
-        // reset
-        setTimeout(() => res(resetCallback()), holdTime);
+        // reset and resolve
+        setTimeout(() => {
+            removeClass(element, classToAdd);
+            addClass(element, classToRemove || "");
+            res("");
+        }, 
+        holdTime);
     });
 }
 
@@ -500,36 +415,35 @@ export async function flashClass(elementId: string, addClass: string, removeClas
 /**
  * Add given css object to given element for given amount of time and reset css values afterwards.
  * 
- * @param elementId id of element to flash the syle of
- * @param flashCss css object (key and value are strings) to apply to given element
+ * @param element id of element to flash the syle of
+ * @param flashCss css object to apply to given element
  * @param holdTime time in ms to apply the styles before resetting them
  * @returns a Promise which resolves once styles are reset
  */
-export async function flashCss(elementId: string, flashCss: Record<string, string>, holdTime = 1000): Promise<void> {
+export async function flashCss(element: HTMLElement, flashCss: CSSProperties, holdTime = 1000): Promise<void> {
     
     return new Promise((res, rej) => {
-        const element = getJQueryElementById(elementId);
         if (!element) {
-            rej("'elementId' falsy: " + elementId);
+            rej("'elementId' falsy");
             return;
         }
 
-        const initCss: Record<string, string> = {};
+        const initCss: CSSProperties = {};
 
         // set flash styles
         Object.entries(flashCss).forEach(([cssProp, cssVal]) => {
             // save init css entry
-            initCss[cssProp] = element.css(cssProp);
+            initCss[cssProp] = element.style[cssProp];
 
             // set flash css value
-            element.css(cssProp, cssVal);
+            element.style[cssProp] = cssVal;
         })
 
         // reset flash styles
         setTimeout(() => {
             res(
-                Object.entries(initCss).forEach(([cssProp, cssVal]) => 
-                    element.css(cssProp, cssVal))
+                Object.entries(initCss)
+                    .forEach(([cssProp, cssVal]) => element.style[cssProp] = cssVal)
             );
         }, holdTime)
     });
@@ -1251,18 +1165,18 @@ export function isPathRelative(path: string | undefined | null): boolean {
  * Animate element from transparent to solid and set ```display = 'block'```.
  * 
  * @param element to fade in
- * @param duration time the animation will take in ms
+ * @param duration time the animation will take in ms. Default is 100
  * @param easing animation function, see {@link AnimationEasing}
  * @param options more animation options, see {@link KeyframeAnimationOptions}
  * @param onComplete callback to execute on animation completion
  */
-export function fadeIn(element: HTMLElement, duration = 100, easing?: AnimationEasing, options?: KeyframeAnimationOptions, onComplete?: () => void): void {
+export async function fadeIn(element: HTMLElement | undefined | null, duration = 100, easing?: AnimationEasing, options?: KeyframeAnimationOptions, onComplete?: () => void): Promise<void> {
 
     if (!element)
         return;
 
     element.style.display = "block";
-    element.animate(
+    const animation = element.animate(
         [
             { opacity: 0 }, 
             { opacity: 1 }
@@ -1274,21 +1188,23 @@ export function fadeIn(element: HTMLElement, duration = 100, easing?: AnimationE
         }
     );
 
+    await animation.finished;
+
     if (onComplete)
-        setTimeout(() => onComplete(), duration);
+        onComplete();
 }
 
 
 /**
- * Animate element to transparent, then set ```display = 'none'```.
+ * Animate element to transparent, then set ```display = 'none'```. Resolves once animation is finished.
  * 
  * @param element to fade out
- * @param duration time the animation will take in ms
+ * @param duration time the animation will take in ms. Default is 100
  * @param easing animation function, see {@link AnimationEasing}
  * @param options more animation options, see {@link KeyframeAnimationOptions}
  * @param onComplete callback to execute on animation completion
  */
-export function fadeOut(element: HTMLElement, duration = 100, easing?: AnimationEasing, options?: KeyframeAnimationOptions, onComplete?: () => void): void {
+export async function fadeOut(element: HTMLElement | undefined | null, duration = 100, easing?: AnimationEasing, options?: KeyframeAnimationOptions, onComplete?: () => void): Promise<void> {
 
     if (!element)
         return;
@@ -1297,7 +1213,7 @@ export function fadeOut(element: HTMLElement, duration = 100, easing?: Animation
         duration = 100;
 
     const opacity = stringToNumber(element.style.opacity);
-    element.animate(
+    const animation = element.animate(
         [
             { opacity: opacity === -1 ? 1 : opacity }, 
             { opacity: 0 }
@@ -1309,11 +1225,195 @@ export function fadeOut(element: HTMLElement, duration = 100, easing?: Animation
         }
     );
 
-    setTimeout(() => {
-        element.style.display = "none";
+    await animation.finished;
 
-        if (onComplete)
-            onComplete();
+    element.style.display = "none";
+    
+    if (onComplete)
+        onComplete();
+}
+
+
+/**
+ * Sets ```display = "block"```, animates height to given ```elements``` actual height, starting from 0 and then commits that height.
+ * 
+ * @param element to slide down
+ * @param duration time the animation will take in ms. Default is 100
+ * @param easing animation function, see {@link AnimationEasing}
+ * @param options more animation options, see {@link KeyframeAnimationOptions}
+ * @param onComplete callback to execute on animation completion
+ */
+export async function slideDown(element: HTMLElement | undefined | null, duration = 100, easing?: AnimationEasing, options?: KeyframeAnimationOptions, onComplete?: () => void): Promise<void> {
+    
+    if (!element)
+        return;
+
+    if (isNumberFalsy(duration))
+        duration = 100;
+
+    element.style.display = "block";
+
+    const actualHeight = element.offsetHeight;
+
+    animateAndCommit(
+        element,
+        [{ height: "0px" }, { height: actualHeight + "px" }],
+        { 
+            duration, 
+            easing, 
+            ...(options || {}) 
+        },
+        onComplete
+    );
+}
+
+
+/**
+ * Animates height to 0, assuming that given ```element``` had a larger height, then sets ```display = "none"```. Wont commit 0 as height. Resolves once animation is finished.
+ * 
+ * @param element to slide down
+ * @param duration time the animation will take in ms. Default is 100
+ * @param easing animation function, see {@link AnimationEasing}
+ * @param options more animation options, see {@link KeyframeAnimationOptions}
+ * @param onComplete callback to execute on animation completion
+ */
+export async function slideUp(element: HTMLElement | undefined | null, duration = 100, easing?: AnimationEasing, options?: KeyframeAnimationOptions, onComplete?: () => void): Promise<void> {
+    
+    if (!element)
+        return;
+
+    if (isNumberFalsy(duration))
+        duration = 100;
+
+    const animation = element.animate(
+        [{ height: "0px" }],
+        { 
+            duration, 
+            easing, 
+            ...(options || {}) 
+        },
+    );
+
+    await animation.finished;
+    
+    element.style.display = "none";
+
+    if (onComplete)
+        onComplete();
+}
+
+
+/**
+ * Stop (cancel that is) all animations of given element.
+ * 
+ * @param element to stop all animations for
+ */
+export function stopAnimations(element: HTMLElement): void {
+
+    if (!element)
+        return;
+
+    const animations = element.getAnimations();
+    if (!animations || !animations.length)
+        return;
+
+    animations
+        .forEach(animation => animation.cancel());
+}
+
+
+/**
+ * @param strNode to parse to element. Should be one node but may have any number of children
+ * @returns the html element or an empty ```<div>``` element if arg is falsy
+ */
+export function stringToHtmlElement(strNode: string): HTMLElement {
+
+    const parser = new DOMParser();
+
+    if (isBlank(strNode))
+        return parser.parseFromString("<div></div>", "text/html").body;
+
+    const parsedDocument = parser.parseFromString(strNode, "text/html");
+
+    return parsedDocument.head.firstChild as HTMLElement || parsedDocument.body.firstChild as HTMLElement;
+}
+
+
+/**
+ * @param element to add class from
+ * @param classNames classes to add. Blank classes will be ignored
+ */
+export function addClass(element: HTMLElement | undefined | null, ...classNames: string[]): void {
+
+    if (!element || !classNames || !classNames.length)
+        return;
+
+    classNames
+        .forEach(className => {
+            if (className.includes(" ")) {
+                logWarn("'className' cannot contain whitespace");
+                return;
+            }
+
+            if (!isBlank(className))
+                element.classList.add(className);
+        });
+}
+
+
+/**
+ * @param element to remove class from
+ * @param classNames classes to remove. Blank classes will be ignored
+ */
+export function removeClass(element: HTMLElement | undefined | null, ...classNames: string[]): void {
+
+    if (!element || !classNames || !classNames.length)
+        return;
+
+    classNames
+        .forEach(className => {
+            if (className.includes(" ")) {
+                logWarn("'className' cannot contain whitespace");
+                return;
+            }
+
+            if (!isBlank(className))
+                element.classList.remove(className);
+        });
+}
+
+
+/**
+ * Basically calls ```animate()``` but will commit any animation styles to ```element.style```.
+ * 
+ * @param element to animate styles of
+ * @param keyframes see {@link KeyFrame} and {@link PropertyIndexedKeyframes}
+ * @param options of the animation. Will set ```fill = "both"``` by default, this can be overridden though
+ * @param onComplete callback to execute on animation completion
+ * @returns the animation or ```null``` if given ```element``` is falsy
+ */
+export async function animateAndCommit(element: HTMLElement | undefined | null, keyframes: Keyframe[] | PropertyIndexedKeyframes | null, options?: KeyframeAnimationOptions, onComplete?: () => void): Promise<Animation | null> {
+
+    if (!element)
+        return null;
+
+    const animation = element.animate(keyframes, {
+        fill: "both",
+        ...options
+    });
+
+    try {
+        await animation.finished;
+        animation.commitStyles();
         
-    }, duration);
+    // might throw AbortError or InvalidStateError, happens when animation is canceled before finished, has no consequences though
+    } catch (e) {
+    }
+    
+    animation.cancel();
+
+    if (onComplete)
+        onComplete();
+
+    return animation
 }

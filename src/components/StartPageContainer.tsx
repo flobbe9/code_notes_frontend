@@ -1,8 +1,7 @@
-import $ from "jquery";
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import DefaultProps from "../abstract/DefaultProps";
 import { getHeadTitleText } from "../helpers/constants";
-import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, removeConfirmPageUnload } from "../helpers/utils";
+import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, isNumberFalsy, removeConfirmPageUnload } from "../helpers/utils";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Head from "./Head";
@@ -35,7 +34,7 @@ export default function StartPageContainer({children, ...props}: Props) {
     /** List of note ids that have been edited since they were last saved. Remove a note id from this list, once the note gets saved */
     const [editedNoteIds, setEditedNoteIds] = useState<Set<Number>>(new Set());
 
-    const { windowSize, isMobileWidth, setHasAnyNoteBeenEdited, hasAnyNoteBeenEdited } = useContext(AppContext);
+    const { isMobileWidth, setHasAnyNoteBeenEdited, hasAnyNoteBeenEdited } = useContext(AppContext);
     const { noteEntities } = useContext(AppFetchContext);
 
     const context = {
@@ -54,12 +53,6 @@ export default function StartPageContainer({children, ...props}: Props) {
         editedNoteIds,
         setEditedNoteIds,
     }
-
-
-    useEffect(() => {
-        updateStartPageContentWidth();
-
-    }, [isShowSideBar, windowSize]);
 
 
     useEffect(() => {
@@ -86,44 +79,13 @@ export default function StartPageContainer({children, ...props}: Props) {
     }
 
 
-    function updateStartPageContentWidth(): void {
-
-        const startPageContent = $("#StartPageContent");
-        const startPageContentWidth = calculateStartPageContentWidth();
-
-        if (isNumberFalsy(startPageContentWidth))
-            return;
-
-        startPageContent.animate(
-            { width: startPageContentWidth },
-            100
-        );
-    }
-
-
-    function calculateStartPageContentWidth(): number | undefined {
-
-        const windowWidth = $("#App").innerWidth();
-
-        // case: sidebar not rendered yet
-        if (isBlank(windowWidth?.toString()))
-            return;
-        
-        const windowWidthNumber = getCSSValueAsNumber(windowWidth!, 2);
-        const sideBarWidthNumber = getStartPageSideBarWidth();
-
-        return isShowSideBar ? windowWidthNumber - sideBarWidthNumber :
-                               windowWidthNumber + sideBarWidthNumber;
-    }
-
-
     /**
      * @returns the width of the expanded side bart, not including the toggle button and considering mobile mode.
      */
     function getStartPageSideBarWidth(): number {
 
         if (isMobileWidth) 
-            return $(window).width()! * 0.3;
+            return window.outerWidth * 0.3;
 
         return getCSSValueAsNumber(getCssConstant("startPageSideBarWidth"), 2);
     }

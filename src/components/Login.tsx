@@ -1,10 +1,9 @@
-import $ from "jquery";
-import React, { MouseEvent, useContext, useEffect, useRef } from "react";
+import React, { ChangeEvent, MouseEvent, useContext, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
 import "../assets/styles/Login.scss";
-import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, getHeadTitleText, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM, START_PAGE_PATH } from "../helpers/constants";
+import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, getHeadTitleText, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../helpers/constants";
 import { isResponseError } from "../helpers/fetchUtils";
 import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, replaceCurrentBrowserHistoryEntry, setCsrfToken, stringToNumber } from "../helpers/utils";
 import { useFormInput } from "../hooks/useFormInput";
@@ -144,15 +143,15 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     }
 
 
-    function handleEmailInputChange(event: any): void {
+    function handleEmailInputChange(event: ChangeEvent): void {
 
-        setEmail($(event.target).prop("value"));
+        setEmail((event.target as HTMLInputElement).value);
     }
 
     
-    function handlePasswordInputChange(event: any): void {
+    function handlePasswordInputChange(event: ChangeEvent): void {
 
-        setPassword($(event.target).prop("value"));
+        setPassword((event.target as HTMLInputElement).value);
     }
 
 

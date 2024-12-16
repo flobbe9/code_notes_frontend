@@ -46,6 +46,8 @@ export const RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY = "reset-password-token";
 export const BLOCK_SETTINGS_ANIMATION_DURATION = 150;
 /** In ms. See ```<Popup>``` */
 export const POPUP_FADE_DURATION = 200;
+/** In ms */
+export const CODE_INPUT_FULLSCREEN_ANIMATION_DURATION = 300;
 export const INVALID_INPUT_CLASS_NAME = "invalidInput";
 export const MAX_TAG_INPUT_VALUE_LENGTH = 50;
 export const MAX_NOTE_TITLE_VALUE_LENGTH = 255;

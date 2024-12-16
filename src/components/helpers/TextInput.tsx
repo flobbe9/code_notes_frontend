@@ -1,13 +1,12 @@
-import $ from "jquery";
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import HelperProps from '../../abstract/HelperProps';
+import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
 import '../../assets/styles/TextInput.scss';
 import { INVALID_INPUT_CLASS_NAME } from '../../helpers/constants';
-import { isBlank, isBooleanFalsy, log } from '../../helpers/utils';
-import Flex from './Flex';
-import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
+import { addClass, isBlank, isBooleanFalsy, removeClass } from '../../helpers/utils';
 import Button from "./Button";
+import Flex from './Flex';
 
 interface Props extends HelperProps {
     /** Default is "" */
@@ -75,7 +74,7 @@ export default forwardRef(function TextInput(
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, 'TextInput');
 
     const inputRef = useRef<HTMLInputElement>(null);
-    const floatingLabelRef = useRef(null);
+    const floatingLabelRef = useRef<HTMLDivElement>(null);
 
     // state is password visible
 
@@ -111,18 +110,20 @@ export default forwardRef(function TextInput(
      */
     function updateFloatingLabel(): void {
         const floatingLabelDownClass = 'moveFloatingLabelDown';
-        const floatingLabel = $(floatingLabelRef.current!);
+        const floatingLabel = floatingLabelRef.current!;
 
-        if (isMoveFloatingLabelDown()) floatingLabel.addClass(floatingLabelDownClass);
-        else floatingLabel.removeClass(floatingLabelDownClass);
+        if (isMoveFloatingLabelDown()) 
+            addClass(floatingLabel, floatingLabelDownClass);
+        else 
+            removeClass(floatingLabel, floatingLabelDownClass);
     }
 
 
     function isMoveFloatingLabelDown(): boolean {
-        const input = $(inputRef.current!);
+        const input = inputRef.current!;
 
         // move down if value is blank and not focuesd or dontMoveFloatingLabel is true
-        return (isBlank(input.prop('value')) && !input.is(':focus')) || dontMoveFloatingLabel;
+        return (isBlank(input.value) && !input.matches(':focus')) || dontMoveFloatingLabel;
     }
 
 

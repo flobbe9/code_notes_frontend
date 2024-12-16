@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
@@ -41,7 +40,7 @@ export default function StartPageContent({...props}: Props) {
     const { selectedTagEntityNames } = useContext(StartPageContainerContext);
     const searchNoteHelper = new SearchNoteHelper(noteEntities, selectedTagEntityNames);
     
-    const searchInputRef = useRef(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     const context = {
         notes,
@@ -57,14 +56,14 @@ export default function StartPageContent({...props}: Props) {
 
 
     useEffect(() => {
-        $(window).on("keydown", handleKeyDown);
+        window.addEventListener("keydown",  handleKeyDown);
 
         // only update the whole state if no notes are rendered yet or notes have been cleared
         if (!notes.length || !noteEntities.length)
             setNotes(mapNoteEntitiesToJsx());
 
         return () => {
-            $(window).off("keydown", handleKeyDown);
+            window.removeEventListener("keydown", handleKeyDown);
         }
     }, [noteEntities]);
 
@@ -80,7 +79,7 @@ export default function StartPageContent({...props}: Props) {
         // focus search input on Strg + Shift + F
         if (isKeyPressed("Control") && isKeyPressed("Shift") && event.key === "F") {
             event.preventDefault();
-            $(searchInputRef.current!).trigger("focus");
+            searchInputRef.current!.focus();
         }
     }
 
