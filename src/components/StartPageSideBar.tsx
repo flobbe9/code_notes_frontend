@@ -191,7 +191,8 @@ export default function StartPageSideBar({...props}: Props) {
                         />
 
                         {/* Reset button */}
-                        <Flex className="mt-3" horizontalAlign="right">
+                        {/* NOTE: don't use flex here */}
+                        <div className="mt-3 textRight">
                             <Button 
                                 className="resetButton hover" 
                                 title="Reset tag filter" 
@@ -200,7 +201,7 @@ export default function StartPageSideBar({...props}: Props) {
                             >
                                 Reset   
                             </Button>
-                        </Flex>
+                        </div>
 
                         <hr />
 
