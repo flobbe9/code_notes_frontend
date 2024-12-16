@@ -174,7 +174,7 @@ export default function AddNewNoteInput({...props}: Props) {
                 <ButtonWithSlideLabel 
                     className="fullWidth addCodeNoteInputWithVariablesButton" 
                     label="Code with Variables" 
-                    title="Add code with variables section"
+                    title="Add code section with variables"
                     onClick={handleAddCodeNoteInputWithVariables}
                 >
                     <i className="fa-solid fa-plus me-2"></i>

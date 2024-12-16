@@ -70,7 +70,7 @@ export default function PrivacyPolicy({...props}: Props) {
                         *not persistent: Only stored in the browser session after successful login, but not on the server.<br />
                     </p>
                     <p>
-                        All user data stored on the web server is securely saved and inaccessible to outsiders. Passwords are irreversibly encrypted before stored. <br />
+                        All user data stored on the web server is securely saved and inaccessible to outsiders. Passwords are irreversibly encrypted before beeing stored. <br />
                         User data is processed based on Article 6 par. 1 letter f DSGVO.
                     </p>
                 </div>

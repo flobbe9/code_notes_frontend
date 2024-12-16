@@ -42,7 +42,7 @@ export default function Footer({...props}: Props) {
             </Flex>
 
             <Flex className="Footer-rightContainer col-6" horizontalAlign="right" verticalAlign="center">
-                <span className="Footer-rightContainer-version">Version {VERSION}</span>
+                <span className="Footer-rightContainer-version">v {VERSION}</span>
             </Flex>
                 
             {children}
