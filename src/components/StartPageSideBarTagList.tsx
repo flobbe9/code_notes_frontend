@@ -64,8 +64,10 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
         if (!tagEntities)
             return [];
 
-        return tagEntities.map(tagEntity => 
-            getTagCheckboxElement(tagEntity));
+        return tagEntities
+            .sort((t1, t2) => t1.name.localeCompare(t2.name))
+            .map(tagEntity => 
+                getTagCheckboxElement(tagEntity));
     }
 
 
