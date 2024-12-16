@@ -1,6 +1,6 @@
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import { AppContext } from "../components/App";
-import { StartPageContainerContext } from "../components/StartPageContainer";
+import { StartPageContainerContext } from "../components/routes/StartPageContainer";
 import { matchStringsConsiderWhiteSpace } from "./searchUtils";
 import { isBlank } from "./utils";
 

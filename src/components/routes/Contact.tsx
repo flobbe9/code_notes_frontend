@@ -1,8 +1,8 @@
 import React from "react";
-import "../assets/styles/Contact.scss";
-import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import { LINK_DEFAULT_REL } from "../helpers/constants";
-import Flex from "./helpers/Flex";
+import "../../assets/styles/Contact.scss";
+import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { LINK_DEFAULT_REL } from "../../helpers/constants";
+import Flex from "../helpers/Flex";
 
 
 interface Props extends DefaultProps {

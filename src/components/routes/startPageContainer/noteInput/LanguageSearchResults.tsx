@@ -1,10 +1,10 @@
 import React, { KeyboardEvent, useEffect, useRef, useState } from "react";
-import { getCleanDefaultProps } from "../abstract/DefaultProps";
-import HelperProps from "../abstract/HelperProps";
-import "../assets/styles/LanguageSearchResults.scss";
-import { logWarn, toUpperCaseFirstChar } from "../helpers/utils";
-import HelperDiv from "./helpers/HelperDiv";
-import HiddenInput from "./helpers/HiddenInput";
+import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
+import HelperProps from "../../../../abstract/HelperProps";
+import "../../../../assets/styles/LanguageSearchResults.scss";
+import { logWarn, toUpperCaseFirstChar } from "../../../../helpers/utils";
+import HelperDiv from "../../../helpers/HelperDiv";
+import HiddenInput from "../../../helpers/HiddenInput";
 
 
 interface Props extends HelperProps {

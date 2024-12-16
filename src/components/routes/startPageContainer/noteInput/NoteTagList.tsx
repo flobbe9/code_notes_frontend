@@ -1,15 +1,15 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { AppUserEntity } from "../../abstract/entites/AppUserEntity";
-import { NoteEntity } from "../../abstract/entites/NoteEntity";
-import { TagEntity } from "../../abstract/entites/TagEntity";
-import "../../assets/styles/NoteTagList.scss";
-import { getRandomString, isBlank } from '../../helpers/utils';
-import { AppUserService } from "../../services/AppUserService";
-import { AppFetchContext } from "../AppFetchContextHolder";
-import Flex from "../helpers/Flex";
-import HelperDiv from "../helpers/HelperDiv";
-import TagInput from "../TagInput";
+import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
+import { AppUserEntity } from "../../../../abstract/entites/AppUserEntity";
+import { NoteEntity } from "../../../../abstract/entites/NoteEntity";
+import { TagEntity } from "../../../../abstract/entites/TagEntity";
+import "../../../../assets/styles/NoteTagList.scss";
+import { getRandomString, isBlank } from '../../../../helpers/utils';
+import { AppUserService } from "../../../../abstract/services/AppUserService";
+import { AppFetchContext } from "../../../AppFetchContextHolder";
+import Flex from "../../../helpers/Flex";
+import HelperDiv from "../../../helpers/HelperDiv";
+import TagInput from "./TagInput";
 import { NoteContext } from "./Note";
 
 

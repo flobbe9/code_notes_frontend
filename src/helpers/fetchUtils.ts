@@ -1,5 +1,5 @@
 import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
-import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
+import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { BACKEND_BASE_URL, CSRF_TOKEN_HEADER_NAME } from "./constants";
 import { clearSensitiveCache, getCsrfToken, isNumberFalsy, logApiResponse } from "./utils";
 

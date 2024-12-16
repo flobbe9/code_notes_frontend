@@ -5,7 +5,7 @@ import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, REGISTER_PATH, RESET_PAS
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, stopAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
-import Contact from "./Contact";
+import Contact from "./routes/Contact";
 import Footer from "./Footer";
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
 import LoggedInComponent from "./helpers/LoggedInComponent";
@@ -13,13 +13,13 @@ import LoggedOutComponent from "./helpers/LoggedOutComponent";
 import Overlay from './helpers/Overlay';
 import Popup from './helpers/Popup';
 import Toast, { ToastSevirity } from './helpers/Toast';
-import Login from "./Login";
+import Login from "./routes/Login";
 import NavBar from './NavBar';
-import PrivacyPolicy from "./PrivacyPolicy";
-import Register from "./Register";
+import PrivacyPolicy from "./routes/PrivacyPolicy";
+import Register from "./routes/Register";
 import ResetPassword from "./ResetPassword";
 import RouteContext from "./RouteContext";
-import StartPageContainer from './StartPageContainer';
+import StartPageContainer from './routes/startPageContainer/StartPageContainer';
 
 
 /**

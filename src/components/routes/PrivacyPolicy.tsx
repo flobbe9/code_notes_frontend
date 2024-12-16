@@ -1,10 +1,10 @@
 import React from "react";
-import "../assets/styles/PrivacyPolicy.scss";
-import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import { BASE_URL, getHeadTitleText, LINK_DEFAULT_REL } from "../helpers/constants";
-import Flex from "./helpers/Flex";
-import { getCurrentUrlWithoutWWW } from "../helpers/utils";
-import Head from "./Head";
+import "../../assets/styles/PrivacyPolicy.scss";
+import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { BASE_URL, getHeadTitleText, LINK_DEFAULT_REL } from "../../helpers/constants";
+import Flex from "../helpers/Flex";
+import { getCurrentUrlWithoutWWW } from "../../helpers/utils";
+import Head from "../helpers/Head";
 
 
 interface Props extends DefaultProps {

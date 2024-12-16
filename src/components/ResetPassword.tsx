@@ -7,7 +7,7 @@ import { BACKEND_BASE_URL, getHeadTitleText, LOGIN_PATH, PASSWORD_REGEX, RESET_P
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { getCurrentUrlWithoutWWW, isBlank, replaceCurrentBrowserHistoryEntry } from "../helpers/utils";
 import { AppContext } from "./App";
-import Head from "./Head";
+import Head from "./helpers/Head";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import TextInput from "./helpers/TextInput";

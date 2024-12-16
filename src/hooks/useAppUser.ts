@@ -4,10 +4,10 @@ import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { AppUserService } from "../services/AppUserService";
+import { AppUserService } from "../abstract/services/AppUserService";
 import { isBlank, logError } from "../helpers/utils";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
-import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
+import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 
 
 /**

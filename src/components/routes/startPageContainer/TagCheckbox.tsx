@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { getCleanDefaultProps } from "../abstract/DefaultProps";
-import { TagEntity } from "../abstract/entites/TagEntity";
-import HelperProps from "../abstract/HelperProps";
-import "../assets/styles/TagCheckbox.scss";
-import Checkbox from "./helpers/Checkbox";
+import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
+import { TagEntity } from "../../../abstract/entites/TagEntity";
+import HelperProps from "../../../abstract/HelperProps";
+import "../../../assets/styles/TagCheckbox.scss";
+import Checkbox from "../../helpers/Checkbox";
 import { StartPageContainerContext } from "./StartPageContainer";
 
 

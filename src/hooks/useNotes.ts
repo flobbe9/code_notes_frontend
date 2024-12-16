@@ -7,7 +7,7 @@ import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { CustomExceptionFormatService } from "../services/CustomExceptionFormatService";
+import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 
 

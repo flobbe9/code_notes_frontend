@@ -1,9 +1,9 @@
 import React, { useContext, useRef } from "react";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import "../../assets/styles/NoteTitle.scss";
-import { INVALID_INPUT_CLASS_NAME, MAX_NOTE_TITLE_VALUE_LENGTH } from "../../helpers/constants";
-import { flashClass, isEventKeyTakingUpSpace } from "../../helpers/utils";
-import { AppContext } from "../App";
+import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
+import "../../../../assets/styles/NoteTitle.scss";
+import { INVALID_INPUT_CLASS_NAME, MAX_NOTE_TITLE_VALUE_LENGTH } from "../../../../helpers/constants";
+import { flashClass, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
+import { AppContext } from "../../../App";
 import { NoteContext } from "./Note";
 
 

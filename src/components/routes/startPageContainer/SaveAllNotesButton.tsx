@@ -1,14 +1,14 @@
 import React, { MouseEvent, useContext } from "react";
-import { ButtonProps } from "../abstract/ButtonProps";
-import { getCleanDefaultProps } from "../abstract/DefaultProps";
-import { NoteEntity } from "../abstract/entites/NoteEntity";
-import "../assets/styles/SaveAllNotesButton.scss";
-import { isResponseError } from "../helpers/fetchUtils";
-import { isNumberFalsy, stringToNumber } from './../helpers/utils';
-import { AppContext } from "./App";
-import { AppFetchContext } from "./AppFetchContextHolder";
-import Button from "./helpers/Button";
-import Login from "./Login";
+import { ButtonProps } from "../../../abstract/ButtonProps";
+import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
+import { NoteEntity } from "../../../abstract/entites/NoteEntity";
+import "../../../assets/styles/SaveAllNotesButton.scss";
+import { isResponseError } from "../../../helpers/fetchUtils";
+import { isNumberFalsy, stringToNumber } from '../../../helpers/utils';
+import { AppContext } from "../../App";
+import { AppFetchContext } from "../../AppFetchContextHolder";
+import Button from "../../helpers/Button";
+import Login from "../Login";
 import { StartPageContainerContext } from "./StartPageContainer";
 
 

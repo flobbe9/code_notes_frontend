@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router";
-import { addClass, stringToHtmlElement } from "../helpers/utils";
+import { addClass, stringToHtmlElement } from "../../helpers/utils";
 
 
 interface Props {

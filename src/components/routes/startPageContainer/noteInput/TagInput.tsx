@@ -1,16 +1,16 @@
 import React, { useContext, useRef, useState } from "react";
-import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import { TagEntity } from "../abstract/entites/TagEntity";
-import "../assets/styles/TagInput.scss";
-import { MAX_TAG_INPUT_VALUE_LENGTH } from "../helpers/constants";
-import { isBlank } from "../helpers/utils";
-import { AppContext } from "./App";
-import { AppFetchContext } from "./AppFetchContextHolder";
-import Button from "./helpers/Button";
-import Flex from "./helpers/Flex";
-import { NoteContext } from "./noteInput/Note";
-import { NoteTagListContext } from "./noteInput/NoteTagList";
-import { StartPageContainerContext } from "./StartPageContainer";
+import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
+import { TagEntity } from "../../../../abstract/entites/TagEntity";
+import "../../../../assets/styles/TagInput.scss";
+import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../../../helpers/constants";
+import { isBlank } from "../../../../helpers/utils";
+import { AppContext } from "../../../App";
+import { AppFetchContext } from "../../../AppFetchContextHolder";
+import Button from "../../../helpers/Button";
+import Flex from "../../../helpers/Flex";
+import { NoteContext } from "./Note";
+import { NoteTagListContext } from "./NoteTagList";
+import { StartPageContainerContext } from "../StartPageContainer";
 
 
 interface Props extends DefaultProps {

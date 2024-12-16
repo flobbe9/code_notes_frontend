@@ -1,10 +1,10 @@
 import React, { forwardRef, Ref, useState } from "react";
-import { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import HelperProps from "../../abstract/HelperProps";
-import "../../assets/styles/NoteInputSwitch.scss";
-import { getRandomString } from "../../helpers/utils";
-import Flex from "../helpers/Flex";
-import RadioButton from "../helpers/RadioButton";
+import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
+import HelperProps from "../../../../abstract/HelperProps";
+import "../../../../assets/styles/NoteInputSwitch.scss";
+import { getRandomString } from "../../../../helpers/utils";
+import Flex from "../../../helpers/Flex";
+import RadioButton from "../../../helpers/RadioButton";
 
 
 interface Props extends HelperProps {

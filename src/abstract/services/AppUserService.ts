@@ -1,10 +1,10 @@
 
-import CryptoJSImpl from '../abstract/CryptoJSImpl';
-import { NoteEntity } from '../abstract/entites/NoteEntity';
-import { TagEntity } from '../abstract/entites/TagEntity';
-import { TagEntityService } from '../abstract/services/TagEntityService';
-import { logWarn } from '../helpers/utils';
-import { AppUserEntity } from './../abstract/entites/AppUserEntity';
+import CryptoJSImpl from '../CryptoJSImpl';
+import { NoteEntity } from '../entites/NoteEntity';
+import { TagEntity } from '../entites/TagEntity';
+import { TagEntityService } from './TagEntityService';
+import { logWarn } from '../../helpers/utils';
+import { AppUserEntity } from '../entites/AppUserEntity';
 
 
 /**

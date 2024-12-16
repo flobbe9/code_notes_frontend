@@ -1,12 +1,12 @@
 import React, { useContext } from "react";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { NoteInputType } from "../../abstract/NoteInputType";
-import "../../assets/styles/AddNewNoteInput.scss";
-import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../helpers/constants";
-import { AppFetchContext } from "../AppFetchContextHolder";
-import ButtonWithSlideLabel from "../helpers/ButtonWithSlideLabel";
-import Flex from "../helpers/Flex";
+import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
+import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
+import { NoteInputType } from "../../../../abstract/NoteInputType";
+import "../../../../assets/styles/AddNewNoteInput.scss";
+import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../../../helpers/constants";
+import { AppFetchContext } from "../../../AppFetchContextHolder";
+import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
+import Flex from "../../../helpers/Flex";
 import { NoteContext } from "./Note";
 
 

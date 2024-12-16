@@ -15,6 +15,10 @@
     position: absolute;
     width: 100%;
 
+    .simpleLink {
+        @include dontSelectText();
+    }
+
     &-rightContainer {
         &-version {
             color: grey;

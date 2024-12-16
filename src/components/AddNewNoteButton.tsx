@@ -4,7 +4,7 @@ import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
-import { StartPageContentContext } from "./StartPageContent";
+import { StartPageContentContext } from "./routes/startPageContainer/StartPageContent";
 
 
 interface Props extends HelperProps {

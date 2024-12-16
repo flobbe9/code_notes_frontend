@@ -1,23 +1,23 @@
 import React, { ChangeEvent, MouseEvent, useContext, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
-import "../assets/styles/Login.scss";
-import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, getHeadTitleText, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../helpers/constants";
-import { isResponseError } from "../helpers/fetchUtils";
-import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, replaceCurrentBrowserHistoryEntry, setCsrfToken, stringToNumber } from "../helpers/utils";
-import { useFormInput } from "../hooks/useFormInput";
-import { AppContext } from "./App";
-import { AppFetchContext } from "./AppFetchContextHolder";
-import Head from "./Head";
-import Button from "./helpers/Button";
-import Flex from "./helpers/Flex";
-import Hr from "./helpers/Hr";
-import TextInput from "./helpers/TextInput";
-import Oauth2LoginButton from "./Oauth2LoginButton";
+import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../../abstract/InputValidationWrapper";
+import "../../assets/styles/Login.scss";
+import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, getHeadTitleText, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
+import { isResponseError } from "../../helpers/fetchUtils";
+import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, replaceCurrentBrowserHistoryEntry, setCsrfToken, stringToNumber } from "../../helpers/utils";
+import { useFormInput } from "../../hooks/useFormInput";
+import { AppContext } from "./../App";
+import { AppFetchContext } from "./../AppFetchContextHolder";
+import Head from "./../helpers/Head";
+import Button from "./../helpers/Button";
+import Flex from "./../helpers/Flex";
+import Hr from "./../helpers/Hr";
+import TextInput from "./../helpers/TextInput";
+import Oauth2LoginButton from "./../Oauth2LoginButton";
 import Register from "./Register";
-import ResendConfirmationMail from "./ResendConfirmationMail";
-import SendPasswordResetMail from "./SendPasswordResetMail";
+import ResendConfirmationMail from "./../ResendConfirmationMail";
+import SendPasswordResetMail from "./../SendPasswordResetMail";
 
 
 interface Props extends DefaultProps {

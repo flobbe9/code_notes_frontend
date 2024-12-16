@@ -1,23 +1,23 @@
 import React, { FormEvent, MouseEvent, useContext, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
-import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
-import "../assets/styles/Register.scss";
-import { BACKEND_BASE_URL, EMAIL_REGEX, getHeadTitleText, LOGIN_PATH, PASSWORD_REGEX } from "../helpers/constants";
-import { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { getCurrentUrlWithoutWWW, isBlank } from "../helpers/utils";
-import { useFormInput } from "../hooks/useFormInput";
-import { AppContext } from "./App";
-import Head from "./Head";
-import Button from "./helpers/Button";
-import Flex from "./helpers/Flex";
-import Hr from "./helpers/Hr";
-import TextInput from "./helpers/TextInput";
+import { CustomExceptionFormat } from "../../abstract/CustomExceptionFormat";
+import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../../abstract/InputValidationWrapper";
+import "../../assets/styles/Register.scss";
+import { BACKEND_BASE_URL, EMAIL_REGEX, getHeadTitleText, LOGIN_PATH, PASSWORD_REGEX } from "../../helpers/constants";
+import { fetchAny, isResponseError } from "../../helpers/fetchUtils";
+import { getCurrentUrlWithoutWWW, isBlank } from "../../helpers/utils";
+import { useFormInput } from "../../hooks/useFormInput";
+import { AppContext } from "../App";
+import Head from "../helpers/Head";
+import Button from "../helpers/Button";
+import Flex from "../helpers/Flex";
+import Hr from "../helpers/Hr";
+import TextInput from "../helpers/TextInput";
 import Login from "./Login";
-import Oauth2LoginButton from "./Oauth2LoginButton";
-import PasswordAdvice from "./PasswordAdvice";
-import ResendConfirmationMail from "./ResendConfirmationMail";
+import Oauth2LoginButton from "../Oauth2LoginButton";
+import PasswordAdvice from "../PasswordAdvice";
+import ResendConfirmationMail from "../ResendConfirmationMail";
 
 
 interface Props extends DefaultProps {

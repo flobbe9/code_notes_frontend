@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { NoteInputEntity } from "../../abstract/entites/NoteInputEntity";
-import { ProgrammingLanguage } from "../../abstract/ProgrammingLanguage";
-import "../../assets/styles/NoteInputSettings.scss";
-import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES } from "../../helpers/constants";
-import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTakingUpSpace } from "../../helpers/utils";
-import Button from "../helpers/Button";
-import Flex from "../helpers/Flex";
-import SearchBar from "../helpers/SearchBar";
-import LanguageSearchResults from "../LanguageSearchResults";
+import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
+import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
+import { ProgrammingLanguage } from "../../../../abstract/ProgrammingLanguage";
+import "../../../../assets/styles/NoteInputSettings.scss";
+import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES } from "../../../../helpers/constants";
+import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
+import Button from "../../../helpers/Button";
+import Flex from "../../../helpers/Flex";
+import SearchBar from "../../../helpers/SearchBar";
+import LanguageSearchResults from "./LanguageSearchResults";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from "./Note";
 
