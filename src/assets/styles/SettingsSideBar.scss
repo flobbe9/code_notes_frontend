@@ -1,0 +1,23 @@
+@import "./global/functions.scss";
+
+
+.SettingsSideBar {
+    font-size: 1.2em;
+    padding: 1.7em 1em; // 1.7em will somehow align sidebar with settings page...
+
+    &-button {
+        color: var(--matteBlueLight);
+        margin-bottom: .2em;
+        transition: var(--transitionTime);
+        width: 100%;
+
+        .buttonContentContainer {
+            justify-content: left;
+        }
+
+        &.active {
+            background-color: var(--matteBlueLight);
+            color: var(--accentColor);
+        }
+    }
+}

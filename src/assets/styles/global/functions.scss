@@ -141,6 +141,12 @@
     }
 }
 
+@mixin customDisabled {
+    &[disabled] {
+        @content;
+    }
+}
+
 @mixin flexCenter() {
     align-items: center;
     display: flex;
