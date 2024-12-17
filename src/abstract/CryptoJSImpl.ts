@@ -16,9 +16,9 @@ export default class CryptoJSImpl {
 
 
     /**
-     * @param key secret string used by alogrithm. Needs to be 8 chars long. Default is {@link CRYPTO_KEY}.
+     * @param key secret string used by alogrithm. Needs to be either 16 or 32 chars long. Default is {@link CRYPTO_KEY}.
      * @param iv secret string used by alogrithm. Necessary for encryption to always return the same value. Default is {@link CRYPTO_IV}
-     *           Needs to be 8 chars long
+     *           Needs to be 16 chars long
      */
     constructor(key = CRYPTO_KEY, iv = CRYPTO_IV) {
 
@@ -91,8 +91,8 @@ export default class CryptoJSImpl {
     /**
      * Validate constructor params.
      * 
-     * @param key 
-     * @param iv 
+     * @param key needs to be either 16 or 32 chars long
+     * @param iv needs to be 16 chars long
      * @returns true if all params are valid
      */
     private areConstructorParamsValid(key: string, iv: string): boolean {
@@ -102,8 +102,7 @@ export default class CryptoJSImpl {
             return false;
         }
 
-        // case: too short, insecure (I guess)
-        if (key.length < 8 || iv.length < 8) {
+        if ((key.length !== 16 && key.length !== 32) || iv.length !== 16) {
             logError("Either key or iv length are unexpected.");
             return false;
         }
