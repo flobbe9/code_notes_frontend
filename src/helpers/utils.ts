@@ -1304,6 +1304,44 @@ export async function slideUp(element: HTMLElement | undefined | null, duration 
 
 
 /**
+ * Play (cancel that is) all animations of given element.
+ * 
+ * @param element to play all animations for
+ */
+export function playAnimations(element: HTMLElement): void {
+
+    if (!element)
+        return;
+
+    const animations = element.getAnimations();
+    if (!animations || !animations.length)
+        return;
+
+    animations
+        .forEach(animation => animation.play());
+}
+
+
+/**
+ * Pause (cancel that is) all animations of given element.
+ * 
+ * @param element to pause all animations for
+ */
+export function pauseAnimations(element: HTMLElement): void {
+
+    if (!element)
+        return;
+
+    const animations = element.getAnimations();
+    if (!animations || !animations.length)
+        return;
+
+    animations
+        .forEach(animation => animation.pause());
+}
+
+
+/**
  * Stop (cancel that is) all animations of given element.
  * 
  * @param element to stop all animations for

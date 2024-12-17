@@ -1,8 +1,8 @@
-import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { createContext, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
 import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_PATH, START_PAGE_PATH } from "../helpers/constants";
-import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, stopAnimations } from '../helpers/utils';
+import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, pauseAnimations, playAnimations, stopAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
 import Footer from "./Footer";
@@ -32,6 +32,7 @@ export default function App() {
     const [toastSummary, setToastSummary] = useState("");
     const [toastMessage, setToastMessage] = useState("");
     const [toastSevirity, setToastSevirity] = useState<ToastSevirity>("info");
+    const [toastScreenTime, setToastScreenTime] = useState<number>(NaN);
     const [toastScreenTimeTimeout, setToastScreenTimeTimeout] = useState<NodeJS.Timeout>();
     
     const [isAppOverlayVisible, setIsAppOverlayVisible] = useState(false);
@@ -107,7 +108,8 @@ export default function App() {
         setToastSummary(summary);
         setToastMessage(message);
         setToastSevirity(sevirity);
-
+        setToastScreenTime(screenTime ?? NaN);
+        
         // case: hide automatically
         if (!isNumberFalsy(screenTime)) {
             // stop toast animation
@@ -119,9 +121,7 @@ export default function App() {
             setToastScreenTimeTimeout(toastTimeout);
         }
 
-        setTimeout(() => {
-            moveToast();
-        }, 10)
+        setTimeout(moveToast, 10)
     }
 
 
@@ -154,6 +154,33 @@ export default function App() {
             },
             10
         ); // wait for css to complete
+    }
+        
+
+    /**
+     * Will cancel the toast timeout and possibly pause ongoing toast animations.
+     * 
+     * @param event 
+     */
+    function handleToastMouseEnter(event: MouseEvent): void {
+
+        clearTimeout(toastScreenTimeTimeout);
+        pauseAnimations(toastRef.current!);
+    }
+    
+
+    /**
+     * Will restart the toast timeout to hide itself (if was set) and possibly resume ongoing toast animations.
+     * 
+     * @param event 
+     */
+    function handleToastMouseLeave(event: MouseEvent): void {
+
+        playAnimations(toastRef.current!)
+
+        // case: toast does hide automatically
+        if (!isNumberFalsy(toastScreenTime))
+            setToastScreenTimeTimeout(setTimeout(() => moveToast(true), toastScreenTime));
     }
     
 
@@ -353,7 +380,7 @@ export default function App() {
             isBottomMostPopup: false
         };
     }
-    
+
 
     return (
         <AppContext.Provider value={context}>
@@ -429,6 +456,8 @@ export default function App() {
                                 message={toastMessage}
                                 sevirity={toastSevirity}
                                 ref={toastRef} 
+                                onMouseEnter={handleToastMouseEnter}
+                                onMouseLeave={handleToastMouseLeave}
                             />  
                         </div>
                     </AppFetchContextHolder>

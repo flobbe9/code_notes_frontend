@@ -25,7 +25,6 @@ export default forwardRef(function Toast({summary, message = "", sevirity = "inf
 
     const { moveToast } = useContext(AppContext);
 
-
     return (
         <div 
             id={id} 
@@ -36,9 +35,9 @@ export default forwardRef(function Toast({summary, message = "", sevirity = "inf
         >
             <div className={"textContainer " + sevirity}>
                 <div className={`summary ${isBlank(message) ? '' : 'mb-3'}`}>
-                    <Flex>
-                        <div className="col-10"><strong>{summary}</strong></div>
-                        <span className="col-2 textRight hover" onClick={() => moveToast(true)}>
+                    <Flex flexWrap="nowrap">
+                        <div className="fullWidth"><strong>{summary}</strong></div>
+                        <span className="ms-3 textRight hover" onClick={() => moveToast(true)}>
                             <i className="fa-solid fa-xmark fa-xl "></i>
                         </span>
                     </Flex>
