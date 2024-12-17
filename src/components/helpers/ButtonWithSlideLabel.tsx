@@ -71,7 +71,7 @@ export default forwardRef(function ButtonWithSlideLabel(
                 opacity: 1,
                 width: initialNoteInputButtonLabelWidth,
             },
-            { duration: 300 }
+            { duration: 300, easing: "ease-out" }
         );
     }
 

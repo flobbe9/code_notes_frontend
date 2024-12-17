@@ -56,7 +56,7 @@ export default function NavBarProfileSection({...props}: Props) {
                     style={{color: "white"}}
                     onClickPromise={handleLogout}
                 >
-                    <i className="fa-solid fa-right-from-bracket me-1"></i>
+                    <i className="fa-solid fa-right-from-bracket me-1 mirrorX"></i>
                 </ButtonWithSlideLabel>
 
                 {/* Profile */}

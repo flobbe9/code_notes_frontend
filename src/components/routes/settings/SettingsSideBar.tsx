@@ -30,20 +30,6 @@ export default function SettingsSideBar({...props}: Props) {
                 Profile
             </Button>
 
-            <Button 
-                className={`SettingsSideBar-button ${window.location.pathname === "/settings/totp" ? "active" : "hoverStrong"}`}
-                onClick={() => navigate("/settings/totp")}
-            >
-                TOTP
-            </Button>
-
-            <Button 
-                className={`SettingsSideBar-button ${window.location.pathname === "/settings/other" ? "active" : "hoverStrong"}`}
-                onClick={() => navigate("/settings/other")}
-            >
-                Other
-            </Button>
-
             {children}
         </div>
     )

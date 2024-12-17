@@ -56,7 +56,7 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
 
     const [isResetByToken, setIsResetByToken] = useState(window.location.pathname === RESET_PASSWORD_BY_TOKEN_PATH);
     
-    const { toast } = useContext(AppContext);
+    const { toast, hidePopup } = useContext(AppContext);
     
     const [urlQueryParams, setUrlSearchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -166,7 +166,7 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
 
             case 417:
                 isRemoveToken = true;
-                toast(summary, "Cannot reset the password for this account. If you have registered using a third party provider like Google or Github, please refer to their account settings instead.", "warn");
+                toast(summary, "Cannot reset the password for this account. If you have registered using a third party provider like e.g. Google or Github, please refer to their account settings instead.", "warn");
                 break;
 
             default:
@@ -193,7 +193,11 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
         }
             
         window.localStorage.removeItem(RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY);
-        navigate(LOGIN_PATH);
+        if (!isPopupContent)
+            navigate(LOGIN_PATH);
+
+        else
+            hidePopup();
     }
 
 

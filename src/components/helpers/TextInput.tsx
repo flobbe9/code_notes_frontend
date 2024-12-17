@@ -201,7 +201,7 @@ export default forwardRef(function TextInput(
             rendered={rendered}
             {...otherProps}
         >
-            <div className="fullWidth">
+            <div className="TextInput-container fullWidth">
                 <div 
                     className="floatingLabel transition" 
                     ref={floatingLabelRef} 

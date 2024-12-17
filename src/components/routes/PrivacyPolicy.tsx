@@ -49,8 +49,6 @@ export default function PrivacyPolicy({...props}: Props) {
                         <li><b>Registration/Login via third-party providers (Google, GitHub or Microsoft)</b></li>
                         <ul>
                             <li>Email address (persistent*)</li>
-                            <li>Profile picture (not persistent*)</li>
-                            <li>Name (not persistent)</li>
                             <li>Global User ID (persistent)
                                 <ul>
                                     <li>The unique, unmodifiable identifier of a user within the third-party provider's environment</li>
@@ -67,7 +65,6 @@ export default function PrivacyPolicy({...props}: Props) {
 
                     <p>
                         *persistent: Stored on this website's server and in the browser session (after successful login).<br />
-                        *not persistent: Only stored in the browser session after successful login, but not on the server.<br />
                     </p>
                     <p>
                         All user data stored on the web server is securely saved and inaccessible to outsiders. Passwords are irreversibly encrypted before beeing stored. <br />

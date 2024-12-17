@@ -1,4 +1,4 @@
-import React, { ClipboardEvent, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { ClipboardEvent, DragEvent, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/ContentEditableDiv.scss";
@@ -28,6 +28,7 @@ export default forwardRef(function ContentEditableDiv(
         onKeyUp,
         onKeyDownCapture,
         onPaste,
+        onDrop,
         rendered = true,
         title = "",
         placeholder = "",
@@ -152,16 +153,30 @@ export default forwardRef(function ContentEditableDiv(
     }
 
 
-    function handlePaste(event): void {
+    function handlePaste(event: ClipboardEvent): void {
 
-        if (disabled)
+        if (disabled) {
+            event.preventDefault();
             return;
+        }
 
         if (onPaste)
             onPaste(event);
 
         if (isInputDivEmpty())
             removePlaceholderInput();
+    }
+
+
+    function handleDrop(event: DragEvent): void {
+
+        if (disabled) {
+            event.preventDefault();
+            return;
+        }
+
+        if (onDrop)
+            onDrop(event);
     }
 
 
@@ -224,6 +239,8 @@ export default forwardRef(function ContentEditableDiv(
                 onKeyUp={handleKeyUp}
                 onCut={handleCut}
                 onPaste={handlePaste}
+                onDrop={handleDrop}
+                tabIndex={disabled ? -1 : props.tabIndex}
                 _hover={_hover}
                 {...otherProps}
             >

@@ -234,6 +234,14 @@
     height: 100vh;
 }
 
+.mirrorX {
+    @include scale(-1, 1);
+}
+
+.mirrorY {
+    @include scale(1, -1);
+}
+
 @keyframes rotating {
     from {transform: rotate(0deg)}
     to {transform: rotate(360deg)} 

@@ -439,11 +439,6 @@ export default function App() {
                                             </SettingsPage>
                                         </LoggedInComponent>
                                     } />
-                                    <Route path="/settings/totp" element={
-                                        <SettingsPage>
-                                            <div>totp</div>
-                                        </SettingsPage>
-                                    } />
                                     <Route path="*" element={<div>404</div>} />
                                 </Routes>
                             </div>
