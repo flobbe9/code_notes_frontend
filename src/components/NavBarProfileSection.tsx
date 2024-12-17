@@ -7,6 +7,7 @@ import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import HelperDiv from "./helpers/HelperDiv";
+import ButtonWithSlideLabel from "./helpers/ButtonWithSlideLabel";
 
 
 interface Props extends DefaultProps {
@@ -48,8 +49,17 @@ export default function NavBarProfileSection({...props}: Props) {
             style={style}
             {...otherProps}
         >
-            {/* Profile icon */}
             <HelperDiv rendered={isLoggedIn}>
+                {/* Logout */}
+                <ButtonWithSlideLabel
+                    label="Logout"
+                    style={{color: "white"}}
+                    onClickPromise={handleLogout}
+                >
+                    <i className="fa-solid fa-right-from-bracket me-1"></i>
+                </ButtonWithSlideLabel>
+
+                {/* Profile */}
                 <Link to={PROFILE_PATH}>
                     <img 
                         src="/img/account.png" 
@@ -59,15 +69,6 @@ export default function NavBarProfileSection({...props}: Props) {
                         title="Profile"
                     />
                 </Link>
-
-                {/* TODO: move this somewhere else */}
-                <Button
-                    className="hover"
-                    style={{color: "white"}}
-                    onClickPromise={handleLogout}
-                >
-                    Logout
-                </Button>
             </HelperDiv>
             
             <HelperDiv rendered={!isLoggedIn}>
