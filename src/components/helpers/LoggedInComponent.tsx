@@ -4,7 +4,7 @@ import ConditionalComponent from "./ConditionalComponent";
 
 
 interface Props {
-    element: ReactNode
+    children: ReactNode
     redirectPath?: string
 }
 
@@ -14,7 +14,7 @@ interface Props {
  */
 export default function LoggedInComponent(props: Props) {
 
-    const { isLoggedIn } = useContext(AppFetchContext);
+    const { isLoggedIn, isLoggedInUseQueryResult } = useContext(AppFetchContext);
 
-    return <ConditionalComponent condition={isLoggedIn} {...props} />
+    return <ConditionalComponent condition={isLoggedIn || !isLoggedInUseQueryResult.isFetched} {...props} />
 }

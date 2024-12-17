@@ -1,11 +1,10 @@
 import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
-import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_PATH, START_PAGE_PATH } from "../helpers/constants";
+import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, stopAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
-import Contact from "./routes/Contact";
 import Footer from "./Footer";
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
 import LoggedInComponent from "./helpers/LoggedInComponent";
@@ -13,12 +12,15 @@ import LoggedOutComponent from "./helpers/LoggedOutComponent";
 import Overlay from './helpers/Overlay';
 import Popup from './helpers/Popup';
 import Toast, { ToastSevirity } from './helpers/Toast';
-import Login from "./routes/Login";
 import NavBar from './NavBar';
-import PrivacyPolicy from "./routes/PrivacyPolicy";
-import Register from "./routes/Register";
 import ResetPassword from "./ResetPassword";
 import RouteContext from "./RouteContext";
+import Contact from "./routes/Contact";
+import Login from "./routes/Login";
+import PrivacyPolicy from "./routes/PrivacyPolicy";
+import Register from "./routes/Register";
+import Profile from './routes/settings/profile/Profile';
+import SettingsPage from './routes/settings/SettingsPage';
 import StartPageContainer from './routes/startPageContainer/StartPageContainer';
 
 
@@ -390,11 +392,31 @@ export default function App() {
                                 <Routes>
                                     <Route path={START_PAGE_PATH} element={<StartPageContainer />} />
                                     <Route path={REGISTER_PATH} element={<Register />} />
-                                    <Route path={LOGIN_PATH} element={<LoggedOutComponent element={<Login />} />} />
-                                    <Route path={RESET_PASSWORD_PATH} element={<LoggedInComponent element={<ResetPassword />} />} />
+                                    <Route path={LOGIN_PATH} element={
+                                        <LoggedOutComponent>
+                                            <Login />
+                                        </LoggedOutComponent>
+                                    } />
+                                    <Route path={RESET_PASSWORD_PATH} element={
+                                        <LoggedInComponent>
+                                            <ResetPassword />
+                                        </LoggedInComponent>
+                                    } />
                                     <Route path={RESET_PASSWORD_BY_TOKEN_PATH} element={<ResetPassword />} />
                                     <Route path={PRIVACY_POLICY_PATH} element={<PrivacyPolicy />} />
                                     <Route path={CONTACT_PATH} element={<Contact />} />
+                                    <Route path={PROFILE_PATH} element={
+                                        <LoggedInComponent>
+                                            <SettingsPage>
+                                                <Profile />
+                                            </SettingsPage>
+                                        </LoggedInComponent>
+                                    } />
+                                    <Route path="/settings/totp" element={
+                                        <SettingsPage>
+                                            <div>totp</div>
+                                        </SettingsPage>
+                                    } />
                                     <Route path="*" element={<div>404</div>} />
                                 </Routes>
                             </div>
