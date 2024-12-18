@@ -1,6 +1,8 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { ChangeEvent, FocusEvent, MouseEvent, useContext, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { TagEntity } from "../../../../abstract/entites/TagEntity";
+import { AppUserService } from "../../../../abstract/services/AppUserService";
+import { TagEntityService } from "../../../../abstract/services/TagEntityService";
 import "../../../../assets/styles/TagInput.scss";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../../../helpers/constants";
 import { isBlank } from "../../../../helpers/utils";
@@ -8,14 +10,14 @@ import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
+import { StartPageContainerContext } from "../StartPageContainer";
 import { NoteContext } from "./Note";
 import { NoteTagListContext } from "./NoteTagList";
-import { StartPageContainerContext } from "../StartPageContainer";
 
 
 interface Props extends DefaultProps {
 
-    initialTag: TagEntity,
+    initialTagEntity: TagEntity,
 
     propsKey: string
 }
@@ -25,9 +27,9 @@ interface Props extends DefaultProps {
  * @parent ```<NoteTagList>```
  * @since 0.0.1
  */
-export default function TagInput({initialTag, propsKey, ...props}: Props) {
+export default function TagInput({initialTagEntity, propsKey, ...props}: Props) {
 
-    const [tag, setTag] = useState(initialTag);
+    const [tagEntity, setTagEntity] = useState<TagEntity>(initialTagEntity);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagInput");
 
@@ -35,16 +37,17 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     const componentRef = useRef<HTMLDivElement>(null);
 
     const { toast } = useContext(AppContext);
-    const { noteEntities, appUserEntity } = useContext(AppFetchContext);
+    const { appUserEntity, noteEntities} = useContext(AppFetchContext);
     const { updateStartPageSideBarTagList } = useContext(StartPageContainerContext);
     const { noteEdited } = useContext(NoteContext);
 
     const { 
         getTagElementIndex, 
-        addTagElement,
-        addTag, 
-        removeTag, 
-        getNumBlankTagElements,
+        addTag,
+        addTagEntity, 
+        removeTag,
+        removeTagEntity, 
+        getNumBlankTags,
         tagElements,
         noteTagEntities
     } = useContext(NoteTagListContext);
@@ -66,62 +69,91 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     }
 
 
-    function handleChange(event): void {
+    function handleChange(event: ChangeEvent): void {
 
-        tag.name = inputRef.current!.value;
+        tagEntity.name = inputRef.current!.value;
 
         noteEdited();
     }
 
 
-    function handleBlur(event): void {
-
-        // case: duplicate tag
-        if (isDuplicateTagElement())
+    /**
+     * Mak sure only one empty tag input is present. Update sidebar tag list and ```appUserEntity.tags```.
+     * 
+     * @param event 
+     */
+    function handleBlur(event: FocusEvent): void {
+        
+        let numBlankTags = getNumBlankTags();
+        
+        if (isDuplicateTag(!numBlankTags)) {
+            // clear tag input
             handleDuplicateTag();
+            numBlankTags++;
+        }
 
-        const numBlankTags = getNumBlankTagElements();
+        const isTagBlank = isTagValueBlank();
 
-        // case: tag is blank and other blank tags are present
-        if (isTagValueBlank() && numBlankTags > 1)
-            removeTag(getTagElementIndex(propsKey));
+        // case: cleared existing tag
+        if (isTagBlank && numBlankTags > 1)
+            handleRemoveTag();
 
-        handleNewTag();
+        // case: updated existing tag
+        else if (!isTagBlank && numBlankTags === 1)
+            handleUpdateTag();
 
-        // case: no blank tags
-        if (!numBlankTags)
-            addTagElement();
+        // case: added new tag
+        else
+            handleNewTag(numBlankTags);
+
+        AppUserService.removeUnusedTags(appUserEntity, noteEntities);
 
         updateStartPageSideBarTagList();
     }
 
 
     /**
-     * Add current tag to ```noteEntity.tags``` if not present and update ```tag``` state. Focusses new tag
+     * Add new tag entity to appUserEntity if ```tagEntity``` does not exist yet.
      */
-    function handleNewTag(): void {
+    function handleUpdateTag(): void {
+
+        if (!TagEntityService.contains(appUserEntity.tags, tagEntity))
+            AppUserService.addTagEntity(appUserEntity, TagEntityService.clone(tagEntity));
+    }
+
+
+    /**
+     * Update ```appUserEntity.tags```, ```noteEntity.tags``` and ```tagEntity``` states. Focus new tag.
+     * 
+     * Don't do anything if this tag is not a new tag or is blank.
+     */
+    function handleNewTag(numBlankTags: number): void {
 
         if (isTagElementContainedInNoteEntity() || isTagValueBlank())
             return;
         
-        const tagEntity = {name: getTagElementValue()};
+        const tagEntity = {name: getTagValue()};
 
-        // add to states
-        addTag(tagEntity, noteEntities, appUserEntity);
+        addTagEntity(tagEntity);
+        if (!numBlankTags)
+            addTag();
 
-        // update component state
-        setTag(tagEntity);
+        setTagEntity(tagEntity);
 
         // focus new tag
         setTimeout(focusNextTagInput, 10);
     }
 
 
-    function handleRemoveTag(event): void {
+    function handleRemoveTag(event?: MouseEvent): void {
         
-        removeTag(getTagElementIndex(propsKey));
+        const tagIndex = getTagElementIndex(propsKey);
 
-        updateStartPageSideBarTagList();
+        removeTagEntity(tagIndex);
+        removeTag(tagIndex);
+
+        if (event)
+            updateStartPageSideBarTagList();
 
         noteEdited();
     }
@@ -133,7 +165,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     }
 
 
-    function getTagElementValue(): string {
+    function getTagValue(): string {
 
         return inputRef.current!.value;
     }
@@ -141,7 +173,7 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
 
     function isTagValueBlank(): boolean {
 
-        return isBlank(getTagElementValue());
+        return isBlank(getTagValue());
     }
 
 
@@ -165,15 +197,18 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
     }
 
 
-    function isDuplicateTagElement(): boolean {
+    /**
+     * @param isNewTagElement indicates that the tag to be checked has not been added to ```noteTagEntities``` yet
+     * @returns ```true``` the current tag value should not be added to / updated in ```noteTagEntities```
+     */
+    function isDuplicateTag(isNewTagElement: boolean): boolean {
 
         if (!noteTagEntities)
             return false;
 
-        const tagElementValue = getTagElementValue();
+        const tagElementValue = getTagValue();
 
-        return !!noteTagEntities!.filter(tag => tag.name === tagElementValue).length && 
-               !isTagElementContainedInNoteEntity();
+        return noteTagEntities!.filter(tag => tag.name === tagElementValue).length === (isNewTagElement ? 1 : 2);
     }
 
 
@@ -182,8 +217,11 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
      */
     function handleDuplicateTag(): void {
 
-        const tagValue = getTagElementValue();
+        let tagValue = getTagValue();
         inputRef.current!.value = "";
+
+        if (tagValue.length > 30)
+            tagValue = tagValue.substring(0, 30) + "...";
 
         toast("Duplicate Tag", "This note already has a tag with the name '" + tagValue + "'.", "warn", 7000);     
     }
@@ -202,9 +240,9 @@ export default function TagInput({initialTag, propsKey, ...props}: Props) {
                 type="text" 
                 className="tagInput"
                 placeholder="Tag..."
-                title={"Tag " + tag.name}
+                title={"Tag " + tagEntity.name}
                 spellCheck={false}
-                defaultValue={tag.name}
+                defaultValue={tagEntity.name}
                 ref={inputRef}
                 maxLength={MAX_TAG_INPUT_VALUE_LENGTH}
                 onKeyDown={handleKeyDown}

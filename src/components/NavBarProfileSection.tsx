@@ -64,7 +64,7 @@ export default function NavBarProfileSection({...props}: Props) {
                     <img 
                         src="/img/account.png" 
                         alt="account" 
-                        className="accountIcon invertColor hover" 
+                        className="accountIcon invertColor hover dontSelectText" 
                         height={30}
                         title="Profile"
                     />

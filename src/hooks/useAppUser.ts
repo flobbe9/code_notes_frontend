@@ -1,13 +1,14 @@
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
+import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
+import { TagEntity } from "../abstract/entites/TagEntity";
+import { AppUserService } from "../abstract/services/AppUserService";
+import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { AppUserService } from "../abstract/services/AppUserService";
 import { isBlank, logError } from "../helpers/utils";
-import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
-import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 
 
 /**
@@ -19,6 +20,8 @@ export function useAppUser(isLoggedIn: boolean) {
     
     const initAppUserEntity = AppUserService.getDefaultInstance();
     const [appUserEntity, setAppUserEntity] = useState<AppUserEntity>(initAppUserEntity);
+    /** Tags to be transfered to app user right after login */
+    const [loggedOutTags, setLoggedOutTags] = useState<TagEntity[]>([]);
     const { toast } = useContext(AppContext);
 
     const queryClient = useQueryClient();
@@ -31,15 +34,20 @@ export function useAppUser(isLoggedIn: boolean) {
 
 
     useEffect(() => {
-        if (useQueryResult.data)
+        if (useQueryResult.data) {
+            useQueryResult.data.tags = [...useQueryResult.data.tags || [], ...loggedOutTags];
             setAppUserEntity(useQueryResult.data);
+            setLoggedOutTags([]);
+        }
 
     }, [useQueryResult.data]);
 
 
     useEffect(() => {
-        if (isLoggedIn)
+        if (isLoggedIn) {
+            setLoggedOutTags(appUserEntity.tags || []);
             useQueryResult.refetch();
+        }
         
     }, [isLoggedIn])
 

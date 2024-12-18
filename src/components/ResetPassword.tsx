@@ -6,13 +6,14 @@ import "../assets/styles/ResetPassword.scss";
 import { BACKEND_BASE_URL, getHeadTitleText, LOGIN_PATH, PASSWORD_REGEX, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY, RESET_PASSWORD_TOKEN_URL_QUERY_PARAM, START_PAGE_PATH } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { getCurrentUrlWithoutWWW, isBlank, replaceCurrentBrowserHistoryEntry } from "../helpers/utils";
+import { useFormInput } from "../hooks/useFormInput";
 import { AppContext } from "./App";
-import Head from "./helpers/Head";
+import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
+import Head from "./helpers/Head";
 import TextInput from "./helpers/TextInput";
 import PasswordAdvice from "./PasswordAdvice";
-import { useFormInput } from "../hooks/useFormInput";
 
 
 interface Props extends DefaultProps {
@@ -57,6 +58,7 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
     const [isResetByToken, setIsResetByToken] = useState(window.location.pathname === RESET_PASSWORD_BY_TOKEN_PATH);
     
     const { toast, hidePopup } = useContext(AppContext);
+    const { isLoggedIn } = useContext(AppFetchContext);
     
     const [urlQueryParams, setUrlSearchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -271,6 +273,17 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
     }
 
 
+    // get heading
+        // is loggedin
+            // change password
+    function getHeading(): string {
+
+        return isLoggedIn ? 
+            "Change password" :
+            "Reset password";
+    }
+
+
     return (
         <Flex 
             id={id} 
@@ -283,13 +296,13 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
             <Head 
                 headTagStrings={[
                     `<link rel='canonical' href='${getCurrentUrlWithoutWWW()}' />`,
-                    `<title>${getHeadTitleText("Reset password")}</title>`,
+                    `<title>${getHeadTitleText(getHeading() )}</title>`,
                 ]}
                 rendered={!isPopupContent}
             />
             
             <div className={`ResetPassword-contentContainer ${!isPopupContent && 'mt-5'}`}>
-                <h2 className="ResetPassword-contentContainer-heading mb-4">Reset password</h2> 
+                <h2 className="ResetPassword-contentContainer-heading mb-4">{getHeading()}</h2> 
 
                 <div className="ResetPassword-contentContainer-formContainer mb-5">
                     {/* Old password */}
@@ -352,7 +365,7 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
                         ref={submitButtonRef}
                         onClickPromise={handleFormSubmit}
                     >
-                        Reset password
+                        {getHeading()}
                     </Button>
                 </div>
             </div>

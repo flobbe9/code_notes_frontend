@@ -1,16 +1,15 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
-import { AppUserEntity } from "../../../../abstract/entites/AppUserEntity";
-import { NoteEntity } from "../../../../abstract/entites/NoteEntity";
 import { TagEntity } from "../../../../abstract/entites/TagEntity";
+import { AppUserService } from "../../../../abstract/services/AppUserService";
+import { TagEntityService } from "../../../../abstract/services/TagEntityService";
 import "../../../../assets/styles/NoteTagList.scss";
 import { getRandomString, isBlank } from '../../../../helpers/utils';
-import { AppUserService } from "../../../../abstract/services/AppUserService";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
 import Flex from "../../../helpers/Flex";
 import HelperDiv from "../../../helpers/HelperDiv";
-import TagInput from "./TagInput";
 import { NoteContext } from "./Note";
+import TagInput from "./TagInput";
 
 
 interface Props extends DefaultProps {
@@ -35,10 +34,11 @@ export default function NoteTagList({...props}: Props) {
 
     const context = {
         getTagElementIndex,
-        addTagElement,
         addTag,
+        addTagEntity,
         removeTag,
-        getNumBlankTagElements,
+        removeTagEntity,
+        getNumBlankTags,
         tagElements,
         noteTagEntities: noteEntity.tags
     }
@@ -58,7 +58,7 @@ export default function NoteTagList({...props}: Props) {
 
         const tagElements = noteEntity.tags.map(tag => {
             const key = getRandomString();
-            return <TagInput initialTag={tag} key={key} propsKey={key} />;
+            return <TagInput initialTagEntity={tag} key={key} propsKey={key} />;
         });
 
         // add blank tag
@@ -71,7 +71,7 @@ export default function NoteTagList({...props}: Props) {
     /**
      * Append a new ```<TagInput />``` with an empty name to ```tags``` state. Does not update ```appUserEntity```.
      */
-    function addTagElement(): void {
+    function addTag(): void {
 
         setTagElements([...tagElements, getNewTagElement()]);
     }
@@ -79,21 +79,55 @@ export default function NoteTagList({...props}: Props) {
 
     /**
      * @param tagEntity to add to ```noteEntity.tags``` and ```appUserEntity.tags```
-     * @param noteEntities the globally fetched state
-     * @param appUserEntity the globally fetched state
      */
-    function addTag(tagEntity: TagEntity, noteEntities: NoteEntity[], appUserEntity: AppUserEntity): void {
+    function addTagEntity(tagEntity: TagEntity): void {
 
         if (!tagEntity)
             return;
 
         // add to appUser first
-        AppUserService.addTag(appUserEntity, noteEntities, tagEntity);
+        AppUserService.addTagEntity(appUserEntity, TagEntityService.clone(tagEntity));
 
         // add to noteEntity
         noteEntity.tags = [...(noteEntity.tags || []), tagEntity];
     }
 
+
+    /**
+     * Removes tag at given ```index``` from ```noteEntity.tags```.
+     * 
+     * @param index of the tag to remove
+     */
+    function removeTagEntity(index: number): void {
+
+        const tagToRemove = noteEntity.tags!.splice(index, 1)[0];
+
+        if (!tagToRemove || !appUserEntity.tags)
+            return;
+
+        // case: tagEntity is used somewhere else
+        if (AppUserService.isTagEntityPresentInANote(noteEntities, tagToRemove))
+            return;
+                
+        AppUserService.removeTagEntity(appUserEntity, tagToRemove);
+    }
+
+
+    /**
+     * Remove the ```<TagInput />``` with given ```key``` from ```tagElements``` state.
+     * 
+     * @param key of the tagInput to remove
+     */
+    function removeTag(index: number): void {
+
+        // case: no tag with this key
+        if (index === -1)
+            return;
+
+        tagElements.splice(index, 1);
+        setTagElements([...tagElements]);
+    }
+    
 
     /**
      * @param index
@@ -105,58 +139,9 @@ export default function NoteTagList({...props}: Props) {
         const defaultTag = {name: name};
 
         const key = getRandomString();
-        return <TagInput initialTag={defaultTag} key={key} propsKey={key} />;
+        return <TagInput initialTagEntity={defaultTag} key={key} propsKey={key} />;
     }
 
-
-    /**
-     * Removes tag at given ```index``` from ```noteEntity.tags```.
-     * 
-     * @param index of the tag to remove
-     */
-    function removeTag(index: number): void {
-
-        const tagToRemove = noteEntity.tags!.splice(index, 1)[0];
-
-        removeTagFromAppUserEntityEntity(tagToRemove);
-
-        removeTagElement(index);
-    }
-
-
-    /**
-     * Remove the ```<TagInput />``` with given ```key``` from ```tagElements``` state.
-     * 
-     * @param key of the tagInput to remove
-     */
-    function removeTagElement(index: number): void {
-
-        // case: no tag with this key
-        if (index === -1)
-            return;
-
-        // remove tag
-        const tagsState = tagElements;
-        tagsState.splice(index, 1);
-
-        // update state
-        setTagElements([...tagsState]);
-    }
-
-
-    function removeTagFromAppUserEntityEntity(tagEntity: TagEntity): void {
-
-        // case: falsy arg or appUserEntity has no tagEntities or no notes anyway
-        if (!tagEntity || !appUserEntity.tags)
-            return;
-
-        // case: tagEntity is used somewhere else
-        if (AppUserService.isTagEntityPresentInANote(noteEntities, tagEntity))
-            return;
-                
-        AppUserService.removeTagEntity(appUserEntity, tagEntity);
-    }
-    
 
     /**
      * @param key of the ```<TagInput />``` to search
@@ -178,7 +163,7 @@ export default function NoteTagList({...props}: Props) {
     }
 
 
-    function getNumBlankTagElements(): number {
+    function getNumBlankTags(): number {
 
         const renderedTagInputs = getTagInputElements();
 
@@ -218,11 +203,12 @@ export default function NoteTagList({...props}: Props) {
 
 
 export const NoteTagListContext = createContext({
-    getTagElementIndex: (tag: string | number) => {return -1 as number},
-    addTagElement: () => {},
-    addTag: (tag: TagEntity, n, a) => {},
+    getTagElementIndex: (key: string | number) => {return -1 as number},
+    addTag: () => {},
+    addTagEntity: (tag: TagEntity) => {},
     removeTag: (index: number) => {},
-    getNumBlankTagElements: () => {return 1 as number},
+    removeTagEntity: (index: number) => {},
+    getNumBlankTags: () => {return 1 as number},
     tagElements: [<></>],
     noteTagEntities: [{}] as (TagEntity[] | null)
 })

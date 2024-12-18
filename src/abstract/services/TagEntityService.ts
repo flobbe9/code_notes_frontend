@@ -24,6 +24,31 @@ export class TagEntityService extends AbstractService {
 
         toast(`Tag ${i + 1} invalid`, `Tags cannot be longer than ${MAX_TAG_INPUT_VALUE_LENGTH} characters.`, "warn");
     }
+
+
+    public static getDefaultInstance(): TagEntity {
+
+        return {
+            id: -1,
+            created: "",
+            updated: "",
+            name: ""
+        }
+    }
+
+
+    public static clone(tagEntity: TagEntity): TagEntity {
+
+        if (!tagEntity)
+            return this.getDefaultInstance();
+
+        return {
+            id: tagEntity.id,
+            created: tagEntity.created,
+            updated: tagEntity.updated,
+            name: tagEntity.name
+        }
+    }
     
 
     /**
@@ -31,7 +56,7 @@ export class TagEntityService extends AbstractService {
      * @param tag to get index for
      * @returns index of given ```tag``` in given ```tags```, matching by ```tag.name```
      */
-    public static getTagIndex(tags: TagEntity[], tag: TagEntity): number {
+    public static getTagIndex(tags: TagEntity[] | undefined | null, tag: TagEntity | undefined | null): number {
 
         if (!tags || !tag)
             return -1;
@@ -45,5 +70,11 @@ export class TagEntityService extends AbstractService {
         });
 
         return tagIndex;
+    }
+
+
+    public static contains(tags: TagEntity[] | undefined | null, tag: TagEntity | undefined | null): boolean {
+
+        return this.getTagIndex(tags, tag) !== -1;
     }
 }

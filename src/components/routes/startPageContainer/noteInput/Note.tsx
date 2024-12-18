@@ -6,7 +6,7 @@ import { NoteEntityService } from "../../../../abstract/services/NoteEntityServi
 import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, logWarn } from '../../../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, isBlank, isNumberFalsy, logWarn } from '../../../../helpers/utils';
 import { useHasComponentMounted } from "../../../../hooks/useHasComponentMounted";
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
@@ -157,9 +157,6 @@ export default function Note({propsKey, ...props}: Props) {
             return;
         }
 
-        // call this before updating side bar, need to get fresh app user tags first
-        appUserEntityUseQueryResult.refetch();
-
         // update saved note in state, update sidebar
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
         noteEntities.splice(noteIndex, 1, jsonResponse);
@@ -173,10 +170,18 @@ export default function Note({propsKey, ...props}: Props) {
 
     function handleDeleteNoteClick(event): void {
 
+        let noteEntityTitle = noteEntity.title;
+
+        if (isBlank(noteEntityTitle))
+            noteEntityTitle = "<blank>";
+
+        else if (noteEntityTitle.length > 30)
+            noteEntityTitle = noteEntityTitle.substring(0, 30) + "..."
+
         showPopup(
             <Confirm
                 heading={<h3>Delete Note?</h3>}
-                message={`Are you sure you want to delete '${noteEntity.title}'?`}
+                message={`Are you sure you want to delete '${noteEntityTitle}'?`}
                 style={{maxWidth: "50vw"}}
                 onConfirm={event => deleteNote()}
             />
