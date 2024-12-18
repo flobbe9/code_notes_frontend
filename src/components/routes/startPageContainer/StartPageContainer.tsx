@@ -8,6 +8,7 @@ import Head from "../../helpers/Head";
 import StartPageContent from "./StartPageContent";
 import StartPageSideBar from "./StartPageSideBar";
 import Flex from "../../helpers/Flex";
+import ContentEditableDiv from "../../helpers/ContentEditableDiv";
 
 
 interface Props extends DefaultProps {
@@ -124,6 +125,8 @@ export default function StartPageContainer({children, ...props}: Props) {
                 `<title>${getHeadTitleText()}</title>`,
                 `<meta name="description" content="Edit, save and manage your coding notes. Save code snippets with variables and quickly insert values to copy your custom command. Use build in VSCode editor to comfortably edit your notes." />`
             ]} />
+
+            <ContentEditableDiv placeholder="test" />
 
             <Flex flexWrap="nowrap">
                 <StartPageSideBar />

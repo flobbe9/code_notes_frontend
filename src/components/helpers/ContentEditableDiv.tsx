@@ -100,27 +100,21 @@ export default forwardRef(function ContentEditableDiv(
      *                        Default is ```true```
      * @returns ```true``` if input div has no text (or white space) and no html (except possibly the placeholder ```<input>```)
      */
-    // TODO: does not work
-        // improove innerText/Html is empty conditons
     function isInputDivEmpty(withPlaceholder = true): boolean {
 
         const inputDiv = componentRef.current!;
         const innerText = inputDiv.innerText;
-        const innerHtml = inputDiv.innerHTML;
         const inputDivChildren = inputDiv.children;
         const firstInputDivChild = inputDivChildren.length ? inputDivChildren[0] : undefined;
 
         const isInnerHtmlConsideredEmpty = !inputDivChildren.length || !!firstInputDivChild?.matches(".placeholderInput");
-        // const isInnerHtmlConsideredEmpty = firstInputDivChild?.matches("br") || !!firstInputDivChild?.matches(".placeholderInput");
 
         // case: empty only without inner text and a placeholder input
         if (withPlaceholder)
             return isEmpty(innerText) && isInnerHtmlConsideredEmpty;
-            // return innerText === "\n" && isInnerHtmlConsideredEmpty;
 
         // case: actually empty
-        return isEmpty(innerText) && isEmpty(innerHtml);
-        // return (isBlank(innerText) || innerText === "\n") && (isBlank(innerHtml) || innerHtml === "<br>");
+        return isEmpty(innerText) || innerText === "\n";
     }
 
 
@@ -193,6 +187,7 @@ export default forwardRef(function ContentEditableDiv(
         placeholderInput.className = "placeholderInput";
         placeholderInput.placeholder = placeholder;
 
+        componentRef.current!.innerHTML = "";
         componentRef.current!.append(placeholderInput);
     }
 

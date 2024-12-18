@@ -8,8 +8,8 @@ import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTak
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
 import SearchBar from "../../../helpers/SearchBar";
-import LanguageSearchResults from "./LanguageSearchResults";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
+import LanguageSearchResults from "./LanguageSearchResults";
 import { NoteContext } from "./Note";
 
 
@@ -117,6 +117,8 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
             () => {
                 languageSearchBar.style.position = (hide ? "absolute" : "relative");
                 languageSearchBar.style.zIndex = hide ? "-1" : "1";
+                if (!hide)
+                    (languageSearchBar.querySelector(".searchInput") as HTMLInputElement)?.focus();
             }
         )
     }
