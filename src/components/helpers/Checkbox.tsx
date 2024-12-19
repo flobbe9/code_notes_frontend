@@ -3,7 +3,6 @@ import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/Checkbox.scss";
 import Flex from "./Flex";
-import HelperDiv from "./HelperDiv";
 import HiddenInput from "./HiddenInput";
 
 
@@ -49,7 +48,7 @@ export default forwardRef(function Checkbox({
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Checkbox");
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
 
     useImperativeHandle(ref, () => componentRef.current!, []);
 
@@ -108,28 +107,28 @@ export default forwardRef(function Checkbox({
             }}
             title={title}
             rendered={rendered}
-            onClick={handleClick}
             verticalAlign="center"
             horizontalAlign="center"
             ref={componentRef}
+            onClick={handleClick}
             _hover={checked ? _hover : {}}
             {...otherProps}
         >
-
             <HiddenInput
                 type="checkbox"
-                className="checkboxInput"
+                className="Checkbox-input"
                 checked={checked}
                 disabled={disabled}
              />
                 
-            <HelperDiv 
-                className="checkboxContent dontSelectText" 
+            <Flex 
+                className="Checkbox-content dontSelectText" 
                 rendered={checked || dontHideChildren}
+                verticalAlign="center"
                 title={title}
             >
                 {children || <i className="fa-solid fa-check"></i>}
-            </HelperDiv>
+            </Flex>
         </Flex>
     )
 })

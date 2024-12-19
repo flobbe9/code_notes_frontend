@@ -1,12 +1,14 @@
-import React, { forwardRef, Ref, useContext, useRef } from "react";
+import React, { forwardRef, Ref, useContext, useImperativeHandle, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { RememberMyChoiceKey, RememberMyChoiceValue } from "../../abstract/RememberMyChoice";
 import "../../assets/styles/Confirm.scss";
+import { isBooleanFalsy, logWarn } from "../../helpers/utils";
 import { AppContext } from "../App";
 import Button from "./Button";
+import Checkbox from "./Checkbox";
 import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";
-import { isBooleanFalsy } from "../../helpers/utils";
-import Checkbox from "./Checkbox";
+import { REMEMBER_MY_CHOICE_KEY_PREFIX } from "../../helpers/constants";
 
 
 interface Props extends DefaultProps {
@@ -20,6 +22,13 @@ interface Props extends DefaultProps {
     heading?: string | JSX.Element | JSX.Element[],
     /** No default styles in here */
     message?: string | JSX.Element | JSX.Element[],
+
+    /** Will render a checkbox and store confirm choice to localStorage. Not showing popup again is not handled here */
+    rememberMyChoice?: boolean,
+    /** Default is "Remember my choice" */
+    rememberMyChoiceLabel?: string,
+    /** Required if ```rememberMyChoice``` is ```true``` */
+    rememberMyChoiceKey?: RememberMyChoiceKey
 
     /** If ```true```, hitting "Enter" will trigger the confirm button without any tabbing. Else, it will trigger the cancel button. Default is ```false``` */
     focusConfirmOnRender?: boolean,
@@ -42,6 +51,9 @@ export default forwardRef(function Confirm(
         cancelLabel = "Cancel",
         heading,
         message,
+        rememberMyChoice,
+        rememberMyChoiceLabel = "Remember my choice",
+        rememberMyChoiceKey,
         focusConfirmOnRender = false,
         onConfirm,
         onCancel,
@@ -50,12 +62,17 @@ export default forwardRef(function Confirm(
     ref: Ref<HTMLDivElement>
 ) {
 
+    const [isRememberMyChoice, setIsRememberMyChoice] = useState(false);
+
     const { hidePopup } = useContext(AppContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Confirm");
 
+    const componentRef = useRef<HTMLDivElement>(null);
     const cancelButtonRef = useRef<HTMLButtonElement>(null);
     const confirmButtonRef = useRef<HTMLButtonElement>(null);
+    
+    useImperativeHandle(ref, () => componentRef.current!, []);
 
 
     function handleCancel(event): void {
@@ -71,7 +88,9 @@ export default forwardRef(function Confirm(
 
         if (onConfirm)
             onConfirm(event);
-            
+
+        updateChoice("confirm");
+
         hidePopup();
     }
 
@@ -94,11 +113,27 @@ export default forwardRef(function Confirm(
     }
 
 
+    function updateChoice(choice: RememberMyChoiceValue): void {
+
+        // case: is not remember my choice
+        if (!choice || !rememberMyChoice || !isRememberMyChoice)
+            return;
+
+        if (!rememberMyChoiceKey) {
+            logWarn("Missing remember my choice key");
+            return;
+        }
+
+        localStorage.setItem(`${REMEMBER_MY_CHOICE_KEY_PREFIX}${rememberMyChoiceKey}`, choice);
+    }
+
+
     return (
         <div 
             id={id} 
             className={className}
             style={style}
+            ref={componentRef}
             {...otherProps}
         >
             {/* Heading */}
@@ -112,9 +147,19 @@ export default forwardRef(function Confirm(
             </div>
 
             <div className="Confirm-footer">
-                <Flex className="my-2" verticalAlign="center">
+                <Flex className="mb-4 hover" verticalAlign="center">
                     {/* Remember my choice */}
-                    <Checkbox className="Confirm-footer-rememberMyChoiceCheckbox me-2" /> Remember my choice
+                    <Checkbox 
+                        className="Confirm-footer-rememberMyChoiceCheckbox me-2" 
+                        isChecked={isRememberMyChoice}
+                        setIsChecked={setIsRememberMyChoice}
+                    /> 
+                    <span 
+                        className="Confirm-footer-rememberMyChoiceLabel dontSelectText"
+                        onClick={() => setIsRememberMyChoice(!isRememberMyChoice)}
+                    >
+                        {rememberMyChoiceLabel}
+                    </span>
                 </Flex>
 
                 <Flex horizontalAlign="right">
@@ -134,7 +179,7 @@ export default forwardRef(function Confirm(
                         ref={confirmButtonRef} 
                         onRender={focusConfirmButton}
                         onClick={handleConfirm}
-                        >
+                    >
                         {confirmLabel}
                     </Button>
                 </Flex>

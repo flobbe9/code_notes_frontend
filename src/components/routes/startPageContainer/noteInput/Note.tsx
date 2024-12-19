@@ -6,7 +6,7 @@ import { NoteEntityService } from "../../../../abstract/services/NoteEntityServi
 import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString, isBlank, isNumberFalsy, logWarn } from '../../../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, handleRememberMyChoice, isNumberFalsy, logWarn, shortenString } from '../../../../helpers/utils';
 import { useHasComponentMounted } from "../../../../hooks/useHasComponentMounted";
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
@@ -170,19 +170,17 @@ export default function Note({propsKey, ...props}: Props) {
 
     function handleDeleteNoteClick(event): void {
 
-        let noteEntityTitle = noteEntity.title;
-
-        if (isBlank(noteEntityTitle))
-            noteEntityTitle = "<blank>";
-
-        else if (noteEntityTitle.length > 30)
-            noteEntityTitle = noteEntityTitle.substring(0, 30) + "..."
+        if (handleRememberMyChoice("deleteNote", deleteNote))
+            return;
 
         showPopup(
             <Confirm
-                heading={<h3>Delete Note?</h3>}
-                message={`Are you sure you want to delete '${noteEntityTitle}'?`}
-                onConfirm={event => deleteNote()}
+                heading={<h3>Delete this Note?</h3>}
+                message={`Are you sure you want to delete '${shortenString(noteEntity.title)}'?`}
+                rememberMyChoice
+                rememberMyChoiceLabel="Don't ask again"
+                rememberMyChoiceKey="deleteNote"
+                onConfirm={deleteNote}
             />
         );
     }

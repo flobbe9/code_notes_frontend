@@ -2,12 +2,17 @@
 
 .Confirm {   
     max-width: 50vw;
+    min-width: 20vw;
 
     &-footer {
         &-rememberMyChoiceCheckbox {
             border-color: var(--matteBlue) !important;
             height: 20px !important;
             width: 20px !important;
+        }
+
+        &-rememberMyChoiceLabel {
+            @include cursorHover();
         }
 
         &-confirmButton {

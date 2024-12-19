@@ -30,7 +30,7 @@
     user-select: none;
 }
 
-@mixin hoverCursor() {
+@mixin cursorHover() {
     &:not([disabled]):hover {
         cursor: pointer;
     }
@@ -43,7 +43,7 @@
         opacity: 0.7;
     }
 
-    @include hoverCursor();
+    @include cursorHover();
 }
 
 @mixin customHover {
@@ -113,14 +113,14 @@
     }
 }
 
-@mixin focusOutline($color: currentColor) {
+@mixin outlineFocus($color: currentColor) {
     outline: 3px solid $color;
     outline-offset: 1px;
 }
 
 @mixin buttonFocus($color: currentColor) {
     @include customFocusVisible {
-        @include focusOutline($color);
+        @include outlineFocus($color);
     }
 }
 

@@ -4,8 +4,11 @@
     border: 2px solid var(--codeGrey);
     border-radius: var(--borderRadius);
     height: 30px;
-    padding: 5px;
     width: 30px;
 
-    @include hoverCursor();
+    &:has(.Checkbox-input:not([disabled]):focus) {
+        @include outlineFocus();
+    }
+
+    @include cursorHover();
 }

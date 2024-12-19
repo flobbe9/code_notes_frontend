@@ -10,16 +10,16 @@
     width: fit-content !important;
 
     // case: input not checked and not disabled
-    &:has(.checkboxInput:not(:disabled):not(:checked)):hover {
+    &:has(.Checkbox-input:not(:disabled):not(:checked)):hover {
         @include hover();
     }
         
     // case: focused
-    &:has(.checkboxInput:focus) {
-        @include focusOutline(white);
+    &:has(.Checkbox-input:focus) {
+        @include outlineFocus(white);
     }
 
-    .checkboxContent {
+    .Checkbox-content {
         margin: 0 10px;
     }   
 }

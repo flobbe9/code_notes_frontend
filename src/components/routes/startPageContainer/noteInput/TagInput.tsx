@@ -5,7 +5,7 @@ import { AppUserService } from "../../../../abstract/services/AppUserService";
 import { TagEntityService } from "../../../../abstract/services/TagEntityService";
 import "../../../../assets/styles/TagInput.scss";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../../../helpers/constants";
-import { isBlank } from "../../../../helpers/utils";
+import { isBlank, shortenString } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
 import Button from "../../../helpers/Button";
@@ -220,10 +220,7 @@ export default function TagInput({initialTagEntity, propsKey, ...props}: Props) 
         let tagValue = getTagValue();
         inputRef.current!.value = "";
 
-        if (tagValue.length > 30)
-            tagValue = tagValue.substring(0, 30) + "...";
-
-        toast("Duplicate Tag", "This note already has a tag with the name '" + tagValue + "'.", "warn", 7000);     
+        toast("Duplicate Tag", "This note already has a tag with the name '" + shortenString(tagValue) + "'.", "warn", 7000);     
     }
 
 

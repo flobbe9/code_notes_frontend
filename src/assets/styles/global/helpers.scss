@@ -159,7 +159,7 @@
 }
 
 .hoverStrong {
-    @include hoverCursor();
+    @include cursorHover();
 
     transition: opacity var(--transitionTime);
 

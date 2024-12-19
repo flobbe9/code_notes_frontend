@@ -15,7 +15,7 @@
         }
 
         &:has(.radioButtonInput:focus) {
-            @include focusOutline(black);
+            @include outlineFocus(black);
         }
 
     }

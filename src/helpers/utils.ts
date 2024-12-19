@@ -6,10 +6,11 @@ import CryptoJSImpl from "../abstract/CryptoJSImpl";
 import { AnimationEasing } from "../abstract/CSSTypes";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
+import { isRememberMyChoiceValue, RememberMyChoiceKey } from "../abstract/RememberMyChoice";
 import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTE_QUERY_KEY } from "../hooks/useNotes";
-import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_SEVIRITY_COLORS, LogSevirity } from "./constants";
+import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_SEVIRITY_COLORS, LogSevirity, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
 
 
@@ -1454,4 +1455,54 @@ export async function animateAndCommit(element: HTMLElement | undefined | null, 
         onComplete();
 
     return animation
+}
+
+
+/**
+ * Find choice in localStorage and possibly call callback.
+ * 
+ * Will remove localStorage entry if value is invalid.
+ * 
+ * @param key to determine the right popup. Will prepend {@link REMEMBER_MY_CHOICE_KEY_PREFIX}
+ * @param confirmCallback executed if rememberd choice is "confirm"
+ * @returns ```true``` if a valid choice was cached (no matter if "confirm" or "cancel")
+ */
+export function handleRememberMyChoice(key: RememberMyChoiceKey, confirmCallback?: () => void): boolean {
+
+    const choice = localStorage.getItem(REMEMBER_MY_CHOICE_KEY_PREFIX + key);
+
+    if (!choice) 
+        return false;
+    
+    // case: invalid value in stored in localStorage
+    if (!isRememberMyChoiceValue(choice)) {
+        logWarn(`Choice '${choice}' is not a valid 'RememberMyChoiceValue'. Removing entry`);
+        localStorage.removeItem(REMEMBER_MY_CHOICE_KEY_PREFIX + key);
+        return false;
+    }
+
+    if (choice === "confirm" && confirmCallback)
+        confirmCallback();
+
+    return true;
+}
+
+
+/**
+ * Get a substring of given ```str``` with "..." appended. E.g. ```"veeery long string" => "veery lon..."```
+ * 
+ * @param str to shorten (wont be altered)
+ * @param maxLength length the ```str``` may have at most. Strings longer than that will be shortened. Default is 30
+ * @param blankReplacement returned if ```str``` is blank. Default is "\<blank\>"
+ * @returns shortened ```str``` or ```str``` if not too long
+ */
+export function shortenString(str: string, maxLength = 30, blankReplacement = "<blank>"): string {
+
+    if (isBlank(str))
+        return blankReplacement;
+
+    if (str.length > maxLength)
+        return str.substring(0, maxLength) + "...";
+
+    return str;
 }

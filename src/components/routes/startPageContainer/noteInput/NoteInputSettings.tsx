@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
-import { ProgrammingLanguage } from "../../../../abstract/ProgrammingLanguage";
+import { CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES, ProgrammingLanguage } from "../../../../abstract/ProgrammingLanguage";
 import "../../../../assets/styles/NoteInputSettings.scss";
-import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES } from "../../../../helpers/constants";
+import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../../helpers/constants";
 import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";

@@ -5,7 +5,7 @@
     border-radius: var(--borderRadius);
     padding: 2px;
     width: fit-content;
-    @include hoverCursor();
+    @include cursorHover();
 
     .radioButtonContent {        
         .defaultIcon {

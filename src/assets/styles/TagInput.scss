@@ -59,7 +59,7 @@
         transition: var(--transitionTimeFast);
         width: fit-content;
 
-        @include hoverCursor();
+        @include cursorHover();
         
         .fa-solid.fa-xmark {
             width: fit-content;

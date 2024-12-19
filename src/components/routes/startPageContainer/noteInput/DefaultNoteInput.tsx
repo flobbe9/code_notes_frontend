@@ -3,7 +3,7 @@ import { DefaultNoteInputProps } from "../../../../abstract/DefaultNoteInputProp
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import "../../../../assets/styles/DefaultNoteInput.scss";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../../../helpers/constants";
-import { animateAndCommit, getJsxElementIndexByKey } from "../../../../helpers/utils";
+import { animateAndCommit, getJsxElementIndexByKey, handleRememberMyChoice, shortenString } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
 import Confirm from "../../../helpers/Confirm";
 import Flex from "../../../helpers/Flex";
@@ -91,10 +91,16 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     function handleDeleteNote(event): void {
 
+        if (handleRememberMyChoice("deleteNoteInput", deleteNote))
+            return;
+
         showPopup((
             <Confirm 
                 heading={<h3>Delete this section?</h3>}
-                message={`Are you sure you want to delete this section of the '${noteEntity.title}' note?`}
+                message={`Are you sure you want to delete this section of the '${shortenString(noteEntity.title)}' note?`}
+                rememberMyChoice
+                rememberMyChoiceLabel="Don't ask again"
+                rememberMyChoiceKey="deleteNoteInput"
                 onConfirm={deleteNote}
             />
         ));

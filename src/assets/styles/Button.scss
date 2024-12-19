@@ -10,6 +10,6 @@
         min-height: 24px; // the height of the rotating circle icon
     }
 
-    @include hoverCursor();
+    @include cursorHover();
     @include buttonFocus();
 }
