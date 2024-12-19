@@ -29,5 +29,15 @@
 
     .content {
         padding-bottom: calc(var(--footerHeight));
+
+        /** Ment for any page directly at <Route>*/
+        .defaultPageContent {
+            width: 70vw;
+            margin: 2em 0;
+    
+            @media only screen and (max-width: $mobileMaxWidth) {
+                width: 85vw;
+            }
+        }
     }
 }

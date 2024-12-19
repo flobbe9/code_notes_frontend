@@ -37,7 +37,7 @@ export default function Footer({...props}: Props) {
             {...otherProps}
         >
             <Flex className="Footer-leftContainer col-6" verticalAlign="center">
-                <Link to={PRIVACY_POLICY_PATH} className="hover simpleLink me-3">Data policy</Link>
+                <Link to={PRIVACY_POLICY_PATH} className="hover simpleLink me-3">Privacy policy</Link>
                 <Link to={CONTACT_PATH} className="hover simpleLink me-3">Contact</Link>
             </Flex>
 

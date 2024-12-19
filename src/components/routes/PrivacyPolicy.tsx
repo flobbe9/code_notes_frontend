@@ -26,7 +26,7 @@ export default function PrivacyPolicy({...props}: Props) {
                 `<title>${getHeadTitleText("Privacy Policy")}</title>`
             ]} />
 
-            <div className="PrivacyPolicy-container">
+            <div className="PrivacyPolicy-container defaultPageContent">
                 <h2>Privacy Policy</h2><br />
                 <p>Information about the processing of your data according to Article 13 of the General Data Protection Regulation</p>
 
@@ -148,7 +148,7 @@ export default function PrivacyPolicy({...props}: Props) {
 
                 <h3>Cookies and Tracking</h3>
                 <div>
-                    <p>
+                    <div>
                         Only necessary cookies are used to ensure the full functionality of the website: <br />
                         <b>JSESSIONID</b>
                         <ul>
@@ -156,7 +156,7 @@ export default function PrivacyPolicy({...props}: Props) {
                             <li>Lifespan: indefinite</li>
                             <li>Function: Identification of the browser session (remembering an active login, even after closing the browser)</li>
                         </ul>
-                    </p>
+                    </div>
 
                     <p>
                         No tracking tools are used. Additionally, data such as IP addresses or accessed websites are not logged or stored.

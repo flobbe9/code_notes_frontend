@@ -22,7 +22,7 @@ export default function SettingsPage({...props}: Props) {
 
     return (
         <Flex horizontalAlign="center" {...otherProps}>
-            <Flex className="SettingsPage-container">
+            <Flex className="SettingsPage-container defaultPageContent">
                 <SettingsSideBar className="col-3" />
 
                 <div className="SettingsPage-container-settingsContent col-9">

@@ -1,3 +1,6 @@
+@import "./global/variables.scss";
+
+
 .Toast {
     bottom: -1000px;
     left: 30px;
@@ -7,6 +10,10 @@
 
     h3, h4, h5 {
         margin: 0 0 10px 0;
+    }
+
+    @media only screen and (max-width: $mobileMaxWidth) {
+        max-width: 300px;
     }
 
     .textContainer {

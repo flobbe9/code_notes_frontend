@@ -19,7 +19,7 @@ export default function Contact({...props}: Props) {
 
     return (
         <Flex horizontalAlign="center" {...otherProps}>
-            <div className="Contact-container">
+            <div className="Contact-container defaultPageContent">
                 <h2>Contact</h2><br />
             
                 <p>
