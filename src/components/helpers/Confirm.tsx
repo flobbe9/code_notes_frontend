@@ -6,6 +6,7 @@ import Button from "./Button";
 import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";
 import { isBooleanFalsy } from "../../helpers/utils";
+import Checkbox from "./Checkbox";
 
 
 interface Props extends DefaultProps {
@@ -101,7 +102,7 @@ export default forwardRef(function Confirm(
             {...otherProps}
         >
             {/* Heading */}
-            <HelperDiv className="Confirm-heading mb-3" rendered={!!heading}>
+            <HelperDiv className="Confirm-heading mb-3 pe-4" rendered={!!heading}>
                 {heading}
             </HelperDiv>
 
@@ -110,27 +111,34 @@ export default forwardRef(function Confirm(
                 {message}
             </div>
 
-            <Flex className="Confirm-footer" horizontalAlign="right">
-                {/* Cancel */}
-                <Button 
-                    className="Confirm-footer-cancelButton hover" 
-                    ref={cancelButtonRef}
-                    onRender={focusCancelButton}
-                    onClick={handleCancel}
-                >
-                    {cancelLabel}
-                </Button>
+            <div className="Confirm-footer">
+                <Flex className="my-2" verticalAlign="center">
+                    {/* Remember my choice */}
+                    <Checkbox className="Confirm-footer-rememberMyChoiceCheckbox me-2" /> Remember my choice
+                </Flex>
 
-                {/* Confirm */}
-                <Button 
-                    className="Confirm-footer-confirmButton hover" 
-                    ref={confirmButtonRef} 
-                    onRender={focusConfirmButton}
-                    onClick={handleConfirm}
-                >
-                    {confirmLabel}
-                </Button>
-            </Flex>
+                <Flex horizontalAlign="right">
+                    {/* Cancel */}
+                    <Button 
+                        className="Confirm-footer-cancelButton hover me-2" 
+                        ref={cancelButtonRef}
+                        onRender={focusCancelButton}
+                        onClick={handleCancel}
+                    >
+                        {cancelLabel}
+                    </Button>
+
+                    {/* Confirm */}
+                    <Button 
+                        className="Confirm-footer-confirmButton hover" 
+                        ref={confirmButtonRef} 
+                        onRender={focusConfirmButton}
+                        onClick={handleConfirm}
+                        >
+                        {confirmLabel}
+                    </Button>
+                </Flex>
+            </div>
                 
             {children}
         </div>

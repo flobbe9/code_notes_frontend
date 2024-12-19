@@ -120,21 +120,19 @@ export default function Popup({
                 onClick={handleOuterClick}
             >
                 <div 
-                    className={"popupContentContainer"}
+                    className={"Popup-flexContainer-contentContainer"}
                     ref={popupContainerRef}
                 >
-                    {/* Header */}
-                    <Flex className="popupHeader" horizontalAlign="right" verticalAlign="start">
-                        <Button
-                            className="popupXButton"
-                            onClick={handleXButtonClick}
-                        >
-                            <i className="fa-solid fa-xmark fa-lg hoverStrong"></i>
-                        </Button>
-                    </Flex>
+                    {/* X-Button */}
+                    <Button
+                        className="Popup-flexContainer-contentContainer-xButton"
+                        onClick={handleXButtonClick}
+                    >
+                        <i className="fa-solid fa-xmark fa-lg hoverStrong"></i>
+                    </Button>
 
-                    {/* Body */}
-                    <div className="popupContent">{popupContent}</div>
+                    {/* Content */}
+                    <div className="Popup-flexContainer-contentContainer-content">{popupContent}</div>
 
                     {children}
                 </div>

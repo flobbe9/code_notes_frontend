@@ -182,7 +182,6 @@ export default function Note({propsKey, ...props}: Props) {
             <Confirm
                 heading={<h3>Delete Note?</h3>}
                 message={`Are you sure you want to delete '${noteEntityTitle}'?`}
-                style={{maxWidth: "50vw"}}
                 onConfirm={event => deleteNote()}
             />
         );

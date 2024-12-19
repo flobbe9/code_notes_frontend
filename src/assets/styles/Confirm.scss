@@ -1,7 +1,15 @@
 @import "./global/functions.scss";
 
 .Confirm {   
+    max-width: 50vw;
+
     &-footer {
+        &-rememberMyChoiceCheckbox {
+            border-color: var(--matteBlue) !important;
+            height: 20px !important;
+            width: 20px !important;
+        }
+
         &-confirmButton {
             background-color: var(--matteBlue);
             color: white;

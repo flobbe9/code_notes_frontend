@@ -126,8 +126,6 @@ export default function StartPageContainer({children, ...props}: Props) {
                 `<meta name="description" content="Edit, save and manage your coding notes. Save code snippets with variables and quickly insert values to copy your custom command. Use build in VSCode editor to comfortably edit your notes." />`
             ]} />
 
-            <ContentEditableDiv placeholder="test" />
-
             <Flex flexWrap="nowrap">
                 <StartPageSideBar />
 

@@ -1,7 +1,7 @@
 @import "../styles/global/functions.scss";
 
 .Popup {
-    $contentContainerPadding: 10px;
+    $contentContainerPadding: 20px;
 
     display: none;
     height: 100vh;
@@ -10,29 +10,29 @@
     z-index: var(--overlayZIndex);
     
     &-flexContainer {
-        .popupContentContainer {
-            max-height: 98vh;
+        &-contentContainer {
             border: 1px solid var(--matteBlue);
             background-color: white;
             border-radius: var(--borderRadius);
             margin: 0 1vh;
+            max-height: 98vh;
             min-height: 100px;
             min-width: 100px;
             overflow: auto;
+            position: relative;
             padding: $contentContainerPadding;
             z-index: calc(var(--overlayZIndex) + 1);
-            
             @include scrollBar();
             
-            // Header
-            .popupXButton {
+            &-xButton {
                 background-color: transparent;
-                padding: 0;
+                padding: 0 !important;
+                position: absolute;
+                right: $contentContainerPadding;
+                top: $contentContainerPadding;
             }
 
-            // Body
-            .popupContent {
-                padding: 10px;
+            &-content {
                 padding-top: 0;
             }
         }
