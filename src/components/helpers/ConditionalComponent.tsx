@@ -1,5 +1,5 @@
 import React, { Fragment, ReactNode, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { START_PAGE_PATH } from "../../helpers/constants";
 import { isBlank, isPathRelative, replaceCurrentBrowserHistoryEntry } from "../../helpers/utils";
 
@@ -24,6 +24,8 @@ export default function ConditionalComponent({condition, children, redirectPath}
 
     const navigate = useNavigate();
 
+    const location = useLocation();
+
     useEffect(() => {
         if (!condition) {
             // case: got a valid redirect path
@@ -40,11 +42,9 @@ export default function ConditionalComponent({condition, children, redirectPath}
                 replaceCurrentBrowserHistoryEntry(START_PAGE_PATH);
                 navigate(START_PAGE_PATH);
             }
-    
-            return;
         }
 
-    }, [condition]);
+    }, [condition, location]);
 
 
     return condition ? children : <Fragment />;

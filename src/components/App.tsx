@@ -1,11 +1,12 @@
 import React, { createContext, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
-import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_PATH, START_PAGE_PATH } from "../helpers/constants";
+import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, pauseAnimations, playAnimations, stopAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
 import Footer from "./Footer";
+import ConditionalComponent from './helpers/ConditionalComponent';
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
 import LoggedInComponent from "./helpers/LoggedInComponent";
 import LoggedOutComponent from "./helpers/LoggedOutComponent";
@@ -432,6 +433,7 @@ export default function App() {
                                     <Route path={RESET_PASSWORD_BY_TOKEN_PATH} element={<ResetPassword />} />
                                     <Route path={PRIVACY_POLICY_PATH} element={<PrivacyPolicy />} />
                                     <Route path={CONTACT_PATH} element={<Contact />} />
+                                    <Route path={SETTINGS_PATH} element={<ConditionalComponent condition={false} redirectPath={PROFILE_PATH} children />} />
                                     <Route path={PROFILE_PATH} element={
                                         <LoggedInComponent>
                                             <SettingsPage>
