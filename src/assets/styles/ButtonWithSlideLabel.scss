@@ -1,7 +1,7 @@
 .ButtonWithSlideLabel {
     font-size: 1em;
 
-    .addNoteInputButtonLabelContainer {
+    &-labelContainer {
         line-height: 1;
         opacity: 0;
         overflow: hidden;
@@ -10,7 +10,7 @@
         text-wrap: nowrap;
         z-index: -1;
         
-        .addNoteInputButtonLabel {
+        &-label {
             margin-left: 3px;
         }
     }

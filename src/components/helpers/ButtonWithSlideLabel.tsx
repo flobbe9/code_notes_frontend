@@ -2,7 +2,7 @@ import React, { forwardRef, MouseEvent, Ref, useEffect, useImperativeHandle, use
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/ButtonWithSlideLabel.scss";
-import { animateAndCommit, stopAnimations } from "../../helpers/utils";
+import { animateAndCommit, getTextWidth } from "../../helpers/utils";
 import Button from "./Button";
 
 
@@ -25,22 +25,23 @@ export default forwardRef(function ButtonWithSlideLabel(
     ref: Ref<HTMLElement>
 ) {
 
+    const componentName = "ButtonWithSlideLabel";
+
     const [initialNoteInputButtonLabelWidth, setInitialNoteInputButtonLabelWidth] = useState<string>();
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ButtonWithSlideLabel");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName);
 
     const componentRef = useRef<HTMLButtonElement>(null);
+    const childrenRef = useRef<HTMLElement>(null);
+    const labelContainerRef = useRef<HTMLSpanElement>(null);
+    const labelRef = useRef<HTMLSpanElement>(null);
 
 
     useImperativeHandle(ref, () => componentRef.current!, []);
 
 
     useEffect(() => {
-        // wait for adjacent elements to render as well
-        setTimeout(
-            () => setInitialNoteInputButtonLabelWidth(getNoteInputButtonLabelWidth()), 
-            200
-        );
+        setTimeout(() => setInitialNoteInputButtonLabelWidth(getNoteInputButtonLabelWidth()), 200); // wait for adjacent elements to render as well
         
     }, []);
 
@@ -51,22 +52,12 @@ export default forwardRef(function ButtonWithSlideLabel(
         if (!initialNoteInputButtonLabelWidth)
             return;
 
-        const buttonLabelElement = (event.target as HTMLElement).querySelector(".addNoteInputButtonLabelContainer") as HTMLButtonElement;
+        labelContainerRef.current!.style.position = "relative";
+        labelContainerRef.current!.style.width = "0";
+        labelContainerRef.current!.style.zIndex = "0";
 
-        // case: not finished rendered yet (?)
-        if (!buttonLabelElement)
-            return;
-
-        // prepare for animation
-        buttonLabelElement.style.position = "relative";
-        buttonLabelElement.style.width = "0";
-        buttonLabelElement.style.zIndex = "0";
-
-        stopAnimations(buttonLabelElement);
-
-        // show button label
         animateAndCommit(
-            buttonLabelElement,
+            labelContainerRef.current!,
             {
                 opacity: 1,
                 width: initialNoteInputButtonLabelWidth,
@@ -78,13 +69,8 @@ export default forwardRef(function ButtonWithSlideLabel(
 
     function handleMouseLeave(event): void {
 
-        const buttonLabelElement = event.target.querySelector(".addNoteInputButtonLabelContainer") as HTMLButtonElement;
-
-        stopAnimations(buttonLabelElement);
-
-        // hide button label
         animateAndCommit(
-            buttonLabelElement,
+            labelContainerRef.current!,
             {
                 opacity: 0,
                 width: 0,
@@ -95,9 +81,9 @@ export default forwardRef(function ButtonWithSlideLabel(
             },
             // reset label style
             () => {
-                buttonLabelElement.style.position = "absolute";
-                buttonLabelElement.style.zIndex = "-1";
-                buttonLabelElement.style.width = initialNoteInputButtonLabelWidth || "";        
+                labelContainerRef.current!.style.position = "absolute";
+                labelContainerRef.current!.style.zIndex = "-1";
+                labelContainerRef.current!.style.width = initialNoteInputButtonLabelWidth || "";        
             }
         )
     }
@@ -108,8 +94,10 @@ export default forwardRef(function ButtonWithSlideLabel(
         if (!componentRef.current)
             return "0";
 
-        const buttonLabelElement = componentRef.current!.querySelector(".addNoteInputButtonLabelContainer") as HTMLButtonElement;
-        return buttonLabelElement?.offsetWidth + "px";
+        const labelWidth = getTextWidth(label, labelRef.current!.style.fontSize, labelRef.current!.style.fontFamily, labelRef.current!.style.fontWeight);
+        const childrenWidth = childrenRef.current!.offsetWidth;
+
+        return (labelWidth + childrenWidth) + "px";
     }
     
 
@@ -125,10 +113,10 @@ export default forwardRef(function ButtonWithSlideLabel(
             ref={componentRef}
             {...otherProps}
         >
-            {children}
+            <span className={`${componentName}-children`} ref={childrenRef}>{children}</span>
 
-            <span className="addNoteInputButtonLabelContainer">
-                <span className={`${labelClassName} addNoteInputButtonLabel`}>{label}</span>
+            <span className={`${componentName}-labelContainer`} ref={labelContainerRef}>
+                <span className={`${componentName}-labelContainer-label ${labelClassName}`} ref={labelRef}>{label}</span>
             </span>
         </Button>
     )
