@@ -148,7 +148,7 @@ export default function AddNewNoteInput({...props}: Props) {
             <div className="col-4 pe-2">
                 <ButtonWithSlideLabel 
                     className="fullWidth addPlainTextNoteInputButton" 
-                    label="Plain Text" 
+                    label="Plain text" 
                     title="Add plain text section"
                     onClick={handleAddPlainTextNoteInput}
                 >
@@ -165,15 +165,14 @@ export default function AddNewNoteInput({...props}: Props) {
                     onClick={handleAddCodeNoteInput}
                 >
                     <i className="fa-solid fa-plus me-2"></i>
-                    <img src="/img/vscode_blue.webp" alt="vscode" height={20} />
-                    {/* <i className="fa-solid fa-code"></i> */}
+                    <img src="/img/vsStudio_purple.png" className="vsStudioIcon" alt="vscode" height={20} />
                 </ButtonWithSlideLabel>
             </div>
 
             <div className="col-4">
                 <ButtonWithSlideLabel 
                     className="fullWidth addCodeNoteInputWithVariablesButton" 
-                    label="Code with Variables" 
+                    label="Code with variables" 
                     title="Add code section with variables"
                     onClick={handleAddCodeNoteInputWithVariables}
                 >

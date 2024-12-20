@@ -95,9 +95,8 @@ export default forwardRef(function ButtonWithSlideLabel(
             return "0";
 
         const labelWidth = getTextWidth(label, labelRef.current!.style.fontSize, labelRef.current!.style.fontFamily, labelRef.current!.style.fontWeight);
-        const childrenWidth = childrenRef.current!.offsetWidth;
 
-        return (labelWidth + childrenWidth) + "px";
+        return (labelWidth + 25) + "px"; // 25 is a guess and should technically be the labels margin-left, but needs 10px in addition for some reason
     }
     
 
@@ -115,7 +114,7 @@ export default forwardRef(function ButtonWithSlideLabel(
         >
             <span className={`${componentName}-children`} ref={childrenRef}>{children}</span>
 
-            <span className={`${componentName}-labelContainer`} ref={labelContainerRef}>
+            <span className={`${componentName}-labelContainer textLeft`} ref={labelContainerRef}>
                 <span className={`${componentName}-labelContainer-label ${labelClassName}`} ref={labelRef}>{label}</span>
             </span>
         </Button>
