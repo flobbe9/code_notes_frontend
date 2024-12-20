@@ -91,8 +91,8 @@ export default function PrivacyPolicy({...props}: Props) {
                 <h5>Deletion of User Data</h5>
                 <div>
                     <p>
-                        Automatic deletion of user data or accounts (e.g., due to inactivity) is not planned.
-                        An account can be deleted by the user themselves through profile settings or upon explicit request to the contact details mentioned above. <br />
+                        User accounts that have not been confirmed after registration will be deleted after 14 days. Confirmed accounts will never be deleted automatically.
+                        An account can generally be deleted anytime by the user themselves through profile settings or upon explicit request to the contact details mentioned above. <br />
                         User data in the browser session is deleted as soon as the user logs out or the session ID becomes invalid.
                         A session timeout (automatic logout after a certain amount of time) is not implemented for functionality reasons.
                     </p>
