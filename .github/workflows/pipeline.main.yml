@@ -57,6 +57,7 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:${{env.REACT_APP_VERSION}}
+          # TODO: only pass NODE_VERSION as build arg?  
           build-args: |
             NODE_VERSION=${{env.NODE_VERSION}}
             PORT=${{env.PORT}}
@@ -72,7 +73,7 @@ jobs:
   #   steps:
   #     - uses: appleboy/ssh-action@v1.2.0
   #       with: 
-  #         host: spellbook-gmbh.de
+  #         host: code-notes.net
   #         username: ${{ secrets.SSH_USER_NAME }}
   #         password: ${{ secrets.SSH_PASSWORD }}
   #         debug: true
