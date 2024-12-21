@@ -425,15 +425,10 @@ export default function App() {
                                             <Login />
                                         </LoggedOutComponent>
                                     } />
-                                    <Route path={RESET_PASSWORD_PATH} element={
-                                        <LoggedInComponent>
-                                            <ResetPassword />
-                                        </LoggedInComponent>
-                                    } />
-                                    <Route path={RESET_PASSWORD_BY_TOKEN_PATH} element={<ResetPassword />} />
                                     <Route path={PRIVACY_POLICY_PATH} element={<PrivacyPolicy />} />
                                     <Route path={CONTACT_PATH} element={<Contact />} />
                                     <Route path={SETTINGS_PATH} element={<ConditionalComponent condition={false} redirectPath={PROFILE_PATH} children />} />
+                                    <Route path={RESET_PASSWORD_BY_TOKEN_PATH} element={<ResetPassword />} />
                                     <Route path={PROFILE_PATH} element={
                                         <LoggedInComponent>
                                             <SettingsPage>

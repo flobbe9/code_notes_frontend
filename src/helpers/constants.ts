@@ -17,13 +17,13 @@ export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL + "";
 export const LINK_DEFAULT_REL = "noopener noreferrer nofollow";
 
 export const START_PAGE_PATH = "/";
+export const SETTINGS_PATH = "/settings";
 export const LOGIN_PATH = `/login`;
 export const REGISTER_PATH = `/register`;
-export const RESET_PASSWORD_PATH = `/reset-password`;
+export const RESET_PASSWORD_PATH = `${SETTINGS_PATH}/reset-password`;
 export const RESET_PASSWORD_BY_TOKEN_PATH = `/reset-password-by-token`;
 export const PRIVACY_POLICY_PATH = `/privacy-policy`;
 export const CONTACT_PATH = `/contact`;
-export const SETTINGS_PATH = "/settings";
 export const PROFILE_PATH = `${SETTINGS_PATH}/profile`;
 
 export const LOGOUT_URL = `${BACKEND_BASE_URL}/logout`;

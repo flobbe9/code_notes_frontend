@@ -297,6 +297,7 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
                 headTagStrings={[
                     `<link rel='canonical' href='${getCurrentUrlWithoutWWW()}' />`,
                     `<title>${getHeadTitleText(getHeading() )}</title>`,
+                    `<meta name='robots' content='noindex nofollow'>`
                 ]}
                 rendered={!isPopupContent}
             />

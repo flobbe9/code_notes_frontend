@@ -104,6 +104,7 @@ export default function Profile({...props}: Props) {
             <Head headTagStrings={[
                 `<link rel='canonical' href='${getCurrentUrlWithoutWWW()}' />`,
                 `<title>${getHeadTitleText("Profile")}</title>`,
+                `<meta name='robots' content='noindex nofollow'>`
             ]} />
 
             <div className="Profile-userDetail">

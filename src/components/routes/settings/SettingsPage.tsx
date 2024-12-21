@@ -1,6 +1,6 @@
 import React from "react";
-import "../../../assets/styles/SettingsPage.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
+import "../../../assets/styles/SettingsPage.scss";
 import Flex from "../../helpers/Flex";
 import SettingsSideBar from "./SettingsSideBar";
 
