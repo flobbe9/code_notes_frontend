@@ -5,20 +5,20 @@ FROM node:${NODE_VERSION}-alpine
 
 WORKDIR /app
 
-# COPY ./src ./src
-# COPY ./public ./public
-# COPY ./package.json \
-#      ./tsconfig.json \
-#      ./.env \
-#      # copy if exists
-#      ./.env.loca[l] \
-#      ./
+COPY ./src ./src
+COPY ./public ./public
+COPY ./package.json \
+     ./tsconfig.json \
+     ./.env \
+     # copy if exists
+     ./.env.loca[l] \
+     ./
 
-# RUN npm i
-# RUN npm run build
+RUN npm i
+RUN npm run build
 
 # UNCOMMENT: and comment out above steps and .dockerignore "build" in order to quickly use local build folder 
-COPY ./build ./build
+# COPY ./build ./build
 
 
 FROM node:${NODE_VERSION}-alpine

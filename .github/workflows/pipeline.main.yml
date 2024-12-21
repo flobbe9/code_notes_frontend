@@ -9,22 +9,20 @@ on:
 
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  # build:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository 
-        uses: actions/checkout@v4
-
-      - run: npm i
-      
-      - run: npm run build
-        env: 
-          CI: ""
+    # steps:
+    #   - name: Checkout repository 
+    #     uses: actions/checkout@v4
+    #   - run: npm i
+    #   - run: npm run build
+    #     env: 
+    #       CI: ""
 
   push_to_DockerHub:
     runs-on: ubuntu-latest
-    needs: build
+    # needs: build
 
     steps:
       - name: Checkout repository 
