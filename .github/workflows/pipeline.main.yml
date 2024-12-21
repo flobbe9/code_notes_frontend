@@ -59,7 +59,6 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:${{env.REACT_APP_VERSION}}
           build-args: |
             NODE_VERSION=${{env.NODE_VERSION}}
-          secret-envs: |
             PORT=${{env.PORT}}
             HTTPS=true
             SSL_DIR=${{env.SSL_DIR}}

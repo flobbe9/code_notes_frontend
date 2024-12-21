@@ -7,12 +7,13 @@ services:
       args:
         - NODE_VERSION=${NODE_VERSION}
         - SSL_KEY_FILE_PASSWORD=password
+        - HTTPS=false
+        - PORT=3000
+        - SSL_DIR=src/assets/ssl/development
+        - SSL_CRT_FILE_NAME=src/assets/ssl/development/localhost.crt.pem
+        - SSL_KEY_FILE_NAME=src/assets/ssl/development/localhost.key.pem
     environment:
-      - HTTPS=false
-      - PORT=3000
-      - SSL_DIR=src/assets/ssl/development
-      - SSL_CRT_FILE_NAME=src/assets/ssl/development/localhost.crt.pem
-      - SSL_KEY_FILE_NAME=src/assets/ssl/development/localhost.key.pem
+      - TZ=${TZ}
     ports: 
       - 3000:3000
     # UNCOMMENT: to use NODE_ENV=development
