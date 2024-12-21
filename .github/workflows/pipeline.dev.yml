@@ -1,0 +1,22 @@
+name: $GITHUB_REPOSITORY dev
+
+run-name: ${{ github.event.head_commit.message }}
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository 
+        uses: actions/checkout@v4
+
+      - run: npm ci
+      
+      - run: npm run build
+        env: 
+            CI: ""

@@ -4,11 +4,10 @@ import { getHeadTitleText } from "../../../helpers/constants";
 import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, isNumberFalsy, removeConfirmPageUnload } from "../../../helpers/utils";
 import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextHolder";
+import Flex from "../../helpers/Flex";
 import Head from "../../helpers/Head";
 import StartPageContent from "./StartPageContent";
 import StartPageSideBar from "./StartPageSideBar";
-import Flex from "../../helpers/Flex";
-import ContentEditableDiv from "../../helpers/ContentEditableDiv";
 
 
 interface Props extends DefaultProps {

@@ -1,7 +1,6 @@
 {
   "name": "code_notes_frontend",
-  "version": "0.0.1",
-  "nodeVersion": "22.6.0",
+  "version": "version_in_env_file",
   "private": true,
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
@@ -26,7 +25,8 @@
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@types/react-router-dom": "^5.3.3",
-    "@types/sanitize-html": "^2.11.0"
+    "@types/sanitize-html": "^2.11.0",
+    "sass": "^1.83.0"
   },
   "scripts": {
     "start": "react-scripts start",

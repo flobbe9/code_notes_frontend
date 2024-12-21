@@ -1,0 +1,88 @@
+name: $GITHUB_REPOSITORY main
+
+
+run-name: ${{ github.event.head_commit.message }}
+on: 
+  push: 
+    branches: 
+      - dev
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository 
+        uses: actions/checkout@v4
+
+      - run: npm ci
+      
+      - run: npm run build
+        env: 
+          CI: ""
+
+  push_to_DockerHub:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository 
+        uses: actions/checkout@v4
+  
+      - name: move .env vars to pipeline
+        run: |
+          echo $(cat .env | grep '^REACT_APP_VERSION=.*$') >> $GITHUB_ENV
+          echo $(cat .env | grep '^PORT=.*$') >> $GITHUB_ENV
+          echo $(cat .env | grep '^NODE_VERSION=.*$') >> $GITHUB_ENV
+          echo $(cat .env | grep '^SSL_DIR=.*$') >> $GITHUB_ENV
+          echo $(cat .env | grep '^SSL_CRT_FILE_NAME=.*$') >> $GITHUB_ENV
+          echo $(cat .env | grep '^SSL_KEY_FILE_NAME=.*$') >> $GITHUB_ENV
+        shell: bash
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Build and push
+        uses: docker/build-push-action@v6.10.0
+        with:
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:${{env.REACT_APP_VERSION}}
+          build-args: |
+            NODE_VERSION=${{env.NODE_VERSION}}
+          secret-envs: |
+            PORT=${{env.PORT}}
+            HTTPS=true
+            SSL_DIR=${{env.SSL_DIR}}
+            SSL_CRT_FILE_NAME=${{env.SSL_CRT_FILE_NAME}}
+            SSL_KEY_FILE_NAME=${{env.SSL_KEY_FILE_NAME}}
+
+  # deploy_to_server:
+  #   runs-on: ubuntu-latest
+  #   needs: push_to_DockerHub
+
+  #   steps:
+  #     - uses: appleboy/ssh-action@v1.2.0
+  #       with: 
+  #         host: spellbook-gmbh.de
+  #         username: ${{ secrets.SSH_USER_NAME }}
+  #         password: ${{ secrets.SSH_PASSWORD }}
+  #         debug: true
+  #         script: |
+  #           ./copySecretsToRemote.sh REACT_APP_CRYPTO_KEY='${{secrets.REACT_APP_CRYPTO_KEY}}' REACT_APP_CRYPTO_IV='${{secrets.REACT_APP_CRYPTO_IV}}' SSL_KEY_FILE_PASSWORD='${{secrets.SSL_KEY_FILE_PASSWORD}}'
+
+  #           docker compose pull frontend
+  #           yes | docker rm $(docker container ls --all --filter=ancestor=$(docker images -f "dangling=true" -q) --format "{{.ID}}") --force
+  #           yes | docker image rm $(docker images -f "dangling=true" -q)
+  #           docker compose up frontend -d
