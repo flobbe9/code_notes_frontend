@@ -57,7 +57,7 @@ export default function NavBarProfileSection({...props}: Props) {
                     onClickPromise={handleLogout}
                     title={"Logout"}
                 >
-                    <i className="fa-solid fa-right-from-bracket me-1 mirrorX"></i>
+                    <i className="fa-solid fa-right-from-bracket mirrorX"></i>
                 </ButtonWithSlideLabel>
 
                 {/* Profile */}

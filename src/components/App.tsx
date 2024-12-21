@@ -15,7 +15,7 @@ import Popup from './helpers/Popup';
 import Toast, { ToastSevirity } from './helpers/Toast';
 import NavBar from './NavBar';
 import ResetPassword from "./ResetPassword";
-import RouteContext from "./RouteContext";
+import RouteContextHolder from "./RouteContextHolder";
 import Contact from "./routes/Contact";
 import Login from "./routes/Login";
 import PrivacyPolicy from "./routes/PrivacyPolicy";
@@ -386,7 +386,7 @@ export default function App() {
     return (
         <AppContext.Provider value={context}>
             <BrowserRouter>
-                <RouteContext>
+                <RouteContextHolder>
                     <AppFetchContextHolder>
                         <div id="App" className="App">
                             <Overlay 
@@ -458,7 +458,7 @@ export default function App() {
                             />  
                         </div>
                     </AppFetchContextHolder>
-                </RouteContext>
+                </RouteContextHolder>
             </BrowserRouter>
         </AppContext.Provider>
     );

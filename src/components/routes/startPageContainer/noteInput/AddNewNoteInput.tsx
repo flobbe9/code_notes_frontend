@@ -166,7 +166,7 @@ export default function AddNewNoteInput({...props}: Props) {
                 >
                     <i className="fa-solid fa-plus me-2"></i>
                     <img src="/img/vsStudio_purple.png" className="vsStudioIcon" alt="vscode" height={20} />
-                </ButtonWithSlideLabel>
+                </ButtonWithSlideLabel> 
             </div>
 
             <div className="col-4">

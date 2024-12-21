@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppFetchContext } from "../components/AppFetchContextHolder";
 import { CSRF_TOKEN_URL_QUERY_PARAM } from "../helpers/constants";
 import { getCsrfToken, replaceCurrentBrowserHistoryEntry, setCsrfToken } from "../helpers/utils";
+import { RouteContext } from "../components/RouteContextHolder";
 
 
 /**
@@ -19,6 +20,7 @@ export function useCsrfToken() {
     const [queryParams, setQueryParams] = useSearchParams();
     const navigate = useNavigate();
 
+    const { clearUrlQueryParams } = useContext(RouteContext);
     const { isLoggedIn, isLoggedInUseQueryResult } = useContext(AppFetchContext);
 
 
@@ -56,11 +58,7 @@ export function useCsrfToken() {
         if (!csrfToken) 
             return null;
 
-        // navigate to current url but remove query params
-        navigate(window.location.pathname);
-
-        // remove last history entry (that is then one with the csrf token)
-        replaceCurrentBrowserHistoryEntry();
+        clearUrlQueryParams();
 
         return csrfToken;
     }

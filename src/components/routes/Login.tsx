@@ -3,21 +3,22 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../../abstract/InputValidationWrapper";
 import "../../assets/styles/Login.scss";
-import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, getHeadTitleText, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
+import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, getHeadTitleText, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
-import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, replaceCurrentBrowserHistoryEntry, setCsrfToken, stringToNumber } from "../../helpers/utils";
+import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, setCsrfToken, stringToNumber } from "../../helpers/utils";
 import { useFormInput } from "../../hooks/useFormInput";
+import { RouteContext } from "../RouteContextHolder";
 import { AppContext } from "./../App";
 import { AppFetchContext } from "./../AppFetchContextHolder";
-import Head from "./../helpers/Head";
 import Button from "./../helpers/Button";
 import Flex from "./../helpers/Flex";
+import Head from "./../helpers/Head";
 import Hr from "./../helpers/Hr";
 import TextInput from "./../helpers/TextInput";
 import Oauth2LoginButton from "./../Oauth2LoginButton";
-import Register from "./Register";
 import ResendConfirmationMail from "./../ResendConfirmationMail";
 import SendPasswordResetMail from "./../SendPasswordResetMail";
+import Register from "./Register";
 
 
 interface Props extends DefaultProps {
@@ -52,6 +53,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     const submitButtonRef = useRef<HTMLButtonElement>(null);
 
     const { toast, hidePopup, showPopup, replacePopupContent } = useContext(AppContext);
+    const { clearUrlQueryParams } = useContext(RouteContext);
     const { fetchLogin, isLoggedInUseQueryResult } = useContext(AppFetchContext);
     
     const navigate = useNavigate();
@@ -82,6 +84,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     useEffect(() => {
         handleConfirmAccountRedirect();
         handleRequestResetPasswordMailRedirect();
+        handleOauth2ErrorRedirect();
         
     }, []);
 
@@ -209,8 +212,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
 
         // case: invalid param value, clear query params
         if (statusCode === -1) {
-            replaceCurrentBrowserHistoryEntry();
-            navigate(window.location.pathname);
+            clearUrlQueryParams();
             return;
         }
 
@@ -239,9 +241,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
                 toast("Failed to confirm account", "An unexpected error occurred. Please resend the confirmation mail and click the 'Confirm' button in it.", "error");
         }
 
-        // clear query params from url and from history
-        replaceCurrentBrowserHistoryEntry();
-        navigate(window.location.pathname);
+        clearUrlQueryParams();
     }
 
 
@@ -262,8 +262,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
 
         // case: invalid param value, clear query params
         if (statusCode === -1) {
-            replaceCurrentBrowserHistoryEntry();
-            navigate(window.location.pathname);
+            clearUrlQueryParams();
             return;
         }
 
@@ -290,9 +289,40 @@ export default function Login({isPopupContent = false, ...props}: Props) {
                 toast(summary, "An unexpected error has occurred. Please try again by clicking 'Forgot my password'.", "error", 8000);
         }
         
-        // clear query params from url and from history
-        replaceCurrentBrowserHistoryEntry();
-        navigate(window.location.pathname);
+        clearUrlQueryParams();
+    }
+
+
+    function handleOauth2ErrorRedirect(): void {
+
+        if (isPopupContent)
+            return;
+
+        const statusCodeString = urlQueryParams.get(OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM);
+
+        if (!statusCodeString)
+            return;
+
+        const statusCode = stringToNumber(statusCodeString);
+
+        // case: invalid param value, clear query params
+        if (statusCode === -1) {
+            clearUrlQueryParams();
+            return;
+        }
+
+        const summary = "Failed to register";
+
+        switch (statusCode) {
+            case 406:
+                toast(summary, "An account with this E-Mail address is already registered, using a different third-party provider.", "warn");
+                break;
+
+            default:
+                toast(summary, "An unexpected error occurred. Please try again.", "error", 8000);
+        }
+
+        clearUrlQueryParams();
     }
     
     
