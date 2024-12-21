@@ -172,7 +172,7 @@ export default function SendPasswordResetMail({isParentPopupContent, ...props}: 
             style={style}
             {...otherProps}
         >
-            <h4 className="mb-4">Send reset password E-Mail</h4>
+            <h4 className="mb-4 pe-4">Send reset password E-Mail</h4>
 
             <TextInput
                 className="SendPasswordResetMail-emailInput mb-3"

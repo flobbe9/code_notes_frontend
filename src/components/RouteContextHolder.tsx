@@ -1,6 +1,7 @@
-import React, { createContext, Fragment, useEffect } from "react";
+import React, { createContext, Fragment, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { replaceCurrentBrowserHistoryEntry } from "../helpers/utils";
+import { AppContext } from "./App";
 
 
 
@@ -16,6 +17,8 @@ export default function RouteContextHolder({children}) {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const { moveToast } = useContext(AppContext);
+
     const context = {
         clearUrlQueryParams
     }
@@ -23,6 +26,7 @@ export default function RouteContextHolder({children}) {
 
     useEffect(() => {
         scrollTop();
+        moveToast(true);
 
     }, [location]);
 
@@ -33,6 +37,7 @@ export default function RouteContextHolder({children}) {
      * Only scroll to ```y=0```, leave x as it is
      */
     function scrollTop(): void {
+
         window.scrollTo(window.scrollX, 0);
     }
 

@@ -172,7 +172,7 @@ export default function ResendConfirmationMail({isParentPopupContent, ...props}:
             style={style}
             {...otherProps}
         >
-            <h4 className="mb-4">Resend confirmation E-Mail</h4>
+            <h4 className="mb-4 pe-4">Resend confirmation E-Mail</h4>
 
             <TextInput
                 className="ResendConfirmationMail-emailInput mb-3"
