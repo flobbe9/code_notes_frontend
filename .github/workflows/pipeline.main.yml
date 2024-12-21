@@ -1,4 +1,4 @@
-name: $GITHUB_REPOSITORY main
+name: code_notes_frontend main
 
 
 run-name: ${{ github.event.head_commit.message }}
