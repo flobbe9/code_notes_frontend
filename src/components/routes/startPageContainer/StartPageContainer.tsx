@@ -1,7 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import DefaultProps from "../../../abstract/DefaultProps";
-import { getHeadTitleText } from "../../../helpers/constants";
-import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, isNumberFalsy, removeConfirmPageUnload } from "../../../helpers/utils";
+import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, getHeadTitleText, isNumberFalsy, removeConfirmPageUnload } from "../../../helpers/utils";
 import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextHolder";
 import Flex from "../../helpers/Flex";

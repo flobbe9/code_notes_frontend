@@ -1,7 +1,7 @@
 import React from "react";
 import "../../assets/styles/Contact.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { LINK_DEFAULT_REL } from "../../helpers/constants";
+import { HELP_EMAIL, LINK_DEFAULT_REL } from "../../helpers/constants";
 import Flex from "../helpers/Flex";
 
 
@@ -28,7 +28,7 @@ export default function Contact({...props}: Props) {
                     38100 Braunschweig <br />
                     Germany<br /><br />
 
-                    Email: <a href="mailto:support.code-notes@gmail.com" className="blueLink" rel={LINK_DEFAULT_REL}>support.code-notes@gmail.com</a>
+                    Email: <a href={`mailto:${HELP_EMAIL}`} className="blueLink" rel={LINK_DEFAULT_REL}>{HELP_EMAIL}</a>
                 </p>
 
                 {children}

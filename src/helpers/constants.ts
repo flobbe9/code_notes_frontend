@@ -64,17 +64,7 @@ export const EMAIL_REGEX = new RegExp(/^[\w\-.]+@([\w-]+.)+[\w-]{2,4}$/, "g");
 export const HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES = 12;
 /** Will be prepended to the localStorage key to prevent key name collisions. */
 export const REMEMBER_MY_CHOICE_KEY_PREFIX = "code_notes-rememberMyChoice-";
-
-/**
- * Get the text for the ```<title>```.
- * 
- * @param pageTitle title of page, not including the company name
- * @returns ```pageTitle | ${companyName}``` or just ```companyName``` if no ```pageTitle```
- */
-export function getHeadTitleText(pageTitle?: string): string {
-
-    return isBlank(pageTitle) ? `${APP_NAME_PRETTY}` : `${pageTitle} | ${APP_NAME_PRETTY}`; 
-}
+export const HELP_EMAIL = "help.codenotes@gmail.com";
 
 
 // Sanitizer

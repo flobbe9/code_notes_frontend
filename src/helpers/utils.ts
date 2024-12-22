@@ -10,7 +10,7 @@ import { isRememberMyChoiceValue, RememberMyChoiceKey } from "../abstract/Rememb
 import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTE_QUERY_KEY } from "../hooks/useNotes";
-import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_SEVIRITY_COLORS, LogSevirity, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
+import { APP_NAME_PRETTY, BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_SEVIRITY_COLORS, LogSevirity, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
 
 
@@ -1505,4 +1505,16 @@ export function shortenString(str: string, maxLength = 30, blankReplacement = "<
         return str.substring(0, maxLength) + "...";
 
     return str;
+}
+
+
+/**
+ * Get the text for the ```<title>```.
+ * 
+ * @param pageTitle title of page, not including the company name
+ * @returns ```pageTitle | ${companyName}``` or just ```companyName``` if no ```pageTitle```
+ */
+export function getHeadTitleText(pageTitle?: string): string {
+
+    return isBlank(pageTitle) ? `${APP_NAME_PRETTY}` : `${pageTitle} | ${APP_NAME_PRETTY}`; 
 }

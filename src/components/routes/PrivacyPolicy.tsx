@@ -1,9 +1,9 @@
 import React from "react";
 import "../../assets/styles/PrivacyPolicy.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { BASE_URL, getHeadTitleText, LINK_DEFAULT_REL } from "../../helpers/constants";
+import { BASE_URL, HELP_EMAIL, LINK_DEFAULT_REL } from "../../helpers/constants";
 import Flex from "../helpers/Flex";
-import { getCurrentUrlWithoutWWW } from "../../helpers/utils";
+import { getCurrentUrlWithoutWWW, getHeadTitleText } from "../../helpers/utils";
 import Head from "../helpers/Head";
 
 
@@ -39,7 +39,7 @@ export default function PrivacyPolicy({...props}: Props) {
                     38100 Braunschweig <br />
                     Germany<br /><br />
 
-                    Email: <a href="mailto:support.code-notes@gmail.com" className="blueLink" rel={LINK_DEFAULT_REL}>support.code-notes@gmail.com</a>
+                    Email: <a href={`mailto:${HELP_EMAIL}`} className="blueLink" rel={LINK_DEFAULT_REL}>{HELP_EMAIL}</a>
                 </p>
 
                 <h3>User Data</h3>
@@ -192,193 +192,3 @@ export default function PrivacyPolicy({...props}: Props) {
 
     )
 }
-
-
-// German (not beeing updated):
-// return (
-    //     <Flex horizontalAlign="center" {...otherProps}>
-    //         <div className="PrivacyPolicy-container">
-    //             <h2>Datenschutzerklärung</h2>   
-    //             <p>Informationen über die Verarbeitung Ihrer Daten gemäß Art. 13 der Datenschutz-Grundverordnung</p>
-
-
-    //             <h3>Verantwortlicher und Datenschutzbeauftragter</h3>
-    //             <p>Verantwortlich für diese Website ist</p>
-
-    //             <p>
-    //                 Herr Florin Schikarski <br />
-    //                 Bäckerklint 4 <br />
-    //                 38100 Braunschweig <br /><br />
-
-    //                 E-Mail: support.code-notes@gmail.com
-    //             </p>
-
-
-    //             <h3>Benutzer Daten</h3>
-    //             <h5>Welche Daten werden verarbeitet / gespeichert?</h5>
-    //             <div>
-    //                 <ul>
-    //                     <li><b>Registrierung / Login per Drittanbieter (Google, Github oder Microsoft)</b></li>
-    //                     <ul>
-    //                         <li>E-Mail-Adresse (persistent*)</li>
-    //                         <li>Profilbild (nicht persistent*)</li>
-    //                         <li>Name (nicht persistent)</li>
-    //                         <li>Global-User-ID (persistent)
-    //                             <ul>
-    //                                 <li>Das einzigartige, unveränderliche Identifizierungsmerkmal eines Benutzers innerhalb der Umgebung des Drittanbieters</li>
-    //                             </ul>
-    //                         </li>
-    //                     </ul>
-
-    //                     <li><b>Registrierung / Login per Formular</b></li>
-    //                     <ul>
-    //                         <li>E-Mail-Adresse (persistent)</li>
-    //                         <li>Passwort (persistent)</li>
-    //                     </ul>
-    //                 </ul>
-
-    //                 <p>
-    //                     *persistent: Wird auf dem Server dieser Webseite und in der Browser Session (nach erfolgreichem Login) gespeichert.<br />
-    //                     *nicht persistent: Wird lediglich nach erfolgreichem Login in der Browser Session, jedoch nicht auf dem Server gespeichert.<br />
-    //                 </p>
-    //                 <p>
-    //                     Jegliche auf dem Server gespeicherte Benutzerdaten sind für Außenstehende unzugänglich und geschützt gespeichert. Passwörter werden vor dem Speichern unumkehrbar verschlüsselt. <br />
-    //                     Benutzerdaten werden auf der Grundlage des Art. 6 Abs. 1 Buchstabe f DSGVO verarbeitet.
-    //                 </p>
-    //             </div>
-
-    //             <h5>Warum werden Benutzerdaten Daten verarbeitet / gespeichert?</h5>
-    //             <div>
-    //                 <p>
-    //                     Das Speichern und Verarbeiten der o.g. Benutzerdaten dient dem Anlegen von Benutzerprofilen, also allgemein der Funktionalität dieser Webseite.<br />
-    //                     Mithilfe von Benutzerprofilen lässt sich vom Benutzer erstellter Content speichern, abrufen und bearbeiten.
-    //                 </p>
-    //             </div>
-
-    //             <h5>Wie lange werden Benutzerdaten gespeichert?</h5>
-    //             <div>
-    //                 <p>
-    //                     Benutzerdaten auf dem Server bleiben so lange gespeichert, wie der Account des Benutzers existiert. <br />
-    //                     Benutzerdaten in der Browsersession bleiben bestehen, so lange wie die Browsersession valide ist. 
-    //                 </p>
-    //             </div>
-
-    //             <h5>Löschung von Benutzerdaten</h5>
-    //             <div>
-    //                 <p>
-    //                     Eine automatische Löschung von Benutzerdaten oder Accounts (z.B. nach einiger Zeit Inaktivität) ist nicht vorgesehen.
-    //                     Ein Account kann vom Benutzer selbst mittels der Profileinstellungen oder nach ausdrücklicher Aufforderung an o.g. Kontaktdaten gelöscht werden. <br />
-    //                     Benutzerdaten in der Browsersession werden gelöscht, sobald der Benutzer sich selbständig abmeldet oder die Session-ID
-    //                     invalide geworden ist. Ein Session Timeout (also ein automatischer Logout nach einiger Zeit) ist aus Funktionalitätsgründen nicht vorgesehen.
-    //                 </p>
-    //             </div>
-
-    //             <h5>Bearbeiten von Benutzerdaten</h5>
-    //             <div>
-    //                 <p>
-    //                     Das Benutzerpasswort kann mittels der Profileinstellungen oder per Link Aufforderung geändert werden. <br />
-    //                     Auch jegliche Benutzerpräferenzen bezüglich der Funktionalität der Webseite (z.B. der Content Erstellung) können vom Benutzer nach Erfolgreichem Login bearbeitet werden.
-    //                 </p>
-    //             </div>
-
-    //             <h5>Betroffenenrechte</h5>
-    //             <div>
-    //                 <b>Recht auf Auskunft</b>
-    //                 <p>Sie können Auskunft nach Art. 15 DSGVO über Ihre personenbezogenen Daten verlangen, die wir verarbeiten.</p>
-
-    //                 <b>Recht auf Widerspruch:</b>
-    //                 <p>
-    //                     Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit gegen die Verarbeitung Ihrer personenbezogenen Daten, 
-    //                     die aufgrund von Artikel 6 Abs. 1 Buchstabe f DSGVO erfolgt, Widerspruch einzulegen. Der Verantwortliche verarbeitet die personenbezogenen Daten dann nicht mehr, 
-    //                     es sei denn, er kann zwingende schutzwürdige Gründe für die Verarbeitung nachweisen, die die Interessen, Rechte und Freiheiten der betroffenen Person überwiegen, 
-    //                     oder die Verarbeitung dient der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen. Die Erfassung der Daten zur Bereitstellung der Website und die Speicherung der 
-    //                     Protokolldateien sind für den Betrieb der Internetseite zwingend erforderlich.
-    //                 </p>
-
-    //                 <b>Recht auf Berichtigung</b>
-    //                 <p>
-    //                     Sollten die Sie betreffenden Angaben nicht (mehr) zutreffend sein, können Sie nach Art. 16 DSGVO eine Berichtigung verlangen. 
-    //                     Sollten Ihre Daten unvollständig sein, können Sie eine Vervollständigung verlangen.
-    //                 </p>
-
-    //                 <b>Recht auf Löschung</b>
-    //                 <p>
-    //                     Sie können nach Art. 17 DSGVO die Löschung Ihrer personenbezogenen Daten verlangen.
-    //                 </p>
-
-    //                 <b>Recht auf Einschränkung der Verarbeitung</b>
-    //                 <p>
-    //                     Sie haben nach Art. 18 DSGVO das Recht, eine Einschränkung der Verarbeitung Ihrer personenbezogenen Daten zu verlangen.
-    //                 </p>
-
-    //                 <b>Recht auf Beschwerde</b>
-    //                 <p>
-    //                     Wenn Sie der Ansicht sind, dass die Verarbeitung Ihrer personenbezogenen Daten gegen Datenschutzrecht verstößt, 
-    //                     haben Sie nach Ar. 77 Abs. 1 DSGVO das Recht, sich bei einer Datenschutzaufsichtsbehörde eigener Wahl zu beschweren. 
-    //                     Hierzu gehört auch die für den Verantwortlichen zuständige Datenschutzaufsichtsbehörde: Landesbeauftragte für Datenschutz und 
-    //                     Informationsfreiheit Nordrhein-Westfalen, <a href="https://www.ldi.nrw.de/kontakt/ihre-beschwerde"  className="blueLink" target="_blank" rel={LINK_DEFAULT_REL}>https://www.ldi.nrw.de/kontakt/ihre-beschwerde</a>.
-    //                 </p>
-
-    //                 <b>Recht auf Datenübertragbarkeit</b>
-    //                 <p>
-    //                     Für den Fall, dass die Voraussetzungen des Art. 20 Abs. 1 DSGVO vorliegen, steht Ihnen das Recht zu, sich Daten, die wir auf Grundlage Ihrer 
-    //                     Einwilligung oder in Erfüllung eines Vertrags automatisiert verarbeiten, an sich oder an Dritte aushändigen zu lassen. Die Erfassung der Daten zur 
-    //                     Bereitstellung der Website und die Speicherung der Protokolldateien sind für den Betrieb der Internetseite zwingend erforderlich. Sie beruhen daher 
-    //                     nicht auf einer Einwilligung nach Art. 6 Abs. 1 Buchstabe a DSGVO oder auf einem Vertrag nach Art. 6 Abs. 1 Buchstabe b DSGVO, sondern sind nach
-    //                     Art. 6 Abs. 1 Buchstabe f DSGVO gerechtfertigt. Die Voraussetzungen des Art. 20 Abs. 1 DSGVO sind demnach insoweit nicht erfüllt.
-    //                 </p>
-    //             </div>
-
-    //             <h3>Cookies und Tracking</h3>
-    //             <div>
-    //                 <p>
-    //                     Es werden lediglich notwendige Cookies verwendet, die der vollständigen Funktionalität der Webseite dienen: <br />
-    //                     <b>JSESSIONID</b>
-    //                     <ul>
-    //                         <li>Domain: {BASE_URL}</li>
-    //                         <li>Lebensdauer: unbestimmt</li>
-    //                         <li>Funktion: Identifizierung der Browsersession (Merken eines aktiven Logins, auch nach schließen des Browsers)</li>
-    //                     </ul>
-    //                 </p>
-
-    //                 <p>
-    //                     Es werden keinerlei Trackingtools eingesetzt. Auch Daten wie IP-Adresse oder aufgerufene Webseiten werden nicht protokolliert oder gespeichert.
-    //                 </p>
-    //             </div>
-
-    //             <h3>Hosting</h3>
-    //             <div>
-    //                 <p>
-    //                     Die Inhalte unserer Website werden bei folgendem Anbieter gehostet: <br />
-    //                     <b>Strato</b>
-    //                 </p>
-                    
-    //                 <p>
-    //                     Anbieter ist die Strato AG, Otto-Ostrowski-Straße 7, 10249 Berlin (nachfolgend „Strato“). Wenn Sie unsere
-    //                     Website besuchen, erfasst Strato verschiedene Logfiles inklusive Ihrer IP-Adressen. <br />
-    //                     Weitere Informationen entnehmen Sie der Datenschutzerklärung von Strato: <a className="blueLink" href="https://www.strato.de/datenschutz/" target="_blank" rel={LINK_DEFAULT_REL}>https://www.strato.de/datenschutz/</a>.
-    //                 </p>
-
-    //                 <p>
-    //                     Die Verwendung von Strato erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Wir haben ein berechtigtes
-    //                     Interesse an einer möglichst zuverlässigen Darstellung unserer Website. Sofern eine entsprechende
-    //                     Einwilligung abgefragt wurde, erfolgt die Verarbeitung ausschließlich auf Grundlage von Art. 6 Abs. 1 lit. a
-    //                     DSGVO und § 25 Abs. 1 TDDDG, soweit die Einwilligung die Speicherung von Cookies oder den Zugriff auf
-    //                     Informationen im Endgerät des Nutzers (z. B. Device-Fingerprinting) im Sinne des TDDDG umfasst. Die
-    //                     Einwilligung ist jederzeit widerrufbar.
-    //                 </p>
-                    
-    //                 <h5>Auftragsverarbeitung</h5>
-    //                 <p>
-    //                     Wir haben einen Vertrag über Auftragsverarbeitung (AVV) zur Nutzung des oben genannten Dienstes
-    //                     geschlossen. Hierbei handelt es sich um einen datenschutzrechtlich vorgeschriebenen Vertrag, der
-    //                     gewährleistet, dass dieser die personenbezogenen Daten unserer Websitebesucher nur nach unseren
-    //                     Weisungen und unter Einhaltung der DSGVO verarbeitet.
-    //                 </p>
-
-    //             </div>
-
-    //             {children}
-    //         </div>
-    //     </Flex>
-    // )
