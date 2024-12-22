@@ -1,5 +1,6 @@
 import React, { createContext, Fragment, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { PROTOCOL } from "../helpers/constants";
 import { replaceCurrentBrowserHistoryEntry } from "../helpers/utils";
 import { AppContext } from "./App";
 
@@ -27,6 +28,7 @@ export default function RouteContextHolder({children}) {
     useEffect(() => {
         scrollTop();
         moveToast(true);
+        redirectWWW();
 
     }, [location]);
 
@@ -52,6 +54,18 @@ export default function RouteContextHolder({children}) {
         replaceCurrentBrowserHistoryEntry();
 
         navigate(window.location.pathname);
+    }
+
+
+    /**
+     * Redirect to same url but without "www." since spring does not like www. :)
+     */
+    function redirectWWW(): void {
+
+        const currentUrl = window.location.href;
+
+        if (currentUrl.startsWith(PROTOCOL + "://www."))
+            window.location.href = currentUrl.replace("www.", "");
     }
 
 
