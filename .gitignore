@@ -4,7 +4,6 @@ DefaultComponent.tsx
 package-lock.json
 .env.*
 *.csr
-*.key
 *.p12
 *.md
 test.*

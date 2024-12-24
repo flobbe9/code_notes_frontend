@@ -5,14 +5,24 @@ FROM node:${NODE_VERSION}-alpine
 
 WORKDIR /app
 
+ARG REACT_APP_CRYPTO_KEY
+ARG REACT_APP_CRYPTO_IV
+
 COPY ./src ./src
 COPY ./public ./public
 COPY ./package.json \
      ./tsconfig.json \
+     ./writeToEnvFile.sh \
      ./.env \
      # copy if exists
      ./.env.loca[l] \
      ./
+
+# write some args to .env file
+RUN chmod 777 ./writeToEnvFile.sh
+RUN ./writeToEnvFile.sh \
+    REACT_APP_CRYPTO_KEY=${REACT_APP_CRYPTO_KEY} \
+    REACT_APP_CRYPTO_IV=${REACT_APP_CRYPTO_IV}
 
 RUN npm i
 RUN npm run build

@@ -1,22 +1,27 @@
 services:
   frontend:
-    image: dev_${NAME}
+    image: dev_${API_NAME}
     container_name: frontend
     build: 
       context: .
       args:
-        - NODE_VERSION=${NODE_VERSION}
-        - SSL_KEY_FILE_PASSWORD=password
-        - HTTPS=false
-        - PORT=3000
-        - SSL_DIR=src/assets/ssl/development
-        - SSL_CRT_FILE_NAME=src/assets/ssl/development/localhost.crt.pem
-        - SSL_KEY_FILE_NAME=src/assets/ssl/development/localhost.key.pem
-        - REACT_APP_CRYPTO_KEY='O9s3f{q:;Z&3gqc]%sZfLmsk20bh3alb'
-        - REACT_APP_CRYPTO_IV='Cb<fA]Jz?9Kdh#eF'
+        NODE_VERSION: ${NODE_VERSION}
+        SSL_KEY_FILE_PASSWORD: password
+        HTTPS: false
+        PORT: 3000
+        SSL_DIR: src/assets/ssl/development
+        SSL_CRT_FILE_NAME: src/assets/ssl/development/localhost.crt.pem
+        SSL_KEY_FILE_NAME: src/assets/ssl/development/localhost.key.pem
+    # NOTE: this does not override application .env vars
     environment:
       - TZ=${TZ}
     ports: 
       - 3000:3000
     # UNCOMMENT: to use NODE_ENV=development
     # entrypoint: npm start 
+    healthcheck:
+      test: wget --no-verbose --no-check-certificate --tries=1 --spider http://frontend:3000 || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: on-failure
