@@ -67,7 +67,7 @@ export function useAppUser(isLoggedIn: boolean) {
             return initAppUserEntity;
         }
 
-        return AppUserService.encryptSensitiveFields(jsonResponse);
+        return jsonResponse;
     }
     
 
@@ -77,9 +77,8 @@ export function useAppUser(isLoggedIn: boolean) {
      * Expecting all fields to present.
      * 
      * @param appUserToSave to save or update. Wont be altered
-     * @param decrypt indicates whether to decrypt sensitive fields of given ```appUserToSave``` (see {@link decryptSensitiveFields})
      */
-    async function fetchSave(appUserToSave = appUserEntity, decrypt = true): Promise<AppUserEntity | CustomExceptionFormat> {
+    async function fetchSave(appUserToSave = appUserEntity): Promise<AppUserEntity | CustomExceptionFormat> {
 
         // case: falsy arg
         if (!appUserToSave) {
@@ -88,10 +87,6 @@ export function useAppUser(isLoggedIn: boolean) {
         }
 
         let appUserToSaveCopy = appUserToSave;
-
-        // case: given app user is encrypted
-        if (decrypt)
-            appUserToSaveCopy = AppUserService.decryptSensitiveFields(appUserToSave);
 
         const url = `${BACKEND_BASE_URL}/app-user/save`;
         return await fetchJson(url, "post", appUserToSaveCopy);

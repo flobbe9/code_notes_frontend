@@ -1,7 +1,7 @@
 import React, { createContext, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
-import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
+import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, pauseAnimations, playAnimations, stopAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";

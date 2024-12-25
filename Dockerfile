@@ -11,15 +11,8 @@ COPY ./package.json \
      ./tsconfig.json \
      ./writeToEnvFile.sh \
      ./.env \
-    #  ./.env.loca[l] \
+     ./.env.loca[l] \
      ./
-
-# write some args to .env file
-# RUN chmod 777 ./writeToEnvFile.sh
-# RUN --mount=type=secret,id=react_app_crypto_key \
-#     ./writeToEnvFile.sh \
-        # REACT_APP_CRYPTO_KEY=${REACT_APP_CRYPTO_KEY} \
-#         REACT_APP_CRYPTO_IV=${REACT_APP_CRYPTO_IV}
 
 RUN npm i
 RUN npm run build

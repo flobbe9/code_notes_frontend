@@ -1,20 +1,19 @@
 import React, { MouseEvent, useContext, useEffect, useState } from "react";
-import CryptoJSImpl from "../../../../abstract/CryptoJSImpl";
+import { CustomExceptionFormat } from "../../../../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
+import { CustomExceptionFormatService } from "../../../../abstract/services/CustomExceptionFormatService";
 import "../../../../assets/styles/Profile.scss";
-import { AppFetchContext } from "../../../AppFetchContextHolder";
-import Button from "../../../helpers/Button";
-import ContentEditableDiv from "../../../helpers/ContentEditableDiv";
-import TextInput from "../../../helpers/TextInput";
-import { getCurrentUrlWithoutWWW, getHeadTitleText, isBlank } from "../../../../helpers/utils";
-import { AppContext } from "../../../App";
-import ResetPassword from "../../../ResetPassword";
-import Confirm from "../../../helpers/Confirm";
 import { BACKEND_BASE_URL } from "../../../../helpers/constants";
 import { fetchAny, isResponseError } from "../../../../helpers/fetchUtils";
-import { CustomExceptionFormat } from "../../../../abstract/CustomExceptionFormat";
-import { CustomExceptionFormatService } from "../../../../abstract/services/CustomExceptionFormatService";
+import { getCurrentUrlWithoutWWW, getHeadTitleText, isBlank } from "../../../../helpers/utils";
+import { AppContext } from "../../../App";
+import { AppFetchContext } from "../../../AppFetchContextHolder";
+import ResetPassword from "../../../ResetPassword";
+import Button from "../../../helpers/Button";
+import Confirm from "../../../helpers/Confirm";
+import ContentEditableDiv from "../../../helpers/ContentEditableDiv";
 import Head from "../../../helpers/Head";
+import TextInput from "../../../helpers/TextInput";
 
 
 interface Props extends DefaultProps {
@@ -34,7 +33,7 @@ export default function Profile({...props}: Props) {
 
 
     useEffect(() => {
-        setEmail(new CryptoJSImpl().decrypt(appUserEntity.email));
+        setEmail(appUserEntity.email);
 
     }, [appUserEntity]);
 

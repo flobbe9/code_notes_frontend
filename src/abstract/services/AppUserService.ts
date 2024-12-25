@@ -52,6 +52,7 @@ export class AppUserService {
     /**
      * @param appUserEntity app user to encrypt fields for. Will be altered
      * @returns ```appUserEntity``` with {@link SENSITIVE_FIELDS} beeing encrypted
+     * @deprecated see CryptoJSImpl NOTE
      */
     public static encryptSensitiveFields(appUserEntity: AppUserEntity): AppUserEntity {
 
@@ -69,6 +70,7 @@ export class AppUserService {
     /**
      * @param appUserEntity app user to decrypt fields for. Wont be altered
      * @returns a copy of ```appUserEntity``` instance with decrypted {@link SENSITIVE_FIELDS}.
+     * @deprecated see CryptoJSImpl NOTE
      */
     public static decryptSensitiveFields(appUserEntity: AppUserEntity): AppUserEntity {
 

@@ -5,6 +5,8 @@ import { isBlank, logError } from "../helpers/utils";
 
 /**
  * Class defining simple encryption methods using "CryptoJS".
+ * NOTE: Don't use this for sensitive data since there's no way of storing secrets
+ * inside a react app. Not passing key and iv into production build.
  * 
  * @since 0.1.0
  */

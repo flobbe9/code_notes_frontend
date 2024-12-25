@@ -2,7 +2,6 @@ import parse, { Element } from "html-react-parser";
 import { CSSProperties } from "react";
 import sanitize from "sanitize-html";
 import { useQueryClientObj } from "..";
-import CryptoJSImpl from "../abstract/CryptoJSImpl";
 import { AnimationEasing } from "../abstract/CSSTypes";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
@@ -1116,32 +1115,29 @@ export function replaceCurrentBrowserHistoryEntry(path: string = window.location
 
 
 /**
- * Attempts to retrieve the csrf token from cache and decrypt it. 
+ * Attempts to retrieve the csrf token from cache. 
  * 
- * @returns the decrypted csrf token or a blank string
+ * @returns the csrf token or a blank string
  */
 export function getCsrfToken(): string {
 
-    const encryptedCsrfToken = localStorage.getItem(CSRF_TOKEN_QUERY_KEY);
+    const csrfToken = localStorage.getItem(CSRF_TOKEN_QUERY_KEY);
 
-    if (isBlank(encryptedCsrfToken))
+    if (isBlank(csrfToken))
         return "";
 
-    return new CryptoJSImpl().decrypt(encryptedCsrfToken!);
+    return csrfToken!;
 }
 
 
 /**
- * Will encrypt given ```csrfToken``` and update the use query cache. If ```csrfToken``` is falsy, the cache
- * will still be updated but with a blank string.
+ * Will store given ```csrfToken``` in localStorage (regardless of the token beeing blank or not).
  * 
  * @param csrfToken to encrypt and cache
  */
 export function setCsrfToken(csrfToken: string): void {
     
-    const encryptedCsrfToken = new CryptoJSImpl().encrypt(csrfToken);
-
-    localStorage.setItem(CSRF_TOKEN_QUERY_KEY, encryptedCsrfToken);
+    localStorage.setItem(CSRF_TOKEN_QUERY_KEY, csrfToken);
 }
 
 
