@@ -9,7 +9,6 @@ COPY ./src ./src
 COPY ./public ./public
 COPY ./package.json \
      ./tsconfig.json \
-     ./writeToEnvFile.sh \
      ./.env \
      ./.env.loca[l] \
      ./
