@@ -45,6 +45,7 @@ ARG SSL_KEY_FILE_NAME=
 ENV SSL_KEY_FILE_NAME=${SSL_DIR}/${SSL_KEY_FILE_NAME}
 
 COPY --from=0 /app/build ./build
+COPY --from=0 /app/.env ./
 COPY ./${SSL_DIR} ./${SSL_DIR}
 
 RUN npm i -g serve
