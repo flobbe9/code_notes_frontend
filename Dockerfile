@@ -5,24 +5,21 @@ FROM node:${NODE_VERSION}-alpine
 
 WORKDIR /app
 
-ARG REACT_APP_CRYPTO_KEY
-ARG REACT_APP_CRYPTO_IV
-
 COPY ./src ./src
 COPY ./public ./public
 COPY ./package.json \
      ./tsconfig.json \
      ./writeToEnvFile.sh \
      ./.env \
-     # copy if exists
-     ./.env.loca[l] \
+    #  ./.env.loca[l] \
      ./
 
 # write some args to .env file
-RUN chmod 777 ./writeToEnvFile.sh
-RUN ./writeToEnvFile.sh \
-    REACT_APP_CRYPTO_KEY=${REACT_APP_CRYPTO_KEY} \
-    REACT_APP_CRYPTO_IV=${REACT_APP_CRYPTO_IV}
+# RUN chmod 777 ./writeToEnvFile.sh
+# RUN --mount=type=secret,id=react_app_crypto_key \
+#     ./writeToEnvFile.sh \
+        # REACT_APP_CRYPTO_KEY=${REACT_APP_CRYPTO_KEY} \
+#         REACT_APP_CRYPTO_IV=${REACT_APP_CRYPTO_IV}
 
 RUN npm i
 RUN npm run build
@@ -39,8 +36,7 @@ ARG HTTPS=
 ENV HTTPS=${HTTPS}
 ARG PORT=
 ENV PORT=${PORT}
-ARG SSL_KEY_FILE_PASSWORD=
-ENV SSL_KEY_FILE_PASSWORD=${SSL_KEY_FILE_PASSWORD} 
+ENV SSL_KEY_FILE_PASSWORD= 
 ARG SSL_DIR=
 ENV SSL_DIR=${SSL_DIR}
 ARG SSL_CRT_FILE_NAME=

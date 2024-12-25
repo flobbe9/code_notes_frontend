@@ -1,4 +1,5 @@
-# NOTE: exclude characters: &\;'
+# NOTE: exclude these characters in args: &\;
+    # don't use single quotes for variable values
 # NOTE: in VSCode select line-endings "LF" in the bottom right
 
 # place the .env and this .sh file inside same directory

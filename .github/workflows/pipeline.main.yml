@@ -5,28 +5,30 @@ run-name: ${{ github.event.head_commit.message }}
 on: 
   push: 
     branches: 
-      - main
+      - dev
 
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  # build:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository 
-        uses: actions/checkout@v4
-      - run: npm i
-      - run: npm run build
-        env: 
-          CI: ""
+  #   steps:
+  #     - name: Checkout repository 
+  #       uses: actions/checkout@v4
+  #     - run: npm i
+  #     - run: npm run build
 
   push_to_DockerHub:
     runs-on: ubuntu-latest
-    needs: build
+    # needs: build
 
     steps:
       - name: Checkout repository 
         uses: actions/checkout@v4
+
+      - run: printf "\nREACT_APP_CRYPTO_KEY=1234567812345678" >> .env;
+      - run: printf "\nREACT_APP_CRYPTO_IV=1234567812345678" >> .env;
+      - run: cat .env
   
       - name: move .env vars to pipeline
         run: |
@@ -79,9 +81,9 @@ jobs:
           script: |
             chmod 777 ./${{ vars.SSH_TARGET_FOLDER }}/writeToEnvFile.sh
             ./${{ vars.SSH_TARGET_FOLDER }}/writeToEnvFile.sh \
-              FRONTEND_REACT_APP_CRYPTO_KEY='${{secrets.REACT_APP_CRYPTO_KEY}}' \
-              FRONTEND_REACT_APP_CRYPTO_IV='${{secrets.REACT_APP_CRYPTO_IV}}' \
-              FRONTEND_SSL_KEY_FILE_PASSWORD='${{secrets.SSL_KEY_FILE_PASSWORD}}'
+              FRONTEND_REACT_APP_CRYPTO_KEY='${{ secrets.REACT_APP_CRYPTO_KEY }}' \
+              FRONTEND_REACT_APP_CRYPTO_IV='${{ secrets.REACT_APP_CRYPTO_IV }}' \
+              FRONTEND_SSL_KEY_FILE_PASSWORD='${{ secrets.SSL_KEY_FILE_PASSWORD }}'
 
             docker compose -f './${{ vars.SSH_TARGET_FOLDER }}/docker-compose.yml' pull frontend
             yes | docker rm $(docker container ls --all --filter=ancestor=$(docker images -f "dangling=true" -q) --format "{{.ID}}") --force
