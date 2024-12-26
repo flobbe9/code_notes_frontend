@@ -1,0 +1,25 @@
+@import "./global/functions.scss";
+
+
+.NotFound {
+    height: 80vh;
+    
+    &-heading {
+        color: var(--accentColor);
+        font-family: noteFont;
+        font-size: 4em;
+    }
+    
+    &-textContent {
+        color: var(--matteBlueLight);
+    }
+
+    &-backButton {
+        background-color: var(--matteBlackLight);
+        color: white;
+        margin-top: 5em;
+        padding: 7px 50px;
+
+        @include buttonFocus(var(--accentColor));
+    }
+}

@@ -4,13 +4,13 @@ import { useLocation } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
+import { AppUserService } from "../abstract/services/AppUserService";
+import { LOGOUT_URL } from "../helpers/constants";
+import fetchJson from "../helpers/fetchUtils";
 import { clearUserCache } from "../helpers/utils";
 import { useAppUser } from "../hooks/useAppUser";
 import { useLoggedIn } from "../hooks/useLoggedIn";
 import { useNotes } from "../hooks/useNotes";
-import { AppUserService } from "../abstract/services/AppUserService";
-import fetchJson from "../helpers/fetchUtils";
-import { LOGOUT_URL } from "../helpers/constants";
 
 
 /**

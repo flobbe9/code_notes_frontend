@@ -1,7 +1,7 @@
 import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { BACKEND_BASE_URL, CSRF_TOKEN_HEADER_NAME } from "./constants";
-import { clearSensitiveCache, getCsrfToken, isNumberFalsy, logApiResponse } from "./utils";
+import { clearSensitiveCache, getCsrfToken, isNumberFalsy, logApiResponse, sleep } from "./utils";
 
 
 /** Http status code "Service Unavailable" 503, use this status when ```fetch()``` throws "failed to fetch" error */
@@ -60,23 +60,32 @@ export async function fetchAny(url: string, method = "get", body?: any, headers?
     if (body) 
         fetchConfig.body = JSON.stringify(body);
 
-    // send request
+    let response: Response | CustomExceptionFormat | undefined = undefined;
     try {
-        const response = await fetch(url, fetchConfig);
+        response = await fetch(url, fetchConfig);
 
-        // case: request failed
-        if (!isHttpStatusCodeAlright(response.status)) {
-            const jsonResponse = await response.json();
+    // case: network error
+    } catch(e) {
+        await sleep(1000);
+
+        try {
+            // try again
+            response = await fetch(url, fetchConfig);
+
+        } catch (e) {
+            return handleFetchError(e, url);
+        }
+
+    } finally {
+        // case: different error than 503
+        if (!isHttpStatusCodeAlright(response!.status) && response!.status !== 503) {
+            const jsonResponse = await response!.json();
             handleResponseError(jsonResponse, debug);
             return jsonResponse;
         }
-        
-        return response;
-
-    // case: failed to fetch
-    } catch(e) {
-        return handleFetchError(e, url);
     }
+
+    return response;
 }
 
 
@@ -191,7 +200,7 @@ async function handleResponseError(errorResponse: CustomExceptionFormat, debug: 
  */
 function handleFetchError(e: Error, url: string): CustomExceptionFormat {
 
-    const error = CustomExceptionFormatService.getInstance(500, e.message);
+    const error = CustomExceptionFormatService.getInstance(503, e.message);
     error.path = url.replace(BACKEND_BASE_URL, "")
 
     logApiResponse(error);
