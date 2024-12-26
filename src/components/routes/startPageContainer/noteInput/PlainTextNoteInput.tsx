@@ -87,6 +87,7 @@ export default function PlainTextNoteInput({
         if (!isBlank(inputDiv.innerText)) {
             const parsedText = await parseCodeTextToCodeHtml();
             inputDiv.innerHTML = parsedText;
+            noteInputEntity.value = parsedText;
         }
     }
 
@@ -135,8 +136,6 @@ export default function PlainTextNoteInput({
 
         // sanitize
         const sanitizedInputDivValue = sanitize(parsedText, DEFAULT_HTML_SANTIZER_OPTIONS);
-        
-        updateAppUserEntity();
         
         setIsNoteInputOverlayVisible(false);
 
@@ -240,12 +239,6 @@ export default function PlainTextNoteInput({
     function handlePaste(event: ClipboardEvent): void {
 
         noteEdited();
-    }
-
-
-    function updateAppUserEntity(): void {
-
-        noteInputEntity.value = inputDivRef.current!.innerHTML;
     }
 
 
