@@ -210,7 +210,7 @@ export default function Register({isPopupContent = false, ...props}: Props) {
     return (
         <Flex 
             id={id} 
-            className={className}
+            className={`${className} ${!isPopupContent && " mb-4"}`}
             style={style}
             horizontalAlign="center"
             verticalAlign="center"
