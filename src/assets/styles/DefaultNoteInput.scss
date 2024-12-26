@@ -86,8 +86,15 @@
             .overflow-guard {
                 border-width: calc($noteInputDefaultBorderWidth + $noteInputHoverBorderWidthIncrease) !important;
                 padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
+                
+                .view-lines {
+                    padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
+                }
             }
-            
+        }
+    }
+    &:has(textarea:not([disabled]):focus) {
+        .overflow-guard {
             .view-lines {
                 padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
             }
