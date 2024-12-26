@@ -210,7 +210,7 @@ export default function PlainTextNoteInput({
         if (keyName === "Control")
             sanitizeClipboardText();
 
-        if (isEventKeyTakingUpSpace(keyName) && !isControlKeyPressed())
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed())
             noteEdited();
     }
 

@@ -23,7 +23,7 @@ import Register from "./routes/Register";
 import Profile from './routes/settings/profile/Profile';
 import SettingsPage from './routes/settings/SettingsPage';
 import StartPageContainer from './routes/startPageContainer/StartPageContainer';
-import _404 from './routes/NotFound';
+import NotFound from './routes/NotFound';
 
 
 /**
@@ -437,7 +437,7 @@ export default function App() {
                                             </SettingsPage>
                                         </LoggedInComponent>
                                     } />
-                                    <Route path="*" element={<_404></_404>} />
+                                    <Route path="*" element={<NotFound></NotFound>} />
                                 </Routes>
                             </div>
 
