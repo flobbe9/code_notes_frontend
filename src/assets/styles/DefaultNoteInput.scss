@@ -12,7 +12,6 @@
     border-left: $noteInputDefaultBorder transparent;
     margin: 5px 0;
     position: relative;
-    transition: border var(--transitionTime);
 
     // PlainTextNoteInput
     &:has(.PlainTextNoteInput) {
@@ -23,16 +22,15 @@
     }
     &:has(.PlainTextNoteInput:not(.fullScreen)) {
         .ContentEditableDiv {
-            transition: var(--transitionTime);
+            transition: background-color var(--transitionTime);
 
             @include customHover {
-                border-width: calc($noteInputDefaultBorderWidth + $noteInputHoverBorderWidthIncrease) !important;
-                padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
+                &:not(:focus) {
+                    background-color: var(--matteBlackLight2);
+                }
             }
-
             @include customFocus {
-                border-width: calc($noteInputDefaultBorderWidth + $noteInputHoverBorderWidthIncrease) !important;
-                padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
+                background-color: var(--matteBlackLight);
             }
         }
     }
@@ -46,54 +44,42 @@
     }
     &:has(.CodeNoteInputWithVariables:not(.fullScreen)) {
         .ContentEditableDiv {
-            transition: var(--transitionTime);
+            transition: background-color var(--transitionTime);
 
             @include customHover {
-                border-width: calc($noteInputDefaultBorderWidth + $noteInputHoverBorderWidthIncrease) !important;
-                padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
+                &:not(:focus) {
+                    background-color: var(--matteBlackLight2);
+                }
             }
-
             @include customFocus {
-                border-width: calc($noteInputDefaultBorderWidth + $noteInputHoverBorderWidthIncrease) !important;
-                padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
+                background-color: var(--matteBlackLight);
             }
         }
     }
     
     // CodeNoteInput
     &:has(.CodeNoteInput) {
-        // .view-lines {
         .overflow-guard {
             border-left: $noteInputDefaultBorder var(--codeNoteInputColor);
             border-right: $noteInputDefaultBorder var(--codeNoteInputColor);
         }
     }
     &:has(.CodeNoteInput:not(.fullScreen)) {
-        .overflow-guard {
-            transition: var(--transitionTime);
-
-            @include customHover {
-                border-width: calc($noteInputDefaultBorderWidth + $noteInputHoverBorderWidthIncrease) !important;
-                padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
-
-                .view-lines {
-                    padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
+        // not focused, not disabled, hover
+        &:has(textarea:not(:focus)) {
+            &:has(.overflow-guard:not([disabled]):hover) {
+                .overflow-guard, .view-lines { 
+                    background-color: var(--matteBlackLight2);
                 }
             }
         }
-
         &:has(textarea:not([disabled]):focus) {
-            .overflow-guard {
-                border-width: calc($noteInputDefaultBorderWidth + $noteInputHoverBorderWidthIncrease) !important;
-                padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
-                
-                .view-lines {
-                    padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
-                }
+            .overflow-guard, .view-lines {
+                background-color: var(--matteBlackLight);
             }
         }
     }
-    &:has(textarea:not([disabled]):focus) {
+    &:has(textarea:not([disabled])) {
         .overflow-guard {
             .view-lines {
                 padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
