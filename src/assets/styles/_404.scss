@@ -1,0 +1,11 @@
+._404 {
+    &-heading {
+        color: var(--matteBlue);
+    }
+    
+    &-textContent {
+        color: orange;
+        font-family: noteFont;
+        font-size: 2em;
+    }
+}
