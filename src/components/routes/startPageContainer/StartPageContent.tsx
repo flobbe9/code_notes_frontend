@@ -48,7 +48,7 @@ export default function StartPageContent({...props}: Props) {
 
         noteSearchResults,
 
-        getNoteByNoteEntity
+        createNoteByNoteEntity
     }
 
 
@@ -91,14 +91,15 @@ export default function StartPageContent({...props}: Props) {
         if (!noteEntities || !noteEntities.length)
             return [];
 
-        return noteEntities.map((noteEntity) => 
-            getNoteByNoteEntity());
+        return noteEntities.map((noteEntity, i) => 
+            createNoteByNoteEntity(noteEntity));
     }
 
 
-    function getNoteByNoteEntity(): JSX.Element {
+    function createNoteByNoteEntity(noteEntity: NoteEntity): JSX.Element {
 
-        const key = getRandomString();
+        // const key = getRandomString();
+        const key = noteEntity.id ?? getRandomString();
         return <Note key={key} propsKey={String(key)} />
     }
 
@@ -184,5 +185,5 @@ export const StartPageContentContext = createContext({
 
     noteSearchResults: [] as NoteEntity[],
 
-    getNoteByNoteEntity: (noteEntity: NoteEntity, index: number) => {return <></>}
+    createNoteByNoteEntity: (noteEntity: NoteEntity, index: number) => {return <></>}
 })

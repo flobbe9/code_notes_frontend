@@ -4,7 +4,7 @@ import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/Default
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInput.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION } from "../../../../helpers/constants";
-import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, setClipboardText, setCssConstant } from "../../../../helpers/utils";
+import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, log, setClipboardText, setCssConstant } from "../../../../helpers/utils";
 import useWindowResizeCallback from "../../../../hooks/useWindowResizeCallback";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
@@ -130,7 +130,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         if (!isEditorMounted)
             return;
 
-        updateAppUserEntity();
+        updateNoteEntity(null);
 
     }, [codeNoteInputLanguage]);
 
@@ -143,7 +143,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         if (!isFullScreen)
             setTimeout(() => setNumEditorLines(getNumEditorValueLines(value)), 5);
 
-        updateAppUserEntity();
+        updateNoteEntity(value);
 
         noteEdited();
     }
@@ -151,15 +151,11 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     /**
      * Set ```noteInputEntity``` values using this noteInput.
-     * 
-     * @param editorValue the current text in the editor
      */
-    function updateAppUserEntity(): void {
+    function updateNoteEntity(value: string | null): void {
 
-        const editorValue = getCurrentEditorValue();
-
-        // value
-        noteInputEntity.value = editorValue;
+        if (value !== null)
+            noteInputEntity.value = value;
 
         // programmingLanguage
         noteInputEntity.programmingLanguage = codeNoteInputLanguage;
@@ -248,11 +244,11 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     /**
      * 
-     * @returns the initial height of the editor depending on the initial number of lines of the ```editorValue``` and ```minNumInitialLines```
+     * @returns the initial height of the editor depending on the initial number of lines of the ```noteEntityInput.value``` and ```minNumInitialLines```
      */
     function getInitialEditorHeight(): number {
 
-        let numEditorValueLines = getNumEditorValueLines(editorValue);
+        let numEditorValueLines = getNumEditorValueLines(noteInputEntity.value);
 
         if (numEditorValueLines < minNumInitialLines)
             numEditorValueLines = minNumInitialLines;
@@ -456,19 +452,10 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
 
     /**
-     * @returns the current value of the editor (taken from the textarea element inside) or a blank string if has not mounted yet
+     * Notice that calling ```.value``` on this element is not reliable. Use the ```onChange``` handler for that.
+     * 
+     * @returns the ```<textarea>``` element of the monaco editor
      */
-    function getCurrentEditorValue(): string {
-
-        if (!isEditorMounted)
-            return "";
-
-        const textArea = getEditorTextArea()!;
-
-        return textArea.value;
-    }
-
-
     function getEditorTextArea(): HTMLTextAreaElement | null {
         
         return componentRef.current!.querySelector("textarea.inputarea") as HTMLTextAreaElement;
@@ -492,7 +479,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
                     height={editorHeight} 
                     language={codeNoteInputLanguage.toLowerCase()}
                     theme="vs-dark"
-                    defaultValue={editorValue}
+                    defaultValue={noteInputEntity.value}
                     onChange={handleChange}
                     onMount={handleEditorMount}
                 />
