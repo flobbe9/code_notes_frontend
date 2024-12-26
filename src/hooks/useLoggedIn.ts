@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
+import { sleep } from "../helpers/utils";
 
 
 /**
@@ -33,14 +34,14 @@ export function useLoggedIn() {
 
         const url = `${BACKEND_BASE_URL}/app-user/check-logged-in`;
 
-        const resopnse = await fetchAny(url);
+        const response = await fetchAny(url);
 
-        if (isResponseError(resopnse)) {
+        if (isResponseError(response)) {
             toast("Unexpected Error", "The page could not be loaded completely. Please refresh the page.", "error");
             return false;
         }
 
-        return await resopnse.text() === "true";
+        return await response.text() === "true";
     }
 
 

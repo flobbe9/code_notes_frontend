@@ -1077,11 +1077,8 @@ export function getCurrentUrlWithoutWWW(): string {
  * Removes sensitive data from use query cache.
  */
 export function clearSensitiveCache(): void {
-
-    if (!useQueryClientObj)
-        return;
     
-    if (useQueryClientObj.getQueryData<AppUserEntity>(APP_USER_QUERY_KEY))
+    if (useQueryClientObj && useQueryClientObj.getQueryData<AppUserEntity>(APP_USER_QUERY_KEY))
         useQueryClientObj.removeQueries({queryKey: APP_USER_QUERY_KEY});
 
     localStorage.removeItem(CSRF_TOKEN_QUERY_KEY);
@@ -1514,3 +1511,20 @@ export function getHeadTitleText(pageTitle?: string): string {
 
     return isBlank(pageTitle) ? `${APP_NAME_PRETTY}` : `${pageTitle} | ${APP_NAME_PRETTY}`; 
 }
+
+
+/**
+ * Await a promise that resolves after given delay with given ```resolveValue```.
+ * 
+ * @param delay in ms
+ * @param resolveValue value passed to ```res``` callback 
+ * @returns ```resolveValue``` or ```undefined```
+ */
+export async function sleep<T>(delay: number, resolveValue?: T): Promise<T | undefined> {
+
+    return await new Promise((res, rej) => {
+        setTimeout(() => {
+            res(resolveValue);
+        }, delay);
+    });
+} 
