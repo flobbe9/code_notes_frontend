@@ -2,6 +2,7 @@ import React, { MouseEvent, useContext } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";
+import { isResponseError } from "../helpers/fetchUtils";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import { StartPageContentContext } from "./routes/startPageContainer/StartPageContent";
@@ -17,26 +18,34 @@ interface Props extends HelperProps {
  */
 export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
-    const { noteEntities, setNoteEntities } = useContext(AppFetchContext);
-    const { notes, setNotes, getNoteByNoteEntity } = useContext(StartPageContentContext)
+    const { noteEntities, setNoteEntities, isLoggedIn, fetchSaveNoteEntity } = useContext(AppFetchContext);
+    const { notes, setNotes, createNoteByNoteEntity } = useContext(StartPageContentContext)
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteButton", true);
 
 
     /**
-     * Prepend a new ```note``` to both ```noteEntities``` and ```notes``` but don't save.
+     * Prepend a new ```note``` to both ```noteEntities``` and ```notes``` and save it. 
      */
     async function prependNote(): Promise<void> {
 
-        const newNoteEntity: NoteEntity = {
+        let newNoteEntity: NoteEntity = {
             title: "",
             noteInputs: [],
             tags: []
         }
 
+        if (isLoggedIn) {
+            const jsonResponse = await fetchSaveNoteEntity(newNoteEntity);
+            if (isResponseError(jsonResponse))
+                return;
+            
+            newNoteEntity = jsonResponse;
+        }
+
         setNoteEntities([newNoteEntity, ...noteEntities]);
 
-        setNotes([getNoteByNoteEntity(newNoteEntity, notes.length), ...notes]);
+        setNotes([createNoteByNoteEntity(newNoteEntity, notes.length), ...notes]);
     }
 
 

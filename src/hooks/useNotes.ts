@@ -3,11 +3,11 @@ import { useContext, useEffect, useState } from "react";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { NoteEntity } from '../abstract/entites/NoteEntity';
+import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 
 
@@ -15,7 +15,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     const [noteEntities, setNoteEntities] = useState<NoteEntity[]>([]);
     /** Notes created prior to login, these will be set right after logging in and then added to the ```noteEntities``` */
-    const [noteEntitiesNotLoggedIn, setNoteEntitiesNotLoggedIn] = useState<NoteEntity[]>([]);
+    const [unsavedNotes, setUnsavedNotes] = useState<NoteEntity[]>([]);
     /** Is a toggle state, meaning that the boolean does not reflect the states meaning. Is toggled everytime useQueryResult.data updates */
     const [gotNewData, setGotNewData] = useState(false);
 
@@ -36,9 +36,8 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     
     useEffect(() => {
-        if (useQueryResult.data) {
-            setNoteEntities([...noteEntitiesNotLoggedIn, ...useQueryResult.data]);
-            setNoteEntitiesNotLoggedIn([]);
+        if (useQueryResult.data && !unsavedNotes.length) {
+            setNoteEntities(useQueryResult.data);
             // this is to notify the component to map all notes again
             setGotNewData(!gotNewData);
         }
@@ -54,8 +53,10 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
 
     useEffect(() => {
-        if (isLoggedIn && noteEntities.length)
-            setNoteEntitiesNotLoggedIn([...noteEntities]);
+        if (isLoggedIn && noteEntities.length) {
+            setUnsavedNotes([...noteEntities]);
+            handleLogin();
+        }
             
     }, [isLoggedIn])
 
@@ -160,6 +161,31 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         }
 
         return response;
+    }
+
+
+    /**
+     * Save any unsaved notes, update ```noteEntities``` and notify start page content.
+     */
+    async function handleLogin(): Promise<void> {
+
+        // case: no unsaved notes
+        if (!noteEntities.length) {
+            setNoteEntities([...useQueryResult.data]);
+            
+        } else {
+            const jsonResponse = await fetchSaveAll(noteEntities);
+            if (isResponseError(jsonResponse))
+                return;
+            
+            setNoteEntities([...jsonResponse, ...useQueryResult.data]);
+            setUnsavedNotes([]);
+            
+            toast("Save all notes", "All new notes saved successfully", "success", 4000);
+        }
+
+        // this is to notify the component to map all notes again
+        setGotNewData(!gotNewData);
     }
 
     
