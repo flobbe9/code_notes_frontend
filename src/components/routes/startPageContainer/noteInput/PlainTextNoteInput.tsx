@@ -344,19 +344,7 @@ export default function PlainTextNoteInput({
                 </Overlay>
             </pre>
 
-            {/* Fullscreen */}
-            <Button 
-                className="fullScreenButton defaultNoteInputButton"
-                title={isFullScreen ? "Normal screen" : "Fullscreen"}
-                onClick={toggleFullScreen}
-            >
-                {isFullScreen ?
-                    <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
-                    <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
-                }
-            </Button>
-
-            {/* Copy button */}
+            {/* Copy */}
             <Button
                 className="defaultNoteInputButton copyButton"
                 title="Copy"
@@ -366,12 +354,25 @@ export default function PlainTextNoteInput({
                 <i className="fa-solid fa-copy"></i>
             </Button>
 
+            {/* Delete */}
             <Button 
                 className="deleteNoteButton defaultNoteInputButton" 
                 title="Delete section"
                 onClick={handleDeleteNote}
             >
                 <i className="fa-solid fa-xmark fa-lg"></i>
+            </Button>
+
+             {/* Fullscreen */}
+             <Button 
+                className="fullScreenButton defaultNoteInputButton"
+                title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                onClick={toggleFullScreen}
+            >
+                {isFullScreen ?
+                    <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                    <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                }
             </Button>
 
             {children}

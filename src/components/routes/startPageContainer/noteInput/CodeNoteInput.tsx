@@ -4,7 +4,8 @@ import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/Default
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInput.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION } from "../../../../helpers/constants";
-import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, log, setClipboardText, setCssConstant } from "../../../../helpers/utils";
+import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, setClipboardText, setCssConstant } from "../../../../helpers/utils";
+import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import useWindowResizeCallback from "../../../../hooks/useWindowResizeCallback";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
@@ -47,7 +48,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     const [editorWidth, setEditorWidth] = useState("100%");
     const [editorTransition, setEditorTransition] = useState(0);
     const [numEditorLines, setNumEditorLines] = useState(1);
-    const [editorValue, setEditorValue] = useState(noteInputEntity.value);
     const [editorHeight, setEditorHeight] = useState(0);
 
     const { isShowSideBar, getStartPageSideBarWidth } = useContext(StartPageContainerContext);
@@ -69,19 +69,20 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeNoteInput");
 
     const componentRef = useRef<HTMLDivElement>(null);
+    // assigned in editor mount function
     const editorRef = useRef(null);
     const copyButtonRef = useRef(null);
     const fullScreenButtonRef = useRef(null);
 
-
+    
     useEffect(() => {
         setAreNoteInputSettingsDisabled(true);
         updateFullScreenSetterStates();
-
+        
         setEditorHeight(getInitialEditorHeight());
-
+        
     }, []);
-
+    
 
     useEffect(() => {
         if (isEditorMounted)
@@ -328,7 +329,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
             { width: editorWidth },
             { duration: editorTransition },
             () => setTimeout(() => 
-                getOuterEditorContainer().style.width = "100%", 300) // wait for possible sidebar animations to finish, even though editor is done
+                getOuterEditorContainer()!.style.width = "100%", 300) // wait for possible sidebar animations to finish, even though editor is done
         );
     }
 
@@ -336,7 +337,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     function handleWindowResize(): void {
 
         if (isShowNoteInputSettings)
-            setFullEditorWidth(getOuterEditorContainer().offsetWidth! - getNoteInputSettingsWidth());
+            setFullEditorWidth(getOuterEditorContainer()!.offsetWidth! - getNoteInputSettingsWidth());
 
         else
             updateFullEditorWidth();
@@ -346,7 +347,10 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     /**
      * @returns the most outer container (a ```<section>```) of the monaco editor. The ```editorRef``` is somewhere deeper inside
      */
-    function getOuterEditorContainer(): HTMLElement {
+    function getOuterEditorContainer(): HTMLElement | null {
+
+        if (!componentRef.current)
+            return null;
 
         return componentRef.current!.querySelector("section") as HTMLElement;
     }
@@ -374,7 +378,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
      */
     function updateFullEditorWidth(): number {
 
-        const newFullEditorWidth = getOuterEditorContainer().offsetWidth;
+        const newFullEditorWidth = getOuterEditorContainer()!.offsetWidth;
 
         setFullEditorWidth(newFullEditorWidth);
         setCssConstant("fullEditorWidth", newFullEditorWidth + "px");
@@ -385,7 +389,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     function activateFullScreenStyles(): void {
 
-        const editor = getOuterEditorContainer();
+        const editor = getOuterEditorContainer()!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef!.current!
 
         const appOverlayZIndex = getCssConstant("overlayZIndex");
@@ -409,7 +413,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     function deactivateFullScreenStyles(): void {
 
-        const editor = getOuterEditorContainer();
+        const editor = getOuterEditorContainer()!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef!.current!
         
         // move up just a little bit
@@ -487,20 +491,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
             <div className="CodeNoteInput-buttonContainer">
                 <Flex flexWrap="nowrap" horizontalAlign="right">
-                    {/* Fullscreen */}
-                    <Button 
-                        className={"fullScreenButton defaultNoteInputButton"}
-                        title={isFullScreen ? "Normal screen" : "Fullscreen"}
-                        disabled={areNoteInputSettingsDisabled}
-                        ref={fullScreenButtonRef}
-                        onClick={toggleFullScreen}
-                    >
-                        {isFullScreen ?
-                            <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
-                            <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
-                        }
-                    </Button>
-
                     {/* Copy */}
                     <Button
                         className="defaultNoteInputButton copyButton"
@@ -520,6 +510,20 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
                         onClick={handleDeleteNote}
                     >
                         <i className="fa-solid fa-xmark fa-lg"></i>
+                    </Button>
+
+                    {/* Fullscreen */}
+                    <Button 
+                        className={"fullScreenButton defaultNoteInputButton"}
+                        title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                        disabled={areNoteInputSettingsDisabled}
+                        ref={fullScreenButtonRef}
+                        onClick={toggleFullScreen}
+                    >
+                        {isFullScreen ?
+                            <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                            <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        }
                     </Button>
                 </Flex>
 

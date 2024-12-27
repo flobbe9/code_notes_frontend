@@ -126,7 +126,7 @@ export default function Profile({...props}: Props) {
                     type="password"
                 >
                     <Button
-                        className="Profile-userDetail-passwordInput-changePasswordButton hover ms-2"
+                        className="Profile-userDetail-passwordInput-changePasswordButton hover"
                         title={"Change password"}
                         onClick={handleChangePassword}
                     >
