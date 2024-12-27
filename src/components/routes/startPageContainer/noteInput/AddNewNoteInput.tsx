@@ -130,7 +130,7 @@ export default function AddNewNoteInput({...props}: Props) {
     
         noteEntity.noteInputs = [...noteEntity.noteInputs, noteInputEntityEntity];
 
-        const newNoteInput = createNoteInputByNoteInputType(noteInputEntityEntity, noteInputs.length);
+        const newNoteInput = createNoteInputByNoteInputType(noteInputEntityEntity, true);
         setNoteInputs([...noteInputs, newNoteInput]);
 
         noteEdited();

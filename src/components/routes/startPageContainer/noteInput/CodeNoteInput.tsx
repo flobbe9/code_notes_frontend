@@ -5,7 +5,6 @@ import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInput.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION } from "../../../../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, setClipboardText, setCssConstant } from "../../../../helpers/utils";
-import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import useWindowResizeCallback from "../../../../hooks/useWindowResizeCallback";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
@@ -63,6 +62,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         toggleFullScreen,
         isFullScreen,
         handleDeleteNote,
+        focusOnRender
     } = useContext(DefaultNoteInputContext);
     const { componentRef: defaultCodeNoteInputRef } = useContext(DefaultCodeNoteInputContext);
 
@@ -82,6 +82,13 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         setEditorHeight(getInitialEditorHeight());
         
     }, []);
+
+
+    useEffect(() => {
+        if (focusOnRender)
+            getEditorTextArea()?.focus();
+
+    }, [componentRef.current])
     
 
     useEffect(() => {

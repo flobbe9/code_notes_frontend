@@ -14,7 +14,7 @@ interface Props extends DefaultNoteInputProps {
 /**
  * @since 0.0.1
  */
-export default function DefaultCodeNoteInput({noteInputEntity, propsKey, ...props}: Props) {
+export default function DefaultCodeNoteInput({noteInputEntity, propsKey, focusOnRender = false, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultCodeNoteInput");
 
@@ -27,7 +27,7 @@ export default function DefaultCodeNoteInput({noteInputEntity, propsKey, ...prop
     
     return (
         <DefaultCodeNoteInputContext.Provider value={context}>
-            <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={propsKey}>
+            <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={propsKey} focusOnRender={focusOnRender}>
                 <div     
                     id={id} 
                     className={className}

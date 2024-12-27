@@ -19,7 +19,7 @@ import { NoteContext } from './Note';
 
 interface Props extends HelperProps {
 
-    noteInputEntity: NoteInputEntity
+    noteInputEntity: NoteInputEntity,
 }
 
 
@@ -47,7 +47,8 @@ export default function PlainTextNoteInput({
         setDeactivateFullScreenStyles,
         toggleFullScreen,
         isFullScreen,
-        handleDeleteNote
+        handleDeleteNote,
+        focusOnRender
     } = useContext(DefaultNoteInputContext);
 
     const componentRef = useRef<HTMLDivElement>(null);
@@ -62,6 +63,9 @@ export default function PlainTextNoteInput({
 
         setActivateFullScreenStyles(() => {return activateFullScreenStyles});
         setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
+
+        if (focusOnRender)
+            inputDivRef.current?.focus();
 
     }, []);
 

@@ -21,7 +21,7 @@ interface Props extends DefaultNoteInputProps {
  *  
  * @since 0.0.1
  */
-export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: Props) {
+export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRender = false, ...props}: Props) {
 
     const [isShowNoteInputSettings, setIsShowNoteInputSettings] = useState(false);
     const [areNoteInputSettingsDisabled, setAreNoteInputSettingsDisabled] = useState(false);
@@ -66,6 +66,8 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         toggleFullScreen,
 
         handleDeleteNote,
+
+        focusOnRender,
 
         componentRef
     }
@@ -240,6 +242,8 @@ export const DefaultNoteInputContext = createContext({
     toggleFullScreen: (event) => {},
 
     handleDeleteNote: (event) => {},
+
+    focusOnRender: false as boolean,
 
     componentRef: {} as RefObject<HTMLDivElement>
 });

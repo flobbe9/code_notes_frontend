@@ -63,7 +63,8 @@ export default function CodeNoteInputWithVariables({
         setDeactivateFullScreenStyles,
         toggleFullScreen,
         isFullScreen,
-        handleDeleteNote
+        handleDeleteNote,
+        focusOnRender
     } = useContext(DefaultNoteInputContext);
     const { componentRef: defaultCodeNoteInputRef } = useContext(DefaultCodeNoteInputContext);
 
@@ -79,6 +80,10 @@ export default function CodeNoteInputWithVariables({
 
         setActivateFullScreenStyles(() => {return activateFullScreenStyles});
         setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
+
+        if (focusOnRender)
+            setTimeout(() => 
+                inputDivRef.current?.focus(), 10); // default text will be removed otherwise
         
     }, []);
 
