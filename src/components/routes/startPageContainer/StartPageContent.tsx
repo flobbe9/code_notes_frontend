@@ -78,11 +78,11 @@ export default function StartPageContent({...props}: Props) {
 
     function handleKeyDown(event): void {
 
-        // focus search input on Strg + Shift + F
+        // focus search input
         if (isKeyPressed("Control") && isKeyPressed("Shift") && event.key === "F") {
             event.preventDefault();
             searchInputRef.current!.focus();
-        }
+        } 
     }
 
 

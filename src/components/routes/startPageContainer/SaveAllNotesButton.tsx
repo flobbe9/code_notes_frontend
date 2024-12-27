@@ -1,4 +1,4 @@
-import React, { MouseEvent, useContext } from "react";
+import React, { MouseEvent, useContext, useEffect } from "react";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
@@ -22,11 +22,29 @@ interface Props extends ButtonProps {
  */
 export default function SaveAllNotesButton({...props}: Props) {
 
-    const { toast, showPopup } = useContext(AppContext);
+    const { toast, showPopup, isKeyPressed } = useContext(AppContext);
     const { noteEntities, setNoteEntities, isLoggedIn, fetchSaveAllNoteEntities } = useContext(AppFetchContext);
     const { editedNoteIds, setEditedNoteIds } = useContext(StartPageContainerContext);
 
     const {className, children, ...otherProps} = getCleanDefaultProps(props, "SaveAllNotesButton", true);
+
+
+    useEffect(() => {
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        }
+    }, []);
+
+
+    function handleKeyDown(event: KeyboardEvent): void {
+
+        if (isKeyPressed("Control") && isKeyPressed("Shift") && event.key === "S") {
+            event.preventDefault();
+            document.getElementById("ButtonSaveAllNotesButton")?.click();
+        }
+    }
 
 
     /**
@@ -84,7 +102,7 @@ export default function SaveAllNotesButton({...props}: Props) {
     return (
         <Button 
             className={`${className} hover`} 
-            title={props.disabled ? "No changes yet" : "Save all notes"}
+            title={props.disabled ? "No changes yet" : "Save all notes (Ctrl + Shift + S)"}
             onClickPromise={handleSave}
             {...otherProps}
         >
