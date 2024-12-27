@@ -119,6 +119,9 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         newNoteInputEntitys.splice(noteInputEntityIndex, 1);
         setNoteInputs([...newNoteInputEntitys]);
 
+        // is visible if is fullscreen
+        setIsAppOverlayVisible(false);
+
         noteEdited();
     }
 
