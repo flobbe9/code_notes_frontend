@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { forwardRef, Ref, useContext, useImperativeHandle, useRef } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import "../../../../assets/styles/NoteTitle.scss";
 import { INVALID_INPUT_CLASS_NAME, MAX_NOTE_TITLE_VALUE_LENGTH } from "../../../../helpers/constants";
@@ -18,7 +18,7 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function NoteTitle({...props}: Props) {
+export default forwardRef(function NoteTitle({...props}: Props, ref: Ref<HTMLInputElement>) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteTitle");
 
@@ -26,6 +26,8 @@ export default function NoteTitle({...props}: Props) {
     const { noteEntity, noteEdited } = useContext(NoteContext);
 
     const inputRef = useRef<HTMLInputElement>(null);
+
+    useImperativeHandle(ref, () => inputRef.current!, []);
 
     
     function handleChange(event): void {
@@ -104,4 +106,4 @@ export default function NoteTitle({...props}: Props) {
             {children}
         </div>
     )
-}
+})

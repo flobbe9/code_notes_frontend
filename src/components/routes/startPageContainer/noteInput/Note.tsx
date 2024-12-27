@@ -6,7 +6,7 @@ import { NoteEntityService } from "../../../../abstract/services/NoteEntityServi
 import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString, handleRememberMyChoice, isNumberFalsy, logWarn, shortenString } from '../../../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, handleRememberMyChoice, isNumberFalsy, log, logWarn, shortenString } from '../../../../helpers/utils';
 import { useHasComponentMounted } from "../../../../hooks/useHasComponentMounted";
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
@@ -29,7 +29,9 @@ import DefaultCodeNoteInput from "./DefaultCodeNoteInput";
 
 interface Props extends DefaultProps {
 
-    propsKey: string
+    propsKey: string,
+    /** Whether to focus the title on render. Default is ```false``` */
+    focusOnRender?: boolean,
 }
 
 
@@ -39,7 +41,7 @@ interface Props extends DefaultProps {
  * @parent ```<StartPageContent>```
  * @since 0.0.1
  */
-export default function Note({propsKey, ...props}: Props) {
+export default function Note({propsKey, focusOnRender = false, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Note");
 
@@ -60,8 +62,9 @@ export default function Note({propsKey, ...props}: Props) {
     } = useContext(AppFetchContext);
     const { noteSearchResults, notes, setNotes } = useContext(StartPageContentContext);
 
-    const componentRef = useRef(null);
-    const saveButtonRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
+    const titleInputRef = useRef<HTMLInputElement>(null);
+    const saveButtonRef = useRef<HTMLButtonElement>(null);
 
     const context = {
         noteEntity,
@@ -75,6 +78,14 @@ export default function Note({propsKey, ...props}: Props) {
     }
 
     const hasComponentMounted = useHasComponentMounted();
+
+
+    
+    useEffect(() => {
+        if (focusOnRender)
+            titleInputRef.current?.focus();
+
+    }, [componentRef.current]);
 
 
     useEffect(() => {
@@ -301,7 +312,7 @@ export default function Note({propsKey, ...props}: Props) {
                 <div className="contentContainer">
                     <Flex className="fullWidth mb-4" flexWrap="nowrap">
                         {/* Title */}
-                        <NoteTitle className="me-1 col-6" />
+                        <NoteTitle className="me-1 col-6" ref={titleInputRef} />
 
                         {/* Tags */}
                         <NoteTagList className="col-6" />
