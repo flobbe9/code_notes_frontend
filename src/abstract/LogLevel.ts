@@ -4,7 +4,7 @@ import { logWarn } from "../helpers/utils";
 /**
  * Applies to custom "log" methods in "utils.ts".
  *  
- * @since 0.0.3
+ * @since 0.0.4
  */
 
 
