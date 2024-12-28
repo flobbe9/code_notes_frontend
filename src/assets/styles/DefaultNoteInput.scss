@@ -10,8 +10,8 @@
     $noteInputHoverBorderWidthIncrease: 3px;
 
     border-left: $noteInputDefaultBorder transparent;
-    margin: 5px 0;
     position: relative;
+    transition: opacity var(--transitionTime);
 
     // PlainTextNoteInput
     &:has(.PlainTextNoteInput) {
@@ -84,6 +84,36 @@
             .view-lines {
                 padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
             }
+        }
+    }
+
+    &-dragged {
+        opacity: .5;
+    }
+
+    &-dragArea {
+        border-top-left-radius: var(--borderRadius);
+        border-bottom-left-radius: var(--borderRadius);
+        transition: background-color var(--transitionTime);
+        @include customHover {
+            background-color: var(--matteBlackLight2);
+            cursor: grab;
+        }
+
+        .fa-grip {
+            color: white;
+        }
+    }
+
+    &-dropZoneHr {
+        border-radius: var(--borderRadius);
+        height: .3em;
+        margin: 3px 0;
+        transition: background-color var(--transitionTime);
+        width: 100%;
+
+        &-active {
+            background-color: rgb(0, 110, 255);
         }
     }
 

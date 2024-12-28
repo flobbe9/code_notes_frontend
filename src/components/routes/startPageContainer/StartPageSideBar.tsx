@@ -21,9 +21,6 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 // IDEA: filter icon
-// TODO: 
-    // consider heading like "Filter by tag", remove hr
-    // give tags differen border radius?
 export default function StartPageSideBar({...props}: Props) {
 
     /** Tag search value eagerly updated on change event */

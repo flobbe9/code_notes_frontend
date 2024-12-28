@@ -198,7 +198,7 @@ export default function App() {
      * @param event 
      */
     function handleToastMouseLeave(event: MouseEvent): void {
-
+        
         playAnimations(toastRef.current!)
 
         // case: toast does hide automatically

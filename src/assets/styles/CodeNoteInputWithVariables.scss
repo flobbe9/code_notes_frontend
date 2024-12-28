@@ -66,10 +66,7 @@
                 }
                 
                 &:not(:focus) {
-                    @include customHover {
-                        @include hover();
-                        cursor: pointer !important;
-                    }
+                    @include hover();
                 }
             }
         }
