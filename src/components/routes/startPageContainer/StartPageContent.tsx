@@ -78,11 +78,11 @@ export default function StartPageContent({...props}: Props) {
 
     function handleKeyDown(event): void {
 
-        // focus search input on Strg + Shift + F
+        // focus search input
         if (isKeyPressed("Control") && isKeyPressed("Shift") && event.key === "F") {
             event.preventDefault();
             searchInputRef.current!.focus();
-        }
+        } 
     }
 
 
@@ -91,16 +91,15 @@ export default function StartPageContent({...props}: Props) {
         if (!noteEntities || !noteEntities.length)
             return [];
 
-        return noteEntities.map((noteEntity, i) => 
+        return noteEntities.map(noteEntity => 
             createNoteByNoteEntity(noteEntity));
     }
 
 
-    function createNoteByNoteEntity(noteEntity: NoteEntity): JSX.Element {
+    function createNoteByNoteEntity(noteEntity: NoteEntity, focusOnRender = false): JSX.Element {
 
-        // const key = getRandomString();
         const key = noteEntity.id ?? getRandomString();
-        return <Note key={key} propsKey={String(key)} />
+        return <Note key={key} propsKey={String(key)} focusOnRender={focusOnRender} /> 
     }
 
 
@@ -185,5 +184,5 @@ export const StartPageContentContext = createContext({
 
     noteSearchResults: [] as NoteEntity[],
 
-    createNoteByNoteEntity: (noteEntity: NoteEntity, index: number) => {return <></>}
+    createNoteByNoteEntity: (noteEntity: NoteEntity, focusOnRender = false) => {return <></>}
 })

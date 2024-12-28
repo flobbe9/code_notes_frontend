@@ -18,7 +18,7 @@ export default function RouteContextHolder({children}) {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { moveToast } = useContext(AppContext);
+    const { moveToast, toast, forceToastTimeout } = useContext(AppContext);
 
     const context = {
         clearUrlQueryParams
@@ -27,7 +27,7 @@ export default function RouteContextHolder({children}) {
 
     useEffect(() => {
         scrollTop();
-        moveToast(true);
+        forceToastTimeout();
         redirectWWW();
 
     }, [location]);

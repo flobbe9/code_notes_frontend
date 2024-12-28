@@ -2,7 +2,7 @@ import React, { createContext, MouseEvent, ReactNode, useEffect, useRef, useStat
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../assets/styles/App.scss';
 import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
-import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, pauseAnimations, playAnimations, stopAnimations } from '../helpers/utils';
+import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, pauseAnimations, playAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
 import AppFetchContextHolder from "./AppFetchContextHolder";
 import Footer from "./Footer";
@@ -18,12 +18,12 @@ import ResetPassword from "./ResetPassword";
 import RouteContextHolder from "./RouteContextHolder";
 import Contact from "./routes/Contact";
 import Login from "./routes/Login";
+import NotFound from './routes/NotFound';
 import PrivacyPolicy from "./routes/PrivacyPolicy";
 import Register from "./routes/Register";
 import Profile from './routes/settings/profile/Profile';
 import SettingsPage from './routes/settings/SettingsPage';
 import StartPageContainer from './routes/startPageContainer/StartPageContainer';
-import _404 from './routes/NotFound';
 
 
 /**
@@ -59,6 +59,7 @@ export default function App() {
 
     const context = {
         toast,
+        forceToastTimeout,
         moveToast,
 
         windowSize,
@@ -97,7 +98,7 @@ export default function App() {
 
 
     /**
-     * Set given text to toast and slide it up. Interrupt ongoing animation if any.
+     * Set given text to toast and slide it up.
      * 
      * @param summary serves like a small heading
      * @param message to display in tost body
@@ -114,9 +115,7 @@ export default function App() {
         
         // case: hide automatically
         if (!isNumberFalsy(screenTime)) {
-            // stop toast animation
             clearTimeout(toastScreenTimeTimeout);
-            stopAnimations(toastRef.current!);
 
             // hide toast
             const toastTimeout = setTimeout(() => moveToast(true), screenTime);
@@ -124,6 +123,28 @@ export default function App() {
         }
 
         setTimeout(moveToast, 10)
+    }
+
+
+    /**
+     * Start a timeout for toast to hide if it doesn't hide automatically.
+     * 
+     * @param screenTime time in ms that the popup should stay visible before hiding again automatically. If omitted, 
+     *                   the popup wont hide by itself.
+     */
+    function forceToastTimeout(screenTime = 8000): void {
+
+        // case: no toast present or will hide on it's own
+        if (isBlank(toastSummary) || !isNumberFalsy(toastScreenTime))
+            return;
+
+        // toast(toastSummary, toastMessage, toastSevirity, toastScreenTime);
+        clearTimeout(toastScreenTimeTimeout);
+
+        // hide toast
+        const toastTimeout = setTimeout(() => moveToast(true), screenTime);
+        setToastScreenTime(screenTime);
+        setToastScreenTimeTimeout(toastTimeout);
     }
 
 
@@ -177,7 +198,7 @@ export default function App() {
      * @param event 
      */
     function handleToastMouseLeave(event: MouseEvent): void {
-
+        
         playAnimations(toastRef.current!)
 
         // case: toast does hide automatically
@@ -437,7 +458,7 @@ export default function App() {
                                             </SettingsPage>
                                         </LoggedInComponent>
                                     } />
-                                    <Route path="*" element={<_404></_404>} />
+                                    <Route path="*" element={<NotFound></NotFound>} />
                                 </Routes>
                             </div>
 
@@ -463,6 +484,7 @@ export default function App() {
 
 export const AppContext = createContext({
     toast: (summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number) => {},
+    forceToastTimeout: (screentTime?: number) => {},
     moveToast: (hideToast = false, screenTime?: number) => {},
 
     windowSize: [0, 0],

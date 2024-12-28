@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, DragEvent, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../../abstract/entites/NoteEntity";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
@@ -6,7 +6,7 @@ import { NoteEntityService } from "../../../../abstract/services/NoteEntityServi
 import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString, handleRememberMyChoice, isNumberFalsy, logWarn, shortenString } from '../../../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, handleRememberMyChoice, isNumberFalsy, log, logError, logWarn, shortenString } from '../../../../helpers/utils';
 import { useHasComponentMounted } from "../../../../hooks/useHasComponentMounted";
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
@@ -29,7 +29,9 @@ import PlainTextNoteInput from "./PlainTextNoteInput";
 
 interface Props extends DefaultProps {
 
-    propsKey: string
+    propsKey: string,
+    /** Whether to focus the title on render. Default is ```false``` */
+    focusOnRender?: boolean,
 }
 
 
@@ -39,13 +41,18 @@ interface Props extends DefaultProps {
  * @parent ```<StartPageContent>```
  * @since 0.0.1
  */
-export default function Note({propsKey, ...props}: Props) {
+export default function Note({propsKey, focusOnRender = false, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Note");
 
     const [noteEntity, setNoteEntity] = useState(NoteEntityService.getDefaultInstance());
     const [isNoteInSearchResults, setIsNoteInSearchResults] = useState(true);
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
+
+    const [draggedNoteInputIndex, setDraggedNoteInputIndex] = useState(NaN);
+    /** Index of the noteInput, the mouse is currently hovering over while dragging another noteInput */
+    const [dragOverNoteInputIndex, setDragOverNoteInputIndex] = useState(NaN); // NOTE: don't use -1 as default
+
 
     const { toast, showPopup } = useContext(AppContext);
     const { editedNoteIds, setEditedNoteIds } = useContext(StartPageContainerContext);
@@ -60,8 +67,10 @@ export default function Note({propsKey, ...props}: Props) {
     } = useContext(AppFetchContext);
     const { noteSearchResults, notes, setNotes } = useContext(StartPageContentContext);
 
-    const componentRef = useRef(null);
-    const saveButtonRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
+    const titleInputRef = useRef<HTMLInputElement>(null);
+    const contentContainerRef = useRef<HTMLDivElement>(null);
+    const saveButtonRef = useRef<HTMLButtonElement>(null);
 
     const context = {
         noteEntity,
@@ -71,30 +80,42 @@ export default function Note({propsKey, ...props}: Props) {
 
         createNoteInputByNoteInputType,
 
+        draggedNoteInputIndex, 
+        setDraggedNoteInputIndex,
+        dragOverNoteInputIndex, 
+        setDragOverNoteInputIndex,
+
         noteEdited
     }
 
     const hasComponentMounted = useHasComponentMounted();
 
-
+    
     useEffect(() => {
         if (!noteInputs.length)
             setNoteInputs(mapNoteInputsToJsx());
-
+        
     }, [noteEntity]);
-
+    
 
     useEffect(() => {
         updateNoteEntity();
-
+        
     }, [noteEntities]);
-
-
+    
+    
     useEffect(() => {
         if (hasComponentMounted)
             setIsNoteInSearchResults(noteSearchResults.includes(noteEntity));
-
+        
     }, [noteSearchResults]);
+    
+    
+    useEffect(() => {
+        if (focusOnRender)
+            titleInputRef.current?.focus();
+
+    }, [componentRef.current]);
 
 
     function mapNoteInputsToJsx(): JSX.Element[] {
@@ -107,27 +128,42 @@ export default function Note({propsKey, ...props}: Props) {
     }
 
 
-    function createNoteInputByNoteInputType(noteInputEntity: NoteInputEntity): JSX.Element {
+    function createNoteInputByNoteInputType(noteInputEntity: NoteInputEntity, focusOnRender?): JSX.Element {
 
         const key = getRandomString();
         switch (noteInputEntity.type) {
             case "PLAIN_TEXT":
                 return (
-                    <DefaultNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                    <DefaultNoteInput 
+                        noteInputEntity={noteInputEntity} 
+                        propsKey={key} 
+                        key={key}
+                        focusOnRender={focusOnRender}
+                    >
                         <PlainTextNoteInput noteInputEntity={noteInputEntity} />
                     </DefaultNoteInput>
                     )
 
             case "CODE":
                 return (
-                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                    <DefaultCodeNoteInput 
+                        noteInputEntity={noteInputEntity} 
+                        propsKey={key} 
+                        key={key}
+                        focusOnRender={focusOnRender}
+                    >
                         <CodeNoteInput noteInputEntity={noteInputEntity} />
                     </DefaultCodeNoteInput>
                 )
 
             case "CODE_WITH_VARIABLES":
                 return (
-                    <DefaultCodeNoteInput noteInputEntity={noteInputEntity} propsKey={key} key={key}>
+                    <DefaultCodeNoteInput 
+                        noteInputEntity={noteInputEntity} 
+                        propsKey={key} 
+                        key={key}
+                        focusOnRender={focusOnRender}
+                    >
                         <CodeNoteInputWithVariables noteInputEntity={noteInputEntity} />
                     </DefaultCodeNoteInput>
                 )
@@ -273,6 +309,43 @@ export default function Note({propsKey, ...props}: Props) {
     }
 
 
+    /**
+     * Will append dragged note input AFTER the note input currently dragging over. Updates both ```noteInputs``` and ```noteEntity.noteInputs```.
+     * 
+     * @param event should not contain any data in ```event.dataTransfer.getData()```, dropping into content editable divs should be safe
+     */
+    function handleDrop(event: DragEvent): void {
+        
+        event.preventDefault();
+
+        // case: no note inputs (should not happen)
+        if (!noteEntity.noteInputs?.length)
+            return;
+
+        // case: dropped at same position
+        if (draggedNoteInputIndex === dragOverNoteInputIndex || draggedNoteInputIndex === dragOverNoteInputIndex + 1)
+            return;
+
+        let draggedNoteInputEntity = noteEntity.noteInputs[draggedNoteInputIndex],
+            draggedNoteInput = noteInputs[draggedNoteInputIndex];
+
+        // case: index out of bounds, happens e.g. when dropping a noteInput from a different note
+        if (!draggedNoteInputEntity || !draggedNoteInput) {
+            logError(`'draggedNoteInputIndex' ${draggedNoteInputIndex} out of bounds for 'noteEntity.noteInputs' of length ${noteEntity.noteInputs.length} `)
+            return;
+        }
+
+        // reorder 
+        noteEntity.noteInputs.splice(draggedNoteInputIndex, 1);
+        noteEntity.noteInputs.splice(dragOverNoteInputIndex + 1, 0, draggedNoteInputEntity);
+        noteInputs.splice(draggedNoteInputIndex, 1);
+        noteInputs.splice(dragOverNoteInputIndex + 1, 0, draggedNoteInput);
+        setNoteInputs([...noteInputs]);
+
+        noteEdited();
+    }
+
+
     return (
         <NoteContext.Provider value={context}>
             <HelperDiv 
@@ -283,10 +356,18 @@ export default function Note({propsKey, ...props}: Props) {
                 rendered={isNoteInSearchResults}
                 {...otherProps}
             >
-                <div className="contentContainer">
-                    <Flex className="fullWidth mb-4" flexWrap="nowrap">
+                <div 
+                    className="contentContainer"
+                    ref={contentContainerRef}
+                    onDrop={handleDrop}
+                    onDragOver={(e) => e.preventDefault()}
+                >
+                    <Flex className="fullWidth pb-4" flexWrap="nowrap" onDragEnter={(e) => {
+                        log("top drag over")
+                        setDragOverNoteInputIndex(-1);
+                    }}>
                         {/* Title */}
-                        <NoteTitle className="me-1 col-6" />
+                        <NoteTitle className="me-1 col-6" ref={titleInputRef} />
 
                         {/* Tags */}
                         <NoteTagList className="col-6" />
@@ -336,7 +417,13 @@ export const NoteContext = createContext({
 
     noteInputs: [<></>],
     setNoteInputs: (noteInputs: JSX.Element[]) => {},
-    createNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity, index: number) => {return <></>},
+
+    draggedNoteInputIndex: NaN as number, 
+    setDraggedNoteInputIndex: (index: number) => {},
+    dragOverNoteInputIndex: NaN as number, 
+    setDragOverNoteInputIndex: (index: number) => {},
+
+    createNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity, focusOnRender = false) => {return <></>},
 
     /**
      * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```

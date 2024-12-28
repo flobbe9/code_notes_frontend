@@ -63,7 +63,8 @@ export default function CodeNoteInputWithVariables({
         setDeactivateFullScreenStyles,
         toggleFullScreen,
         isFullScreen,
-        handleDeleteNote
+        handleDeleteNote,
+        focusOnRender
     } = useContext(DefaultNoteInputContext);
     const { componentRef: defaultCodeNoteInputRef } = useContext(DefaultCodeNoteInputContext);
 
@@ -79,6 +80,10 @@ export default function CodeNoteInputWithVariables({
 
         setActivateFullScreenStyles(() => {return activateFullScreenStyles});
         setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
+
+        if (focusOnRender)
+            setTimeout(() => 
+                inputDivRef.current?.focus(), 10); // default text will be removed otherwise
         
     }, []);
 
@@ -681,18 +686,6 @@ export default function CodeNoteInputWithVariables({
 
             <div className="CodeNoteInputWithVariables-buttonContainer">
                 <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
-                    {/* Fullscreen */}
-                    <Button 
-                        className="fullScreenButton defaultNoteInputButton"
-                        title={isFullScreen ? "Normal screen" : "Fullscreen"}
-                        onClick={toggleFullScreen}
-                    >
-                        {isFullScreen ?
-                            <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
-                            <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
-                        }
-                    </Button>
-                    
                     {/* Copy */}
                     <Button
                         className="defaultNoteInputButton copyButton"
@@ -710,6 +703,18 @@ export default function CodeNoteInputWithVariables({
                         onClick={handleDeleteNote}
                     >
                         <i className="fa-solid fa-xmark fa-lg"></i>
+                    </Button>
+                    
+                    {/* Fullscreen */}
+                    <Button 
+                        className="fullScreenButton defaultNoteInputButton"
+                        title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                        onClick={toggleFullScreen}
+                    >
+                        {isFullScreen ?
+                            <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                            <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        }
                     </Button>
                 </Flex>
 

@@ -45,7 +45,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
         setNoteEntities([newNoteEntity, ...noteEntities]);
 
-        setNotes([createNoteByNoteEntity(newNoteEntity, notes.length), ...notes]);
+        setNotes([createNoteByNoteEntity(newNoteEntity, true), ...notes]); // pass true
     }
 
 

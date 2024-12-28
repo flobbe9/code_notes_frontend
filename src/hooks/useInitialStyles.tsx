@@ -1,5 +1,6 @@
 import { useContext, useEffect } from "react";
 import { AppContext } from "../components/App";
+import { logWarn } from "../helpers/utils";
 
 
 
@@ -40,6 +41,9 @@ export function useInitialStyles(
      */
     function setInitialStyle(): void {
 
+        if (!element)
+            return;
+
         setTimeout(() => {
             attributesCallback((cssAttributeToChange: string, cssAttributeToUse: string, element: HTMLElement) => 
                 element.style[cssAttributeToChange] = window.getComputedStyle(element).getPropertyValue(cssAttributeToUse))
@@ -49,6 +53,9 @@ export function useInitialStyles(
 
 
     function handleWindowResize(): void {
+        
+        if (!element) 
+            return;
 
         // unset attributes to change in order to cleanly set them again
         attributesCallback((cssAttributeToChange: string, cssAttributeToUse: string, element: HTMLElement) => 
@@ -65,7 +72,6 @@ export function useInitialStyles(
      */
     function attributesCallback(callback: (cssAttributeToChange: string, cssAttributeToUse: string, element: HTMLElement) => any): any {
 
-        // case: element not present (yet)
         if (!element)
             return;
 

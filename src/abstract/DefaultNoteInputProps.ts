@@ -9,5 +9,8 @@ export interface DefaultNoteInputProps extends DefaultProps {
     
     noteInputEntity: NoteInputEntity,
 
-    propsKey: string
+    propsKey: string,
+
+    /** Default should be ```false``` */
+    focusOnRender?: boolean
 }

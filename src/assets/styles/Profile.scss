@@ -1,5 +1,5 @@
 @import "./global/functions.scss";
-
+@import "./global/variables.scss";
 
 .Profile {
     $disabledOpacity: .8;
@@ -37,8 +37,6 @@
         }
 
         &-passwordInput {
-            flex-flow: nowrap !important;
-            
             &:has(.textInput:disabled) {
                 opacity: 1 !important;
                 
@@ -70,6 +68,10 @@
                 }
 
                 @include buttonFocus(black);
+
+                @media only screen and (min-width: $tabletMinWidth) {
+                    margin-left: .5em;
+                }
             }
         }
     }

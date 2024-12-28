@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/Hr.scss";
 import { isBlank } from "../../helpers/utils";
@@ -32,21 +32,26 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function Hr({
-    textContainerBottom,
-    textContainerLeft,
-    textContainerRight,
-    textContainerTop,
-    textContainerHorizontalPos = "center",
-    textContainerVerticalPos = "center",
-    hrClassName,
-    ...props
-}: Props) {
+export default forwardRef(function Hr(
+    {
+        textContainerBottom,
+        textContainerLeft,
+        textContainerRight,
+        textContainerTop,
+        textContainerHorizontalPos = "center",
+        textContainerVerticalPos = "center",
+        hrClassName,
+        ...props
+    }: Props,
+    ref: Ref<HTMLDivElement>
+) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Hr");
 
     const componentRef = useRef<HTMLDivElement>(null);
     const textContainerRef = useRef<HTMLDivElement>(null);
+
+    useImperativeHandle(ref, () => componentRef.current!, []);
 
 
     useEffect(() => {
@@ -99,4 +104,4 @@ export default function Hr({
             </HelperDiv>
         </Flex>
     )
-}
+})

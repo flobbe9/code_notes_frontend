@@ -1,12 +1,13 @@
-import React, { createContext, RefObject, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, DragEvent, RefObject, useContext, useEffect, useRef, useState } from "react";
 import { DefaultNoteInputProps } from "../../../../abstract/DefaultNoteInputProps";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import "../../../../assets/styles/DefaultNoteInput.scss";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../../../helpers/constants";
-import { animateAndCommit, getJsxElementIndexByKey, handleRememberMyChoice, shortenString } from "../../../../helpers/utils";
+import { addClass, animateAndCommit, getJsxElementIndexByKey, handleRememberMyChoice, isNumberFalsy, removeClass, shortenString } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
 import Confirm from "../../../helpers/Confirm";
 import Flex from "../../../helpers/Flex";
+import Hr from "../../../helpers/Hr";
 import { NoteContext } from "./Note";
 
 
@@ -21,7 +22,7 @@ interface Props extends DefaultNoteInputProps {
  *  
  * @since 0.0.1
  */
-export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: Props) {
+export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRender = false, ...props}: Props) {
 
     const [isShowNoteInputSettings, setIsShowNoteInputSettings] = useState(false);
     const [areNoteInputSettingsDisabled, setAreNoteInputSettingsDisabled] = useState(false);
@@ -35,13 +36,25 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
     const [isNoteInputOverlayVisible, setIsNoteInputOverlayVisible] = useState(false);
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "DefaultNoteInput");
+    const componentName = "DefaultNoteInput";
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName);
 
     const componentRef = useRef<HTMLDivElement>(null);
+    const topMostDropZoneHrHrRef = useRef<HTMLDivElement>(null);
+    const dropZoneHrRef = useRef<HTMLDivElement>(null);
 
     const { isAppOverlayVisible, setIsAppOverlayVisible, showPopup } = useContext(AppContext);
 
-    const { noteEntity, noteInputs, setNoteInputs, noteEdited } = useContext(NoteContext);
+    const { 
+        noteEntity, 
+        noteInputs, 
+        setNoteInputs, 
+        noteEdited,
+        draggedNoteInputIndex,
+        setDraggedNoteInputIndex,
+        dragOverNoteInputIndex,
+        setDragOverNoteInputIndex
+    } = useContext(NoteContext);
 
     const context = {
         isShowNoteInputSettings, 
@@ -67,6 +80,8 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
 
         handleDeleteNote,
 
+        focusOnRender,
+
         componentRef
     }
 
@@ -87,6 +102,12 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
             deactivateFullScreen();
 
     }, [isAppOverlayVisible]);
+
+
+    useEffect(() => {
+        handleDragOverNoteInputIndexChange();
+
+    }, [dragOverNoteInputIndex])
 
 
     function handleDeleteNote(event): void {
@@ -118,6 +139,9 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
         const newNoteInputEntitys = noteInputs;
         newNoteInputEntitys.splice(noteInputEntityIndex, 1);
         setNoteInputs([...newNoteInputEntitys]);
+
+        // is visible if is fullscreen
+        setIsAppOverlayVisible(false);
 
         noteEdited();
     }
@@ -190,25 +214,125 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, ...props}: 
             deactivateFullScreen();
     }
 
+    
+    function handleDragEnter(event: DragEvent): void {
+
+        setDragOverNoteInputIndex(getJsxElementIndexByKey(noteInputs, propsKey));
+    }
+
+
+    /**
+     * Sets the ```draggedNoteInputIndex```, uses the whole ```<DefaultNoteInput>``` as dragImage and styles the dragged noteInput.
+     * 
+     * @param event 
+     */
+    function handleDragStart(event: DragEvent): void {
+        
+        setDraggedNoteInputIndex(getJsxElementIndexByKey(noteInputs, propsKey));
+
+        event.dataTransfer.dropEffect = "move";
+
+        let dragImage: HTMLElement = componentRef.current!.querySelector(".ContentEditableDiv") as HTMLElement;
+        if (componentRef.current!.querySelector(".CodeNoteInput"))
+            dragImage = componentRef.current!.querySelector(".CodeNoteInput .view-lines") as HTMLElement;
+
+        event.dataTransfer.setDragImage(dragImage, 0, 0);
+
+        addClass(componentRef.current!, `${componentName}-dragged`);
+    }
+
+
+    /**
+     * Remove styles of dragged noteInput and reset drag index states.
+     * 
+     * @param event 
+     */
+    function handleDragEnd(event: DragEvent): void {
+
+        removeClass(componentRef.current!, `${componentName}-dragged`);
+        setDraggedNoteInputIndex(NaN);
+        setDragOverNoteInputIndex(NaN);
+    }
+    
+
+    /**
+     * Activate or deactivate styles of ```<hr>``` elements during drag over. Make sure to not activate them if the noteInput position
+     * would not change on drop
+     */
+    function handleDragOverNoteInputIndexChange(): void {
+
+        // case: is drag end
+        if (isNumberFalsy(draggedNoteInputIndex)) {
+            deactivateDragOverStyles();
+            return;
+        }
+
+        const noteInputIndex = getJsxElementIndexByKey(noteInputs, propsKey);
+        
+        const isDraggingOverThisNoteInput = dragOverNoteInputIndex === noteInputIndex;
+        const isNoteInputRightBeforeDraggedInput = draggedNoteInputIndex === dragOverNoteInputIndex + 1;
+        const isDraggingToTopMostNoteInput = noteInputIndex === 0 && dragOverNoteInputIndex === -1;
+        const isBeeingDragged = draggedNoteInputIndex === noteInputIndex;
+
+        deactivateDragOverStyles();
+
+        // case: dropping would not change the position
+        if (isBeeingDragged || isNoteInputRightBeforeDraggedInput)
+            return;
+
+        if (isDraggingToTopMostNoteInput)
+            addClass(topMostDropZoneHrHrRef.current!, `${componentName}-dropZoneHr-active`)
+
+        else if (isDraggingOverThisNoteInput)
+            addClass(dropZoneHrRef.current!, `${componentName}-dropZoneHr-active`)
+    }
+
+
+    function deactivateDragOverStyles(): void {
+
+        removeClass(dropZoneHrRef.current!, `${componentName}-dropZoneHr-active`);
+        removeClass(topMostDropZoneHrHrRef.current!, `${componentName}-dropZoneHr-active`);
+    }
+    
 
     return (
         <DefaultNoteInputContext.Provider value={context}>
-            <Flex 
+            <div
                 id={id} 
                 className={className}
                 style={style}
-                flexWrap="nowrap"
-                verticalAlign="start"
-                horizontalAlign="center"
                 ref={componentRef}
+                onDragEnter={handleDragEnter}
                 {...otherProps}
             >
-                <div className="DefaultNoteInput-content fullWidth">
-                    {/* NoteInput */}
-                    {children}
-                </div>
-            </Flex>
+                {/* Topmost dropZoneHr */}
+                <Hr 
+                    className={`${componentName}-dropZoneHr`} 
+                    hidden={getJsxElementIndexByKey(noteInputs, propsKey) !== 0} 
+                    ref={topMostDropZoneHrHrRef} 
+                />
 
+                <Flex flexWrap="nowrap">
+                    {/* Drag area */}
+                    <Flex 
+                        className={`${componentName}-dragArea`} 
+                        verticalAlign="center"
+                        draggable 
+                        onDragStart={handleDragStart} 
+                        onDragEnd={handleDragEnd}
+                    >
+                        <i className="fa-solid fa-grip fa-lg fa-rotate-90 px-1" title="Move section"></i>
+                    </Flex>
+
+                    <div className="DefaultNoteInput-content fullWidth">
+                        {/* NoteInput */}
+                        {children}
+                    </div>
+                </Flex>
+
+                {/* DropZoneHr */}
+                <Hr className={`${componentName}-dropZoneHr`} ref={dropZoneHrRef} />
+            </div>
         </DefaultNoteInputContext.Provider>
     )
 }
@@ -237,6 +361,8 @@ export const DefaultNoteInputContext = createContext({
     toggleFullScreen: (event) => {},
 
     handleDeleteNote: (event) => {},
+
+    focusOnRender: false as boolean,
 
     componentRef: {} as RefObject<HTMLDivElement>
 });

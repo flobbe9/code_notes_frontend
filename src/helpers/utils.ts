@@ -5,21 +5,28 @@ import { useQueryClientObj } from "..";
 import { AnimationEasing } from "../abstract/CSSTypes";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
+import { isDebugLogLevel, isErrorLogLevel, isInfoLogLevel, isWarnLogLevel, LogLevelName } from "../abstract/LogLevel";
 import { isRememberMyChoiceValue, RememberMyChoiceKey } from "../abstract/RememberMyChoice";
 import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTE_QUERY_KEY } from "../hooks/useNotes";
-import { APP_NAME_PRETTY, BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_SEVIRITY_COLORS, LogSevirity, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
+import { APP_NAME_PRETTY, BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_LEVEL_COLORS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
 
 
 export function log(message?: any, ...optionalParams: any[]): void {
+
+    if (!isInfoLogLevel())
+        return;
 
     console.log(message, ...optionalParams);
 }
 
 
 export function logDebug(message?: any, ...optionalParams: any[]): void {
+
+    if (!isDebugLogLevel())
+        return;
 
     const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
     
@@ -28,6 +35,9 @@ export function logDebug(message?: any, ...optionalParams: any[]): void {
 
 
 export function logWarn(message?: any, ...optionalParams: any[]): void {
+    
+    if (!isWarnLogLevel())
+        return;
 
     const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
 
@@ -37,11 +47,14 @@ export function logWarn(message?: any, ...optionalParams: any[]): void {
 
 export function logWarnFiltered(message?: any, ...optionalParams: any[]): void {
 
-    logFiltered("warn", message, ...optionalParams);
+    logFiltered("WARN", message, ...optionalParams);
 }
 
 
 export function logError(message?: any, ...optionalParams: any[]): void {
+
+    if (!isErrorLogLevel())
+        return;
 
     const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
 
@@ -51,7 +64,7 @@ export function logError(message?: any, ...optionalParams: any[]): void {
 
 export function logErrorFiltered(message?: any, ...optionalParams: any[]): void {
 
-    logFiltered("error", message, ...optionalParams);
+    logFiltered("ERROR", message, ...optionalParams);
 }
 
 
@@ -59,17 +72,17 @@ export function logErrorFiltered(message?: any, ...optionalParams: any[]): void 
  * Dont log given ```obj``` if it contains one of {@link CONSOLE_MESSAGES_TO_AVOID}s strings. Log normally if ```obj``` is not
  * of type ```string```, ```number``` or ```Error```.
  * 
- * @param sevirity of obj to choose text background color
+ * @param logLevelName of obj to choose text background color
  * @param obj to filter before logging
  * @param optionalParams 
  */
-function logFiltered(sevirity: LogSevirity, obj?: any, ...optionalParams: any[]): void {
+function logFiltered(logLevelName: LogLevelName, obj?: any, ...optionalParams: any[]): void {
 
     let messageToCheck = obj;
 
     // case: cannot filter obj
     if (!obj || (typeof obj !== "string" && typeof obj !== "number" && !(obj instanceof Error))) {
-       logColored(sevirity, obj, ...optionalParams);
+       logColored(logLevelName, obj, ...optionalParams);
        return;
     }
 
@@ -83,16 +96,23 @@ function logFiltered(sevirity: LogSevirity, obj?: any, ...optionalParams: any[])
         if (includesIgnoreCaseTrim(messageToCheck, messageToAvoid)) 
             return; 
         
-    logColored(sevirity, messageToCheck, ...optionalParams);
+    logColored(logLevelName, messageToCheck, ...optionalParams);
 }
 
 
-function logColored(sevirity: LogSevirity, obj?: any, ...optionalParams: any[]): void {
+/**
+ * Don't use custom logs here, since the default ```console.log``` metods are overriden with this an must work independently from LogLevel.
+ *  
+ * @param logLevelName 
+ * @param obj 
+ * @param optionalParams 
+ */
+function logColored(logLevelName: LogLevelName, obj?: any, ...optionalParams: any[]): void {
 
     // get log color by sevirity
-    const color = LOG_SEVIRITY_COLORS[sevirity];
+    const color = LOG_LEVEL_COLORS[logLevelName];
 
-    log("%c" + obj, "background: " + color, ...optionalParams);
+    console.log("%c" + obj, "background: " + color, ...optionalParams);
 }
 
 
@@ -997,14 +1017,17 @@ export async function setClipboardText(text: string): Promise<void> {
 /**
  * @param eventKey to check
  * @param includeEnter whether to return ```true``` if event key equals "Enter". Default is ```true```
+ * @param includeRemovingKey see {@link isEventKeyRemovingKey()}. Default is ```false```
  * @returns ```true``` if given eventKey would take up space when inserted into a text input
  */
-export function isEventKeyTakingUpSpace(eventKey: string, includeEnter = true): boolean {
+export function isEventKeyTakingUpSpace(eventKey: string, includeEnter = true, includeRemovingKey = false): boolean {
 
     if (isEmpty(eventKey))
         return false;
 
-    return eventKey.length === 1 || (includeEnter && eventKey === "Enter");
+    return eventKey.length === 1 || 
+           (includeEnter && eventKey === "Enter") ||
+           (includeRemovingKey && isEventKeyRemovingKey(eventKey));
 }
 
 

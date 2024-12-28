@@ -11,6 +11,10 @@
     &.fullScreen {
         border-radius: var(--borderRadius); // for full screen mode
         padding: 15px;
+
+        section {
+            max-width: 73vw;
+        }
     }
     
     .editorContainer {
@@ -25,19 +29,15 @@
                 .overflow-guard {
                     background-color: var(--matteBlack);
                     padding: 0 var(--noteInputPaddingX);
+                    transition: background-color var(--transitionTime), width var(--transitionTime);
+
+                    // line number container
+                    .margin {
+                        display: none;
+                    }
 
                     .monaco-scrollable-element {
-
-                        // line number container
-                        .margin {
-                            display: none;
-                            background-color: var(--matteBlack);
-                            left: -20px;
-                            
-                            .margin-view-overlays, .current-line.current-line-margin-both {
-                                left: -10px;
-                            }
-                        }
+                        left: var(--noteInputPaddingX) !important;
 
                         .decorationsOverviewRuler {
                             display: none !important;
@@ -58,12 +58,11 @@
                             // line container
                             .view-lines {
                                 padding: 0 var(--noteInputPaddingX);
-                                transition: var(--transitionTime);
+                                transition: background-color var(--transitionTime);
                                 width: var(--fullEditorWidth) !important;
 
                                 // line
                                 .view-line {
-                                    
                                 }
                             }
                         }

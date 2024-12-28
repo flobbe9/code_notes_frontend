@@ -19,7 +19,7 @@ import { NoteContext } from './Note';
 
 interface Props extends HelperProps {
 
-    noteInputEntity: NoteInputEntity
+    noteInputEntity: NoteInputEntity,
 }
 
 
@@ -47,7 +47,8 @@ export default function PlainTextNoteInput({
         setDeactivateFullScreenStyles,
         toggleFullScreen,
         isFullScreen,
-        handleDeleteNote
+        handleDeleteNote,
+        focusOnRender
     } = useContext(DefaultNoteInputContext);
 
     const componentRef = useRef<HTMLDivElement>(null);
@@ -62,6 +63,9 @@ export default function PlainTextNoteInput({
 
         setActivateFullScreenStyles(() => {return activateFullScreenStyles});
         setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
+
+        if (focusOnRender)
+            inputDivRef.current?.focus();
 
     }, []);
 
@@ -87,6 +91,7 @@ export default function PlainTextNoteInput({
         if (!isBlank(inputDiv.innerText)) {
             const parsedText = await parseCodeTextToCodeHtml();
             inputDiv.innerHTML = parsedText;
+            noteInputEntity.value = parsedText;
         }
     }
 
@@ -135,8 +140,6 @@ export default function PlainTextNoteInput({
 
         // sanitize
         const sanitizedInputDivValue = sanitize(parsedText, DEFAULT_HTML_SANTIZER_OPTIONS);
-        
-        updateAppUserEntity();
         
         setIsNoteInputOverlayVisible(false);
 
@@ -211,7 +214,7 @@ export default function PlainTextNoteInput({
         if (keyName === "Control")
             sanitizeClipboardText();
 
-        if (isEventKeyTakingUpSpace(keyName) && !isControlKeyPressed())
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed())
             noteEdited();
     }
 
@@ -240,12 +243,6 @@ export default function PlainTextNoteInput({
     function handlePaste(event: ClipboardEvent): void {
 
         noteEdited();
-    }
-
-
-    function updateAppUserEntity(): void {
-
-        noteInputEntity.value = inputDivRef.current!.innerHTML;
     }
 
 
@@ -351,19 +348,7 @@ export default function PlainTextNoteInput({
                 </Overlay>
             </pre>
 
-            {/* Fullscreen */}
-            <Button 
-                className="fullScreenButton defaultNoteInputButton"
-                title={isFullScreen ? "Normal screen" : "Fullscreen"}
-                onClick={toggleFullScreen}
-            >
-                {isFullScreen ?
-                    <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
-                    <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
-                }
-            </Button>
-
-            {/* Copy button */}
+            {/* Copy */}
             <Button
                 className="defaultNoteInputButton copyButton"
                 title="Copy"
@@ -373,12 +358,25 @@ export default function PlainTextNoteInput({
                 <i className="fa-solid fa-copy"></i>
             </Button>
 
+            {/* Delete */}
             <Button 
                 className="deleteNoteButton defaultNoteInputButton" 
                 title="Delete section"
                 onClick={handleDeleteNote}
             >
                 <i className="fa-solid fa-xmark fa-lg"></i>
+            </Button>
+
+             {/* Fullscreen */}
+             <Button 
+                className="fullScreenButton defaultNoteInputButton"
+                title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                onClick={toggleFullScreen}
+            >
+                {isFullScreen ?
+                    <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                    <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                }
             </Button>
 
             {children}
