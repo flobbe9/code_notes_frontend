@@ -1,4 +1,4 @@
-import React, { MouseEvent, useContext, useEffect } from "react";
+import React, { MouseEvent, useContext, useRef } from "react";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
@@ -8,6 +8,7 @@ import { isNumberFalsy, stringToNumber } from '../../../helpers/utils';
 import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextHolder";
 import Button from "../../helpers/Button";
+import HiddenInput from "../../helpers/HiddenInput";
 import Login from "../Login";
 
 
@@ -21,29 +22,12 @@ interface Props extends ButtonProps {
  */
 export default function SaveAllNotesButton({...props}: Props) {
 
-    const { toast, showPopup, isKeyPressed, editedNoteIds, setEditedNoteIds } = useContext(AppContext);
+    const { toast, showPopup, editedNoteIds, setEditedNoteIds } = useContext(AppContext);
     const { noteEntities, setNoteEntities, isLoggedIn, fetchSaveAllNoteEntities } = useContext(AppFetchContext);
 
     const {className, children, ...otherProps} = getCleanDefaultProps(props, "SaveAllNotesButton", true);
 
-
-    useEffect(() => {
-        window.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-        }
-        
-    }, []);
-
-
-    function handleKeyDown(event: KeyboardEvent): void {
-
-        if (isKeyPressed("Control") && isKeyPressed("Shift") && event.key === "S") {
-            event.preventDefault();
-            document.getElementById("ButtonSaveAllNotesButton")?.click();
-        }
-    }
+    const hiddenInputRef = useRef<HTMLInputElement>(null);
 
 
     /**
@@ -101,11 +85,14 @@ export default function SaveAllNotesButton({...props}: Props) {
     return (
         <Button 
             className={`${className} hover`} 
-            title={props.disabled ? "No changes yet" : "Save all notes (Ctrl + Shift + S)"}
+            title={props.disabled ? "No changes yet" : "Save all notes"}
             onClickPromise={handleSave}
             {...otherProps}
         >
             <i className="fa-solid fa-floppy-disk me-2"></i> <span>Save all</span>
+
+            <HiddenInput ref={hiddenInputRef} />
+
             {children}
         </Button>
     )
