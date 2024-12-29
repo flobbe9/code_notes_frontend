@@ -123,8 +123,12 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         if (!noteEntity.noteInputs)
             return [];
 
-        return noteEntity.noteInputs.map(noteInputEntity =>
-            createNoteInputByNoteInputType(noteInputEntity));
+        return noteEntity.noteInputs.map((noteInputEntity, i) => {
+            // if (i >= 1)
+            //     return;
+
+            return createNoteInputByNoteInputType(noteInputEntity);
+        })
     }
 
 
@@ -327,7 +331,8 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
             return;
 
         let draggedNoteInputEntity = noteEntity.noteInputs[draggedNoteInputIndex],
-            draggedNoteInput = noteInputs[draggedNoteInputIndex];
+            draggedNoteInput = noteInputs[draggedNoteInputIndex],
+            fixedDraggedOverNoteInputIndex = draggedNoteInputIndex < dragOverNoteInputIndex ? dragOverNoteInputIndex : dragOverNoteInputIndex + 1;
 
         // case: index out of bounds, happens e.g. when dropping a noteInput from a different note
         if (!draggedNoteInputEntity || !draggedNoteInput) {
@@ -337,9 +342,9 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
         // reorder 
         noteEntity.noteInputs.splice(draggedNoteInputIndex, 1);
-        noteEntity.noteInputs.splice(dragOverNoteInputIndex + 1, 0, draggedNoteInputEntity);
+        noteEntity.noteInputs.splice(fixedDraggedOverNoteInputIndex, 0, draggedNoteInputEntity);
         noteInputs.splice(draggedNoteInputIndex, 1);
-        noteInputs.splice(dragOverNoteInputIndex + 1, 0, draggedNoteInput);
+        noteInputs.splice(fixedDraggedOverNoteInputIndex, 0, draggedNoteInput);
         setNoteInputs([...noteInputs]);
 
         noteEdited();
