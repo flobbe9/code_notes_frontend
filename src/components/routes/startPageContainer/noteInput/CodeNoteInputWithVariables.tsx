@@ -1,6 +1,6 @@
 import hljs from "highlight.js";
 import parse from 'html-react-parser';
-import React, { ClipboardEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { ClipboardEvent, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
@@ -8,7 +8,7 @@ import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInputWithVariables.scss";
 import "../../../../assets/styles/highlightJs/vs.css";
 import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
-import { animateAndCommit, cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
+import { animateAndCommit, cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, isEventKeyTakingUpSpace, log, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from "../../../App";
 import Button from "../../../helpers/Button";
@@ -491,7 +491,7 @@ export default function CodeNoteInputWithVariables({
     }
     
 
-    async function handleKeyDownCapture(event): Promise<void> {
+    async function handleKeyDownCapture(event: KeyboardEvent): Promise<void> {
 
         const keyName = event.key;
         
@@ -501,7 +501,7 @@ export default function CodeNoteInputWithVariables({
             noteEdited();
         }
 
-        if (isEventKeyTakingUpSpace(keyName) && !isControlKeyPressed())
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed() && !(event.target as HTMLElement).classList.contains("variableInput"))
             noteEdited();
     }
     
