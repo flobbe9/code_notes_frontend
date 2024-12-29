@@ -9,7 +9,6 @@ import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextHolder";
 import Button from "../../helpers/Button";
 import Login from "../Login";
-import { StartPageContainerContext } from "./StartPageContainer";
 
 
 interface Props extends ButtonProps {
@@ -22,9 +21,8 @@ interface Props extends ButtonProps {
  */
 export default function SaveAllNotesButton({...props}: Props) {
 
-    const { toast, showPopup, isKeyPressed } = useContext(AppContext);
+    const { toast, showPopup, isKeyPressed, editedNoteIds, setEditedNoteIds } = useContext(AppContext);
     const { noteEntities, setNoteEntities, isLoggedIn, fetchSaveAllNoteEntities } = useContext(AppFetchContext);
-    const { editedNoteIds, setEditedNoteIds } = useContext(StartPageContainerContext);
 
     const {className, children, ...otherProps} = getCleanDefaultProps(props, "SaveAllNotesButton", true);
 
@@ -35,6 +33,7 @@ export default function SaveAllNotesButton({...props}: Props) {
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         }
+        
     }, []);
 
 

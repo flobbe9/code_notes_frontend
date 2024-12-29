@@ -22,7 +22,7 @@ export default function NavBarProfileSection({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NavBarProfileSection", true);
 
-    const { isMobileWidth, hasAnyNoteBeenEdited } = useContext(AppContext);
+    const { isMobileWidth, editedNoteIds } = useContext(AppContext);
     const { isLoggedIn, isLoggedInUseQueryResult, logout } = useContext(AppFetchContext);
 
     
@@ -32,7 +32,7 @@ export default function NavBarProfileSection({...props}: Props) {
 
     async function handleLogout(): Promise<void> {
 
-        if (hasAnyNoteBeenEdited) {
+        if (editedNoteIds.size) {
             const doLogout = window.confirm("Delete unsaved changes and logout?");
             if (!doLogout)
                 return;

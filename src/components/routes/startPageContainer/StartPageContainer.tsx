@@ -1,8 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import DefaultProps from "../../../abstract/DefaultProps";
-import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, getHeadTitleText, isNumberFalsy, removeConfirmPageUnload } from "../../../helpers/utils";
+import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, getHeadTitleText, removeConfirmPageUnload } from "../../../helpers/utils";
 import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextHolder";
 import Flex from "../../helpers/Flex";
 import Head from "../../helpers/Head";
 import StartPageContent from "./StartPageContent";
@@ -30,11 +29,7 @@ export default function StartPageContainer({children, ...props}: Props) {
     /** List of tag entities inside ```<StartPageSideBarTagList>``` that are checked */
     const [selectedTagEntityNames, setSelectedTagEntityNames] = useState<Set<string>>(new Set());
 
-    /** List of note ids that have been edited since they were last saved. Remove a note id from this list, once the note gets saved */
-    const [editedNoteIds, setEditedNoteIds] = useState<Set<Number>>(new Set());
-
-    const { isMobileWidth, setHasAnyNoteBeenEdited, hasAnyNoteBeenEdited } = useContext(AppContext);
-    const { noteEntities } = useContext(AppFetchContext);
+    const { isMobileWidth, editedNoteIds } = useContext(AppContext);
 
     const context = {
         isShowSideBar, 
@@ -48,18 +43,9 @@ export default function StartPageContainer({children, ...props}: Props) {
 
         selectedTagEntityNames, 
         setSelectedTagEntityNames,
-
-        editedNoteIds,
-        setEditedNoteIds,
     }
 
 
-    useEffect(() => {
-        updateHasAnyNoteBeenEdited();
-        
-    }, [editedNoteIds, noteEntities]);
-    
-    
     useEffect(() => {
         addOrRemovePageUnloadEvent();
 
@@ -67,8 +53,8 @@ export default function StartPageContainer({children, ...props}: Props) {
             removeConfirmPageUnload(handlePageUnload);
         }
 
-    }, [hasAnyNoteBeenEdited])
-
+    }, [editedNoteIds]); 
+    
 
     /**
      * Simply toggle the ```isIsUpdateSideBarTagList``` state.
@@ -92,7 +78,7 @@ export default function StartPageContainer({children, ...props}: Props) {
 
     function addOrRemovePageUnloadEvent(): void {
 
-        if (hasAnyNoteBeenEdited) 
+        if (editedNoteIds.size) 
             confirmPageUnload(handlePageUnload); 
 
         else 
@@ -101,19 +87,8 @@ export default function StartPageContainer({children, ...props}: Props) {
     
 
     const handlePageUnload = useCallback((event: BeforeUnloadEvent) => {
-
         event.preventDefault();
     }, []);
-
-
-    function updateHasAnyNoteBeenEdited(): void {
-
-        const hasEditedNotes = !!editedNoteIds.size;
-
-        const hasNewNotes = !!noteEntities.find(noteEntity => isNumberFalsy(noteEntity.id));
-
-        setHasAnyNoteBeenEdited(hasEditedNotes || hasNewNotes);
-    }
 
 
     return (
@@ -148,7 +123,4 @@ export const StartPageContainerContext = createContext({
 
     selectedTagEntityNames: new Set() as Set<string>, 
     setSelectedTagEntityNames: (tagEntities: Set<string>) => {},
-
-    editedNoteIds: new Set<Number>(),
-    setEditedNoteIds: (editedNoteIds: Set<Number>) => {},
 });

@@ -54,8 +54,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     const [dragOverNoteInputIndex, setDragOverNoteInputIndex] = useState(NaN); // NOTE: don't use -1 as default
 
 
-    const { toast, showPopup } = useContext(AppContext);
-    const { editedNoteIds, setEditedNoteIds } = useContext(StartPageContainerContext);
+    const { toast, showPopup, editedNoteIds, setEditedNoteIds } = useContext(AppContext);
     const { 
         appUserEntity, 
         isLoggedIn,

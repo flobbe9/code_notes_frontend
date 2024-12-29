@@ -49,8 +49,8 @@ export default function App() {
     
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
-    /** Whether to prompt confirm on logout click, e.g. because there are unsaved changes */
-    const [hasAnyNoteBeenEdited, setHasAnyNoteBeenEdited] = useState(false);
+    /** List of note ids that have been edited since they were last saved. Remove a note id from this list, once the note gets saved */
+    const [editedNoteIds, setEditedNoteIds] = useState<Set<Number>>(new Set());
 
     const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress();
 
@@ -83,7 +83,8 @@ export default function App() {
         hidePopup,
         replacePopupContent,
 
-        hasAnyNoteBeenEdited, setHasAnyNoteBeenEdited
+        editedNoteIds,
+        setEditedNoteIds,
     }
 
     const toastRef = useRef<HTMLDivElement>(null);
@@ -508,6 +509,6 @@ export const AppContext = createContext({
     hidePopup: () => {},
     replacePopupContent: (content: ReactNode | undefined) => {},
 
-    hasAnyNoteBeenEdited: false as boolean, 
-    setHasAnyNoteBeenEdited: (isConfirm: boolean) => {}
+    editedNoteIds: new Set<Number>(),
+    setEditedNoteIds: (ids: Set<Number>) => {}
 });
