@@ -321,7 +321,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
                         onDragStart={handleDragStart} 
                         onDragEnd={handleDragEnd}
                     >
-                        <i className="fa-solid fa-grip fa-lg fa-rotate-90 px-1" title="Move section"></i>
+                        <i className="fa-solid fa-grip fa-lg fa-rotate-90 pe-1" title="Move section"></i>
                     </Flex>
 
                     <div className="DefaultNoteInput-content fullWidth">
