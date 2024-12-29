@@ -6,9 +6,14 @@
       "src": "img/favicon.ico",
       "sizes": "398x487",
       "type": "image/x-icon"
+    },
+    {
+      "src": "img/favicon.ico",
+      "sizes": "192x512",
+      "type": "image/x-icon"
     }
   ],
-  "start_url": ".",
+  "start_url": "https://code-notes.net",
   "display": "standalone",
   "theme_color": "#313131",
   "background_color": "#ffffff"
