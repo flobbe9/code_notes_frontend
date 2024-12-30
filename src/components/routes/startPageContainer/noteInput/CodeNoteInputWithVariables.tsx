@@ -8,7 +8,7 @@ import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInputWithVariables.scss";
 import "../../../../assets/styles/highlightJs/vs.css";
 import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
-import { animateAndCommit, cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, isEventKeyTakingUpSpace, log, setClipboardText } from "../../../../helpers/utils";
+import { animateAndCommit, cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from "../../../App";
 import Button from "../../../helpers/Button";
@@ -178,7 +178,7 @@ export default function CodeNoteInputWithVariables({
 
         setIsNoteInputOverlayVisible(false);
 
-        updateAppUserEntity();
+        updateNoteInputEntity();
 
         return highlightPromise;
     }
@@ -460,7 +460,7 @@ export default function CodeNoteInputWithVariables({
     /**
      * Set all noteInputEntity fields for this noteInput.
      */
-    function updateAppUserEntity(): void {
+    function updateNoteInputEntity(): void {
 
         // value
         noteInputEntity.value = inputDivRef.current!.innerHTML;
@@ -627,7 +627,7 @@ export default function CodeNoteInputWithVariables({
 
         highlightInputDivContent();
 
-        updateAppUserEntity();
+        updateNoteInputEntity();
     }
 
 

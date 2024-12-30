@@ -174,7 +174,7 @@ export default function StartPageContent({...props}: Props) {
                 </Flex>
 
                 <Flex className="mt-2 mb-5" horizontalAlign="right">
-                    <SaveAllNotesButton disabled={!editedNoteIds.size} rendered={noteEntities.length > 1} />
+                    <SaveAllNotesButton className="mb-2" disabled={!editedNoteIds.size} rendered={noteEntities.length > 1} />
                     <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-4`} />
                 </Flex>
 

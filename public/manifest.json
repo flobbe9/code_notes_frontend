@@ -6,11 +6,6 @@
       "src": "img/favicon.ico",
       "sizes": "398x487",
       "type": "image/x-icon"
-    },
-    {
-      "src": "img/favicon.ico",
-      "sizes": "192x512",
-      "type": "image/x-icon"
     }
   ],
   "start_url": "https://code-notes.net",

@@ -15,7 +15,6 @@ import Confirm from "../../../helpers/Confirm";
 import Flex from "../../../helpers/Flex";
 import HelperDiv from "../../../helpers/HelperDiv";
 import Login from "../../Login";
-import { StartPageContainerContext } from "../StartPageContainer";
 import { StartPageContentContext } from "../StartPageContent";
 import AddNewNoteInput from "./AddNewNoteInput";
 import CodeNoteInput from "./CodeNoteInput";
@@ -379,34 +378,36 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
                     {/* NoteInputs */}
                     {noteInputs}
-                        
-                    <AddNewNoteInput className="mt-2 fullWidth" />
                 </div>
 
-                <Flex className="mt-4" horizontalAlign="right">
-                    {/* Delete */}
-                    <ButtonWithSlideLabel 
-                        className="me-4 transition deleteNoteButton" 
-                        label="Delete Note"
-                        labelClassName="ms-2"
-                        title="Delete note" 
-                        onClick={handleDeleteNoteClick}
-                    >
-                        <i className="fa-solid fa-trash"></i>
-                    </ButtonWithSlideLabel>
+                <Flex className="mt-2">
+                    <AddNewNoteInput className="col-12 col-xl-9" />
 
-                    {/* Save */}
-                    <ButtonWithSlideLabel 
-                        label="Save Note"
-                        labelClassName="ms-2"
-                        className="saveNoteButton saveNoteButton" 
-                        title="Save note"
-                        disabled={isSaveButtonDisabled()}
-                        ref={saveButtonRef}
-                        onClickPromise={handleSave}
-                    >
-                        <i className="fa-solid fa-floppy-disk"></i>
-                    </ButtonWithSlideLabel>
+                    {/* Delete */}
+                    <Flex className="col-12 col-xl-3 mt-2" horizontalAlign="right">
+                        <ButtonWithSlideLabel 
+                            className="transition deleteNoteButton" 
+                            label="Delete note"
+                            labelClassName="ms-2"
+                            title="Delete note" 
+                            onClick={handleDeleteNoteClick}
+                        >
+                            <i className="fa-solid fa-trash"></i>
+                        </ButtonWithSlideLabel>
+
+                        {/* Save */}
+                        <ButtonWithSlideLabel 
+                            className="saveNoteButton ms-2" 
+                            label="Save note"
+                            labelClassName="ms-2"
+                            title="Save note"
+                            disabled={isSaveButtonDisabled()}
+                            ref={saveButtonRef}
+                            onClickPromise={handleSave}
+                        >
+                            <i className="fa-solid fa-floppy-disk"></i>
+                        </ButtonWithSlideLabel>
+                    </Flex>
                 </Flex>
 
                 {children}

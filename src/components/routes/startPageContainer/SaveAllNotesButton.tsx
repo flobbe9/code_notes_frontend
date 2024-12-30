@@ -85,11 +85,11 @@ export default function SaveAllNotesButton({...props}: Props) {
     return (
         <Button 
             className={`${className} hover`} 
-            title={props.disabled ? "No changes yet" : "Save all notes"}
+            title={props.disabled ? "No changes yet" : "Save all edited notes"}
             onClickPromise={handleSave}
             {...otherProps}
         >
-            <i className="fa-solid fa-floppy-disk me-2"></i> <span>Save all</span>
+            <i className="fa-solid fa-floppy-disk me-2"></i> <span>Save all changes</span>
 
             <HiddenInput ref={hiddenInputRef} />
 

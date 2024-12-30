@@ -20,7 +20,8 @@ interface Props extends DefaultProps {
  */
 export default function NavBarProfileSection({...props}: Props) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NavBarProfileSection", true);
+    const componentName = "NavBarProfileSection";
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName, true);
 
     const { isMobileWidth, editedNoteIds } = useContext(AppContext);
     const { isLoggedIn, isLoggedInUseQueryResult, logout } = useContext(AppFetchContext);
@@ -52,8 +53,8 @@ export default function NavBarProfileSection({...props}: Props) {
             <HelperDiv rendered={isLoggedIn}>
                 {/* Logout */}
                 <ButtonWithSlideLabel
+                    className={`${componentName}-logoutButton`}
                     label="Logout"
-                    style={{color: "white"}}
                     onClickPromise={handleLogout}
                     title={"Logout"}
                 >
