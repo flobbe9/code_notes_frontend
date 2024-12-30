@@ -23,7 +23,7 @@ interface Props extends DefaultProps {
     /** No default styles in here */
     message?: string | JSX.Element | JSX.Element[],
 
-    /** Will render a checkbox and store confirm choice to localStorage. Not showing popup again is not handled here */
+    /** Will render a checkbox and store confirm choice to localStorage. Not showing popup again is not handled here. Default is ```false``` */
     rememberMyChoice?: boolean,
     /** Default is "Remember my choice" */
     rememberMyChoiceLabel?: string,
@@ -51,7 +51,7 @@ export default forwardRef(function Confirm(
         cancelLabel = "Cancel",
         heading,
         message,
-        rememberMyChoice,
+        rememberMyChoice = false,
         rememberMyChoiceLabel = "Remember my choice",
         rememberMyChoiceKey,
         focusConfirmOnRender = false,
@@ -147,7 +147,7 @@ export default forwardRef(function Confirm(
             </div>
 
             <div className="Confirm-footer">
-                <Flex className="mb-4 hover" verticalAlign="center">
+                <Flex className="mb-4 hover" verticalAlign="center" rendered={rememberMyChoice}>
                     {/* Remember my choice */}
                     <Checkbox 
                         className="Confirm-footer-rememberMyChoiceCheckbox me-2" 
