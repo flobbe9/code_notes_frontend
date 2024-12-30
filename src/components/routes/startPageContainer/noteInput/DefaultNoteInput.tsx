@@ -53,7 +53,8 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
         draggedNoteInputIndex,
         setDraggedNoteInputIndex,
         dragOverNoteInputIndex,
-        setDragOverNoteInputIndex
+        setDragOverNoteInputIndex,
+        setAreNoteInputsExpanded
     } = useContext(NoteContext);
 
     const context = {
@@ -135,13 +136,14 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
         // update app user
         noteEntity.noteInputs?.splice(noteInputEntityIndex, 1);
 
-        // update noteInputEntitys
-        const newNoteInputEntitys = noteInputs;
-        newNoteInputEntitys.splice(noteInputEntityIndex, 1);
-        setNoteInputs([...newNoteInputEntitys]);
+        const newNoteInputs = noteInputs;
+        newNoteInputs.splice(noteInputEntityIndex, 1);
+        setNoteInputs([...newNoteInputs]);
 
         // is visible if is fullscreen
         setIsAppOverlayVisible(false);
+
+        setAreNoteInputsExpanded(true);
 
         noteEdited();
     }

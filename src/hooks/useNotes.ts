@@ -69,10 +69,8 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         const url = `${BACKEND_BASE_URL}/note/get-all-by-appUser`;
 
         const jsonResponse = await fetchJson(url);
-
         if (isResponseError(jsonResponse)) {
             toast("Failed to load notes", DEFAULT_ERROR_MESSAGE, "error");
-
             return [];
         }
 

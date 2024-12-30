@@ -157,7 +157,7 @@ export default function StartPageContent({...props}: Props) {
                 style={style}
                 {...otherProps}
             >
-                <Flex className="mt-3" flexWrap="nowrap" verticalAlign="center">
+                <Flex className="mt-2 mb-4" flexWrap="nowrap" verticalAlign="center">
                     <SearchBar 
                         id="StartPage"
                         className="fullWidth" 
@@ -173,9 +173,9 @@ export default function StartPageContent({...props}: Props) {
                     />
                 </Flex>
 
-                <Flex className="mt-2 mb-5" horizontalAlign="right">
+                <Flex className="mt-2 mb-4" horizontalAlign="right">
                     <SaveAllNotesButton className="mb-2" disabled={!editedNoteIds.size} rendered={noteEntities.length > 1} />
-                    <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-4`} />
+                    <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-2`} />
                 </Flex>
 
                 {notes}
