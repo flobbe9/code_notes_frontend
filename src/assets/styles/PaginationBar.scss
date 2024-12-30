@@ -1,0 +1,17 @@
+.PaginationBar {
+    color: currentColor;
+
+    &-arrowButton {
+        padding: 0 20px;
+    }
+
+    &-numContainer {
+        .PageNumber {
+            padding: 0;
+
+            &-active {
+                font-weight: bold;
+            }
+        }
+    }
+}
