@@ -2,6 +2,13 @@
 
 
 .NavBarProfileSection {
+    $buttonBorderWidth: 1px;
+
+    &-logoutButton {
+        border: $buttonBorderWidth solid transparent;
+        color: white;
+    }
+
     &-registerLink {
         @include customHover {
             .NavBarProfileSection-registerLink-button {
@@ -11,7 +18,7 @@
 
         &-button {
             background-color: transparent;
-            border: 1px solid white;
+            border: $buttonBorderWidth solid white;
             border-radius: 5px;
             color: white;
         }

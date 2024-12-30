@@ -1,4 +1,4 @@
-import React, { forwardRef, MouseEvent, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/ButtonWithSlideLabel.scss";
@@ -43,10 +43,10 @@ export default forwardRef(function ButtonWithSlideLabel(
     useEffect(() => {
         setTimeout(() => setInitialNoteInputButtonLabelWidth(getNoteInputButtonLabelWidth()), 200); // wait for adjacent elements to render as well
         
-    }, []);
+    }, [label]);
 
 
-    function handleMouseEnter(event: MouseEvent): void {
+    function slideExpand(): void {
 
         // case: initial width not set yet
         if (!initialNoteInputButtonLabelWidth)
@@ -67,7 +67,7 @@ export default forwardRef(function ButtonWithSlideLabel(
     }
 
 
-    function handleMouseLeave(event): void {
+    function slideCollapse(): void {
 
         animateAndCommit(
             labelContainerRef.current!,
@@ -106,8 +106,10 @@ export default forwardRef(function ButtonWithSlideLabel(
             className={className} 
             style={style}
             title={title}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            onMouseEnter={slideExpand}
+            onMouseLeave={slideCollapse}
+            onFocus={slideExpand}
+            onBlur={slideCollapse}
             onClickPromise={onClickPromise}
             ref={componentRef}
             {...otherProps}

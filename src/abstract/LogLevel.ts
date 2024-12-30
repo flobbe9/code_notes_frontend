@@ -15,6 +15,7 @@ const logLevelDef = {
     "DEBUG": 3,
 }
 
+
 export type LogLevelName = keyof typeof logLevelDef;
 
 

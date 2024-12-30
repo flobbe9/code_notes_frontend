@@ -35,7 +35,7 @@ export default function StartPageContent({...props}: Props) {
     const [noteSearchValue, setNoteSearchValue] = useState("");
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[]>([]);
     
-    const { isKeyPressed, hasAnyNoteBeenEdited } = useContext(AppContext);
+    const { isKeyPressed, editedNoteIds } = useContext(AppContext);
     const { noteEntities, isFetchNoteEntitiesTakingLonger, noteUseQueryResult, gotNewNoteEntities } = useContext(AppFetchContext);
     const { selectedTagEntityNames } = useContext(StartPageContainerContext);
     const searchNoteHelper = new SearchNoteHelper(noteEntities, selectedTagEntityNames);
@@ -91,6 +91,15 @@ export default function StartPageContent({...props}: Props) {
         if (!noteEntities || !noteEntities.length)
             return [];
 
+        // const notes: JSX.Element[] = [];
+        // noteEntities
+        //     .forEach((noteEntity, i) => {
+        //         if (i >= 5)
+        //             return;
+        //         notes.push(createNoteByNoteEntity(noteEntity));
+        //     })
+
+        // return notes;
         return noteEntities.map(noteEntity => 
             createNoteByNoteEntity(noteEntity));
     }
@@ -148,7 +157,7 @@ export default function StartPageContent({...props}: Props) {
                 style={style}
                 {...otherProps}
             >
-                <Flex className="mt-3" flexWrap="nowrap" verticalAlign="center">
+                <Flex className="mt-2 mb-4" flexWrap="nowrap" verticalAlign="center">
                     <SearchBar 
                         id="StartPage"
                         className="fullWidth" 
@@ -164,9 +173,9 @@ export default function StartPageContent({...props}: Props) {
                     />
                 </Flex>
 
-                <Flex className="mt-2 mb-5" horizontalAlign="right">
-                    <SaveAllNotesButton disabled={!hasAnyNoteBeenEdited} rendered={noteEntities.length > 1} />
-                    <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-4`} />
+                <Flex className="mt-2 mb-4" horizontalAlign="right">
+                    <SaveAllNotesButton className="mb-2" disabled={!editedNoteIds.size} rendered={noteEntities.length > 1} />
+                    <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-2`} />
                 </Flex>
 
                 {notes}

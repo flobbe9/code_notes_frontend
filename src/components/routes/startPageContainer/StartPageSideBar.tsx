@@ -167,7 +167,8 @@ export default function StartPageSideBar({...props}: Props) {
                     {/* Fixed sidebar part*/}
                     <div className="toolBar">
                         <Button className="toolBarToggleButton hover" onClick={toggleTagFilterContainer}>
-                            <i className="fa-solid fa-bars fa-xl" title="Side bar (Ctrl + B)"></i>
+                            {/* <i className="fa-solid fa-bars fa-xl" title="Side bar (Ctrl + B)"></i> */}
+                            <i className="fa-solid fa-filter fa-xl" title="Filter by tags (Ctrl + B)"></i>
                         </Button>
                     </div>
 

@@ -1,6 +1,6 @@
 import hljs from "highlight.js";
 import parse from 'html-react-parser';
-import React, { ClipboardEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { ClipboardEvent, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
@@ -178,7 +178,7 @@ export default function CodeNoteInputWithVariables({
 
         setIsNoteInputOverlayVisible(false);
 
-        updateAppUserEntity();
+        updateNoteInputEntity();
 
         return highlightPromise;
     }
@@ -460,7 +460,7 @@ export default function CodeNoteInputWithVariables({
     /**
      * Set all noteInputEntity fields for this noteInput.
      */
-    function updateAppUserEntity(): void {
+    function updateNoteInputEntity(): void {
 
         // value
         noteInputEntity.value = inputDivRef.current!.innerHTML;
@@ -491,7 +491,7 @@ export default function CodeNoteInputWithVariables({
     }
     
 
-    async function handleKeyDownCapture(event): Promise<void> {
+    async function handleKeyDownCapture(event: KeyboardEvent): Promise<void> {
 
         const keyName = event.key;
         
@@ -501,7 +501,7 @@ export default function CodeNoteInputWithVariables({
             noteEdited();
         }
 
-        if (isEventKeyTakingUpSpace(keyName) && !isControlKeyPressed())
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed() && !(event.target as HTMLElement).classList.contains("variableInput"))
             noteEdited();
     }
     
@@ -627,7 +627,7 @@ export default function CodeNoteInputWithVariables({
 
         highlightInputDivContent();
 
-        updateAppUserEntity();
+        updateNoteInputEntity();
     }
 
 

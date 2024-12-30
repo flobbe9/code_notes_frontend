@@ -22,7 +22,7 @@
         section {
             background-color: var(--matteBlack);
             color: white;
-
+            
             .vsCodeEditor {
                 margin: 3px 0;
                 
@@ -30,20 +30,20 @@
                     background-color: var(--matteBlack);
                     padding: 0 var(--noteInputPaddingX);
                     transition: background-color var(--transitionTime), width var(--transitionTime);
-
+                    
                     // line number container
                     .margin {
                         display: none;
                     }
-
+                    
                     .monaco-scrollable-element {
                         left: var(--noteInputPaddingX) !important;
-
+                        
                         .decorationsOverviewRuler {
                             display: none !important;
-
+                            
                         }
-
+                        
                         .iPadShowKeyboard {
                             display: none;
                         }
@@ -54,13 +54,13 @@
                         
                         .lines-content {
                             background-color: var(--matteBlack);
-
+                            transition: background-color var(--transitionTime);
+                            
                             // line container
                             .view-lines {
                                 padding: 0 var(--noteInputPaddingX);
-                                transition: background-color var(--transitionTime);
                                 width: var(--fullEditorWidth) !important;
-
+                                
                                 // line
                                 .view-line {
                                 }

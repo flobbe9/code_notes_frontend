@@ -20,9 +20,10 @@ interface Props extends DefaultProps {
  */
 export default function NavBarProfileSection({...props}: Props) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NavBarProfileSection", true);
+    const componentName = "NavBarProfileSection";
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName, true);
 
-    const { isMobileWidth, hasAnyNoteBeenEdited } = useContext(AppContext);
+    const { isMobileWidth, editedNoteIds } = useContext(AppContext);
     const { isLoggedIn, isLoggedInUseQueryResult, logout } = useContext(AppFetchContext);
 
     
@@ -32,7 +33,7 @@ export default function NavBarProfileSection({...props}: Props) {
 
     async function handleLogout(): Promise<void> {
 
-        if (hasAnyNoteBeenEdited) {
+        if (editedNoteIds.size) {
             const doLogout = window.confirm("Delete unsaved changes and logout?");
             if (!doLogout)
                 return;
@@ -52,8 +53,8 @@ export default function NavBarProfileSection({...props}: Props) {
             <HelperDiv rendered={isLoggedIn}>
                 {/* Logout */}
                 <ButtonWithSlideLabel
+                    className={`${componentName}-logoutButton`}
                     label="Logout"
-                    style={{color: "white"}}
                     onClickPromise={handleLogout}
                     title={"Logout"}
                 >

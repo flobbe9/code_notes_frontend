@@ -1,4 +1,5 @@
-import { Editor } from "@monaco-editor/react";
+import { Editor, Monaco } from "@monaco-editor/react";
+import { editor } from "monaco-editor";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
@@ -371,7 +372,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     }
 
 
-    function handleEditorMount(editor, monaco): void {
+    function handleEditorMount(editor: editor.IStandaloneCodeEditor, monaco: Monaco): void {
 
         // assign ref
         (editorRef.current as any) = editor;

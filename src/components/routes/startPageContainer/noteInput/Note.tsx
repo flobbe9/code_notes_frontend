@@ -6,7 +6,7 @@ import { NoteEntityService } from "../../../../abstract/services/NoteEntityServi
 import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString, handleRememberMyChoice, isNumberFalsy, log, logError, logWarn, shortenString } from '../../../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, handleRememberMyChoice, isNumberFalsy, logError, logWarn, shortenString } from '../../../../helpers/utils';
 import { useHasComponentMounted } from "../../../../hooks/useHasComponentMounted";
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
@@ -15,7 +15,6 @@ import Confirm from "../../../helpers/Confirm";
 import Flex from "../../../helpers/Flex";
 import HelperDiv from "../../../helpers/HelperDiv";
 import Login from "../../Login";
-import { StartPageContainerContext } from "../StartPageContainer";
 import { StartPageContentContext } from "../StartPageContent";
 import AddNewNoteInput from "./AddNewNoteInput";
 import CodeNoteInput from "./CodeNoteInput";
@@ -43,19 +42,23 @@ interface Props extends DefaultProps {
  */
 export default function Note({propsKey, focusOnRender = false, ...props}: Props) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Note");
+    const componentName = "Note";
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName);
+
+    const numInitialNoteInputs = 1;
 
     const [noteEntity, setNoteEntity] = useState(NoteEntityService.getDefaultInstance());
     const [isNoteInSearchResults, setIsNoteInSearchResults] = useState(true);
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
+
+    const [areNoteInputsExpanded, setAreNoteInputsExpanded] = useState(false);
 
     const [draggedNoteInputIndex, setDraggedNoteInputIndex] = useState(NaN);
     /** Index of the noteInput, the mouse is currently hovering over while dragging another noteInput */
     const [dragOverNoteInputIndex, setDragOverNoteInputIndex] = useState(NaN); // NOTE: don't use -1 as default
 
 
-    const { toast, showPopup } = useContext(AppContext);
-    const { editedNoteIds, setEditedNoteIds } = useContext(StartPageContainerContext);
+    const { toast, showPopup, editedNoteIds, setEditedNoteIds } = useContext(AppContext);
     const { 
         appUserEntity, 
         isLoggedIn,
@@ -85,7 +88,9 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         dragOverNoteInputIndex, 
         setDragOverNoteInputIndex,
 
-        noteEdited
+        noteEdited,
+
+        setAreNoteInputsExpanded
     }
 
     const hasComponentMounted = useHasComponentMounted();
@@ -96,6 +101,12 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
             setNoteInputs(mapNoteInputsToJsx());
         
     }, [noteEntity]);
+
+
+    useEffect(() => {
+        setNoteInputs(mapNoteInputsToJsx());
+        
+    }, [areNoteInputsExpanded])
     
 
     useEffect(() => {
@@ -123,14 +134,21 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         if (!noteEntity.noteInputs)
             return [];
 
-        return noteEntity.noteInputs.map(noteInputEntity =>
-            createNoteInputByNoteInputType(noteInputEntity));
+        const noteInputs: JSX.Element[] = [];
+        for (let i = 0; i < noteEntity.noteInputs.length; i++) {
+            if (i === numInitialNoteInputs && !areNoteInputsExpanded)
+                break;
+
+            noteInputs.push(createNoteInputByNoteInputType(noteEntity.noteInputs[i]));
+        }
+
+        return noteInputs;
     }
 
 
-    function createNoteInputByNoteInputType(noteInputEntity: NoteInputEntity, focusOnRender?): JSX.Element {
+    function createNoteInputByNoteInputType(noteInputEntity: NoteInputEntity, focusOnRender?: boolean): JSX.Element {
 
-        const key = getRandomString();
+        const key = noteInputEntity.id ? noteInputEntity.id + "" : getRandomString();
         switch (noteInputEntity.type) {
             case "PLAIN_TEXT":
                 return (
@@ -327,7 +345,8 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
             return;
 
         let draggedNoteInputEntity = noteEntity.noteInputs[draggedNoteInputIndex],
-            draggedNoteInput = noteInputs[draggedNoteInputIndex];
+            draggedNoteInput = noteInputs[draggedNoteInputIndex],
+            fixedDraggedOverNoteInputIndex = draggedNoteInputIndex < dragOverNoteInputIndex ? dragOverNoteInputIndex : dragOverNoteInputIndex + 1;
 
         // case: index out of bounds, happens e.g. when dropping a noteInput from a different note
         if (!draggedNoteInputEntity || !draggedNoteInput) {
@@ -337,9 +356,9 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
         // reorder 
         noteEntity.noteInputs.splice(draggedNoteInputIndex, 1);
-        noteEntity.noteInputs.splice(dragOverNoteInputIndex + 1, 0, draggedNoteInputEntity);
+        noteEntity.noteInputs.splice(fixedDraggedOverNoteInputIndex, 0, draggedNoteInputEntity);
         noteInputs.splice(draggedNoteInputIndex, 1);
-        noteInputs.splice(dragOverNoteInputIndex + 1, 0, draggedNoteInput);
+        noteInputs.splice(fixedDraggedOverNoteInputIndex, 0, draggedNoteInput);
         setNoteInputs([...noteInputs]);
 
         noteEdited();
@@ -350,22 +369,22 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         <NoteContext.Provider value={context}>
             <HelperDiv 
                 id={id} 
-                className={className}
+                className={`${className}`}
                 style={style}
                 ref={componentRef}
                 rendered={isNoteInSearchResults}
                 {...otherProps}
             >
                 <div 
-                    className="contentContainer"
                     ref={contentContainerRef}
                     onDrop={handleDrop}
                     onDragOver={(e) => e.preventDefault()}
                 >
-                    <Flex className="fullWidth pb-4" flexWrap="nowrap" onDragEnter={(e) => {
-                        log("top drag over")
-                        setDragOverNoteInputIndex(-1);
-                    }}>
+                    <Flex 
+                        className="fullWidth pb-4" 
+                        flexWrap="nowrap" 
+                        onDragEnter={() => setDragOverNoteInputIndex(-1)}
+                    >
                         {/* Title */}
                         <NoteTitle className="me-1 col-6" ref={titleInputRef} />
 
@@ -375,34 +394,53 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
                     {/* NoteInputs */}
                     {noteInputs}
-                        
-                    <AddNewNoteInput className="mt-2 fullWidth" />
                 </div>
 
-                <Flex className="mt-4" horizontalAlign="right">
-                    {/* Delete */}
-                    <ButtonWithSlideLabel 
-                        className="me-4 transition deleteNoteButton" 
-                        label="Delete Note"
-                        labelClassName="ms-2"
-                        title="Delete note" 
-                        onClick={handleDeleteNoteClick}
+                {/* Show all */}
+                <Flex horizontalAlign="center">
+                    <ButtonWithSlideLabel
+                        className={`${componentName}-showAllButton mb-2`}
+                        rendered={(noteEntity.noteInputs || []).length > numInitialNoteInputs}
+                        label={areNoteInputsExpanded ? "Show less" : "Show all"}
+                        title={areNoteInputsExpanded ? "Show less sections" : "Show all sections"}
+                        onClick={() => setAreNoteInputsExpanded(!areNoteInputsExpanded)}
                     >
-                        <i className="fa-solid fa-trash"></i>
+                        <i className={`${componentName}-showAllButton-arrowIcon fa-solid fa-chevron-down ${areNoteInputsExpanded && 'rotate180'}`}></i>
                     </ButtonWithSlideLabel>
+                </Flex>
 
-                    {/* Save */}
-                    <ButtonWithSlideLabel 
-                        label="Save Note"
-                        labelClassName="ms-2"
-                        className="saveNoteButton saveNoteButton" 
-                        title="Save note"
-                        disabled={isSaveButtonDisabled()}
-                        ref={saveButtonRef}
-                        onClickPromise={handleSave}
-                    >
-                        <i className="fa-solid fa-floppy-disk"></i>
-                    </ButtonWithSlideLabel>
+                <Flex className="mt-2">
+                    {/* Add note input */}
+                    <AddNewNoteInput 
+                        className="col-12 col-xl-9" 
+                        onClick={() => setAreNoteInputsExpanded(true)}
+                    />
+
+                    {/* Delete */}
+                    <Flex className="col-12 col-xl-3 mt-2" horizontalAlign="right">
+                        <ButtonWithSlideLabel 
+                            className="transition deleteNoteButton" 
+                            label="Delete note"
+                            labelClassName="ms-2"
+                            title="Delete note" 
+                            onClick={handleDeleteNoteClick}
+                        >
+                            <i className="fa-solid fa-trash"></i>
+                        </ButtonWithSlideLabel>
+
+                        {/* Save */}
+                        <ButtonWithSlideLabel 
+                            className="saveNoteButton ms-2" 
+                            label="Save note"
+                            labelClassName="ms-2"
+                            title="Save note"
+                            disabled={isSaveButtonDisabled()}
+                            ref={saveButtonRef}
+                            onClickPromise={handleSave}
+                        >
+                            <i className="fa-solid fa-floppy-disk"></i>
+                        </ButtonWithSlideLabel>
+                    </Flex>
                 </Flex>
 
                 {children}
@@ -428,5 +466,7 @@ export const NoteContext = createContext({
     /**
      * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```
      */
-    noteEdited: (edited = true) => {}
+    noteEdited: (edited = true) => {},
+
+    setAreNoteInputsExpanded: (expanded: boolean) => {}
 })
