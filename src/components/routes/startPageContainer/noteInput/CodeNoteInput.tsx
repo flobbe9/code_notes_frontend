@@ -405,6 +405,8 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         defaultCodeNoteInput.style.position = "fixed"; // hardcoded in css
         defaultCodeNoteInput.style.zIndex = appOverlayZIndex + 1;
         defaultCodeNoteInput.style.width = "90vw";
+        // center
+        defaultCodeNoteInput.style.left = "5vw";
         editor.style.width = "100%";
         updateFullEditorWidth();
         
@@ -432,7 +434,8 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         defaultCodeNoteInput.style.width = "100%";
         updateFullEditorWidth();
         updateActualEditorWidth();
-
+        
+        defaultCodeNoteInput.style.left = "auto";
         editor.style.height = editorHeight + "px";
         editor.style.width = (isShowNoteInputSettings ? editorWidth : fullEditorWidth) + "px";
 

@@ -569,6 +569,8 @@ export default function CodeNoteInputWithVariables({
         defaultCodeNoteInput.style.position = "fixed";
         defaultCodeNoteInput.style.zIndex = appOverlayZIndex + 1;
         defaultCodeNoteInput.style.width = "90vw";
+        // center
+        defaultCodeNoteInput.style.left = "5vw";
 
         animateAndCommit(
             defaultCodeNoteInput,
@@ -598,7 +600,8 @@ export default function CodeNoteInputWithVariables({
         
         // resize quickly
         defaultCodeNoteInput.style.width = "100%";
-
+        
+        defaultCodeNoteInput.style.left = "auto";
         inputDivContainer.style.height = "100%";
         inputDiv.style.maxHeight = "var(--codeNoteInputWithVariablesMinHeight)";
 
