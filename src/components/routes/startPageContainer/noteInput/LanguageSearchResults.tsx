@@ -2,7 +2,7 @@ import React, { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
 import "../../../../assets/styles/LanguageSearchResults.scss";
-import { logWarn, toUpperCaseFirstChar } from "../../../../helpers/utils";
+import { logWarn, slideDown, slideUp, toUpperCaseFirstChar } from "../../../../helpers/utils";
 import HelperDiv from "../../../helpers/HelperDiv";
 import HiddenInput from "../../../helpers/HiddenInput";
 
@@ -19,7 +19,9 @@ interface Props extends HelperProps {
 
 
 /**
- * @since latest
+ * Hidden by default. Toggle by updating ```rendered``` state.
+ * 
+ * @since 0.0.1
  */
 export default function LanguageSearchResults({
     rendered = false,
@@ -35,6 +37,15 @@ export default function LanguageSearchResults({
 
     const componentRef = useRef<HTMLDivElement>(null);
     const hiddenCheckboxRef = useRef<HTMLInputElement>(null);
+
+
+    useEffect(() => {
+        if (rendered)
+            slideDown(componentRef.current!);
+        else
+            slideUp(componentRef.current!);
+
+    }, [rendered]);
 
 
     useEffect(() => {
@@ -56,14 +67,14 @@ export default function LanguageSearchResults({
     }
 
 
-    function handleSearchResultBlur(event): void {
+    function handleSearchResultBlur(): void {
 
         if (!isArrowKeyPressed())
             setShowLanguageSearchResults(false);
     }
 
 
-    function handleSearchResultKeyDown(event, searchResult: string): void {
+    function handleSearchResultKeyDown(event: KeyboardEvent, searchResult: string): void {
 
         // toggle checkbox
         const keyName = event.key;
@@ -79,7 +90,7 @@ export default function LanguageSearchResults({
     }
 
 
-    function handleSearchResultKeyUp(event): void {
+    function handleSearchResultKeyUp(): void {
 
         setArrowKeyPressed(false);
     }
@@ -113,7 +124,7 @@ export default function LanguageSearchResults({
     }
 
 
-    function handleSearchResultMouseDown(event, searchResult: string): void {
+    function handleSearchResultMouseDown(searchResult: string): void {
 
         handleSelect(searchResult);
     }
@@ -148,7 +159,7 @@ export default function LanguageSearchResults({
                 onKeyUp={handleSearchResultKeyUp}
                 onFocus={handleSearchResultFocus}
                 onBlur={handleSearchResultBlur}
-                onMouseDown={(event) => handleSearchResultMouseDown(event, upperCaseSearchResult)}
+                onMouseDown={() => handleSearchResultMouseDown(upperCaseSearchResult)}
                 onChange={() => {}} // prevent console error
             />
         })
@@ -200,7 +211,7 @@ export default function LanguageSearchResults({
             className={className}
             style={style}
             ref={componentRef}
-            rendered={rendered}
+            // rendered={rendered}
             {...otherProps}
         >
             {searchResultElements}

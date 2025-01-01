@@ -2,7 +2,7 @@ import React, { createContext, Fragment, useContext, useEffect, useState } from 
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import "../../../assets/styles/PaginationBar.scss";
-import { isNumberFalsy, logError } from "../../../helpers/utils";
+import { isNumberFalsy } from "../../../helpers/utils";
 import { AppContext } from "../../App";
 import Button from "../../helpers/Button";
 import Flex from "../../helpers/Flex";
@@ -136,11 +136,10 @@ export default function PaginationBar({
             currentPage < 1 ||
             totalPages < currentPage;
 
-        if (isInvalid)
-            logError(`Failed to render PaginationBar. Invalid props (total, current): ${totalPages}, ${currentPage}`);
+        // if (isInvalid)
+        //     logDebug(`Failed to render PaginationBar. Invalid props (totalPages, currentPage): ${totalPages}, ${currentPage}`);
 
         return !isInvalid;
-
     }
 
 
@@ -213,7 +212,6 @@ export default function PaginationBar({
     }
 
 
-
     return (
         <PaginationBarContext.Provider value={context}>
             <Flex 
@@ -224,7 +222,12 @@ export default function PaginationBar({
                 {...otherProps}
             >
                 {/* Left Arrow */}
-                <Button className={`${componentName}-arrowButton hoverStrong`} disabled={currentPage === 1} onClick={goToPrevPage}>
+                <Button 
+                    className={`${componentName}-arrowButton hoverStrong`}
+                    disabled={currentPage === 1} 
+                    title={currentPage === 1 ? "" : "Previous page"}
+                    onClick={goToPrevPage}
+                >
                     <i className={`fa-solid fa-chevron-left`}></i>
                 </Button>
 
@@ -241,7 +244,12 @@ export default function PaginationBar({
                 </Flex>
 
                 {/* Right Arrow */}
-                <Button className={`${componentName}-arrowButton hoverStrong`} disabled={currentPage === totalPages} onClick={goToNextPage}>
+                <Button 
+                    className={`${componentName}-arrowButton hoverStrong`} 
+                    disabled={currentPage === totalPages} 
+                    title={currentPage === totalPages ? "" : "Next page"}
+                    onClick={goToNextPage}
+                >
                     <i className={`fa-solid fa-chevron-right`}></i>
                 </Button>
 

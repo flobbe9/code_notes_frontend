@@ -6,8 +6,7 @@ import { NoteEntityService } from "../../../../abstract/services/NoteEntityServi
 import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
-import { getJsxElementIndexByKey, getRandomString, handleRememberMyChoice, isNumberFalsy, log, logError, logWarn, shortenString } from '../../../../helpers/utils';
-import { useHasComponentMounted } from "../../../../hooks/useHasComponentMounted";
+import { getJsxElementIndexByKey, getRandomString, handleRememberMyChoice, isNumberFalsy, logError, logWarn, shortenString } from '../../../../helpers/utils';
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
@@ -48,7 +47,6 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     const numInitialNoteInputs = 1;
 
     const [noteEntity, setNoteEntity] = useState(NoteEntityService.getDefaultInstance());
-    const [isNoteInSearchResults, setIsNoteInSearchResults] = useState(true);
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
     const [areNoteInputsExpanded, setAreNoteInputsExpanded] = useState(false);
@@ -69,8 +67,9 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         setNoteEntities, 
         fetchSaveNoteEntity, 
         fetchDeleteNoteEntity,
+        noteUseQueryResult
     } = useContext(AppFetchContext);
-    const { noteSearchResults, notes, setNotes } = useContext(StartPageContentContext);
+    const { notes, setNotes } = useContext(StartPageContentContext);
 
     const componentRef = useRef<HTMLDivElement>(null);
     const titleInputRef = useRef<HTMLInputElement>(null);
@@ -94,8 +93,6 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
         setAreNoteInputsExpanded,
     }
-
-    const hasComponentMounted = useHasComponentMounted();
     
 
     useEffect(() => {
@@ -122,13 +119,6 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         handleAppendNoteInput();
 
     }, [noteEntity.noteInputs]);
-    
-    
-    useEffect(() => {
-        if (hasComponentMounted)
-            setIsNoteInSearchResults(noteSearchResults.includes(noteEntity));
-        
-    }, [noteSearchResults]);
 
     
     useEffect(() => {
@@ -220,10 +210,15 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
             return;
         }
 
-        // update saved note in state, update sidebar
-        const noteIndex = getJsxElementIndexByKey(notes, propsKey);
-        noteEntities.splice(noteIndex, 1, jsonResponse);
-        setNoteEntities([...noteEntities]);
+        // case: there's other unsaved notes
+        if (editedNoteIds.size > 1) {
+            const noteIndex = getJsxElementIndexByKey(notes, propsKey);
+            noteEntities.splice(noteIndex, 1, jsonResponse);
+            setNoteEntities([...noteEntities]);
+
+        // case: no unsaved notes anymore
+        } else
+            noteUseQueryResult.refetch();
 
         noteEdited(false);
 
@@ -271,13 +266,18 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
 
-        // update note entities
-        noteEntities.splice(noteIndex, 1);
-        setNoteEntities([...noteEntities]);
+        // case: no unsaved notes or this one is the only unsaved note
+        if (!editedNoteIds.size || (editedNoteIds.size === 1 && editedNoteIds.has(noteEntity.id || -1)))
+            noteUseQueryResult.refetch();
 
-        // update notes
-        notes.splice(noteIndex, 1);
-        setNotes([...notes]);
+        // case: got more unsaved notes
+        else {
+            noteEntities.splice(noteIndex, 1);
+            setNoteEntities([...noteEntities]);
+            
+            notes.splice(noteIndex, 1);
+            setNotes([...notes]);
+        } 
 
         noteEdited(false);
     }
@@ -405,7 +405,6 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
                 className={`${className}`}
                 style={style}
                 ref={componentRef}
-                rendered={isNoteInSearchResults}
                 {...otherProps}
             >
                 <div 

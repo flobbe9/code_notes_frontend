@@ -1,7 +1,7 @@
 import React, { createContext, Fragment, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PROTOCOL } from "../helpers/constants";
-import { replaceCurrentBrowserHistoryEntry } from "../helpers/utils";
+import { replaceCurrentBrowserHistoryEntry, scrollTop } from "../helpers/utils";
 import { AppContext } from "./App";
 
 
@@ -31,17 +31,6 @@ export default function RouteContextHolder({children}) {
         redirectWWW();
 
     }, [location]);
-
-
-    /**
-     * Apparently when navigating to a history entry, the scroll state is preserved despite this function call.
-     * 
-     * Only scroll to ```y=0```, leave x as it is
-     */
-    function scrollTop(): void {
-
-        window.scrollTo(window.scrollX, 0);
-    }
 
 
     /**

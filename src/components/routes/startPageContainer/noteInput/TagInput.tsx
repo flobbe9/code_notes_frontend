@@ -1,11 +1,11 @@
-import React, { ChangeEvent, FocusEvent, MouseEvent, useContext, useRef, useState } from "react";
+import React, { KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { TagEntity } from "../../../../abstract/entites/TagEntity";
 import { AppUserService } from "../../../../abstract/services/AppUserService";
 import { TagEntityService } from "../../../../abstract/services/TagEntityService";
 import "../../../../assets/styles/TagInput.scss";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../../../helpers/constants";
-import { isBlank, shortenString } from "../../../../helpers/utils";
+import { getJsxElementIndexByKey, isBlank, logWarn, shortenString } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
 import Button from "../../../helpers/Button";
@@ -17,8 +17,6 @@ import { NoteTagListContext } from "./NoteTagList";
 
 interface Props extends DefaultProps {
 
-    initialTagEntity: TagEntity,
-
     propsKey: string
 }
 
@@ -27,9 +25,9 @@ interface Props extends DefaultProps {
  * @parent ```<NoteTagList>```
  * @since 0.0.1
  */
-export default function TagInput({initialTagEntity, propsKey, ...props}: Props) {
+export default function TagInput({propsKey, ...props}: Props) {
 
-    const [tagEntity, setTagEntity] = useState<TagEntity>(initialTagEntity);
+    const [tagEntity, setTagEntity] = useState<TagEntity>(TagEntityService.getDefaultInstance());
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagInput");
 
@@ -48,12 +46,20 @@ export default function TagInput({initialTagEntity, propsKey, ...props}: Props) 
         removeTag,
         removeTagEntity, 
         getNumBlankTags,
-        tagElements,
+        tags,
         noteTagEntities
     } = useContext(NoteTagListContext);
 
 
-    function handleKeyDown(event): void {
+    useEffect(() => {
+        const tagEntity = getTagEntityFromState();
+        if (tagEntity)
+            setTagEntity(tagEntity);
+
+    }, []);
+
+
+    function handleKeyDown(event: KeyboardEvent): void {
 
         const keyName = event.key;
 
@@ -62,14 +68,14 @@ export default function TagInput({initialTagEntity, propsKey, ...props}: Props) 
     }
 
     
-    function handleEnterKey(event: React.KeyboardEvent<HTMLInputElement>): void {
+    function handleEnterKey(event: KeyboardEvent): void {
 
         event.preventDefault();
         inputRef.current!.blur();
     }
 
 
-    function handleChange(event: ChangeEvent): void {
+    function handleChange(): void {
 
         tagEntity.name = inputRef.current!.value;
 
@@ -79,10 +85,8 @@ export default function TagInput({initialTagEntity, propsKey, ...props}: Props) 
 
     /**
      * Mak sure only one empty tag input is present. Update sidebar tag list and ```appUserEntity.tags```.
-     * 
-     * @param event 
      */
-    function handleBlur(event: FocusEvent): void {
+    function handleBlur(): void {
         
         let numBlankTags = getNumBlankTags();
         
@@ -179,7 +183,7 @@ export default function TagInput({initialTagEntity, propsKey, ...props}: Props) 
 
     function isLastTagElement(): boolean {
 
-        return getTagElementIndex(propsKey) === tagElements.length - 1;
+        return getTagElementIndex(propsKey) === tags.length - 1;
     }
 
 
@@ -190,10 +194,10 @@ export default function TagInput({initialTagEntity, propsKey, ...props}: Props) 
      */
     function isTagElementContainedInNoteEntity(): boolean {
 
-        if (!tagElements?.length)
+        if (!tags?.length)
             return false;
 
-        return getTagElementIndex(propsKey) < tagElements.length - 1;
+        return getTagElementIndex(propsKey) < tags.length - 1;
     }
 
 
@@ -221,6 +225,30 @@ export default function TagInput({initialTagEntity, propsKey, ...props}: Props) 
         inputRef.current!.value = "";
 
         toast("Duplicate Tag", "This note already has a tag with the name '" + shortenString(tagValue) + "'.", "warn", 7000);     
+    }
+    
+
+    /**
+     * @returns the tagEntity from ```tagEntities``` state using this tags's current index in ```tags```
+     */
+    function getTagEntityFromState(): TagEntity | undefined {
+
+        // may happen on login / logout
+        if (!noteTagEntities?.length)
+            return;
+
+        const tagEntityIndex = getJsxElementIndexByKey(tags, propsKey);
+        if (tagEntityIndex === -1) {
+            logWarn("Cannot find tagEntity index");
+            return;
+        }
+
+        if (tagEntityIndex >= noteTagEntities.length) {
+            logWarn(`Tag entity index ${tagEntityIndex} out of bounds for 'noteTagEntities' length ${noteTagEntities.length}`);
+            return;
+        }
+
+        return noteTagEntities[tagEntityIndex];
     }
 
 

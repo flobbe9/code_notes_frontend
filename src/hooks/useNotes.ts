@@ -6,8 +6,9 @@ import { NoteEntity } from '../abstract/entites/NoteEntity';
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
-import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE } from "../helpers/constants";
+import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NUM_NOTES_PER_PAGE } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
+import { isNumberFalsy, log, logWarn, scrollTop } from "../helpers/utils";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 
 
@@ -16,10 +17,15 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
     const [noteEntities, setNoteEntities] = useState<NoteEntity[]>([]);
     /** Notes created prior to login, these will be set right after logging in and then added to the ```noteEntities``` */
     const [unsavedNotes, setUnsavedNotes] = useState<NoteEntity[]>([]);
-    /** Is a toggle state, meaning that the boolean does not reflect the states meaning. Is toggled everytime useQueryResult.data updates */
+    /** Global search results. Should be set to ```undefined``` if there's no search query */
+    const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[] | undefined>(undefined);
+    /** Is a toggle state, meaning that the boolean does not reflect the states meaning. Implies (on change) that new data has been fetched */
     const [gotNewData, setGotNewData] = useState(false);
 
-    const { toast } = useContext(AppContext);
+    /** 1-based */
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const { toast, setEditedNoteIds } = useContext(AppContext);
 
     const queryClient = useQueryClient();
 
@@ -37,12 +43,21 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
     
     useEffect(() => {
         if (useQueryResult.data && !unsavedNotes.length) {
-            setNoteEntities(useQueryResult.data);
+            setNoteEntities(getNoteEntitiesPage());
             // this is to notify the component to map all notes again
             setGotNewData(!gotNewData);
         }
 
-    }, [useQueryResult.data]);
+    }, [useQueryResult.data, noteSearchResults]);
+
+
+    useEffect(() => {
+        // page change will refetch forgetting unsaved changes
+        refetchNotesAndUpdateState();
+        setTimeout(() => scrollTop(), 10); // don't ask me
+        setEditedNoteIds(new Set());
+
+    }, [currentPage]);
 
 
     useEffect(() => {
@@ -75,6 +90,28 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         }
 
         return jsonResponse;
+    }
+
+
+    /**
+     * Refetch and update states regardless of whether the data has changed or not.
+     * 
+     * @returns fetched data, just like ```fetchNotes```
+     */
+    async function refetchNotesAndUpdateState(): Promise<NoteEntity[]> {
+        
+        if (!isLoggedIn || !appUserEntity)
+            return [];
+
+        const jsonResponse = await useQueryResult.refetch();
+
+        if (isResponseError(jsonResponse))
+            return useQueryResult.data;
+
+        setNoteEntities(getNoteEntitiesPage());
+        setGotNewData(!gotNewData);
+
+        return jsonResponse.data || [];
     }
 
 
@@ -176,7 +213,6 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
             if (isResponseError(jsonResponse))
                 return;
             
-            setNoteEntities([...jsonResponse, ...useQueryResult.data]);
             setUnsavedNotes([]);
             
             toast("Save all notes", "All new notes saved successfully", "success", 4000);
@@ -186,13 +222,49 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         setGotNewData(!gotNewData);
     }
 
+
+    /**
+     * Use either note serach results or fetched data.
+     * 
+     * @returns slice of ```useQueryResult.data``` depending on the current ```page``` and {@link NUM_NOTES_PER_PAGE}
+     */
+    function getNoteEntitiesPage(): NoteEntity[] {
+
+        let noteEntities = noteSearchResults;
+
+        // case: no search query
+        if (!noteEntities)
+            noteEntities = useQueryResult.data;
+
+        // case: no notes
+        if (!noteEntities || !noteEntities.length)
+            return [];
+
+        let cleanPage = currentPage;
+        
+        if (isNumberFalsy(currentPage) || currentPage < 1) {
+            logWarn("Invalid page. Using page 1 as fallback");
+            cleanPage = 1;
+        }
+
+        const startIndex = (cleanPage - 1) * NUM_NOTES_PER_PAGE;
+        const endIndex = startIndex + NUM_NOTES_PER_PAGE;
+
+        // case: invalid start index, this will work anyway but should not happen
+        if (startIndex < 0 || startIndex >= noteEntities.length)
+            logWarn(`'startIndex' ${startIndex} out of bounds for 'noteEntities' ${noteEntities.length}`);
+
+        return noteEntities.slice(startIndex, endIndex);
+    }
+
     
     return {
-        noteEntities,
-        setNoteEntities,
+        noteEntities, setNoteEntities,
+        noteSearchResults, setNoteSearchResults,
         useQueryResult,
         isFetchTakingLonger,
         gotNewData, setGotNewData,
+        currentPage, setCurrentPage,
 
         fetchSave,
         fetchSaveAll,

@@ -38,7 +38,7 @@ export default function PlainTextNoteInput({
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
     const { isControlKeyPressed } = useContext(AppContext);
-    const { noteEdited } = useContext(NoteContext);
+    const { noteEdited, noteInputs } = useContext(NoteContext);
     const { 
         isNoteInputOverlayVisible,
         setIsNoteInputOverlayVisible, 

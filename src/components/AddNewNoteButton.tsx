@@ -3,6 +3,7 @@ import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";
 import { isResponseError } from "../helpers/fetchUtils";
+import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import { StartPageContentContext } from "./routes/startPageContainer/StartPageContent";
@@ -18,8 +19,9 @@ interface Props extends HelperProps {
  */
 export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
-    const { noteEntities, setNoteEntities, isLoggedIn, fetchSaveNoteEntity } = useContext(AppFetchContext);
-    const { notes, setNotes, createNoteByNoteEntity } = useContext(StartPageContentContext)
+    const { editedNoteIds } = useContext(AppContext);
+    const { noteEntities, setNoteEntities, isLoggedIn, fetchSaveNoteEntity, noteUseQueryResult, noteSearchResults } = useContext(AppFetchContext);
+    const { notes, setNotes, createNoteByNoteEntity, setIsFocusFirstNote } = useContext(StartPageContentContext)
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteButton", true);
 
@@ -43,9 +45,15 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
             newNoteEntity = jsonResponse;
         }
 
-        setNoteEntities([newNoteEntity, ...noteEntities]);
+        if (editedNoteIds.size || noteSearchResults) {
+            // set focus first to true
+            setNoteEntities([newNoteEntity, ...noteEntities]);
+            setNotes([createNoteByNoteEntity(newNoteEntity), ...notes]);
+            
+        } else
+            noteUseQueryResult.refetch();
 
-        setNotes([createNoteByNoteEntity(newNoteEntity, true), ...notes]); // pass true
+        setIsFocusFirstNote(true);
     }
 
 

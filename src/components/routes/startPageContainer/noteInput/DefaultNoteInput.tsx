@@ -111,25 +111,26 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
     }, [dragOverNoteInputIndex])
 
 
-    function handleDeleteNote(event): void {
+    function handleDeleteNote(): void {
 
-        if (handleRememberMyChoice("deleteNoteInput", deleteNote))
+        if (handleRememberMyChoice("deleteNoteInput", deleteNoteInput))
             return;
 
         showPopup((
             <Confirm 
                 heading={<h3>Delete this section?</h3>}
                 message={`Are you sure you want to delete this section of the '${shortenString(noteEntity.title)}' note?`}
+                confirmLabel="Delete"
                 rememberMyChoice
                 rememberMyChoiceLabel="Don't ask again"
                 rememberMyChoiceKey="deleteNoteInput"
-                onConfirm={deleteNote}
+                onConfirm={deleteNoteInput}
             />
         ));
     }
 
 
-    function deleteNote(): void {
+    function deleteNoteInput(): void {
 
         const noteInputEntityIndex = getJsxElementIndexByKey(noteInputs, propsKey);
 
@@ -319,11 +320,12 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
                     <Flex 
                         className={`${componentName}-dragArea`} 
                         verticalAlign="center"
+                        title="Move section"
                         draggable 
                         onDragStart={handleDragStart} 
                         onDragEnd={handleDragEnd}
                     >
-                        <i className="fa-solid fa-grip fa-lg fa-rotate-90 pe-1" title="Move section"></i>
+                        <span className={`${componentName}-dragArea-dragIcon px-1`}>&#10303;</span>
                     </Flex>
 
                     <div className="DefaultNoteInput-content fullWidth">
