@@ -6,8 +6,9 @@ import "./../assets/styles/NavBarProfileSection.scss";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
-import HelperDiv from "./helpers/HelperDiv";
 import ButtonWithSlideLabel from "./helpers/ButtonWithSlideLabel";
+import Confirm from "./helpers/Confirm";
+import HelperDiv from "./helpers/HelperDiv";
 
 
 interface Props extends DefaultProps {
@@ -16,6 +17,10 @@ interface Props extends DefaultProps {
 
 
 /**
+ * Displays either the profile and logout button or a login and register button.
+ * 
+ * Displays a pending spinner while not sure if logged in or not.
+ * 
  * @since 0.0.1
  */
 export default function NavBarProfileSection({...props}: Props) {
@@ -23,23 +28,31 @@ export default function NavBarProfileSection({...props}: Props) {
     const componentName = "NavBarProfileSection";
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName, true);
 
-    const { isMobileWidth, editedNoteIds } = useContext(AppContext);
+    const { isMobileWidth, editedNoteIds, showPopup } = useContext(AppContext);
     const { isLoggedIn, isLoggedInUseQueryResult, logout } = useContext(AppFetchContext);
 
     
     if (!isLoggedInUseQueryResult.isFetched)
-        return <></>;
+        return <i className="fa-solid fa-circle-notch fa-lg rotating"></i>
 
 
-    async function handleLogout(): Promise<void> {
+    function handleLogout(): void {
 
         if (editedNoteIds.size) {
-            const doLogout = window.confirm("Delete unsaved changes and logout?");
-            if (!doLogout)
-                return;
-        }
-        
-        await logout();
+            showPopup(
+                <Confirm 
+                    heading={<h2>Discard unsaved changes?</h2>}
+                    message={"You have some unsaved notes. Your changes will be lost if you logout."}
+                    confirmLabel="Logout"
+                    rememberMyChoice
+                    rememberMyChoiceLabel="Don't ask again"
+                    rememberMyChoiceKey="discardChangesLogout"
+                    onConfirm={logout}
+                />
+            )
+            
+        } else 
+            logout();
     }
 
 
@@ -55,7 +68,7 @@ export default function NavBarProfileSection({...props}: Props) {
                 <ButtonWithSlideLabel
                     className={`${componentName}-logoutButton`}
                     label="Logout"
-                    onClickPromise={handleLogout}
+                    onClick={handleLogout}
                     title={"Logout"}
                 >
                     <i className="fa-solid fa-right-from-bracket mirrorX"></i>
