@@ -25,7 +25,7 @@ export default function NoteTagList({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteTagList");
 
-    const [tagElements, setTagElements] = useState<JSX.Element[]>([]);
+    const [tags, setTags] = useState<JSX.Element[]>([]);
 
     const componentRef = useRef<HTMLDivElement>(null);
 
@@ -39,13 +39,13 @@ export default function NoteTagList({...props}: Props) {
         removeTag,
         removeTagEntity,
         getNumBlankTags,
-        tagElements,
+        tags,
         noteTagEntities: noteEntity.tags
     }
 
 
     useEffect(() => {
-        setTagElements(mapTagsToJsx());
+        setTags(mapTagsToJsx());
 
     }, [noteEntity]);
 
@@ -56,15 +56,15 @@ export default function NoteTagList({...props}: Props) {
         if (!noteEntity.tags || !noteEntity.tags.length) 
             return [getNewTagElement()];
 
-        const tagElements = noteEntity.tags.map(tag => {
-            const key = getRandomString();
-            return <TagInput initialTagEntity={tag} key={key} propsKey={key} />;
+        const tags = noteEntity.tags.map(tagEntity => {
+            const key = tagEntity.id + "" || getRandomString();
+            return <TagInput key={key} propsKey={key} />;
         });
 
         // add blank tag
-        tagElements.push(getNewTagElement());
+        tags.push(getNewTagElement());
 
-        return tagElements;
+        return tags;
     }
 
 
@@ -73,7 +73,7 @@ export default function NoteTagList({...props}: Props) {
      */
     function addTag(): void {
 
-        setTagElements([...tagElements, getNewTagElement()]);
+        setTags([...tags, getNewTagElement()]);
     }
 
 
@@ -114,7 +114,7 @@ export default function NoteTagList({...props}: Props) {
 
 
     /**
-     * Remove the ```<TagInput />``` with given ```key``` from ```tagElements``` state.
+     * Remove the ```<TagInput />``` with given ```key``` from ```tags``` state.
      * 
      * @param key of the tagInput to remove
      */
@@ -124,8 +124,8 @@ export default function NoteTagList({...props}: Props) {
         if (index === -1)
             return;
 
-        tagElements.splice(index, 1);
-        setTagElements([...tagElements]);
+        tags.splice(index, 1);
+        setTags([...tags]);
     }
     
 
@@ -136,22 +136,20 @@ export default function NoteTagList({...props}: Props) {
      */
     function getNewTagElement(name = ""): JSX.Element {
 
-        const defaultTag = {name: name};
-
         const key = getRandomString();
-        return <TagInput initialTagEntity={defaultTag} key={key} propsKey={key} />;
+        return <TagInput key={key} propsKey={key} />;
     }
 
 
     /**
      * @param key of the ```<TagInput />``` to search
-     * @returns the index of the ```<TagInput />``` in the ```tagElements``` state with given ```key``` or -1 if not found
+     * @returns the index of the ```<TagInput />``` in the ```tags``` state with given ```key``` or -1 if not found
      */
     function getTagElementIndex(key: string | number): number {
 
         let tagElementIndex = -1;
 
-        tagElements.forEach((tag, i) => { 
+        tags.forEach((tag, i) => { 
             // case: found tag by key
             if (tag.key === key) {
                 tagElementIndex = i; 
@@ -192,7 +190,7 @@ export default function NoteTagList({...props}: Props) {
                 {...otherProps}
                 >
                 <Flex className="tagInputContainer fullHeight" flexWrap="nowrap">
-                    {tagElements}
+                    {tags}
                 </Flex>
 
                 {children}
@@ -209,6 +207,6 @@ export const NoteTagListContext = createContext({
     removeTag: (index: number) => {},
     removeTagEntity: (index: number) => {},
     getNumBlankTags: () => {return 1 as number},
-    tagElements: [<></>],
+    tags: [<></>],
     noteTagEntities: [{}] as (TagEntity[] | null)
 })

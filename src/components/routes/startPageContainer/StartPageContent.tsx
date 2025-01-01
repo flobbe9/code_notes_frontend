@@ -1,17 +1,20 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
 import "../../../assets/styles/StartPageContent.scss";
+import { NUM_NOTES_PER_PAGE } from "../../../helpers/constants";
 import { SearchNoteHelper } from "../../../helpers/SearchNoteHelper";
-import { getRandomString } from "../../../helpers/utils";
+import { getRandomString, isBlank } from "../../../helpers/utils";
 import { useCsrfToken } from "../../../hooks/useCsrfToken";
 import AddNewNoteButton from "../../AddNewNoteButton";
 import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextHolder";
+import Confirm from "../../helpers/Confirm";
 import Flex from "../../helpers/Flex";
 import PendingFetchHelper from "../../helpers/PendingFetchHelper";
 import SearchBar from "../../helpers/SearchBar";
 import Note from "./noteInput/Note";
+import PaginationBar from "./PaginationBar";
 import SaveAllNotesButton from "./SaveAllNotesButton";
 import { StartPageContainerContext } from "./StartPageContainer";
 
@@ -28,25 +31,35 @@ interface Props extends DefaultProps {
  */
 export default function StartPageContent({...props}: Props) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageContent", true);
+    const componentName = "StartPageContent";
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName, true);
     
     /** Make sure that ```notes``` and ```noteEntities``` are ordered the same at all times! */
     const [notes, setNotes] = useState<JSX.Element[]>([]);
-    const [noteSearchValue, setNoteSearchValue] = useState("");
-    const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[]>([]);
+    const [isFocusFirstNote, setIsFocusFirstNote] = useState(false);
+
+    const { isKeyPressed, editedNoteIds, showPopup, toast } = useContext(AppContext);
+    const { 
+        noteEntities, 
+        isFetchNoteEntitiesTakingLonger, 
+        noteUseQueryResult, 
+        gotNewNoteEntities, 
+        currentNotesPage, 
+        setCurrentNotesPage,
+        noteSearchResults,
+        setNoteSearchResults
+    } = useContext(AppFetchContext);
+    const { selectedTagEntityNames, noteSearchValue, setNoteSearchValue } = useContext(StartPageContainerContext);
+    const searchNoteHelper = new SearchNoteHelper(noteUseQueryResult.data, selectedTagEntityNames);
     
-    const { isKeyPressed, editedNoteIds } = useContext(AppContext);
-    const { noteEntities, isFetchNoteEntitiesTakingLonger, noteUseQueryResult, gotNewNoteEntities } = useContext(AppFetchContext);
-    const { selectedTagEntityNames } = useContext(StartPageContainerContext);
-    const searchNoteHelper = new SearchNoteHelper(noteEntities, selectedTagEntityNames);
-    
+    const componentRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
     const context = {
         notes,
         setNotes,
 
-        noteSearchResults,
+        setIsFocusFirstNote,
 
         createNoteByNoteEntity
     }
@@ -61,11 +74,13 @@ export default function StartPageContent({...props}: Props) {
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         }
+
     }, []);
 
 
     useEffect(() => {
         setNotes(mapNoteEntitiesToJsx());
+        setIsFocusFirstNote(false);
 
     }, [gotNewNoteEntities]);
 
@@ -73,10 +88,36 @@ export default function StartPageContent({...props}: Props) {
     useEffect(() => {
         handleSearch();
 
-    }, [selectedTagEntityNames]);
+    }, [selectedTagEntityNames, noteUseQueryResult.data]);
 
 
-    function handleKeyDown(event): void {
+    useEffect(() => {
+        // case: no notes on this page but more in cache
+        if (notes && !notes.length && noteUseQueryResult.data.length)
+            handleNotePageEmpty();
+
+    }, [notes]);
+
+
+    /**
+     * Should be called if all notes on a page have been deleted. Make sure to display some notes if possible, 
+     * either by changing the page or refetching notes.
+     */
+    function handleNotePageEmpty(): void {
+
+        const lastPage = Math.ceil(noteUseQueryResult.data.length / NUM_NOTES_PER_PAGE);
+
+        // case: not on last page
+        if (currentNotesPage < lastPage)
+            noteUseQueryResult.refetch();
+
+        // case: currently on last page and got more pages in front
+        else if (lastPage !== 1)
+            setCurrentNotesPage(currentNotesPage - 1);
+    }
+
+
+    function handleKeyDown(event: KeyboardEvent): void {
 
         // focus search input
         if (isKeyPressed("Control") && isKeyPressed("Shift") && event.key === "F") {
@@ -91,17 +132,8 @@ export default function StartPageContent({...props}: Props) {
         if (!noteEntities || !noteEntities.length)
             return [];
 
-        // const notes: JSX.Element[] = [];
-        // noteEntities
-        //     .forEach((noteEntity, i) => {
-        //         if (i >= 5)
-        //             return;
-        //         notes.push(createNoteByNoteEntity(noteEntity));
-        //     })
-
-        // return notes;
-        return noteEntities.map(noteEntity => 
-            createNoteByNoteEntity(noteEntity));
+        return noteEntities.map((noteEntity, i) => 
+            createNoteByNoteEntity(noteEntity, i === 0 && isFocusFirstNote));
     }
 
 
@@ -112,16 +144,16 @@ export default function StartPageContent({...props}: Props) {
     }
 
 
-    function handleSearchKeyDown(event): void {
+    function handleSearchKeyDown(event: React.KeyboardEvent): void {
 
         if (event.key === "Enter")
-            handleSearch(event.target.value)
+            handleSearch((event.target as HTMLInputElement).value)
     }
     
 
-    function handleSearchValueChange(event): void {
+    function handleSearchValueChange(event: ChangeEvent): void {
 
-        const currentSearchValue = event.target.value;
+        const currentSearchValue = (event.target as HTMLInputElement).value;
 
         handleSearch(currentSearchValue);
 
@@ -129,17 +161,67 @@ export default function StartPageContent({...props}: Props) {
     }
 
 
-    function handleSearchXIconClick(event): void {
+    function handleSearchXIconClick(): void {
 
         handleSearch("");
     }
 
 
+    /**
+     * Update the ```searchResults``` state with matching note entities and go to page 1.
+     * 
+     * @param searchValue the search bar input. Default is ```noteSearchValue```
+     */
     function handleSearch(searchValue = noteSearchValue): void {
 
-        const searchResults = searchNoteHelper.getNoteSearchResults(searchValue);
+        // if edited notes
+        if (editedNoteIds.size) {
+            toast("Cannot search", "Please save your pending changes first.", "warn");
+            return;
+        }
+        
+        // case: no search query
+        if (isBlank(searchValue) && !selectedTagEntityNames.size)
+            setNoteSearchResults(undefined);
 
-        setNoteSearchResults(searchResults);
+        else {
+            const searchResults = searchNoteHelper.getNoteSearchResults(searchValue);
+            setNoteSearchResults(searchResults);
+
+            if (currentNotesPage > getTotalPages())
+                setCurrentNotesPage(1);
+        }
+    }
+
+
+    /**
+     * Updates the ```currentPage``` state confirming user's choice if there are unsaved changes.
+     * 
+     * @param page the new ```currentPage```
+     */
+    function handleNotePageChangeClick(page: number): void {
+
+        // case: has pending changes
+        if (editedNoteIds.size) {
+            showPopup(
+                <Confirm
+                    heading={<h2>Discard unsaved changes?</h2>}
+                    message={"You have some unsaved notes. Your changes will be lost if you continue."}
+                    rememberMyChoice
+                    rememberMyChoiceLabel="Don't ask again"
+                    rememberMyChoiceKey="discardChangesChangeNotePage"
+                    onConfirm={() => setCurrentNotesPage(page)}
+                />
+            );
+
+        } else 
+            setCurrentNotesPage(page);
+    }
+
+
+    function getTotalPages(): number {
+
+        return Math.ceil((noteSearchResults ? noteSearchResults : noteUseQueryResult.data).length / NUM_NOTES_PER_PAGE);
     }
 
 
@@ -155,6 +237,7 @@ export default function StartPageContent({...props}: Props) {
                 id={id} 
                 className={className + " fullWidth"}
                 style={style}
+                ref={componentRef}
                 {...otherProps}
             >
                 <Flex className="mt-2 mb-4" flexWrap="nowrap" verticalAlign="center">
@@ -162,14 +245,14 @@ export default function StartPageContent({...props}: Props) {
                         id="StartPage"
                         className="fullWidth" 
                         placeHolder="Search for note title or tag" 
-                        title="Search notes (Ctrl+Shift+F)"
+                        title="Search notes (Ctrl + Shift + F)"
                         ref={searchInputRef}
-                        disabled={!noteEntities.length}
+                        disabled={!noteUseQueryResult.data.length}
                         onChange={handleSearchValueChange}
                         onKeyDown={handleSearchKeyDown}
                         onXIconClick={handleSearchXIconClick}
                         _focus={{borderColor: "var(--accentColor)"}}
-                        _searchIcon={{color: "var(--matteBlackLight)"}}
+                        _searchIcon={{color: "var(--matteBlackLighter)"}}
                     />
                 </Flex>
 
@@ -179,6 +262,21 @@ export default function StartPageContent({...props}: Props) {
                 </Flex>
 
                 {notes}
+
+                {/* No search results... */}
+                <h2 
+                    className="textCenter"
+                    hidden={!noteUseQueryResult.data.length || !!noteEntities.length}
+                >
+                    No search results{!isBlank(noteSearchValue) && ` for '${noteSearchValue}'`}...
+                </h2>
+
+                <PaginationBar 
+                    className={`${componentName}-PaginationBar mb-1`} 
+                    totalPages={getTotalPages()} 
+                    currentPage={currentNotesPage} 
+                    setCurrentPage={handleNotePageChangeClick}
+                />
 
                 {children}
             </div>
@@ -191,7 +289,7 @@ export const StartPageContentContext = createContext({
     notes: [<></>],
     setNotes: (notes: JSX.Element[]) => {},
 
-    noteSearchResults: [] as NoteEntity[],
+    setIsFocusFirstNote: (focus: boolean) => {},
 
     createNoteByNoteEntity: (noteEntity: NoteEntity, focusOnRender = false) => {return <></>}
 })

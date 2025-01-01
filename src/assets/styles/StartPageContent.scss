@@ -1,4 +1,6 @@
 @import "./global/functions.scss";
+@import "./global/variables.scss";
+
 
 .StartPageContent {
     margin-bottom: 40px; // margin to footer
@@ -6,15 +8,21 @@
     padding: 0 5px;
 
     .AddNewNoteButton {
-        background-color: var(--matteBlackLight);
+        background-color: var(--matteBlackLighter);
         color: rgb(52, 116, 255);
         height: fit-content;
         text-wrap: nowrap;
     }
 
     #SearchBarStartPage {
-        border: 2px solid var(--matteBlackLight);
+        border: 2px solid var(--matteBlackLighter);
         background-color: transparent;
         border-radius: var(--borderRadius);
+    }
+
+    &-PaginationBar {
+        @media only screen and (min-width: $tabletMinWidth) {
+            font-size: 1.3em;
+        }
     }
 }

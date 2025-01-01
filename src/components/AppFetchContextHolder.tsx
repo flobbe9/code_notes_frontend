@@ -41,13 +41,17 @@ export default function AppFetchContextHolder({ children }) {
     const { 
         noteEntities, 
         setNoteEntities,
+        noteSearchResults, 
+        setNoteSearchResults,
         useQueryResult: noteUseQueryResult ,
         isFetchTakingLonger: isFetchNoteEntitiesTakingLonger, 
         fetchSave: fetchSaveNoteEntity, 
         fetchSaveAll: fetchSaveAllNoteEntities,
         fetchDelete: fetchDeleteNoteEntity, 
         gotNewData: gotNewNoteEntities, 
-        setGotNewData: setGotNewNoteEntities
+        setGotNewData: setGotNewNoteEntities,
+        currentPage: currentNotesPage, 
+        setCurrentPage: setCurrentNotesPage
     } = useNotes(isLoggedIn, appUserEntity);
 
     const context = {
@@ -59,6 +63,8 @@ export default function AppFetchContextHolder({ children }) {
 
         noteEntities, 
         setNoteEntities, 
+        noteSearchResults,
+        setNoteSearchResults,
         noteUseQueryResult,
         isFetchNoteEntitiesTakingLonger, 
         fetchSaveNoteEntity, 
@@ -66,6 +72,8 @@ export default function AppFetchContextHolder({ children }) {
         fetchDeleteNoteEntity, 
         gotNewNoteEntities,
         setGotNewNoteEntities,
+        currentNotesPage,
+        setCurrentNotesPage,
 
         isLoggedIn, 
         isLoggedInUseQueryResult,
@@ -127,6 +135,8 @@ export const AppFetchContext = createContext({
 
     noteEntities: [] as NoteEntity[],
     setNoteEntities: (noteEntities: NoteEntity[]) => {},
+    noteSearchResults: undefined as NoteEntity[] | undefined, 
+    setNoteSearchResults: (results: NoteEntity[] | undefined) => {},
     fetchSaveNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<NoteEntity | CustomExceptionFormat>},
     fetchSaveAllNoteEntities: async (noteEntities: NoteEntity[]) => {return {} as Promise<NoteEntity[] | CustomExceptionFormat>},
     fetchDeleteNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<Response | CustomExceptionFormat>},
@@ -134,6 +144,8 @@ export const AppFetchContext = createContext({
     noteUseQueryResult: {} as DefinedUseQueryResult<NoteEntity[]>,
     gotNewNoteEntities: false as boolean,
     setGotNewNoteEntities: (newNoteEntities: boolean) => {},
+    currentNotesPage: 1 as number,
+    setCurrentNotesPage: (page: number) => {},
 
     isLoggedIn: false,
     isLoggedInUseQueryResult: {} as DefinedUseQueryResult<boolean>,

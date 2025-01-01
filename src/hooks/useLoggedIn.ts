@@ -3,7 +3,6 @@ import { useContext } from "react";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { sleep } from "../helpers/utils";
 
 
 /**

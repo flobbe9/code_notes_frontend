@@ -6,6 +6,7 @@ import Flex from "../../helpers/Flex";
 import Head from "../../helpers/Head";
 import StartPageContent from "./StartPageContent";
 import StartPageSideBar from "./StartPageSideBar";
+import { AppFetchContext } from "../../AppFetchContextHolder";
 
 
 interface Props extends DefaultProps {
@@ -28,8 +29,10 @@ export default function StartPageContainer({children, ...props}: Props) {
 
     /** List of tag entities inside ```<StartPageSideBarTagList>``` that are checked */
     const [selectedTagEntityNames, setSelectedTagEntityNames] = useState<Set<string>>(new Set());
+    const [noteSearchValue, setNoteSearchValue] = useState("");
 
     const { isMobileWidth, editedNoteIds } = useContext(AppContext);
+    const { setCurrentNotesPage } = useContext(AppFetchContext);
 
     const context = {
         isShowSideBar, 
@@ -41,8 +44,8 @@ export default function StartPageContainer({children, ...props}: Props) {
 
         getStartPageSideBarWidth,
 
-        selectedTagEntityNames, 
-        setSelectedTagEntityNames,
+        selectedTagEntityNames, setSelectedTagEntityNames,
+        noteSearchValue, setNoteSearchValue
     }
 
 
@@ -54,6 +57,14 @@ export default function StartPageContainer({children, ...props}: Props) {
         }
 
     }, [editedNoteIds]); 
+
+
+    useEffect(() => {
+        // case: reset or just started searching
+        if (noteSearchValue.length <= 1 && selectedTagEntityNames.size <= 1) // TODO: && no edited notes
+            setCurrentNotesPage(1);
+
+    }, [noteSearchValue, selectedTagEntityNames]);
     
 
     /**
@@ -123,4 +134,6 @@ export const StartPageContainerContext = createContext({
 
     selectedTagEntityNames: new Set() as Set<string>, 
     setSelectedTagEntityNames: (tagEntities: Set<string>) => {},
+    noteSearchValue: "" as string, 
+    setNoteSearchValue: (value: string) => {}
 });

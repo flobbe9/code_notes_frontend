@@ -1551,3 +1551,14 @@ export async function sleep<T>(delay: number, resolveValue?: T): Promise<T | und
         }, delay);
     });
 } 
+
+
+/**
+ * Apparently when navigating to a history entry, the scroll state is preserved despite this function call.
+ * 
+ * Only scroll to ```y=0```, leave x as it is
+ */
+export function scrollTop(): void {
+
+    window.scrollTo(window.scrollX, 0);
+}

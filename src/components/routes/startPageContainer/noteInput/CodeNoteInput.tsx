@@ -71,7 +71,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     const componentRef = useRef<HTMLDivElement>(null);
     // assigned in editor mount function
-    const editorRef = useRef(null);
+    const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
     const copyButtonRef = useRef(null);
     const fullScreenButtonRef = useRef(null);
 
@@ -86,10 +86,10 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
 
     useEffect(() => {
-        if (focusOnRender)
-            getEditorTextArea()?.focus();
+        if (focusOnRender && isEditorMounted)
+            editorRef.current!.focus();
 
-    }, [componentRef.current])
+    }, [isEditorMounted, editorRef.current]);
     
 
     useEffect(() => {
@@ -147,7 +147,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     useWindowResizeCallback(handleWindowResize);
 
 
-    function handleChange(value: string, event): void {
+    function handleChange(value: string): void {
 
         if (!isFullScreen)
             setTimeout(() => setNumEditorLines(getNumEditorValueLines(value)), 5);
@@ -386,7 +386,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
      */
     function updateFullEditorWidth(): number {
 
-        const newFullEditorWidth = getOuterEditorContainer()!.offsetWidth;
+        const newFullEditorWidth = getOuterEditorContainer()?.offsetWidth || 0;
 
         setFullEditorWidth(newFullEditorWidth);
         setCssConstant("fullEditorWidth", newFullEditorWidth + "px");
@@ -405,6 +405,8 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         defaultCodeNoteInput.style.position = "fixed"; // hardcoded in css
         defaultCodeNoteInput.style.zIndex = appOverlayZIndex + 1;
         defaultCodeNoteInput.style.width = "90vw";
+        // center
+        defaultCodeNoteInput.style.left = "5vw";
         editor.style.width = "100%";
         updateFullEditorWidth();
         
@@ -415,7 +417,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         );
         animateAndCommit(editor, {height: "80vh"}, {duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION});
 
-        getEditorTextArea()!.focus();
+        editorRef.current!.focus();
     }
 
 
@@ -432,7 +434,8 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         defaultCodeNoteInput.style.width = "100%";
         updateFullEditorWidth();
         updateActualEditorWidth();
-
+        
+        defaultCodeNoteInput.style.left = "auto";
         editor.style.height = editorHeight + "px";
         editor.style.width = (isShowNoteInputSettings ? editorWidth : fullEditorWidth) + "px";
 
@@ -460,17 +463,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
         
         return languageSearchBarWidth;
-    }
-
-
-    /**
-     * Notice that calling ```.value``` on this element is not reliable. Use the ```onChange``` handler for that.
-     * 
-     * @returns the ```<textarea>``` element of the monaco editor
-     */
-    function getEditorTextArea(): HTMLTextAreaElement | null {
-        
-        return componentRef.current!.querySelector("textarea.inputarea") as HTMLTextAreaElement;
     }
 
 

@@ -8,7 +8,7 @@
         position: absolute;
         right: 0;
         text-wrap: nowrap;
-        z-index: -1;
+        display: none;
         
         &-label {
             margin-left: 15px;

@@ -38,7 +38,7 @@ export default function PlainTextNoteInput({
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
     const { isControlKeyPressed } = useContext(AppContext);
-    const { noteEdited } = useContext(NoteContext);
+    const { noteEdited, noteInputs } = useContext(NoteContext);
     const { 
         isNoteInputOverlayVisible,
         setIsNoteInputOverlayVisible, 
@@ -274,6 +274,8 @@ export default function PlainTextNoteInput({
 
         plainTextNoteInput.style.position = "fixed";
         plainTextNoteInput.style.width = "90vw";
+        // center
+        plainTextNoteInput.style.left = "5vw";
         plainTextNoteInput.style.zIndex = appOverlayZIndex + 1;
 
         animateAndCommit(
@@ -296,6 +298,8 @@ export default function PlainTextNoteInput({
         plainTextNoteInput.style.position = "relative";
         plainTextNoteInput.style.top = "30px";
         plainTextNoteInput.style.width = "100%";
+        
+        plainTextNoteInput.style.left = "auto";
         
         // animate to start pos
         animateAndCommit(

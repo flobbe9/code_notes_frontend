@@ -4,7 +4,7 @@ import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
 import "../../../assets/styles/SaveAllNotesButton.scss";
 import { isResponseError } from "../../../helpers/fetchUtils";
-import { isNumberFalsy, stringToNumber } from '../../../helpers/utils';
+import { isNumberFalsy } from '../../../helpers/utils';
 import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextHolder";
 import Button from "../../helpers/Button";
@@ -23,7 +23,7 @@ interface Props extends ButtonProps {
 export default function SaveAllNotesButton({...props}: Props) {
 
     const { toast, showPopup, editedNoteIds, setEditedNoteIds } = useContext(AppContext);
-    const { noteEntities, setNoteEntities, isLoggedIn, fetchSaveAllNoteEntities } = useContext(AppFetchContext);
+    const { noteEntities, isLoggedIn, fetchSaveAllNoteEntities, noteUseQueryResult } = useContext(AppFetchContext);
 
     const {className, children, ...otherProps} = getCleanDefaultProps(props, "SaveAllNotesButton", true);
 
@@ -31,7 +31,7 @@ export default function SaveAllNotesButton({...props}: Props) {
 
 
     /**
-     * Fetch method will validate and toast.
+     * Fetch method will validate and toast. Refetch after success
      * 
      * @param event 
      */
@@ -49,11 +49,7 @@ export default function SaveAllNotesButton({...props}: Props) {
             // error handled by fetch method
             return;
 
-        // replace unsaved notes with saved ones before updating the state. Assumes that fetch response keeps the order
-        Object.entries(editedNoteEntitiesAndIndices)
-            .forEach(([noteEntityIndex, noteEntity], i) => 
-                noteEntities.splice(stringToNumber(noteEntityIndex), 1, jsonResponse[i]));
-        setNoteEntities([...noteEntities]);
+        noteUseQueryResult.refetch();
 
         toast("Save all notes", "All notes saved successfully", "success", 4000);
 

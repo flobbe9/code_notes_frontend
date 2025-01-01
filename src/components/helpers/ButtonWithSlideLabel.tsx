@@ -54,7 +54,7 @@ export default forwardRef(function ButtonWithSlideLabel(
 
         labelContainerRef.current!.style.position = "relative";
         labelContainerRef.current!.style.width = "0";
-        labelContainerRef.current!.style.zIndex = "0";
+        labelContainerRef.current!.style.display = "block";
 
         animateAndCommit(
             labelContainerRef.current!,
@@ -69,6 +69,10 @@ export default forwardRef(function ButtonWithSlideLabel(
 
     function slideCollapse(): void {
 
+        // case: called this method because the button was unrendered
+        if (!labelContainerRef.current)
+            return;
+
         animateAndCommit(
             labelContainerRef.current!,
             {
@@ -81,8 +85,12 @@ export default forwardRef(function ButtonWithSlideLabel(
             },
             // reset label style
             () => {
+                // above check somehow does not cover this callback
+                if (!labelContainerRef.current)
+                    return;
+
                 labelContainerRef.current!.style.position = "absolute";
-                labelContainerRef.current!.style.zIndex = "-1";
+                labelContainerRef.current!.style.display = "none";
                 labelContainerRef.current!.style.width = initialNoteInputButtonLabelWidth || "";        
             }
         )

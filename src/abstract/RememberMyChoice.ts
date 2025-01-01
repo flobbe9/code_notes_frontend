@@ -4,7 +4,11 @@
  * @since 0.0.1
  * @see ```<Confirm>```
  */
-export type RememberMyChoiceKey = "deleteNote" | "deleteNoteInput";
+export type RememberMyChoiceKey = 
+    "deleteNote" |
+    "deleteNoteInput" |
+    "discardChangesLogout" |
+    "discardChangesChangeNotePage";
 
 
 /**

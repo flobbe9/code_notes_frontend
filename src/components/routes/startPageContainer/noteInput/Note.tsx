@@ -7,7 +7,6 @@ import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
 import { getJsxElementIndexByKey, getRandomString, handleRememberMyChoice, isNumberFalsy, logError, logWarn, shortenString } from '../../../../helpers/utils';
-import { useHasComponentMounted } from "../../../../hooks/useHasComponentMounted";
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
@@ -16,7 +15,7 @@ import Flex from "../../../helpers/Flex";
 import HelperDiv from "../../../helpers/HelperDiv";
 import Login from "../../Login";
 import { StartPageContentContext } from "../StartPageContent";
-import AddNewNoteInput from "./AddNewNoteInput";
+import AddNewNoteInputButtons from "./AddNewNoteInputButtons";
 import CodeNoteInput from "./CodeNoteInput";
 import CodeNoteInputWithVariables from "./CodeNoteInputWithVariables";
 import DefaultCodeNoteInput from "./DefaultCodeNoteInput";
@@ -48,7 +47,6 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     const numInitialNoteInputs = 1;
 
     const [noteEntity, setNoteEntity] = useState(NoteEntityService.getDefaultInstance());
-    const [isNoteInSearchResults, setIsNoteInSearchResults] = useState(true);
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
     const [areNoteInputsExpanded, setAreNoteInputsExpanded] = useState(false);
@@ -61,14 +59,17 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     const { toast, showPopup, editedNoteIds, setEditedNoteIds } = useContext(AppContext);
     const { 
         appUserEntity, 
+        appUserEntityUseQueryResult,
+
         isLoggedIn,
+
         noteEntities, 
         setNoteEntities, 
-        appUserEntityUseQueryResult,
         fetchSaveNoteEntity, 
         fetchDeleteNoteEntity,
+        noteUseQueryResult
     } = useContext(AppFetchContext);
-    const { noteSearchResults, notes, setNotes } = useContext(StartPageContentContext);
+    const { notes, setNotes } = useContext(StartPageContentContext);
 
     const componentRef = useRef<HTMLDivElement>(null);
     const titleInputRef = useRef<HTMLInputElement>(null);
@@ -90,13 +91,18 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
         noteEdited,
 
-        setAreNoteInputsExpanded
+        setAreNoteInputsExpanded,
     }
+    
 
-    const hasComponentMounted = useHasComponentMounted();
+    useEffect(() => {
+        updateNoteEntity();
+        
+    }, []);
 
     
     useEffect(() => {
+        // on note render
         if (!noteInputs.length)
             setNoteInputs(mapNoteInputsToJsx());
         
@@ -106,21 +112,14 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     useEffect(() => {
         setNoteInputs(mapNoteInputsToJsx());
         
-    }, [areNoteInputsExpanded])
+    }, [areNoteInputsExpanded]);
     
 
     useEffect(() => {
-        updateNoteEntity();
-        
-    }, [noteEntities]);
-    
-    
-    useEffect(() => {
-        if (hasComponentMounted)
-            setIsNoteInSearchResults(noteSearchResults.includes(noteEntity));
-        
-    }, [noteSearchResults]);
-    
+        handleAppendNoteInput();
+
+    }, [noteEntity.noteInputs]);
+
     
     useEffect(() => {
         if (focusOnRender)
@@ -198,7 +197,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
      * 
      * @param event 
      */
-    async function handleSave(event): Promise<void> {
+    async function handleSave(): Promise<void> {
 
         if (!isLoggedIn) {
             showPopup(<Login isPopupContent />);
@@ -211,10 +210,15 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
             return;
         }
 
-        // update saved note in state, update sidebar
-        const noteIndex = getJsxElementIndexByKey(notes, propsKey);
-        noteEntities.splice(noteIndex, 1, jsonResponse);
-        setNoteEntities([...noteEntities]);
+        // case: there's other unsaved notes
+        if (editedNoteIds.size > 1) {
+            const noteIndex = getJsxElementIndexByKey(notes, propsKey);
+            noteEntities.splice(noteIndex, 1, jsonResponse);
+            setNoteEntities([...noteEntities]);
+
+        // case: no unsaved notes anymore
+        } else
+            noteUseQueryResult.refetch();
 
         noteEdited(false);
 
@@ -222,7 +226,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     }
 
 
-    function handleDeleteNoteClick(event): void {
+    function handleDeleteNoteClick(): void {
 
         if (handleRememberMyChoice("deleteNote", deleteNote))
             return;
@@ -231,6 +235,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
             <Confirm
                 heading={<h3>Delete this Note?</h3>}
                 message={`Are you sure you want to delete '${shortenString(noteEntity.title)}'?`}
+                confirmLabel="Delete"
                 rememberMyChoice
                 rememberMyChoiceLabel="Don't ask again"
                 rememberMyChoiceKey="deleteNote"
@@ -261,13 +266,18 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
 
-        // update note entities
-        noteEntities.splice(noteIndex, 1);
-        setNoteEntities([...noteEntities]);
+        // case: no unsaved notes or this one is the only unsaved note
+        if (!editedNoteIds.size || (editedNoteIds.size === 1 && editedNoteIds.has(noteEntity.id || -1)))
+            noteUseQueryResult.refetch();
 
-        // update notes
-        notes.splice(noteIndex, 1);
-        setNotes([...notes]);
+        // case: got more unsaved notes
+        else {
+            noteEntities.splice(noteIndex, 1);
+            setNoteEntities([...noteEntities]);
+            
+            notes.splice(noteIndex, 1);
+            setNotes([...notes]);
+        } 
 
         noteEdited(false);
     }
@@ -307,6 +317,17 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
      */
     function updateNoteEntity(): void {
 
+        const noteEntity = getNoteEntityFromState();
+        if (noteEntity)
+            setNoteEntity(noteEntity)
+    }
+
+
+    /**
+     * @returns the noteEntity from ```noteEntities``` state using this note's current index in ```notes```
+     */
+    function getNoteEntityFromState(): NoteEntity | undefined {
+
         // may happen on login / logout
         if (!noteEntities.length)
             return;
@@ -322,8 +343,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
             return;
         }
 
-        const noteEntity = noteEntities[noteEntityIndex];
-        setNoteEntity(noteEntity)
+        return noteEntities[noteEntityIndex];
     }
 
 
@@ -363,6 +383,19 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
         noteEdited();
     }
+    
+
+    /**
+     * Update ```noteInputs``` state creating a new ```noteInput``` from the last ```noteEntity.noteInputs``` element
+     */
+    function handleAppendNoteInput(): void {
+
+        if (!noteEntity.noteInputs?.length || !areNoteInputsExpanded) 
+            return;
+
+        const newNoteInput = createNoteInputByNoteInputType(noteEntity.noteInputs[noteEntity.noteInputs.length - 1], true);
+        setNoteInputs([...noteInputs, newNoteInput]);
+    }
 
 
     return (
@@ -372,7 +405,6 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
                 className={`${className}`}
                 style={style}
                 ref={componentRef}
-                rendered={isNoteInSearchResults}
                 {...otherProps}
             >
                 <div 
@@ -411,17 +443,13 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
                 <Flex className="mt-2">
                     {/* Add note input */}
-                    <AddNewNoteInput 
-                        className="col-12 col-xl-9" 
-                        onClick={() => setAreNoteInputsExpanded(true)}
-                    />
+                    <AddNewNoteInputButtons className="col-12 col-xl-9" />
 
                     {/* Delete */}
                     <Flex className="col-12 col-xl-3 mt-2" horizontalAlign="right">
                         <ButtonWithSlideLabel 
                             className="transition deleteNoteButton" 
                             label="Delete note"
-                            labelClassName="ms-2"
                             title="Delete note" 
                             onClick={handleDeleteNoteClick}
                         >
@@ -432,7 +460,6 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
                         <ButtonWithSlideLabel 
                             className="saveNoteButton ms-2" 
                             label="Save note"
-                            labelClassName="ms-2"
                             title="Save note"
                             disabled={isSaveButtonDisabled()}
                             ref={saveButtonRef}
@@ -468,5 +495,5 @@ export const NoteContext = createContext({
      */
     noteEdited: (edited = true) => {},
 
-    setAreNoteInputsExpanded: (expanded: boolean) => {}
+    setAreNoteInputsExpanded: (expanded: boolean) => {},
 })
