@@ -36,7 +36,7 @@ const defaultTabletMaxVisiblePageNumbers = 5;
 
 
 /**
- * @since latest
+ * @since 0.0.6
  */
 export default function PaginationBar({
     totalPages,
@@ -269,7 +269,7 @@ const PaginationBarContext = createContext({
 /**
  * Renders exactly one page number with a click event updating the ```currentPage```.
  * 
- * @returns @since latest
+ * @returns @since 0.0.6
  */
 function PageNumber({page, rendered, ...props}: PageNumberProps): JSX.Element {
 
