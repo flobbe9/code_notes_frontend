@@ -85,6 +85,10 @@ export default forwardRef(function ButtonWithSlideLabel(
             },
             // reset label style
             () => {
+                // above check somehow does not cover this callback
+                if (!labelContainerRef.current)
+                    return;
+
                 labelContainerRef.current!.style.position = "absolute";
                 labelContainerRef.current!.style.display = "none";
                 labelContainerRef.current!.style.width = initialNoteInputButtonLabelWidth || "";        

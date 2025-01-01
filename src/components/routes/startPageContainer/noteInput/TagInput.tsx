@@ -244,7 +244,7 @@ export default function TagInput({propsKey, ...props}: Props) {
         }
 
         if (tagEntityIndex >= noteTagEntities.length) {
-            logWarn(`Tag entity index ${tagEntityIndex} out of bounds for 'noteTagEntities' length ${noteTagEntities.length}`);
+            // logDebug(`Tag entity index ${tagEntityIndex} out of bounds for 'noteTagEntities' length ${noteTagEntities.length}`);
             return;
         }
 

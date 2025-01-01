@@ -1,5 +1,5 @@
 
-import { logWarn } from '../../helpers/utils';
+import { isBlank, logWarn } from '../../helpers/utils';
 import CryptoJSImpl from '../CryptoJSImpl';
 import { AppUserEntity } from '../entites/AppUserEntity';
 import { NoteEntity } from '../entites/NoteEntity';
@@ -116,7 +116,9 @@ export class AppUserService {
 
         const tagIndex = TagEntityService.getTagIndex(appUserEntity.tags, tag);
         if (tagIndex === -1) {
-            logWarn(`Could not find index for tag '${tag.name}' in appUserEntity.tags`);
+            if (!isBlank(tag.name))
+                logWarn(`Could not find index for tag '${tag.name}' in appUserEntity.tags`);
+            
             return;
         }
 
