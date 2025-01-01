@@ -10,7 +10,14 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 
 // useQuery config
-export const useQueryClientObj = new QueryClient();
+export const useQueryClientObj = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnReconnect: false,
+            refetchOnWindowFocus: false
+        }
+    }
+});
 
 const persister = createSyncStoragePersister({
     storage: sessionStorage
