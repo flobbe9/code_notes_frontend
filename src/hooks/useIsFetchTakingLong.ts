@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useTimeout } from "./useTimeout";
-import { log } from "../helpers/utils";
 
 
 /**

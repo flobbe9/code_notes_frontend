@@ -26,11 +26,11 @@
 
             @include customHover {
                 &:not(:focus) {
-                    background-color: var(--matteBlackLight2);
+                    background-color: var(--matteBlackLight);
                 }
             }
             @include customFocus {
-                background-color: var(--matteBlackLight);
+                background-color: var(--matteBlackLighter);
             }
         }
     }
@@ -48,11 +48,11 @@
 
             @include customHover {
                 &:not(:focus) {
-                    background-color: var(--matteBlackLight2);
+                    background-color: var(--matteBlackLight);
                 }
             }
             @include customFocus {
-                background-color: var(--matteBlackLight);
+                background-color: var(--matteBlackLighter);
             }
         }
     }
@@ -69,13 +69,13 @@
         &:has(textarea:not(:focus)) {
             &:has(.overflow-guard:not([disabled]):hover) {
                 .overflow-guard, .lines-content { 
-                    background-color: var(--matteBlackLight2);
+                    background-color: var(--matteBlackLight);
                 }
             }
         }
         &:has(textarea:not([disabled]):focus) {
             .overflow-guard, .lines-content {
-                background-color: var(--matteBlackLight);
+                background-color: var(--matteBlackLighter);
             }
         }
     }
@@ -96,8 +96,13 @@
         border-bottom-left-radius: var(--borderRadius);
         transition: background-color var(--transitionTime);
         @include customHover {
-            background-color: var(--matteBlackLight2);
+            background-color: var(--matteBlackLighter);
             cursor: grab;
+        }
+
+        &-dragIcon {
+            color: white;
+            font-size: 1.4em;
         }
 
         .fa-grip {

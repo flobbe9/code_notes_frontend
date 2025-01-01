@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { NoteInputType } from "../../../../abstract/NoteInputType";
-import "../../../../assets/styles/AddNewNoteInput.scss";
+import "../../../../assets/styles/AddNewNoteInputButtons.scss";
 import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../../../helpers/constants";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
@@ -20,9 +20,9 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function AddNewNoteInput({...props}: Props) {
+export default function AddNewNoteInputButtons({...props}: Props) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInput");
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInputButtons");
 
     const { noteEntities } = useContext(AppFetchContext);
     const { noteEntity, noteInputs, setNoteInputs, createNoteInputByNoteInputType, noteEdited } = useContext(NoteContext);

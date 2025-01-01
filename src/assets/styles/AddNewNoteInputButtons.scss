@@ -1,8 +1,8 @@
 @import "./global/functions.scss";
 
-.AddNewNoteInput {
+.AddNewNoteInputButtons {
     .Button {
-        background-color: var(--matteBlackLight);
+        background-color: var(--matteBlackLighter);
         border-radius: var(--codeBorderRadius);
         
         &.addPlainTextNoteInputButton {
