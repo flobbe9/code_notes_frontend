@@ -4,7 +4,7 @@ import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { NoteInputType } from "../../../../abstract/NoteInputType";
 import "../../../../assets/styles/AddNewNoteInputButtons.scss";
 import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../../../helpers/constants";
-import { sleep } from "../../../../helpers/utils";
+import { log, sleep } from "../../../../helpers/utils";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
 import Flex from "../../../helpers/Flex";
@@ -25,7 +25,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInputButtons");
 
-    const { noteEntities } = useContext(AppFetchContext);
+    const { noteEntities, noteUseQueryResult } = useContext(AppFetchContext);
     const { 
         noteEntity, 
         noteEdited, 
@@ -67,8 +67,8 @@ export default function AddNewNoteInputButtons({...props}: Props) {
 
         let value = "";
 
-        // case: first noteInput with variables
-        if (!hasNoteEntityNoteInputOfType("PLAIN_TEXT"))
+        // case: is first note and first noteInput with variables
+        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("PLAIN_TEXT"))
             // add tutorial text
             value = "Plain text and some <code>code...</code>";
 
@@ -83,8 +83,8 @@ export default function AddNewNoteInputButtons({...props}: Props) {
 
         let value = "";
 
-        // case: first noteInput with variables
-        if (!hasNoteEntityNoteInputOfType("CODE_WITH_VARIABLES"))
+        // case: is first note and first noteInput with variables
+        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE_WITH_VARIABLES"))
             // add tutorial text
             value = `x = ${getDefaultVariableInput()} can be copied to the clipboard. Change the programming language on the right.`;
 
@@ -100,8 +100,8 @@ export default function AddNewNoteInputButtons({...props}: Props) {
 
         let value = "";
 
-        // case: first noteInput with variables
-        if (!hasNoteEntityNoteInputOfType("CODE"))
+        // case: is first note and first noteInput with variables
+        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE"))
             // add tutorial text
             value = "VSCode Editor. Change the programming language on the right.";
 
@@ -117,7 +117,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
      * @returns ```true``` if this ```noteEntity``` has at least one noteInput with given type
      */
     function hasNoteEntityNoteInputOfType(noteInputType: NoteInputType): boolean {
-
+        
         return !!noteEntity.noteInputs?.find(noteInputEntity => 
             noteInputEntity.type === noteInputType);
     }
