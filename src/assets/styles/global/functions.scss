@@ -133,10 +133,8 @@
  * Will not focus on click but only on tab focus
  */
 @mixin customFocusVisible {
-    @include customFocus {
-        &:focus-visible {
-            @content;
-        }
+    &:not([disabled]):focus-visible {
+        @content;
     }
 }
 

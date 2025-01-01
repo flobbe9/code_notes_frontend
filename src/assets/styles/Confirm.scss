@@ -18,12 +18,19 @@
         &-confirmButton {
             background-color: var(--matteBlue);
             color: white;
-            
-            @include buttonFocus(black);
-        } 
 
+            @include customFocus {
+                @include outlineFocus(black);
+            }          
+        }
+        
         &-cancelButton {
             background-color: transparent;
+            border: 2px solid var(--matteBlue);
+        
+            @include customFocus {
+                @include outlineFocus();
+            }    
         }
     }
 }

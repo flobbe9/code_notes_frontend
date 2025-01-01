@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES, ProgrammingLanguage } from "../../../../abstract/ProgrammingLanguage";
 import "../../../../assets/styles/NoteInputSettings.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../../helpers/constants";
-import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
+import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTakingUpSpace, moveCursor } from "../../../../helpers/utils";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
 import SearchBar from "../../../helpers/SearchBar";
@@ -117,8 +117,10 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
             () => {
                 languageSearchBar.style.position = (hide ? "absolute" : "relative");
                 languageSearchBar.style.zIndex = hide ? "-1" : "1";
-                if (!hide)
-                    (languageSearchBar.querySelector(".searchInput") as HTMLInputElement)?.focus();
+                if (!hide) {
+                    languageSearchBarRef.current!.focus();
+                    moveCursor((languageSearchBarRef.current!), 0, -1);
+                }
             }
         )
     }
@@ -193,7 +195,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
     }
 
 
-    function handleLanguageSearchKeyUp(event): void {
+    function handleLanguageSearchKeyUp(event: KeyboardEvent): void {
 
         const keyName = event.key;
         
@@ -201,11 +203,11 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
             event.preventDefault();
 
         else if (isEventKeyTakingUpSpace(keyName, false) || keyName === "Backspace")
-            handleLanguageSearch(event);
+            handleLanguageSearch();
     }
 
 
-    function handleLanguageSearch(event): void {
+    function handleLanguageSearch(): void {
 
         const currentSearchInputValue: string = languageSearchBarRef.current!.value;
 

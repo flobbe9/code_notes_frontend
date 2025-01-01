@@ -1,7 +1,6 @@
+import { DefinedUseQueryResult } from "@tanstack/react-query";
 import React, { Fragment, ReactNode, useContext, useEffect } from "react";
 import "../../assets/styles/App.scss";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import { DefinedUseQueryResult } from "@tanstack/react-query";
 import { AppContext } from "../App";
 
 

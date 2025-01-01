@@ -165,7 +165,7 @@ export default forwardRef(function Confirm(
                 <Flex horizontalAlign="right">
                     {/* Cancel */}
                     <Button 
-                        className="Confirm-footer-cancelButton hover me-2" 
+                        className="Confirm-footer-cancelButton hoverStrong me-2" 
                         ref={cancelButtonRef}
                         onRender={focusCancelButton}
                         onClick={handleCancel}
