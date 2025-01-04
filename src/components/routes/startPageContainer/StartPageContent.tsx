@@ -47,7 +47,8 @@ export default function StartPageContent({...props}: Props) {
         currentNotesPage, 
         setCurrentNotesPage,
         noteSearchResults,
-        setNoteSearchResults
+        setNoteSearchResults,
+        isLoggedIn
     } = useContext(AppFetchContext);
     const { selectedTagEntityNames, noteSearchValue, setNoteSearchValue } = useContext(StartPageContainerContext);
     const searchNoteHelper = new SearchNoteHelper(noteUseQueryResult.data, selectedTagEntityNames);
@@ -257,7 +258,7 @@ export default function StartPageContent({...props}: Props) {
                 </Flex>
 
                 <Flex className="mt-2 mb-4" horizontalAlign="right">
-                    <SaveAllNotesButton className="mb-2" disabled={!editedNoteIds.size} rendered={noteEntities.length > 1} />
+                    <SaveAllNotesButton className="mb-2" disabled={!editedNoteIds.size && isLoggedIn} rendered={noteEntities.length > 1} />
                     <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-2`} />
                 </Flex>
 

@@ -267,7 +267,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
 
         // case: no unsaved notes or this one is the only unsaved note
-        if (!editedNoteIds.size || (editedNoteIds.size === 1 && editedNoteIds.has(noteEntity.id || -1)))
+        if ((!editedNoteIds.size || (editedNoteIds.size === 1 && editedNoteIds.has(noteEntity.id || -1))) && isLoggedIn)
             noteUseQueryResult.refetch();
 
         // case: got more unsaved notes
