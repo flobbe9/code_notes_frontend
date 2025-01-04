@@ -1,4 +1,4 @@
-import React, { MouseEvent, useContext, useRef } from "react";
+import React, { MouseEvent, useContext } from "react";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
@@ -8,7 +8,6 @@ import { isNumberFalsy } from '../../../helpers/utils';
 import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextHolder";
 import Button from "../../helpers/Button";
-import HiddenInput from "../../helpers/HiddenInput";
 import Login from "../Login";
 
 
@@ -26,8 +25,6 @@ export default function SaveAllNotesButton({...props}: Props) {
     const { noteEntities, isLoggedIn, fetchSaveAllNoteEntities, noteUseQueryResult } = useContext(AppFetchContext);
 
     const {className, children, ...otherProps} = getCleanDefaultProps(props, "SaveAllNotesButton", true);
-
-    const hiddenInputRef = useRef<HTMLInputElement>(null);
 
 
     /**
@@ -86,8 +83,6 @@ export default function SaveAllNotesButton({...props}: Props) {
             {...otherProps}
         >
             <i className="fa-solid fa-floppy-disk me-2"></i> <span>Save all changes</span>
-
-            <HiddenInput ref={hiddenInputRef} />
 
             {children}
         </Button>
