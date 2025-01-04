@@ -1,8 +1,8 @@
-import React, { forwardRef, Ref, useContext, useImperativeHandle, useRef } from "react";
+import React, { forwardRef, KeyboardEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import "../../../../assets/styles/NoteTitle.scss";
 import { INVALID_INPUT_CLASS_NAME, MAX_NOTE_TITLE_VALUE_LENGTH } from "../../../../helpers/constants";
-import { flashClass, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
+import { flashClass, isEventKeyTakingUpSpace, log } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
 import { NoteContext } from "./Note";
 
@@ -22,37 +22,45 @@ export default forwardRef(function NoteTitle({...props}: Props, ref: Ref<HTMLInp
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteTitle");
 
-    const { toast, isControlKeyPressed } = useContext(AppContext);
+    const { toast } = useContext(AppContext);
     const { noteEntity, noteEdited } = useContext(NoteContext);
 
     const inputRef = useRef<HTMLInputElement>(null);
 
     useImperativeHandle(ref, () => inputRef.current!, []);
 
-    
-    function handleChange(event): void {
 
+    useEffect(() => {
+        // using this instead of defaultValue, don't ask me why, but otherwise the change event is not called when removing all text at once
+        inputRef.current!.value = noteEntity.title;
+
+    }, [noteEntity]);
+
+
+    function handleChange(): void {
+
+        log("change")
         noteEntity.title = inputRef.current!.value;
 
         noteEdited();
     }
 
 
-    function handleKeyDown(event): void {
+    function handleKeyDown(event: KeyboardEvent): void {
 
-        if (isEventKeyTakingUpSpace(event.key, false) && !isControlKeyPressed() && isTitleValueTooLong(event))
-            handleTitleTooLong(event);
+        if (isEventKeyTakingUpSpace(event.key, false, true) && isTitleValueTooLong(event.key))
+            handleTitleTooLong(event.key);
     }
 
 
     /**
-     * @param event the key down event (assuming that the key has not yet been added to the input value)
+     * @param eventKey assuming that the key has not yet been added to the input value
      * @returns ```true``` if the note title's value is longer than {@link MAX_NOTE_TITLE_VALUE_LENGTH}
      */
-    function isTitleValueTooLong(event): boolean {
+    function isTitleValueTooLong(eventKey: string): boolean {
 
         const noteInput = inputRef.current!;
-        const noteInputValue = noteInput.value + event.key;
+        const noteInputValue = noteInput.value + eventKey;
 
         return noteInputValue.length > MAX_NOTE_TITLE_VALUE_LENGTH;
     }
@@ -96,7 +104,6 @@ export default forwardRef(function NoteTitle({...props}: Props, ref: Ref<HTMLInp
                 type="text" 
                 title="Note title"
                 placeholder="Note title..."
-                defaultValue={noteEntity.title}
                 maxLength={MAX_NOTE_TITLE_VALUE_LENGTH}
                 ref={inputRef}
                 onKeyDown={handleKeyDown}

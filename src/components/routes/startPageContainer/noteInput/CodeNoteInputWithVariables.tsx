@@ -51,7 +51,7 @@ export default function CodeNoteInputWithVariables({
     const componentRef = useRef<HTMLDivElement>(null);
     const inputDivRef = useRef<HTMLDivElement>(null);
 
-    const { isKeyPressed, isControlKeyPressed } = useContext(AppContext);
+    const { isKeyPressed } = useContext(AppContext);
     const { noteEdited } = useContext(NoteContext);
     const { 
         codeNoteInputWithVariablesLanguage, 
@@ -100,7 +100,7 @@ export default function CodeNoteInputWithVariables({
      */
     function highlightAndSanitizeDefault(text: string): string {
 
-        let highlightedText;
+        let highlightedText: string;
         if (isAutoDetectLanguage())
             highlightedText= hljs.highlightAuto(text).value;
 
@@ -501,7 +501,7 @@ export default function CodeNoteInputWithVariables({
             noteEdited();
         }
 
-        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed() && !(event.target as HTMLElement).classList.contains("variableInput"))
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !(event.target as HTMLElement).classList.contains("variableInput"))
             noteEdited();
     }
     

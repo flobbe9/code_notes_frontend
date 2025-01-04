@@ -59,6 +59,13 @@ export default function TagInput({propsKey, ...props}: Props) {
     }, []);
 
 
+    useEffect(() => {
+        // using this instead of defaultValue, don't ask me why, but otherwise the change event is not called when removing all text at once
+        inputRef.current!.value = tagEntity.name;
+
+    }, [tagEntity]);
+
+
     function handleKeyDown(event: KeyboardEvent): void {
 
         const keyName = event.key;
@@ -267,7 +274,6 @@ export default function TagInput({propsKey, ...props}: Props) {
                 placeholder="Tag..."
                 title={"Tag " + tagEntity.name}
                 spellCheck={false}
-                defaultValue={tagEntity.name}
                 ref={inputRef}
                 maxLength={MAX_TAG_INPUT_VALUE_LENGTH}
                 onKeyDown={handleKeyDown}
