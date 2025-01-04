@@ -5,11 +5,11 @@ import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../helpers/constants";
 import { animateAndCommit, getCssConstant } from "../../../helpers/utils";
 import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextHolder";
-import { StartPageContainerContext } from "./StartPageContainer";
-import StartPageSideBarTagList from "./StartPageSideBarTagList";
 import Button from "../../helpers/Button";
 import Flex from "../../helpers/Flex";
 import SearchBar from "../../helpers/SearchBar";
+import { StartPageContainerContext } from "./StartPageContainer";
+import StartPageSideBarTagList from "./StartPageSideBarTagList";
 
 
 interface Props extends DefaultProps {
@@ -30,7 +30,7 @@ export default function StartPageSideBar({...props}: Props) {
     const [anyTagsSelected, setAnyTagsSelected] = useState(false);
 
     const { isKeyPressed, isMobileWidth } = useContext(AppContext);
-    const { appUserEntity } = useContext(AppFetchContext);
+    const { appUserEntity, isLoggedIn } = useContext(AppFetchContext);
     const { setIsShowSideBar, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
@@ -178,7 +178,7 @@ export default function StartPageSideBar({...props}: Props) {
                         <SearchBar 
                             placeHolder="Search tags..."
                             title="Search tags"
-                            disabled={!appUserEntity.tags?.length}
+                            disabled={!appUserEntity.tags?.length || !isLoggedIn}
                             ref={searchBarRef}
                             onChange={handleSearchBarChange}
                             onXIconClick={handleSearchBarXIconClick}
@@ -194,7 +194,7 @@ export default function StartPageSideBar({...props}: Props) {
                             <Button 
                                 className="resetButton hover" 
                                 title="Reset tag filter" 
-                                disabled={!anyTagsSelected}
+                                disabled={!anyTagsSelected || !isLoggedIn}
                                 onClick={handleResetClick} 
                             >
                                 Reset   
@@ -205,7 +205,7 @@ export default function StartPageSideBar({...props}: Props) {
 
                         {/* Tag checkboxes */}
                         <div className="startPageSideBarListContainer">
-                            <StartPageSideBarTagList disabled={!appUserEntity.tags?.length} />
+                            <StartPageSideBarTagList disabled={!appUserEntity.tags?.length || !isLoggedIn} />
                         </div>
                     </div>
                 </Flex>
