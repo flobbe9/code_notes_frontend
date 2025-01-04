@@ -176,7 +176,7 @@ export default function StartPageContent({...props}: Props) {
     function handleSearch(searchValue = noteSearchValue): void {
 
         // if edited notes
-        if (editedNoteIds.size) {
+        if (editedNoteIds.size && isLoggedIn) {
             toast("Cannot search", "Please save your pending changes first.", "warn");
             return;
         }
