@@ -4,7 +4,7 @@ import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { NoteInputType } from "../../../../abstract/NoteInputType";
 import "../../../../assets/styles/AddNewNoteInputButtons.scss";
 import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../../../helpers/constants";
-import { log, sleep } from "../../../../helpers/utils";
+import { sleep } from "../../../../helpers/utils";
 import { AppFetchContext } from "../../../AppFetchContextHolder";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
 import Flex from "../../../helpers/Flex";
@@ -25,15 +25,17 @@ export default function AddNewNoteInputButtons({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInputButtons");
 
-    const { noteEntities, noteUseQueryResult } = useContext(AppFetchContext);
+    const { noteEntities } = useContext(AppFetchContext);
     const { 
         noteEntity, 
         noteEdited, 
-        setAreNoteInputsExpanded
+        setAreNoteInputsExpanded,
+        gotNewNoteInputs,
+        setGotNewNoteInputs
     } = useContext(NoteContext);
 
 
-    function handleAddCodeNoteInput(event): void {
+    function handleAddCodeNoteInput(): void {
          
         // case: not noteInputs yet
         if (!noteEntity.noteInputs)
@@ -43,7 +45,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
     }
 
 
-    function handleAddPlainTextNoteInput(event): void {
+    function handleAddPlainTextNoteInput(): void {
          
         // case: not noteInputs yet
         if (!noteEntity.noteInputs)
@@ -53,7 +55,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
     }
 
 
-    function handleAddCodeNoteInputWithVariables(event): void {
+    function handleAddCodeNoteInputWithVariables(): void {
 
         // case: not noteInputs yet
         if (!noteEntity.noteInputs)
@@ -137,16 +139,11 @@ export default function AddNewNoteInputButtons({...props}: Props) {
         // wait for noteInputs to be expanded
         await sleep(100);
 
+        // notify <Note>
+        setGotNewNoteInputs(!gotNewNoteInputs);
         noteEntity.noteInputs = [...noteEntity.noteInputs, noteInputEntity];
 
         noteEdited();
-
-        // not on render
-        // not on page load
-        // not on delete input
-
-        // is expanded
-        // has at least one element
     }
  
 
