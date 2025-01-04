@@ -1272,7 +1272,7 @@ export async function slideDown(element: HTMLElement | undefined | null, duratio
 
     const actualHeight = element.offsetHeight;
 
-    animateAndCommit(
+    await animateAndCommit(
         element,
         [{ height: "0px" }, { height: actualHeight + "px" }],
         { 
@@ -1303,7 +1303,7 @@ export async function slideUp(element: HTMLElement | undefined | null, duration 
         duration = 100;
 
     const animation = element.animate(
-        [{ height: "0px" }],
+        [{ height: window.getComputedStyle(element).getPropertyValue("height") }, { height: "0px" }],
         { 
             duration, 
             easing, 

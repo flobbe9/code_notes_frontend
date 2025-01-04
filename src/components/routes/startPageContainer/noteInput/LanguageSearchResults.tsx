@@ -40,10 +40,7 @@ export default function LanguageSearchResults({
 
 
     useEffect(() => {
-        if (rendered)
-            slideDown(componentRef.current!);
-        else
-            slideUp(componentRef.current!);
+        handleRenderdChange();
 
     }, [rendered]);
 
@@ -202,6 +199,19 @@ export default function LanguageSearchResults({
 
         return Array.from(languageSearchBarChildren)
             .find(child => child.classList.contains("searchInput")) as HTMLInputElement
+    }
+
+
+    function handleRenderdChange(): void {
+
+        if (rendered)
+            slideDown(componentRef.current!, 100, "ease", {}, () => {
+                // makes height adjust to number of results
+                componentRef.current!.style.height = "unset";
+            });
+            
+        else
+            slideUp(componentRef.current!)
     }
 
 
