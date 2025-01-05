@@ -247,7 +247,7 @@ export default function App() {
     }
 
 
-    function handleWindowKeyDown(event): void {
+    function handleWindowKeyDown(event: KeyboardEvent): void {
 
         const key = event.key;
 

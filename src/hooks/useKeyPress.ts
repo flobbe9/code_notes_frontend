@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { isStringFalsy, logWarn } from "../helpers/utils";
+import { isStringFalsy, logDebug, logWarn } from "../helpers/utils";
 
 
 /**
@@ -19,7 +19,7 @@ export default function useKeyPress(checkAllKeys = false) {
 
         // case: falsy param
         if (isStringFalsy(keyName)) {
-            logWarn("Failed to add pressed key to list. 'keyName' is falsy");
+            logDebug(`Failed to add pressed key to list. 'keyName' ${keyName} is falsy`);
             return;
         }
 
@@ -31,7 +31,7 @@ export default function useKeyPress(checkAllKeys = false) {
 
         // case: falsy param
         if (isStringFalsy(keyName)) {
-            logWarn("Failed to remove pressed key to list. 'keyName' is falsy");
+            logDebug(`Failed to remove pressed key to list. 'keyName' ${keyName} is falsy`);
             return;
         }
 

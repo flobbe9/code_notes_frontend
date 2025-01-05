@@ -1562,3 +1562,24 @@ export function scrollTop(): void {
 
     window.scrollTo(window.scrollX, 0);
 }
+
+
+/**
+ * Convenience method wrapping the ```JSON.parse``` method inside a try catch.
+ * 
+ * @param value to parse to an object
+ * @returns the parsed object or ```null``` if error
+ */
+export function jsonParseDontThrow<ReturnType>(value: string | null | undefined): ReturnType | null {
+
+    if (isBlank(value))
+        return null;
+
+    try {
+        return JSON.parse(value!);
+
+    } catch (e) {
+        logDebug(e.message);
+        return null;
+    }
+}

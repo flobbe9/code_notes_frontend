@@ -4,7 +4,7 @@ import { NoteEntity } from "../../../abstract/entites/NoteEntity";
 import "../../../assets/styles/StartPageContent.scss";
 import { NUM_NOTES_PER_PAGE } from "../../../helpers/constants";
 import { SearchNoteHelper } from "../../../helpers/SearchNoteHelper";
-import { getRandomString, isBlank } from "../../../helpers/utils";
+import { getRandomString, isBlank, log } from "../../../helpers/utils";
 import { useCsrfToken } from "../../../hooks/useCsrfToken";
 import AddNewNoteButton from "../../AddNewNoteButton";
 import { AppContext } from "../../App";
