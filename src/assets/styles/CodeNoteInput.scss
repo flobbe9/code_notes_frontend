@@ -1,5 +1,6 @@
 @import "./global/functions.scss";
 
+
 :root {
     // set on redner
     --fullEditorWidth: 500px;
@@ -16,6 +17,22 @@
             max-width: 73vw;
         }
     }
+
+    &:not(.fullScreen) {
+        // not focused, not disabled, hover
+        &:has(textarea:not(:focus)) {
+            &:has(.overflow-guard:not([disabled]):hover) {
+                .overflow-guard, .lines-content { 
+                    background-color: var(--matteBlackLight);
+                }
+            }
+        }
+        &:has(textarea:not([disabled]):focus) {
+            .overflow-guard, .lines-content {
+                background-color: var(--matteBlackLighter) !important;
+            }
+        }
+    }
     
     .editorContainer {
         // = <Editor /> tag
@@ -28,6 +45,8 @@
                 
                 .overflow-guard {
                     background-color: var(--matteBlack);
+                    border-left: var(--noteInputDefaultBorder) var(--codeNoteInputColor);
+                    border-right: var(--noteInputDefaultBorder) var(--codeNoteInputColor);
                     padding: 0 var(--noteInputPaddingX);
                     transition: background-color var(--transitionTime), width var(--transitionTime);
                     
@@ -58,12 +77,11 @@
                             
                             // line container
                             .view-lines {
-                                padding: 0 var(--noteInputPaddingX);
                                 width: var(--fullEditorWidth) !important;
                                 
                                 // line
-                                .view-line {
-                                }
+                                // .view-line {
+                                // }
                             }
                         }
                     }
