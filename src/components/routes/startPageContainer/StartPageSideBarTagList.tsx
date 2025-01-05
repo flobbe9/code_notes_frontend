@@ -26,7 +26,7 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
 
     const [tags, setTags] = useState<JSX.Element[]>([]);
 
-    const { appUserEntity, noteEntities } = useContext(AppFetchContext);
+    const { appUserEntity } = useContext(AppFetchContext);
     const { isupdateSideBarTagList } = useContext(StartPageContainerContext);
     const { searchValue } = useContext(StartPageSideBarContext);
 
@@ -38,7 +38,7 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
     useEffect(() => {
         updateTags();
 
-    }, [appUserEntity, noteEntities, isupdateSideBarTagList]);
+    }, [appUserEntity, isupdateSideBarTagList]);
 
 
     useEffect(() =>  {
@@ -85,7 +85,6 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
         if (isBlank(searchValue) || !allTagEntities)
             return allTagEntities;
         
-        // iterate all tags
         return allTagEntities
             .filter(tagEntity =>
                 matchStringsConsiderWhiteSpace(searchValue, tagEntity.name));
