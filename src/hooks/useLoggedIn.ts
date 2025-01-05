@@ -30,7 +30,7 @@ export function useLoggedIn() {
      * @returns ```true``` if login fetch request is status 200, else false
      */
     async function fetchLoggedIn(): Promise<boolean> {
-
+        
         const url = `${BACKEND_BASE_URL}/app-user/check-logged-in`;
 
         const response = await fetchAny(url);

@@ -45,10 +45,10 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
             newNoteEntity = jsonResponse;
         }
 
-        if (editedNoteIds.size || noteSearchResults) {
+        if (editedNoteIds.size || noteSearchResults || !isLoggedIn) {
             // set focus first to true
             setNoteEntities([newNoteEntity, ...noteEntities]);
-            setNotes([createNoteByNoteEntity(newNoteEntity), ...notes]);
+            setNotes([createNoteByNoteEntity(newNoteEntity, true), ...notes]);
             
         } else
             noteUseQueryResult.refetch();

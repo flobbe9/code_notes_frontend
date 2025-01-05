@@ -52,7 +52,7 @@ export default function App() {
     /** List of note ids that have been edited since they were last saved. Remove a note id from this list, once the note gets saved */
     const [editedNoteIds, setEditedNoteIds] = useState<Set<Number>>(new Set());
 
-    const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress();
+    const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress(true);
 
     /** Time the toast popup takes to slide up and down in ms. */
     const toastSlideDuration = 400;
@@ -247,7 +247,7 @@ export default function App() {
     }
 
 
-    function handleWindowKeyDown(event): void {
+    function handleWindowKeyDown(event: KeyboardEvent): void {
 
         const key = event.key;
 

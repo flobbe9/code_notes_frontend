@@ -1,5 +1,5 @@
 import React, { ChangeEvent, MouseEvent, useContext, useEffect, useRef } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../../abstract/InputValidationWrapper";
 import "../../assets/styles/Login.scss";
@@ -19,6 +19,7 @@ import Oauth2LoginButton from "./../Oauth2LoginButton";
 import ResendConfirmationMail from "./../ResendConfirmationMail";
 import SendPasswordResetMail from "./../SendPasswordResetMail";
 import Register from "./Register";
+import { UNSAVD_NOTES_KEY } from "../../hooks/useNotes";
 
 
 interface Props extends DefaultProps {
@@ -54,10 +55,8 @@ export default function Login({isPopupContent = false, ...props}: Props) {
 
     const { toast, hidePopup, showPopup, replacePopupContent } = useContext(AppContext);
     const { clearUrlQueryParams } = useContext(RouteContext);
-    const { fetchLogin, isLoggedInUseQueryResult } = useContext(AppFetchContext);
+    const { fetchLogin, isLoggedInUseQueryResult, noteEntities } = useContext(AppFetchContext);
     
-    const navigate = useNavigate();
-
     const [urlQueryParams, setUrlSearchParams] = useSearchParams();
     
     type InputName = "email" | "password";
@@ -326,15 +325,21 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     }
     
     
-    function showResendConfirmationMailPopup(event: MouseEvent): void {
+    function showResendConfirmationMailPopup(): void {
 
         showPopup(<ResendConfirmationMail isParentPopupContent={isPopupContent} />);
     }
 
         
-    function showSendPasswordResetMailPopup(event: MouseEvent): void {
+    function showSendPasswordResetMailPopup(): void {
 
         showPopup(<SendPasswordResetMail isParentPopupContent={isPopupContent} />);
+    }
+
+
+    function handleOauth2ButtonClick(): void {
+
+        localStorage.setItem(UNSAVD_NOTES_KEY, JSON.stringify(noteEntities));
     }
 
 
@@ -444,6 +449,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
                         className="Login-contentContainer-oauth2Container-googleButton mb-3"
                         clientRegistrationId="google"
                         iconSrc={"/img/google.png"}
+                        onClick={handleOauth2ButtonClick}
                     >
                         Login with Google
                     </Oauth2LoginButton>
@@ -453,6 +459,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
                         className="Login-contentContainer-oauth2Container-githubButton mb-3"
                         clientRegistrationId="github"
                         iconSrc={"/img/github.png"}
+                        onClick={handleOauth2ButtonClick}
                     >
                         Login with GitHub
                     </Oauth2LoginButton>
@@ -462,6 +469,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
                         className="Login-contentContainer-oauth2Container-azureButton mb-3"
                         clientRegistrationId="azure"
                         iconSrc={"/img/microsoft.png"}
+                        onClick={handleOauth2ButtonClick}
                     >
                         Login with Microsoft
                     </Oauth2LoginButton>

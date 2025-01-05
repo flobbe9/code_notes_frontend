@@ -1272,7 +1272,7 @@ export async function slideDown(element: HTMLElement | undefined | null, duratio
 
     const actualHeight = element.offsetHeight;
 
-    animateAndCommit(
+    await animateAndCommit(
         element,
         [{ height: "0px" }, { height: actualHeight + "px" }],
         { 
@@ -1303,7 +1303,7 @@ export async function slideUp(element: HTMLElement | undefined | null, duration 
         duration = 100;
 
     const animation = element.animate(
-        [{ height: "0px" }],
+        [{ height: window.getComputedStyle(element).getPropertyValue("height") }, { height: "0px" }],
         { 
             duration, 
             easing, 
@@ -1561,4 +1561,25 @@ export async function sleep<T>(delay: number, resolveValue?: T): Promise<T | und
 export function scrollTop(): void {
 
     window.scrollTo(window.scrollX, 0);
+}
+
+
+/**
+ * Convenience method wrapping the ```JSON.parse``` method inside a try catch.
+ * 
+ * @param value to parse to an object
+ * @returns the parsed object or ```null``` if error
+ */
+export function jsonParseDontThrow<ReturnType>(value: string | null | undefined): ReturnType | null {
+
+    if (isBlank(value))
+        return null;
+
+    try {
+        return JSON.parse(value!);
+
+    } catch (e) {
+        logDebug(e.message);
+        return null;
+    }
 }

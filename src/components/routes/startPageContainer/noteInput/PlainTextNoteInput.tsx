@@ -1,5 +1,5 @@
 import parse from 'html-react-parser';
-import React, { ClipboardEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
@@ -8,7 +8,6 @@ import "../../../../assets/styles/PlainTextNoteInput.scss";
 import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
 import { animateAndCommit, getClipboardText, getCssConstant, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
-import { AppContext } from '../../../App';
 import Button from "../../../helpers/Button";
 import ContentEditableDiv from "../../../helpers/ContentEditableDiv";
 import Flex from "../../../helpers/Flex";
@@ -37,8 +36,7 @@ export default function PlainTextNoteInput({
     const [inputDivValue, setInputDivValue] = useState<any>()
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
-    const { isControlKeyPressed } = useContext(AppContext);
-    const { noteEdited, noteInputs } = useContext(NoteContext);
+    const { noteEdited } = useContext(NoteContext);
     const { 
         isNoteInputOverlayVisible,
         setIsNoteInputOverlayVisible, 
@@ -85,14 +83,10 @@ export default function PlainTextNoteInput({
         if (onBlur)
             onBlur(event);
 
-        const inputDiv = inputDivRef.current!;
+        const parsedText = await parseCodeTextToCodeHtml();
 
-        // case: no placeholder present
-        if (!isBlank(inputDiv.innerText)) {
-            const parsedText = await parseCodeTextToCodeHtml();
-            inputDiv.innerHTML = parsedText;
-            noteInputEntity.value = parsedText;
-        }
+        inputDivRef.current!.innerHTML = parsedText;
+        noteInputEntity.value = parsedText;
     }
 
 
@@ -207,19 +201,16 @@ export default function PlainTextNoteInput({
     }
 
 
-    function handleKeyDownCapture(event): void {
+    function handleKeyDownCapture(event: KeyboardEvent): void {
 
         const keyName = event.key;
 
         if (keyName === "Control")
             sanitizeClipboardText();
-
-        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed())
-            noteEdited();
     }
 
 
-    function handleKeyUp(event): void {
+    function handleKeyUp(event: KeyboardEvent): void {
 
         if (disabled)
             return;
@@ -230,23 +221,26 @@ export default function PlainTextNoteInput({
         const keyName = event.key;
 
         if (keyName === "Backspace" || keyName === "Delete")
-            cleanUpEmptyInputDiv(event);
+            cleanUpEmptyInputDiv();
+        
+        if (isEventKeyTakingUpSpace(keyName, true, true))
+            noteEdited();
     }
 
 
-    function handleCut(event: ClipboardEvent): void {
+    function handleCut(): void {
         
         noteEdited();
     }
 
 
-    function handlePaste(event: ClipboardEvent): void {
+    function handlePaste(): void {
 
         noteEdited();
     }
 
 
-    function cleanUpEmptyInputDiv(event): void {
+    function cleanUpEmptyInputDiv(): void {
 
         const inputDiv = inputDivRef.current!;
         const inputBreaks = inputDiv.querySelectorAll("br");
@@ -258,7 +252,7 @@ export default function PlainTextNoteInput({
     }
 
 
-    async function handleCopyClick(event): Promise<void> {
+    async function handleCopyClick(): Promise<void> {
 
         animateCopyIcon();
 

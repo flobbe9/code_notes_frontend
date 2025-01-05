@@ -51,6 +51,9 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
     const [areNoteInputsExpanded, setAreNoteInputsExpanded] = useState(false);
 
+    /** Toggle state, value does not imply anything. Is toggled when adding a new note input */
+    const [gotNewNoteInputs, setGotNewNoteInputs] = useState(false);
+
     const [draggedNoteInputIndex, setDraggedNoteInputIndex] = useState(NaN);
     /** Index of the noteInput, the mouse is currently hovering over while dragging another noteInput */
     const [dragOverNoteInputIndex, setDragOverNoteInputIndex] = useState(NaN); // NOTE: don't use -1 as default
@@ -91,6 +94,9 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
         noteEdited,
 
+        gotNewNoteInputs,
+        setGotNewNoteInputs,
+
         setAreNoteInputsExpanded,
     }
     
@@ -118,7 +124,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     useEffect(() => {
         handleAppendNoteInput();
 
-    }, [noteEntity.noteInputs]);
+    }, [gotNewNoteInputs]);
 
     
     useEffect(() => {
@@ -267,7 +273,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
 
         // case: no unsaved notes or this one is the only unsaved note
-        if (!editedNoteIds.size || (editedNoteIds.size === 1 && editedNoteIds.has(noteEntity.id || -1)))
+        if ((!editedNoteIds.size || (editedNoteIds.size === 1 && editedNoteIds.has(noteEntity.id || -1))) && isLoggedIn)
             noteUseQueryResult.refetch();
 
         // case: got more unsaved notes
@@ -494,6 +500,9 @@ export const NoteContext = createContext({
      * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```
      */
     noteEdited: (edited = true) => {},
+
+    gotNewNoteInputs: false as boolean,
+    setGotNewNoteInputs: (newNoteInputs: boolean) => {},
 
     setAreNoteInputsExpanded: (expanded: boolean) => {},
 })

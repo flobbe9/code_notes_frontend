@@ -19,21 +19,35 @@
         }
     }
 
+    &:not(.fullScreen) {
+        .plainTextInput {
+            transition: background-color var(--transitionTime);
+            @include scrollBar();
+            @include customHover {
+                &:not(:focus) {
+                    background-color: var(--matteBlackLight);
+                }
+            }
+            @include customFocus {
+                background-color: var(--matteBlackLighter);
+            }
+        }
+    }
+
     .inputDivContainer {
         height: 100%;
         margin: 0;
 
         .plainTextInput {
+            border-left: var(--noteInputDefaultBorder) var(--plainTextNoteInputColor);
+            border-right: var(--noteInputDefaultBorder) var(--plainTextNoteInputColor);
             color: white;
             font-family: roundFont;
-            font-size: 0.9em;
             height: 100%;
             max-height: 20vh;
             overflow: auto;
             padding: 8px var(--noteInputPaddingX);
             white-space: pre-wrap;
-
-            @include scrollBar();
 
             &:focus {
                 outline: none;
@@ -47,5 +61,5 @@
                 padding: 1px 7px 1px 6px;
             }
         }
-}
+    }
 }

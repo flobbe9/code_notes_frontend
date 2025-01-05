@@ -8,15 +8,13 @@ import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NUM_NOTES_PER_PAGE } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { isNumberFalsy, log, logWarn, scrollTop } from "../helpers/utils";
+import { isNumberFalsy, jsonParseDontThrow, logWarn, scrollTop } from "../helpers/utils";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 
 
 export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     const [noteEntities, setNoteEntities] = useState<NoteEntity[]>([]);
-    /** Notes created prior to login, these will be set right after logging in and then added to the ```noteEntities``` */
-    const [unsavedNotes, setUnsavedNotes] = useState<NoteEntity[]>([]);
     /** Global search results. Should be set to ```undefined``` if there's no search query */
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[] | undefined>(undefined);
     /** Is a toggle state, meaning that the boolean does not reflect the states meaning. Implies (on change) that new data has been fetched */
@@ -42,7 +40,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
     
     useEffect(() => {
-        if (useQueryResult.data && !unsavedNotes.length) {
+        if (useQueryResult.data && !getUnsavedNoteEntities().length) {
             setNoteEntities(getNoteEntitiesPage());
             // this is to notify the component to map all notes again
             setGotNewData(!gotNewData);
@@ -64,16 +62,13 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         if (isLoggedIn && appUserEntity)
             useQueryResult.refetch();
 
-    }, [isLoggedIn, appUserEntity])
+    }, [isLoggedIn, appUserEntity]);
 
 
     useEffect(() => {
-        if (isLoggedIn && noteEntities.length) {
-            setUnsavedNotes([...noteEntities]);
-            handleLogin();
-        }
+        handleUnsavedNotesTransfer();
             
-    }, [isLoggedIn])
+    }, [isLoggedIn]);
 
 
     async function fetchNotes(): Promise<NoteEntity[]> {
@@ -204,20 +199,22 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
      */
     async function handleLogin(): Promise<void> {
 
+        const unsavedNoteEntities = getUnsavedNoteEntities();
+
         // case: no unsaved notes
-        if (!noteEntities.length) {
+        if (!unsavedNoteEntities.length) 
             setNoteEntities([...useQueryResult.data]);
             
-        } else {
-            const jsonResponse = await fetchSaveAll(noteEntities);
+        else {
+            const jsonResponse = await fetchSaveAll(unsavedNoteEntities);
             if (isResponseError(jsonResponse))
                 return;
-            
-            setUnsavedNotes([]);
             
             toast("Save all notes", "All new notes saved successfully", "success", 4000);
         }
 
+        localStorage.removeItem(UNSAVD_NOTES_KEY);
+        
         // this is to notify the component to map all notes again
         setGotNewData(!gotNewData);
     }
@@ -257,7 +254,30 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         return noteEntities.slice(startIndex, endIndex);
     }
 
+
+    function getUnsavedNoteEntities(): NoteEntity[] {
+
+        const unsavedNoteEntities = jsonParseDontThrow<NoteEntity[]>(localStorage.getItem(UNSAVD_NOTES_KEY));
+
+        return unsavedNoteEntities || [];
+    }
+
+
+    /**
+     * NOTE: oauth2 error redirects (resulting in a not-loggedIn state) will loose unsaved notes
+     */
+    function handleUnsavedNotesTransfer() {
+
+        // transfer unsaved notes
+        if (isLoggedIn) {
+            if (noteEntities.length)
+                localStorage.setItem(UNSAVD_NOTES_KEY, JSON.stringify(noteEntities));
     
+            handleLogin();
+        } 
+    }
+
+        
     return {
         noteEntities, setNoteEntities,
         noteSearchResults, setNoteSearchResults,
@@ -273,3 +293,4 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 }
 
 export const NOTE_QUERY_KEY = ["notes"];
+export const UNSAVD_NOTES_KEY = "unsavedNotes";

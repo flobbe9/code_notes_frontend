@@ -4,7 +4,7 @@ import { NoteEntity } from "../../../abstract/entites/NoteEntity";
 import "../../../assets/styles/StartPageContent.scss";
 import { NUM_NOTES_PER_PAGE } from "../../../helpers/constants";
 import { SearchNoteHelper } from "../../../helpers/SearchNoteHelper";
-import { getRandomString, isBlank } from "../../../helpers/utils";
+import { getRandomString, isBlank, log } from "../../../helpers/utils";
 import { useCsrfToken } from "../../../hooks/useCsrfToken";
 import AddNewNoteButton from "../../AddNewNoteButton";
 import { AppContext } from "../../App";
@@ -47,7 +47,8 @@ export default function StartPageContent({...props}: Props) {
         currentNotesPage, 
         setCurrentNotesPage,
         noteSearchResults,
-        setNoteSearchResults
+        setNoteSearchResults,
+        isLoggedIn
     } = useContext(AppFetchContext);
     const { selectedTagEntityNames, noteSearchValue, setNoteSearchValue } = useContext(StartPageContainerContext);
     const searchNoteHelper = new SearchNoteHelper(noteUseQueryResult.data, selectedTagEntityNames);
@@ -174,8 +175,7 @@ export default function StartPageContent({...props}: Props) {
      */
     function handleSearch(searchValue = noteSearchValue): void {
 
-        // if edited notes
-        if (editedNoteIds.size) {
+        if (editedNoteIds.size && isLoggedIn) {
             toast("Cannot search", "Please save your pending changes first.", "warn");
             return;
         }
@@ -257,7 +257,7 @@ export default function StartPageContent({...props}: Props) {
                 </Flex>
 
                 <Flex className="mt-2 mb-4" horizontalAlign="right">
-                    <SaveAllNotesButton className="mb-2" disabled={!editedNoteIds.size} rendered={noteEntities.length > 1} />
+                    <SaveAllNotesButton className="mb-2" disabled={!editedNoteIds.size && isLoggedIn} rendered={noteEntities.length > 1} />
                     <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-2`} />
                 </Flex>
 

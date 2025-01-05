@@ -2,91 +2,13 @@
 
 :root {
     --noteInputPaddingX: 4px;
+    --noteInputDefaultBorder: 2px solid;
 }
 
 .DefaultNoteInput {
-    $noteInputDefaultBorderWidth: 2px;
-    $noteInputDefaultBorder: $noteInputDefaultBorderWidth solid;
-    $noteInputHoverBorderWidthIncrease: 3px;
-
-    border-left: $noteInputDefaultBorder transparent;
     position: relative;
     transition: opacity var(--transitionTime);
-
-    // PlainTextNoteInput
-    &:has(.PlainTextNoteInput) {
-        .ContentEditableDiv {
-            border-left: $noteInputDefaultBorder var(--plainTextNoteInputColor);
-            border-right: $noteInputDefaultBorder var(--plainTextNoteInputColor);
-        }
-    }
-    &:has(.PlainTextNoteInput:not(.fullScreen)) {
-        .ContentEditableDiv {
-            transition: background-color var(--transitionTime);
-
-            @include customHover {
-                &:not(:focus) {
-                    background-color: var(--matteBlackLight);
-                }
-            }
-            @include customFocus {
-                background-color: var(--matteBlackLighter);
-            }
-        }
-    }
     
-    // CodeNoteInputWithVariables
-    &:has(.CodeNoteInputWithVariables) {
-        .ContentEditableDiv {
-            border-left: $noteInputDefaultBorder var(--codeNoteInputWithVariablesColor) !important;
-            border-right: $noteInputDefaultBorder var(--codeNoteInputWithVariablesColor);
-        }
-    }
-    &:has(.CodeNoteInputWithVariables:not(.fullScreen)) {
-        .ContentEditableDiv {
-            transition: background-color var(--transitionTime);
-
-            @include customHover {
-                &:not(:focus) {
-                    background-color: var(--matteBlackLight);
-                }
-            }
-            @include customFocus {
-                background-color: var(--matteBlackLighter);
-            }
-        }
-    }
-    
-    // CodeNoteInput
-    &:has(.CodeNoteInput) {
-        .overflow-guard {
-            border-left: $noteInputDefaultBorder var(--codeNoteInputColor);
-            border-right: $noteInputDefaultBorder var(--codeNoteInputColor);
-        }
-    }
-    &:has(.CodeNoteInput:not(.fullScreen)) {
-        // not focused, not disabled, hover
-        &:has(textarea:not(:focus)) {
-            &:has(.overflow-guard:not([disabled]):hover) {
-                .overflow-guard, .lines-content { 
-                    background-color: var(--matteBlackLight);
-                }
-            }
-        }
-        &:has(textarea:not([disabled]):focus) {
-            .overflow-guard, .lines-content {
-                background-color: var(--matteBlackLighter);
-            }
-        }
-    }
-    &:has(textarea:not([disabled])) {
-        .overflow-guard {
-            .view-lines {
-                padding-left: calc(var(--noteInputPaddingX) - $noteInputHoverBorderWidthIncrease) !important;
-            }
-        }
-    }
-
     &-dragged {
         opacity: .5;
     }
