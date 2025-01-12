@@ -57,7 +57,7 @@ export default function NoteTagList({...props}: Props) {
             return [getNewTagElement()];
 
         const tags = noteEntity.tags.map(tagEntity => {
-            const key = tagEntity.id + "" || getRandomString();
+            const key = tagEntity.id ? tagEntity.id + "" : getRandomString();
             return <TagInput key={key} propsKey={key} />;
         });
 
@@ -131,10 +131,9 @@ export default function NoteTagList({...props}: Props) {
 
     /**
      * @param index
-     * @param name the tag name. Default is ""
      * @returns a ```<TagInput />``` with an empty tag name
      */
-    function getNewTagElement(name = ""): JSX.Element {
+    function getNewTagElement(): JSX.Element {
 
         const key = getRandomString();
         return <TagInput key={key} propsKey={key} />;

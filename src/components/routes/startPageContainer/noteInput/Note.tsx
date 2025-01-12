@@ -46,6 +46,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
     const numInitialNoteInputs = 1;
 
+    /** This always needs to be an object right from ```noteEntities``` state */
     const [noteEntity, setNoteEntity] = useState(NoteEntityService.getDefaultInstance());
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
@@ -68,6 +69,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
         noteEntities, 
         setNoteEntities, 
+        gotNewNoteEntities,
         fetchSaveNoteEntity, 
         fetchDeleteNoteEntity,
         noteUseQueryResult
@@ -81,6 +83,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
     const context = {
         noteEntity,
+        setNoteEntity,
 
         noteInputs, 
         setNoteInputs,
@@ -104,7 +107,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     useEffect(() => {
         updateNoteEntity();
         
-    }, []);
+    }, [gotNewNoteEntities]);
 
     
     useEffect(() => {
@@ -485,6 +488,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
 export const NoteContext = createContext({
     noteEntity: {} as NoteEntity,
+    setNoteEntity: (noteEntity: NoteEntity) => {},
 
     noteInputs: [<></>],
     setNoteInputs: (noteInputs: JSX.Element[]) => {},

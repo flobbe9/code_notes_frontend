@@ -35,7 +35,7 @@ export default function TagInput({propsKey, ...props}: Props) {
     const componentRef = useRef<HTMLDivElement>(null);
 
     const { toast } = useContext(AppContext);
-    const { appUserEntity, noteEntities} = useContext(AppFetchContext);
+    const { appUserEntity, noteUseQueryResult } = useContext(AppFetchContext);
     const { updateStartPageSideBarTagList } = useContext(StartPageContainerContext);
     const { noteEdited } = useContext(NoteContext);
 
@@ -94,7 +94,7 @@ export default function TagInput({propsKey, ...props}: Props) {
      * Mak sure only one empty tag input is present. Update sidebar tag list and ```appUserEntity.tags```.
      */
     function handleBlur(): void {
-        
+
         let numBlankTags = getNumBlankTags();
         
         if (isDuplicateTag(!numBlankTags)) {
@@ -117,7 +117,7 @@ export default function TagInput({propsKey, ...props}: Props) {
         else
             handleNewTag(numBlankTags);
 
-        AppUserService.removeUnusedTags(appUserEntity, noteEntities);
+        AppUserService.removeUnusedTags(appUserEntity, noteUseQueryResult.data);
 
         updateStartPageSideBarTagList();
     }
@@ -172,7 +172,8 @@ export default function TagInput({propsKey, ...props}: Props) {
 
     function focusNextTagInput(): void {
 
-        componentRef.current!.nextElementSibling?.querySelector("input")?.focus();
+        if (componentRef.current)
+            componentRef.current.nextElementSibling?.querySelector("input")?.focus();
     }
 
 

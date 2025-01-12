@@ -2,7 +2,7 @@ import React, { forwardRef, KeyboardEvent, Ref, useContext, useEffect, useImpera
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import "../../../../assets/styles/NoteTitle.scss";
 import { INVALID_INPUT_CLASS_NAME, MAX_NOTE_TITLE_VALUE_LENGTH } from "../../../../helpers/constants";
-import { flashClass, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
+import { flashClass, isEventKeyTakingUpSpace, log } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
 import { NoteContext } from "./Note";
 
@@ -48,7 +48,7 @@ export default forwardRef(function NoteTitle({...props}: Props, ref: Ref<HTMLInp
     function handleKeyDown(event: KeyboardEvent): void {
 
         if (isEventKeyTakingUpSpace(event.key, false, true) && isTitleValueTooLong(event.key))
-            handleTitleTooLong(event.key);
+            handleTitleTooLong(event);
     }
 
 
@@ -70,7 +70,7 @@ export default forwardRef(function NoteTitle({...props}: Props, ref: Ref<HTMLInp
      * 
      * @param event the key event that triggered this method
      */
-    function handleTitleTooLong(event): void {
+    function handleTitleTooLong(event: KeyboardEvent): void {
 
         event.preventDefault();
 
