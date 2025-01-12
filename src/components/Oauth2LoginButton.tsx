@@ -51,12 +51,12 @@ export default function Oauth2LoginButton({
             id={id} 
             className={className}
             style={style}
+            tabIndex={-1}
             {...otherProps}
         >
             <Link
                 className="Oauth2LoginButton-link blackLink fullWidth"
                 to={getLink()}
-                tabIndex={-1}
                 target={target}
             >
                 <Flex flexWrap="nowrap" verticalAlign="center">

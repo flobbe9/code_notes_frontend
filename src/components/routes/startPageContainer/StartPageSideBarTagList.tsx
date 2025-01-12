@@ -7,9 +7,9 @@ import { matchStringsConsiderWhiteSpace } from "../../../helpers/searchUtils";
 import { getRandomString, isBlank } from "../../../helpers/utils";
 import { AppFetchContext } from "../../AppFetchContextHolder";
 import HelperDiv from "../../helpers/HelperDiv";
+import { StartPageContainerContext } from "./StartPageContainer";
 import { StartPageSideBarContext } from "./StartPageSideBar";
 import TagCheckbox from "./TagCheckbox";
-import { StartPageContainerContext } from "./StartPageContainer";
 
 
 interface Props extends HelperProps {
@@ -27,7 +27,7 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
     const [tags, setTags] = useState<JSX.Element[]>([]);
 
     const { appUserEntity } = useContext(AppFetchContext);
-    const { isupdateSideBarTagList } = useContext(StartPageContainerContext);
+    const { isUpdateSideBarTagList } = useContext(StartPageContainerContext);
     const { searchValue } = useContext(StartPageSideBarContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBarTagList", true);
@@ -38,7 +38,7 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
     useEffect(() => {
         updateTags();
 
-    }, [appUserEntity, isupdateSideBarTagList]);
+    }, [appUserEntity, isUpdateSideBarTagList]);
 
 
     useEffect(() =>  {

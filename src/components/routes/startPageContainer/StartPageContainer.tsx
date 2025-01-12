@@ -25,7 +25,7 @@ export default function StartPageContainer({children, ...props}: Props) {
 
     const [isShowSideBar, setIsShowSideBar] = useState(false);
     /** State that will trigger the sidebar tag list to update. ```undefined``` should stay the init value */
-    const [isupdateSideBarTagList, setIsUpdateSideBarTagList] = useState<boolean>();
+    const [isUpdateSideBarTagList, setIsUpdateSideBarTagList] = useState<boolean>();
 
     /** List of tag entities inside ```<StartPageSideBarTagList>``` that are checked */
     const [selectedTagEntityNames, setSelectedTagEntityNames] = useState<Set<string>>(new Set());
@@ -38,7 +38,7 @@ export default function StartPageContainer({children, ...props}: Props) {
         isShowSideBar, 
         setIsShowSideBar,
 
-        isupdateSideBarTagList, 
+        isUpdateSideBarTagList, 
         setIsUpdateSideBarTagList,
         updateStartPageSideBarTagList,
 
@@ -71,7 +71,7 @@ export default function StartPageContainer({children, ...props}: Props) {
      * Simply toggle the ```isIsUpdateSideBarTagList``` state.
      */
     function updateStartPageSideBarTagList(): void {
-        setIsUpdateSideBarTagList(!isupdateSideBarTagList)
+        setIsUpdateSideBarTagList(!isUpdateSideBarTagList)
     }
 
 
@@ -126,7 +126,7 @@ export const StartPageContainerContext = createContext({
     isShowSideBar: false, 
     setIsShowSideBar: (isShow: boolean) => {},
 
-    isupdateSideBarTagList: true as (boolean | undefined), 
+    isUpdateSideBarTagList: true as (boolean | undefined), 
     setIsUpdateSideBarTagList: (update: boolean | undefined) => {},
     updateStartPageSideBarTagList: () => {},
 

@@ -1,4 +1,4 @@
-import React, { MouseEvent, useContext } from "react";
+import React, { useContext } from "react";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
@@ -29,10 +29,8 @@ export default function SaveAllNotesButton({...props}: Props) {
 
     /**
      * Fetch method will validate and toast. Refetch after success
-     * 
-     * @param event 
      */
-    async function handleSave(event: MouseEvent): Promise<void> {
+    async function handleSave(): Promise<void> {
         
         if (!isLoggedIn) {
             showPopup(<Login isPopupContent />);
