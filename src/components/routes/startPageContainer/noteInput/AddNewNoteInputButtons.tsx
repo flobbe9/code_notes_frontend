@@ -182,13 +182,15 @@ export default function AddNewNoteInputButtons({...props}: Props) {
             <div className="col-4">
                 <ButtonWithSlideLabel 
                     className="fullWidth addCodeNoteInputWithVariablesButton" 
-                    label="Code with variables" 
+                    label="Code with variables"
                     title="Add code section with variables"
                     onClick={handleAddCodeNoteInputWithVariables}
                 >
-                    <i className="fa-solid fa-plus me-2"></i>
-                    <i className="fa-solid fa-dollar-sign"></i>
-                    <span className="curlyBraces">&#123;&#125;</span> 
+                    <div className="dontBreakText">
+                        <i className="fa-solid fa-plus me-2"></i>
+                        <i className="fa-solid fa-dollar-sign"></i>
+                        <span className="curlyBraces">&#123;&#125;</span> 
+                    </div>
                 </ButtonWithSlideLabel>
             </div>
                 
