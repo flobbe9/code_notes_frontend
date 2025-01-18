@@ -640,9 +640,11 @@ export default function CodeNoteInputWithVariables({
     }
 
 
-    function handleAppendVariableButtonClick(event): void {
+    function handleAppendVariableButtonClick(): void {
 
         appendVariableInput();
+        updateNoteInputEntity();
+        noteEdited();
     }
 
 
