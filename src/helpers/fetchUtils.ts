@@ -4,10 +4,6 @@ import { BACKEND_BASE_URL, CSRF_TOKEN_HEADER_NAME } from "./constants";
 import { clearSensitiveCache, getCsrfToken, isNumberFalsy, logApiResponse, sleep } from "./utils";
 
 
-/** Http status code "Service Unavailable" 503, use this status when ```fetch()``` throws "failed to fetch" error */
-export const FAILED_TO_FETCH_STATUS_CODE = 503;
-
-
 /**
  * Call ```fetchAny``` with given params.
  * 

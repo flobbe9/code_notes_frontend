@@ -69,7 +69,6 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
         noteEntities, 
         setNoteEntities, 
-        gotNewNoteEntities,
         fetchSaveNoteEntity, 
         fetchDeleteNoteEntity,
         noteUseQueryResult
@@ -107,7 +106,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     useEffect(() => {
         updateNoteEntity();
         
-    }, [gotNewNoteEntities]);
+    }, [notes]);
 
     
     useEffect(() => {
@@ -352,6 +351,9 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
             return;
         }
 
+        // log(noteEntityIndex, noteEntities[noteEntityIndex].title, noteEntities[noteEntityIndex].id, propsKey)
+        // log the props key
+
         return noteEntities[noteEntityIndex];
     }
 
@@ -426,19 +428,16 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
                         flexWrap="nowrap" 
                         onDragEnter={() => setDragOverNoteInputIndex(-1)}
                     >
-                        {/* Title */}
                         <NoteTitle className="me-1 col-6" ref={titleInputRef} />
 
-                        {/* Tags */}
                         <NoteTagList className="col-6" />
                     </Flex>
 
-                    {/* NoteInputs */}
                     {noteInputs}
                 </div>
 
-                {/* Show all */}
                 <Flex horizontalAlign="center">
+                    {/* Show all */}
                     <ButtonWithSlideLabel
                         className={`${componentName}-showAllButton mb-2`}
                         rendered={(noteEntity.noteInputs || []).length > numInitialNoteInputs}
@@ -451,11 +450,10 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
                 </Flex>
 
                 <Flex className="mt-2">
-                    {/* Add note input */}
                     <AddNewNoteInputButtons className="col-12 col-xl-9" />
 
-                    {/* Delete */}
                     <Flex className="col-12 col-xl-3 mt-2" horizontalAlign="right">
+                        {/* Delete */}
                         <ButtonWithSlideLabel 
                             className="transition deleteNoteButton" 
                             label="Delete note"
