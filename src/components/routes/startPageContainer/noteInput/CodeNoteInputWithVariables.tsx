@@ -84,7 +84,6 @@ export default function CodeNoteInputWithVariables({
         if (focusOnRender)
             setTimeout(() => 
                 inputDivRef.current?.focus(), 10); // default text will be removed otherwise
-        
     }, []);
 
 
@@ -494,6 +493,9 @@ export default function CodeNoteInputWithVariables({
     async function handleKeyDownCapture(event: KeyboardEvent): Promise<void> {
 
         const keyName = event.key;
+
+        if (isKeyPressed("Control"))
+            sanitizeAndUpdateClipboardText();
         
         if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
             event.preventDefault();
