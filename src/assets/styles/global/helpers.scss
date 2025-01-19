@@ -246,6 +246,10 @@
     rotate: 180deg;
 }
 
+.rotate90 {
+    rotate: 90deg;
+}
+
 @keyframes rotating {
     from {transform: rotate(0deg)}
     to {transform: rotate(360deg)} 

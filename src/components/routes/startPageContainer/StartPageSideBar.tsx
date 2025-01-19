@@ -1,13 +1,11 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import "../../../assets/styles/StartPageSideBar.scss";
-import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../helpers/constants";
-import { animateAndCommit, getCssConstant } from "../../../helpers/utils";
 import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextHolder";
 import Button from "../../helpers/Button";
-import Flex from "../../helpers/Flex";
 import SearchBar from "../../helpers/SearchBar";
+import SideBar from "../../helpers/SideBar";
 import { StartPageContainerContext } from "./StartPageContainer";
 import StartPageSideBarTagList from "./StartPageSideBarTagList";
 
@@ -20,7 +18,6 @@ interface Props extends DefaultProps {
 /**
  * @since 0.0.1
  */
-// IDEA: filter icon
 export default function StartPageSideBar({...props}: Props) {
 
     /** Tag search value eagerly updated on change event */
@@ -29,14 +26,13 @@ export default function StartPageSideBar({...props}: Props) {
     /** Refers to ```selectedTagEntityNames``` beeing not empty */
     const [anyTagsSelected, setAnyTagsSelected] = useState(false);
 
-    const { isKeyPressed, isMobileWidth } = useContext(AppContext);
+    const { isKeyPressed } = useContext(AppContext);
     const { appUserEntity, isLoggedIn } = useContext(AppFetchContext);
-    const { setIsShowSideBar, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
+    const { isShowSideBar, setIsShowSideBar, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
+    const { children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
 
-    const componentRef = useRef(null);
-    const tagFilterContainerRef = useRef<HTMLDivElement>(null);
+    const componentRef = useRef<HTMLDivElement>(null);
     const searchBarRef = useRef<HTMLInputElement>(null);
 
     const context = {
@@ -59,94 +55,32 @@ export default function StartPageSideBar({...props}: Props) {
     }, [selectedTagEntityNames]);
 
 
-    function slideRightTagFilterContainer(): void {
+    function handleKeyDown(event: KeyboardEvent): void {
 
-        setIsShowSideBar(true);
-
-        const tagFilterContainer = tagFilterContainerRef.current!;
-
-        tagFilterContainer.style.display = "block";
-
-        animateAndCommit(tagFilterContainer, 
-            {
-                width: getMaxWidth(), 
-                paddingRight: getCssConstant("tagFilterContainerPadding"),
-                paddingLeft: getCssConstant("tagFilterContainerPadding"),
-            },
-            { 
-                duration: BLOCK_SETTINGS_ANIMATION_DURATION,
-                easing: "ease-out",
-            }
-        );
-    }
-
-
-    function slideLeftTagFilterContainer(): void {
-
-        setIsShowSideBar(false);
-
-        const tagFilterContainer = tagFilterContainerRef.current!;
-
-        animateAndCommit(
-            tagFilterContainer,
-            {
-                width: 0, 
-                paddingRight: 0,
-                paddingLeft: 0
-            },
-            {
-                duration: BLOCK_SETTINGS_ANIMATION_DURATION,
-                easing: "ease-in"
-            },
-            () => tagFilterContainer.style.display = "none"
-        );
-    }
-
-
-    function toggleTagFilterContainer(): void {
-
-        const display = tagFilterContainerRef.current!.style.display;
-
-        if (display === "block") 
-            slideLeftTagFilterContainer();
-        else
-            slideRightTagFilterContainer();
-    }
-
-
-    function getMaxWidth(): string {
-
-        return isMobileWidth ? getCssConstant("startPageSideBarWidthWidthMobile") : getCssConstant("startPageSideBarWidth");
-    }
-
-
-    function handleKeyDown(event): void {
-
+        const sideBarDislay = (componentRef.current!.querySelector(".SideBar-right") as HTMLElement).style.display;
         const keyName = event.key;
-
-        if (keyName === "Escape")
-            slideLeftTagFilterContainer();
 
         if (isKeyPressed("Control") && keyName === "b") {
             event.preventDefault();
-            toggleTagFilterContainer();
+            // NOTE: don't use the state in here because it does not update after this event handler is beeing added to window
+            setIsShowSideBar(sideBarDislay !== "block");
         }
     }
 
 
-    function handleSearchBarChange(event): void {
+    function handleSearchBarChange(event: ChangeEvent): void {
 
-        setSearchValue(event.target.value);
+        setSearchValue((event.target as HTMLInputElement).value);
     }
 
 
-    function handleSearchBarXIconClick(event): void {
+    function handleSearchBarXIconClick(): void {
 
         setSearchValue("");
     }
 
 
-    function handleResetClick(event): void {
+    function handleResetClick(): void {
 
         setSelectedTagEntityNames(new Set());
         searchBarRef.current!.value = "";
@@ -156,62 +90,47 @@ export default function StartPageSideBar({...props}: Props) {
 
     return (
         <StartPageSideBarContext.Provider value={context}>
-            <div 
-                id={id} 
-                className={className}
-                style={style}
+            <SideBar 
                 ref={componentRef}
+                isVisible={isShowSideBar}
+                setIsVisible={setIsShowSideBar}
+                toggleIcon={<i className="fa-solid fa-filter fa-xl" title="Filter by tags (Ctrl + B)"></i>}
                 {...otherProps}
             >
-                <Flex className="fullHeight" flexWrap="nowrap">
-                    {/* Fixed sidebar part*/}
-                    <div className="toolBar">
-                        <Button className="toolBarToggleButton hover" onClick={toggleTagFilterContainer}>
-                            {/* <i className="fa-solid fa-bars fa-xl" title="Side bar (Ctrl + B)"></i> */}
-                            <i className="fa-solid fa-filter fa-xl" title="Filter by tags (Ctrl + B)"></i>
-                        </Button>
-                    </div>
+                {/* SearchBar */}
+                <SearchBar 
+                    placeHolder="Search tags..."
+                    title="Search tags"
+                    disabled={!appUserEntity.tags?.length || !isLoggedIn}
+                    ref={searchBarRef}
+                    onChange={handleSearchBarChange}
+                    onXIconClick={handleSearchBarXIconClick}
+                    _focus={{borderColor: "var(--accentColor)"}} 
+                    _searchIcon={{color: "var(--iconColor)"}}
+                    _searchInput={{color: "white"}} 
+                    _xIcon={{color: "var(--iconColor)"}}
+                />
 
-                    {/* Expandable sidebar part */}
-                    <div className="tagFilterContainer hidden" ref={tagFilterContainerRef}>
-                        {/* SearchBar */}
-                        <SearchBar 
-                            placeHolder="Search tags..."
-                            title="Search tags"
-                            disabled={!appUserEntity.tags?.length || !isLoggedIn}
-                            ref={searchBarRef}
-                            onChange={handleSearchBarChange}
-                            onXIconClick={handleSearchBarXIconClick}
-                            _focus={{borderColor: "var(--accentColor)"}} 
-                            _searchIcon={{color: "var(--iconColor)"}}
-                            _searchInput={{color: "white"}} 
-                            _xIcon={{color: "var(--iconColor)"}}
-                        />
+                {/* Reset button */}
+                {/* NOTE: don't use flex here */}
+                <div className="mt-3 textRight">
+                    <Button 
+                        className="resetButton hover" 
+                        title="Reset tag filter" 
+                        disabled={!anyTagsSelected || !isLoggedIn}
+                        onClick={handleResetClick} 
+                    >
+                        Reset   
+                    </Button>
+                </div>
 
-                        {/* Reset button */}
-                        {/* NOTE: don't use flex here */}
-                        <div className="mt-3 textRight">
-                            <Button 
-                                className="resetButton hover" 
-                                title="Reset tag filter" 
-                                disabled={!anyTagsSelected || !isLoggedIn}
-                                onClick={handleResetClick} 
-                            >
-                                Reset   
-                            </Button>
-                        </div>
+                <hr />
 
-                        <hr />
-
-                        {/* Tag checkboxes */}
-                        <div className="startPageSideBarListContainer">
-                            <StartPageSideBarTagList disabled={!appUserEntity.tags?.length || !isLoggedIn} />
-                        </div>
-                    </div>
-                </Flex>
-                    
-                {children}
-            </div>
+                {/* Tag checkboxes */}
+                <div className="startPageSideBarListContainer">
+                    <StartPageSideBarTagList disabled={!appUserEntity.tags?.length || !isLoggedIn} />
+                </div>
+            </SideBar>
         </StartPageSideBarContext.Provider>
     )
 }

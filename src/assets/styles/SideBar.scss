@@ -1,0 +1,28 @@
+@import "./global/functions.scss";
+
+:root {
+    --iconColor: rgb(179, 179, 179);
+    --sideBarWidth: 200px;
+    --sideBarWidthMobile: 30vw; // hardcoded in CodeNoteInput and StartPgaeContainer (0.3)
+    --sideBarPadding: 1rem;
+}
+
+.SideBar {
+    height: 100vh; 
+    position: sticky;
+    top: 0;
+    
+    &-left {
+        padding: 0.5rem;
+        
+        &-toggleButton {
+            color: white;
+            padding: 0.5rem;
+        }
+    }
+    
+    &-right {
+        padding: var(--sideBarPadding);
+        width: 0;
+    }
+}

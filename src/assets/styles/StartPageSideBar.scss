@@ -1,11 +1,7 @@
 @import "./global/functions.scss";
 
 :root {
-    --iconColor: rgb(179, 179, 179);
     --placeHolderColor: rgba(255, 255, 255, 0.582);
-    --startPageSideBarWidth: 200px;
-    --startPageSideBarWidthWidthMobile: 30vw; // hardcoded in CodeNoteInput and StartPgaeContainer (0.3)
-    --tagFilterContainerPadding: 1rem;
 }
 
 .StartPageSideBar {
@@ -14,57 +10,47 @@
     position: sticky;
     top: 0;
     
-    .toolBar {
-        background-color: var(--matteBlue);
-        color: white;
-        padding: 0.5rem;
-        
-        .toolBarToggleButton {
-            background-color: transparent;
+    .SideBar {
+        &-right {
+            border-radius: var(--borderRadius);
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
             color: white;
-            
-            margin-top: 10px;
-            padding: 0.5rem;
+            width: 0;
 
-            &:focus {
-                outline-color: white;
-            }
-        }
-    }
-    
-    .tagFilterContainer {
-        border-radius: var(--borderRadius);
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        color: white;
-        padding: var(--tagFilterContainerPadding);
-        width: 0;
+            .SearchBar {
+                padding: 5px;
+                
+                .searchInput {
+                    @include placeholder {
+                        color: var(--placeHolderColor);
+                    }
+                }
 
-        .SearchBar {
-            padding: 5px;
-
-            .searchInput {
-                @include placeholder {
-                    color: var(--placeHolderColor);
+                .clearSearchValueButton {
+                    color: white;
                 }
             }
 
-            .clearSearchValueButton {
-                // for outline to be white on focus
+            .resetButton {
+                border: 3px solid var(--bs-gray-300);
+                background-color: transparent;
                 color: white;
+                padding: 3px 5px;
+            }
+
+            .startPageSideBarListContainer {
+                overflow: auto;
+                @include scrollBar();
             }
         }
 
-        .resetButton {
-            border: 3px solid var(--bs-gray-300);
-            background-color: transparent;
-            color: white;
-            padding: 3px 5px;
-        }
+        &-left {
+            background-color: var(--matteBlue);
 
-        .startPageSideBarListContainer {
-            overflow: auto;
-            @include scrollBar();
+            &-toggleButton {
+                margin-top: 7px;
+            }
         }
     }
 }
