@@ -50,7 +50,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     const [numEditorLines, setNumEditorLines] = useState(1);
     const [editorHeight, setEditorHeight] = useState(0);
 
-    const { isShowSideBar, getStartPageSideBarWidth } = useContext(StartPageContainerContext);
+    const { isStartPageSideBarVisible, getStartPageSideBarWidth } = useContext(StartPageContainerContext);
     const { noteEdited } = useContext(NoteContext);
     const { 
         isShowNoteInputSettings, 
@@ -121,7 +121,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         if (!isNumberFalsy(fullEditorWidth))
             handleToggleSideBar();
 
-    }, [isShowSideBar]);
+    }, [isStartPageSideBarVisible]);
 
     
     useEffect(() => {
@@ -310,10 +310,10 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
      */
     function handleToggleSideBar(): void {
 
-        setEditorTransition(isShowSideBar ? 0 : BLOCK_SETTINGS_ANIMATION_DURATION + 10);
+        setEditorTransition(isStartPageSideBarVisible ? 0 : BLOCK_SETTINGS_ANIMATION_DURATION + 10);
 
         // case: show side bar
-        if (isShowSideBar) {
+        if (isStartPageSideBarVisible) {
             const fullEditorWidth = updateFullEditorWidth();
             const sideBarWidth = getStartPageSideBarWidth();
 

@@ -1,5 +1,6 @@
 import React, { forwardRef, ReactNode, Ref, useEffect, useImperativeHandle, useRef } from "react";
-import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import { getCleanDefaultProps } from "../../abstract/DefaultProps";
+import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/SideBar.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
 import { animateAndCommit, getCssConstant } from "../../helpers/utils";
@@ -7,7 +8,7 @@ import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
 
 
-interface Props extends DefaultProps {
+interface Props extends HelperProps {
     /** Default is the burger button icon */
     toggleIcon?: ReactNode
     isVisible: boolean,
@@ -46,6 +47,9 @@ export default forwardRef(function SideBar(
 
 
     useEffect(() => {
+        if (props.onRender)
+            props.onRender();
+
         window.addEventListener("keydown", handleKeyDown);
 
         return () => {
@@ -127,7 +131,13 @@ export default forwardRef(function SideBar(
         >
             {/* Fixed sidebar part*/}
             <div className={`${componentName}-left`}>
-                <Button className={`${componentName}-left-toggleButton hover`} onClick={() => setIsVisible(!isVisible)}>
+                <Button 
+                    className={`${componentName}-left-toggleButton hover`} 
+                    disabled={props.disabled}
+                    onClick={() => setIsVisible(!isVisible)}
+                    _disabled={props._disabled}
+                    _focus={props._focus}
+                >
                     {toggleIcon || <i className="fa-solid fa-bars fa-xl"></i>}
                 </Button>
             </div>

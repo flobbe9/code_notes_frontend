@@ -23,7 +23,7 @@ interface Props extends DefaultProps {
  */
 export default function StartPageContainer({children, ...props}: Props) {
 
-    const [isShowSideBar, setIsShowSideBar] = useState(false);
+    const [isStartPageSideBarVisible, setIsStartPageSideBarVisible] = useState(false);
     /** State that will trigger the sidebar tag list to update. ```undefined``` should stay the init value */
     const [isUpdateSideBarTagList, setIsUpdateSideBarTagList] = useState<boolean>();
 
@@ -35,8 +35,8 @@ export default function StartPageContainer({children, ...props}: Props) {
     const { setCurrentNotesPage } = useContext(AppFetchContext);
 
     const context = {
-        isShowSideBar, 
-        setIsShowSideBar,
+        isStartPageSideBarVisible, 
+        setIsStartPageSideBarVisible,
 
         isUpdateSideBarTagList, 
         setIsUpdateSideBarTagList,
@@ -123,8 +123,8 @@ export default function StartPageContainer({children, ...props}: Props) {
 
 
 export const StartPageContainerContext = createContext({
-    isShowSideBar: false, 
-    setIsShowSideBar: (isShow: boolean) => {},
+    isStartPageSideBarVisible: false, 
+    setIsStartPageSideBarVisible: (isShow: boolean) => {},
 
     isUpdateSideBarTagList: true as (boolean | undefined), 
     setIsUpdateSideBarTagList: (update: boolean | undefined) => {},

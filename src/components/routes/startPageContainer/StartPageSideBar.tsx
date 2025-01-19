@@ -28,7 +28,7 @@ export default function StartPageSideBar({...props}: Props) {
 
     const { isKeyPressed, isMobileWidth } = useContext(AppContext);
     const { appUserEntity, isLoggedIn } = useContext(AppFetchContext);
-    const { isShowSideBar, setIsShowSideBar, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
+    const { isStartPageSideBarVisible, setIsStartPageSideBarVisible, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
 
     const { children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
 
@@ -63,7 +63,7 @@ export default function StartPageSideBar({...props}: Props) {
         if (isKeyPressed("Control") && keyName === "b") {
             event.preventDefault();
             // NOTE: don't use the state in here because it does not update after this event handler is beeing added to window
-            setIsShowSideBar(sideBarDislay !== "block");
+            setIsStartPageSideBarVisible(sideBarDislay !== "block");
         }
     }
 
@@ -92,8 +92,8 @@ export default function StartPageSideBar({...props}: Props) {
         <StartPageSideBarContext.Provider value={context}>
             <SideBar 
                 ref={componentRef}
-                isVisible={isShowSideBar}
-                setIsVisible={setIsShowSideBar}
+                isVisible={isStartPageSideBarVisible}
+                setIsVisible={setIsStartPageSideBarVisible}
                 toggleIcon={<i className="fa-solid fa-filter fa-xl" title="Filter by tags (Ctrl + B)"></i>}
                 maxWidth={isMobileWidth ? "30vw" : "200px"} // 30vw is hardcoded in CodeNoteInput and StartPgaeContainer (0.3)
                 {...otherProps}
