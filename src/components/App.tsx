@@ -424,19 +424,6 @@ export default function App() {
                                 {appOverlayContent}
                             </Overlay>
 
-                            <Popup 
-                                id="1"
-                                isPopupVisible={isPopupVisible} 
-                                popupContent={popupContent}
-                                setPopupContent={setPopupContent}
-                            />
-                            <Popup
-                                id="2" 
-                                isPopupVisible={isPopup2Visible} 
-                                popupContent={popup2Content}
-                                setPopupContent={setPopup2Content}
-                             />
-
                             <NavBar />
 
                             <div className="content">
@@ -464,6 +451,20 @@ export default function App() {
                             </div>
 
                             <Footer />
+
+                            <Popup 
+                                id="1"
+                                isPopupVisible={isPopupVisible} 
+                                popupContent={popupContent}
+                                setPopupContent={setPopupContent}
+                            />
+                            
+                            <Popup
+                                id="2" 
+                                isPopupVisible={isPopup2Visible} 
+                                popupContent={popup2Content}
+                                setPopupContent={setPopup2Content}
+                            />
 
                             {/* Toast popup */}
                             <Toast 

@@ -64,7 +64,7 @@ export default forwardRef(function Confirm(
 
     const [isRememberMyChoice, setIsRememberMyChoice] = useState(false);
 
-    const { hidePopup } = useContext(AppContext);
+    const { hidePopup, isMobileWidth } = useContext(AppContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Confirm");
 
@@ -165,7 +165,7 @@ export default forwardRef(function Confirm(
                 <Flex horizontalAlign="right">
                     {/* Cancel */}
                     <Button 
-                        className="Confirm-footer-cancelButton hoverStrong me-2" 
+                        className={`Confirm-footer-cancelButton hoverStrong me-2 ${isMobileWidth && 'mb-2'}`} 
                         ref={cancelButtonRef}
                         onRender={focusCancelButton}
                         onClick={handleCancel}
@@ -175,7 +175,7 @@ export default forwardRef(function Confirm(
 
                     {/* Confirm */}
                     <Button 
-                        className="Confirm-footer-confirmButton hover" 
+                        className={`Confirm-footer-confirmButton hover`}
                         ref={confirmButtonRef} 
                         onRender={focusConfirmButton}
                         onClick={handleConfirm}

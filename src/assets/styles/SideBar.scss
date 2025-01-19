@@ -24,7 +24,7 @@
     }
 
     &.leftAbsolute {
-        $zIndex: calc(var(--overlayZIndex) + 1);
+        $zIndex: calc(var(--overlayZIndex));
 
         min-height: 100%;
         z-index: $zIndex;
@@ -34,7 +34,7 @@
 
             &-toggleButton {
                 position: absolute;
-                z-index: $zIndex;
+                z-index: 1;
             }
         }
 

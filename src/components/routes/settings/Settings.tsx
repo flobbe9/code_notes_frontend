@@ -38,6 +38,11 @@ export default function Settings({...props}: Props) {
         <SettingsContext.Provider value={context}>
             <Flex {...otherProps}>
                 <Flex className={`${componentName}-container defaultPageContent`} flexWrap="nowrap">
+                    <Overlay 
+                        isOverlayVisible={isSettingsOverlayVisible}
+                        setIsOverlayVisible={setIsSettingsOverlayVisible}
+                    />
+                    
                     <SettingsLeft className="col-md-3" />
 
                     {/* hr */}
@@ -47,11 +52,6 @@ export default function Settings({...props}: Props) {
                     <div className={`${componentName}-container-right col-md-8`}>
                         {children}
                     </div>
-
-                    <Overlay 
-                        isOverlayVisible={isSettingsOverlayVisible}
-                        setIsOverlayVisible={setIsSettingsOverlayVisible}
-                    />
                 </Flex>
             </Flex>
         </SettingsContext.Provider>
