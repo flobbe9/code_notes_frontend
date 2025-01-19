@@ -1,20 +1,23 @@
-import React, { forwardRef, ReactNode, Ref, useContext, useEffect, useImperativeHandle, useRef } from "react";
+import React, { forwardRef, ReactNode, Ref, useEffect, useImperativeHandle, useRef } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/SideBar.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";
 import { animateAndCommit, getCssConstant } from "../../helpers/utils";
-import { AppContext } from "../App";
 import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
 
 
 interface Props extends DefaultProps {
-    /** Default is burger button icon */
+    /** Default is the burger button icon */
     toggleIcon?: ReactNode
     isVisible: boolean,
     setIsVisible: (isVisible: boolean) => void
+    /** Width the right slide content should be animated to. Needs to be numeric and needs to include the unit. Default is ```200px``` */
+    maxWidth?: string
+    /** Indicates whether the left slide part should have ```position: absolute```. Default is ```false``` */
+    leftAbsolute?: boolean
 }
-// reconsider default width
+
 
 /**
  * Generic side bar. ```children``` are rendered into the "right" content that can slide.
@@ -26,12 +29,12 @@ export default forwardRef(function SideBar(
         isVisible,
         setIsVisible,
         toggleIcon,
+        maxWidth = "200px",
+        leftAbsolute = false,
         ...props
     }: Props, 
     ref: Ref<HTMLDivElement>
 ) {
-
-    const { isMobileWidth } = useContext(AppContext);
 
     const componentName = "SideBar";
     const { className, children, ...otherProps } = getCleanDefaultProps(props, componentName, true);
@@ -71,7 +74,7 @@ export default forwardRef(function SideBar(
 
         animateAndCommit(tagFilterContainer, 
             {
-                width: getMaxWidth(), 
+                width: maxWidth, 
                 paddingRight: getCssConstant("sideBarPadding"),
                 paddingLeft: getCssConstant("sideBarPadding"),
             },
@@ -106,12 +109,6 @@ export default forwardRef(function SideBar(
     }
 
 
-    function getMaxWidth(): string {
-
-        return isMobileWidth ? getCssConstant("sideBarWidthMobile") : getCssConstant("sideBarWidth");
-    }
-
-
     function handleKeyDown(event: KeyboardEvent): void {
 
         const keyName = event.key;
@@ -123,7 +120,7 @@ export default forwardRef(function SideBar(
 
     return (
         <Flex 
-            className={`${className} fullHeight`}
+            className={`${className} fullHeight ${leftAbsolute && 'leftAbsolute'}`}
             ref={componentRef}
             flexWrap="nowrap"
             {...otherProps}

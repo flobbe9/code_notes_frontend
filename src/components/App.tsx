@@ -22,7 +22,7 @@ import NotFound from './routes/NotFound';
 import PrivacyPolicy from "./routes/PrivacyPolicy";
 import Register from "./routes/Register";
 import Profile from './routes/settings/profile/Profile';
-import SettingsPage from './routes/settings/SettingsPage';
+import Settings from './routes/settings/Settings';
 import StartPageContainer from './routes/startPageContainer/StartPageContainer';
 
 
@@ -454,9 +454,9 @@ export default function App() {
                                     <Route path={RESET_PASSWORD_BY_TOKEN_PATH} element={<ResetPassword />} />
                                     <Route path={PROFILE_PATH} element={
                                         <LoggedInComponent>
-                                            <SettingsPage>
+                                            <Settings>
                                                 <Profile />
-                                            </SettingsPage>
+                                            </Settings>
                                         </LoggedInComponent>
                                     } />
                                     <Route path="*" element={<NotFound></NotFound>} />

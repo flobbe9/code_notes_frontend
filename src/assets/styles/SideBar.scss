@@ -2,8 +2,6 @@
 
 :root {
     --iconColor: rgb(179, 179, 179);
-    --sideBarWidth: 200px;
-    --sideBarWidthMobile: 30vw; // hardcoded in CodeNoteInput and StartPgaeContainer (0.3)
     --sideBarPadding: 1rem;
 }
 
@@ -16,7 +14,6 @@
         padding: 0.5rem;
         
         &-toggleButton {
-            color: white;
             padding: 0.5rem;
         }
     }
@@ -24,5 +21,31 @@
     &-right {
         padding: var(--sideBarPadding);
         width: 0;
+    }
+
+    &.leftAbsolute {
+        $zIndex: calc(var(--overlayZIndex) + 1);
+
+        min-height: 100%;
+        z-index: $zIndex;
+
+        .SideBar-left {
+            width: 50px; // ~ burgerButtonOffsetWidth
+
+            &-toggleButton {
+                position: absolute;
+                z-index: $zIndex;
+            }
+        }
+
+        .SideBar-right {
+            background-color: white;
+            height: 100%;
+            position: absolute;
+            
+            &-content {
+                margin-top: 50px; // ~ bit more then burgerButtonOffsetHeight
+            }
+        }
     }
 }

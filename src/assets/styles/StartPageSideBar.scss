@@ -9,6 +9,7 @@
     height: 100vh; 
     position: sticky;
     top: 0;
+
     
     .SideBar {
         &-right {
@@ -49,6 +50,7 @@
             background-color: var(--matteBlue);
 
             &-toggleButton {
+                color: white;
                 margin-top: 7px;
             }
         }

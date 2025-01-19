@@ -26,7 +26,7 @@ export default function StartPageSideBar({...props}: Props) {
     /** Refers to ```selectedTagEntityNames``` beeing not empty */
     const [anyTagsSelected, setAnyTagsSelected] = useState(false);
 
-    const { isKeyPressed } = useContext(AppContext);
+    const { isKeyPressed, isMobileWidth } = useContext(AppContext);
     const { appUserEntity, isLoggedIn } = useContext(AppFetchContext);
     const { isShowSideBar, setIsShowSideBar, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
 
@@ -95,6 +95,7 @@ export default function StartPageSideBar({...props}: Props) {
                 isVisible={isShowSideBar}
                 setIsVisible={setIsShowSideBar}
                 toggleIcon={<i className="fa-solid fa-filter fa-xl" title="Filter by tags (Ctrl + B)"></i>}
+                maxWidth={isMobileWidth ? "30vw" : "200px"} // 30vw is hardcoded in CodeNoteInput and StartPgaeContainer (0.3)
                 {...otherProps}
             >
                 {/* SearchBar */}
