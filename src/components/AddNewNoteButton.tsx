@@ -1,12 +1,13 @@
-import React, { MouseEvent, useContext } from "react";
+import React, { MouseEvent, useContext, useEffect, useState } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";
 import { isResponseError } from "../helpers/fetchUtils";
-import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
 import Button from "./helpers/Button";
 import { StartPageContentContext } from "./routes/startPageContainer/StartPageContent";
+import { AppContext } from "./App";
+import { NoteEntityService } from "../abstract/services/NoteEntityService";
 
 
 interface Props extends HelperProps {
@@ -17,25 +18,34 @@ interface Props extends HelperProps {
 /**
  * @since 0.0.1
  */
-export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
+export default function AddNewNoteButton({onClick, ...props}: Props) {
 
-    const { editedNoteIds } = useContext(AppContext);
-    const { noteEntities, setNoteEntities, isLoggedIn, fetchSaveNoteEntity, noteUseQueryResult, noteSearchResults } = useContext(AppFetchContext);
-    const { notes, setNotes, createNoteByNoteEntity, setIsFocusFirstNote } = useContext(StartPageContentContext)
+    const [isDisabled, setIsDisabled] = useState(props.disabled);
+
+    const { toast } = useContext(AppContext);
+    const { editedNoteEntities, setEditedNoteEntities, isLoggedIn, fetchSaveNoteEntity, notesUseQueryResult, noteSearchResults } = useContext(AppFetchContext);
+    const { setIsFocusFirstNote } = useContext(StartPageContentContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteButton", true);
 
 
+    useEffect(() => {
+        setIsDisabled((isLoggedIn && !!editedNoteEntities.length) || props.disabled);
+
+    }, [editedNoteEntities, isLoggedIn, props.disabled]);
+
+
     /**
-     * Prepend a new ```note``` to both ```noteEntities``` and ```notes``` and save it. 
+     * Prepend a new ```note``` to both ```editedNoteEntities``` and ```notes``` and save it. Dont add if there's unsaved notes.
      */
     async function prependNote(): Promise<void> {
 
-        let newNoteEntity: NoteEntity = {
-            title: "",
-            noteInputs: [],
-            tags: []
+        if (editedNoteEntities.length && isLoggedIn) {
+            toast("Add new note", "Please save your pending changes before adding a new note", "warn", 8000);
+            return;
         }
+
+        let newNoteEntity: NoteEntity = NoteEntityService.getDefaultInstance();
 
         if (isLoggedIn) {
             const jsonResponse = await fetchSaveNoteEntity(newNoteEntity);
@@ -45,13 +55,12 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
             newNoteEntity = jsonResponse;
         }
 
-        if (editedNoteIds.size || noteSearchResults || !isLoggedIn) {
+        if (noteSearchResults || !isLoggedIn) {
             // set focus first to true
-            setNoteEntities([newNoteEntity, ...noteEntities]);
-            setNotes([createNoteByNoteEntity(newNoteEntity, true), ...notes]);
+            setEditedNoteEntities([newNoteEntity, ...editedNoteEntities]);
             
         } else
-            noteUseQueryResult.refetch();
+            notesUseQueryResult.refetch();
 
         setIsFocusFirstNote(true);
     }
@@ -59,7 +68,7 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
 
     async function handleClick(event: MouseEvent): Promise<void> {
 
-        if (disabled)
+        if (isDisabled)
             return;
 
         if (onClick)
@@ -74,6 +83,8 @@ export default function AddNewNoteButton({disabled, onClick, ...props}: Props) {
             id={id} 
             className={className + " hover"}
             style={style}
+            disabled={isDisabled}
+            title={`${isDisabled ? 'Please save your pending changes first' : 'Add a new note'}`}
             onClickPromise={handleClick}
             {...otherProps}
         >

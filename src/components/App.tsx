@@ -49,9 +49,6 @@ export default function App() {
     
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
-    /** List of note ids that have been edited since they were last saved. Remove a note id from this list, once the note gets saved */
-    const [editedNoteIds, setEditedNoteIds] = useState<Set<Number>>(new Set());
-
     const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress(true);
 
     /** Time the toast popup takes to slide up and down in ms. */
@@ -81,10 +78,7 @@ export default function App() {
 
         showPopup,
         hidePopup,
-        replacePopupContent,
-
-        editedNoteIds,
-        setEditedNoteIds,
+        replacePopupContent
     }
 
     const toastRef = useRef<HTMLDivElement>(null);
@@ -408,7 +402,7 @@ export default function App() {
 
     return (
         <AppContext.Provider value={context}>
-            <BrowserRouter>
+            <BrowserRouter future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
                 <RouteContextHolder>
                     <AppFetchContextHolder>
                         <div id="App" className="App">
@@ -509,7 +503,4 @@ export const AppContext = createContext({
     showPopup: (popupContent?: ReactNode | undefined) => {},
     hidePopup: () => {},
     replacePopupContent: (content: ReactNode | undefined) => {},
-
-    editedNoteIds: new Set<Number>(),
-    setEditedNoteIds: (ids: Set<Number>) => {}
 });

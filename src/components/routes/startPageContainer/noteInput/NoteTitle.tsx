@@ -23,7 +23,7 @@ export default forwardRef(function NoteTitle({...props}: Props, ref: Ref<HTMLInp
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteTitle");
 
     const { toast } = useContext(AppContext);
-    const { noteEntity, noteEdited } = useContext(NoteContext);
+    const { noteEntity, updateNoteEdited } = useContext(NoteContext);
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -41,7 +41,7 @@ export default forwardRef(function NoteTitle({...props}: Props, ref: Ref<HTMLInp
 
         noteEntity.title = inputRef.current!.value;
 
-        noteEdited();
+        updateNoteEdited();
     }
 
 

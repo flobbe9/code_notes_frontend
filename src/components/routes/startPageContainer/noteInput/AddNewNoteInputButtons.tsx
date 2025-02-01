@@ -25,10 +25,10 @@ export default function AddNewNoteInputButtons({...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInputButtons");
 
-    const { noteEntities } = useContext(AppFetchContext);
+    const { isLoggedIn, notesUseQueryResult, editedNoteEntities } = useContext(AppFetchContext);
     const { 
         noteEntity, 
-        noteEdited, 
+        updateNoteEdited, 
         setAreNoteInputsExpanded,
         gotNewNoteInputs,
         setGotNewNoteInputs
@@ -68,8 +68,9 @@ export default function AddNewNoteInputButtons({...props}: Props) {
     function getNewNoteInputEntityPlainText(): NoteInputEntity {
 
         let value = "";
+        const noteEntities = isLoggedIn ? notesUseQueryResult.data : editedNoteEntities;
 
-        // case: is first note and first noteInput with variables
+        // case: is first note and first noteInput
         if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("PLAIN_TEXT"))
             // add tutorial text
             value = "Plain text and some <code>code...</code>";
@@ -84,8 +85,9 @@ export default function AddNewNoteInputButtons({...props}: Props) {
     function getNewNoteInputEntityWithVariables(): NoteInputEntity {
 
         let value = "";
+        const noteEntities = isLoggedIn ? notesUseQueryResult.data : editedNoteEntities;
 
-        // case: is first note and first noteInput with variables
+        // case: is first note and first noteInput
         if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE_WITH_VARIABLES"))
             // add tutorial text
             value = `x = ${getDefaultVariableInput()} can be copied to the clipboard. Change the programming language on the right.`;
@@ -101,8 +103,9 @@ export default function AddNewNoteInputButtons({...props}: Props) {
     function getNewNoteInputEntityCode(): NoteInputEntity {
 
         let value = "";
+        const noteEntities = isLoggedIn ? notesUseQueryResult.data : editedNoteEntities;
 
-        // case: is first note and first noteInput with variables
+        // case: is first note and first noteInput
         if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE"))
             // add tutorial text
             value = "VSCode Editor. Change the programming language on the right.";
@@ -143,7 +146,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
         setGotNewNoteInputs(!gotNewNoteInputs);
         noteEntity.noteInputs = [...noteEntity.noteInputs, noteInputEntity];
 
-        noteEdited();
+        updateNoteEdited();
     }
  
 

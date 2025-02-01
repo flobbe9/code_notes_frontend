@@ -67,6 +67,7 @@ export const HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES = 12;
 /** Will be prepended to the localStorage key to prevent key name collisions. */
 export const REMEMBER_MY_CHOICE_KEY_PREFIX = "code_notes-rememberMyChoice-";
 export const HELP_EMAIL = "help.codenotes@gmail.com";
+/** Min is 1 for backend */
 export const NUM_NOTES_PER_PAGE = 5;
 
 

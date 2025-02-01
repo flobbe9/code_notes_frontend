@@ -36,7 +36,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
     /** List of results after searching. Init value is all results */
     const [languageSearchResults, setLanguageSearchResults] = useState<string[]>(mapLanguageNames(allLanguageSearchResults));
 
-    const { noteEdited } = useContext(NoteContext);
+    const { updateNoteEdited } = useContext(NoteContext);
     const { 
         isShowNoteInputSettings, 
         setIsShowNoteInputSettings,
@@ -191,7 +191,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
         // set searchbar value to selected language
         languageSearchBarRef.current!.value = language;
 
-        noteEdited();
+        updateNoteEdited();
     }
 
 

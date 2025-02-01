@@ -29,7 +29,7 @@ export default function NoteTagList({...props}: Props) {
 
     const componentRef = useRef<HTMLDivElement>(null);
 
-    const { appUserEntity, noteEntities } = useContext(AppFetchContext);
+    const { appUserEntity, editedNoteEntities, notesUseQueryResult } = useContext(AppFetchContext);
     const { noteEntity } = useContext(NoteContext);
 
     const context = {
@@ -106,7 +106,8 @@ export default function NoteTagList({...props}: Props) {
             return;
 
         // case: tagEntity is used somewhere else
-        if (AppUserService.isTagEntityPresentInANote(noteEntities, tagToRemove))
+        // TODO: unsaved notes wont be considered...
+        if (AppUserService.isTagEntityPresentInANote(notesUseQueryResult.data, tagToRemove))
             return;
                 
         AppUserService.removeTagEntity(appUserEntity, tagToRemove);

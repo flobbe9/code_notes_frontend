@@ -10,14 +10,14 @@ import { isBlank } from "./utils";
  */
 export class SearchNoteHelper {
 
-    private noteEntities: NoteEntity[];
+    private editedNoteEntities: NoteEntity[];
     
     private selectedTagEntityNames: Set<string>;
 
 
-    constructor(noteEntities: NoteEntity[], selectedTagEntityNames: Set<string>) {
+    constructor(editedNoteEntities: NoteEntity[], selectedTagEntityNames: Set<string>) {
 
-        this.noteEntities = noteEntities;
+        this.editedNoteEntities = editedNoteEntities;
         this.selectedTagEntityNames = selectedTagEntityNames;
     }
 
@@ -27,12 +27,12 @@ export class SearchNoteHelper {
         const selectedTagNames = [...this.selectedTagEntityNames || []];
 
         // case: no notes
-        if (!this.noteEntities.length)
+        if (!this.editedNoteEntities.length)
             return [];
 
         // case: no serach value and no selected tag
         if (isBlank(searchValue) && !selectedTagNames.length)
-            return this.noteEntities || [];
+            return this.editedNoteEntities || [];
 
         // case: both serach value and selected tag
         if (selectedTagNames.length && !isBlank(searchValue))
@@ -50,10 +50,10 @@ export class SearchNoteHelper {
     private matchAllNoteEntitiesBySelectedTag(): NoteEntity[] {
 
         // case: no notes present
-        if (!this.noteEntities.length)
+        if (!this.editedNoteEntities.length)
             return [];
 
-        return this.noteEntities
+        return this.editedNoteEntities
             .filter(noteEntity => 
                 this.matchNoteEntityBySelectedTagAndNoteTagExactly(this.selectedTagEntityNames, noteEntity));
     }
@@ -62,10 +62,10 @@ export class SearchNoteHelper {
     private matchAllNoteEntitiesBySearchValue(searchValue: string) {
 
         // case: falsy search input or no notes present
-        if (isBlank(searchValue) || !this.noteEntities.length)
+        if (isBlank(searchValue) || !this.editedNoteEntities.length)
             return [];
 
-        return this.noteEntities
+        return this.editedNoteEntities
             .filter(noteEntity => 
                 // match title
                 this.matchNoteEntityBySearchValueAndNoteTitle(searchValue, noteEntity) ||
@@ -78,10 +78,10 @@ export class SearchNoteHelper {
     private matchAllNoteEntitiesBySearchValueAndSelectedTag(searchValue: string): NoteEntity[] {
 
         // case: falsy search input or no notes present
-        if (!this.noteEntities.length)
+        if (!this.editedNoteEntities.length)
             return [];
 
-        return this.noteEntities
+        return this.editedNoteEntities
             .filter(noteEntity => 
                 this.matchNoteEntityBySearchValueAndSelectedTag(searchValue, noteEntity));
     }

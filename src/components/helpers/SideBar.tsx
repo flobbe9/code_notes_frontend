@@ -60,17 +60,17 @@ export default forwardRef(function SideBar(
 
     useEffect(() => {
         if (isVisible) 
-            slideClose();
-        else
             slideOpen();
+        else
+            slideClose();
 
     }, [isVisible]);
 
 
     /**
-     * Update the ```isVisible``` state to close, only use this in use effect
+     * Update the ```isVisible``` state to open, only use this in use effect
      */
-    function slideClose(): void {
+    function slideOpen(): void {
 
         const tagFilterContainer = rightRef.current!;
 
@@ -91,9 +91,9 @@ export default forwardRef(function SideBar(
 
 
     /**
-     * Update the ```isVisible``` state to open, only use this in use effect
+     * Update the ```isVisible``` state to close, only use this in use effect
      */
-    function slideOpen(): void {
+    function slideClose(): void {
 
         const tagFilterContainer = rightRef.current!;
 

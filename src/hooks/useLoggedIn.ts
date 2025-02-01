@@ -18,9 +18,9 @@ export function useLoggedIn() {
 
 
     const useQueryResult = useQuery<boolean>({
-        queryKey: LOGGED_IN_USER_QUERY_KEY,
+        queryKey: LOGGED_IN_QUERY_KEY,
         queryFn: fetchLoggedIn,
-        initialData: queryClient.getQueryData(LOGGED_IN_USER_QUERY_KEY) || false,
+        initialData: queryClient.getQueryData(LOGGED_IN_QUERY_KEY) || false,
     });
 
 
@@ -44,11 +44,8 @@ export function useLoggedIn() {
     }
 
 
-    return {
-        isLoggedIn: useQueryResult.data,
-        useQueryResult
-    }
+    return useQueryResult;
 }
 
 
-export const LOGGED_IN_USER_QUERY_KEY = ["loggedIn"];
+export const LOGGED_IN_QUERY_KEY = ["loggedIn"];

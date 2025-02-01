@@ -36,7 +36,7 @@ export default function PlainTextNoteInput({
     const [inputDivValue, setInputDivValue] = useState<any>()
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
-    const { noteEdited } = useContext(NoteContext);
+    const { updateNoteEdited } = useContext(NoteContext);
     const { 
         isNoteInputOverlayVisible,
         setIsNoteInputOverlayVisible, 
@@ -224,19 +224,19 @@ export default function PlainTextNoteInput({
             cleanUpEmptyInputDiv();
         
         if (isEventKeyTakingUpSpace(keyName, true, true))
-            noteEdited();
+            updateNoteEdited();
     }
 
 
     function handleCut(): void {
         
-        noteEdited();
+        updateNoteEdited();
     }
 
 
     function handlePaste(): void {
 
-        noteEdited();
+        updateNoteEdited();
     }
 
 

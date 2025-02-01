@@ -49,7 +49,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
         noteEntity, 
         noteInputs, 
         setNoteInputs, 
-        noteEdited,
+        updateNoteEdited,
         draggedNoteInputIndex,
         setDraggedNoteInputIndex,
         dragOverNoteInputIndex,
@@ -146,7 +146,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
 
         setAreNoteInputsExpanded(true);
 
-        noteEdited();
+        updateNoteEdited();
     }
 
 
@@ -207,18 +207,18 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
         const keyName = event.key;
 
         if (keyName === "Escape") 
-            handleEscape(event);
+            handleEscape();
     }
 
 
-    function handleEscape(event): void {
+    function handleEscape(): void {
 
         if (isFullScreen)
             deactivateFullScreen();
     }
 
     
-    function handleDragEnter(event: DragEvent): void {
+    function handleDragEnter(): void {
 
         setDragOverNoteInputIndex(getJsxElementIndexByKey(noteInputs, propsKey));
     }
@@ -247,10 +247,8 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
 
     /**
      * Remove styles of dragged noteInput and reset drag index states.
-     * 
-     * @param event 
      */
-    function handleDragEnd(event: DragEvent): void {
+    function handleDragEnd(): void {
 
         removeClass(componentRef.current!, `${componentName}-dragged`);
         setDraggedNoteInputIndex(NaN);

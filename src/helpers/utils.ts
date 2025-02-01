@@ -9,7 +9,7 @@ import { isDebugLogLevel, isErrorLogLevel, isInfoLogLevel, isWarnLogLevel, LogLe
 import { isRememberMyChoiceValue, RememberMyChoiceKey } from "../abstract/RememberMyChoice";
 import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
-import { NOTE_QUERY_KEY } from "../hooks/useNotes";
+import { NOTES_QUERY_KEY } from "../hooks/useNotes";
 import { APP_NAME_PRETTY, BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_LEVEL_COLORS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
 
@@ -1118,8 +1118,8 @@ export function clearUserCache(): void {
     
     clearSensitiveCache();
 
-    if (useQueryClientObj.getQueryData<AppUserEntity>(NOTE_QUERY_KEY))
-        useQueryClientObj.removeQueries({queryKey: NOTE_QUERY_KEY});
+    if (useQueryClientObj.getQueryData<AppUserEntity>(NOTES_QUERY_KEY))
+        useQueryClientObj.removeQueries({queryKey: NOTES_QUERY_KEY});
 }
 
 
@@ -1465,8 +1465,6 @@ export async function animateAndCommit(element: HTMLElement | undefined | null, 
     } catch (e) {
     }
     
-    animation.cancel();
-
     if (onComplete)
         onComplete();
 

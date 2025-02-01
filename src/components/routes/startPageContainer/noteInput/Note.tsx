@@ -46,7 +46,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
     const numInitialNoteInputs = 1;
 
-    /** This always needs to be an object right from ```noteEntities``` state */
+    /** This always needs to be an object right from ```editedNoteEntities``` state */
     const [noteEntity, setNoteEntity] = useState(NoteEntityService.getDefaultInstance());
     const [noteInputs, setNoteInputs] = useState<JSX.Element[]>([]);
 
@@ -59,19 +59,20 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     /** Index of the noteInput, the mouse is currently hovering over while dragging another noteInput */
     const [dragOverNoteInputIndex, setDragOverNoteInputIndex] = useState(NaN); // NOTE: don't use -1 as default
 
+    const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
 
-    const { toast, showPopup, editedNoteIds, setEditedNoteIds } = useContext(AppContext);
+    const { toast, showPopup } = useContext(AppContext);
     const { 
         appUserEntity, 
         appUserEntityUseQueryResult,
 
         isLoggedIn,
 
-        noteEntities, 
-        setNoteEntities, 
+        editedNoteEntities, 
+        setEditedNoteEntities, 
         fetchSaveNoteEntity, 
         fetchDeleteNoteEntity,
-        noteUseQueryResult
+        notesUseQueryResult
     } = useContext(AppFetchContext);
     const { notes, setNotes } = useContext(StartPageContentContext);
 
@@ -94,7 +95,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         dragOverNoteInputIndex, 
         setDragOverNoteInputIndex,
 
-        noteEdited,
+        updateNoteEdited,
 
         gotNewNoteInputs,
         setGotNewNoteInputs,
@@ -134,6 +135,12 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
             titleInputRef.current?.focus();
 
     }, [componentRef.current]);
+
+
+    useEffect(() => {
+        setIsSaveButtonDisabled(getIsSaveButtonDisabled());
+
+    }, [isLoggedIn, editedNoteEntities, noteEntity]); // TODO: remove isLoggedIn?
 
 
     function mapNoteInputsToJsx(): JSX.Element[] {
@@ -219,16 +226,15 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         }
 
         // case: there's other unsaved notes
-        if (editedNoteIds.size > 1) {
-            const noteIndex = getJsxElementIndexByKey(notes, propsKey);
-            noteEntities.splice(noteIndex, 1, jsonResponse);
-            setNoteEntities([...noteEntities]);
+        if (editedNoteEntities.length > 1) {
+            NoteEntityService.removeById(editedNoteEntities, noteEntity.id!);
+            setEditedNoteEntities([...editedNoteEntities]);
 
         // case: no unsaved notes anymore
         } else
-            noteUseQueryResult.refetch();
+            notesUseQueryResult.refetch();
 
-        noteEdited(false);
+        updateNoteEdited(false);
 
         toast("Save", "Successfully saved note", "success", 5000);
     }
@@ -236,7 +242,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
     function handleDeleteNoteClick(): void {
 
-        if (handleRememberMyChoice("deleteNote", deleteNote))
+        if (handleRememberMyChoice("deleteNote", handleDeleteNote))
             return;
 
         showPopup(
@@ -247,21 +253,21 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
                 rememberMyChoice
                 rememberMyChoiceLabel="Don't ask again"
                 rememberMyChoiceKey="deleteNote"
-                onConfirm={deleteNote}
+                onConfirm={handleDeleteNote}
             />
         );
     }
 
 
     /**
-     * Fetch delete notes and update both ```noteEntities``` and ```notes``` state.
+     * Fetch delete notes and update both ```editedNoteEntities``` and ```notes``` state.
      */
-    async function deleteNote(): Promise<void> {
+    async function handleDeleteNote(): Promise<void> {
 
         if (!appUserEntity)
             return;
         
-        // case: note was never saved in the first place, dont fetch delete
+        // only fetch delete if note was already saved before
         if (!isNumberFalsy(noteEntity.id)) {
             const response = await fetchDeleteNoteEntity(noteEntity);
             if (isResponseError(response)) {
@@ -273,21 +279,24 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         }
 
         const noteIndex = getJsxElementIndexByKey(notes, propsKey);
+        
+        // case: was edited
+        if (NoteEntityService.includesById(editedNoteEntities, noteEntity.id!) || !isLoggedIn) {
+            editedNoteEntities.splice(noteIndex, 1);
+            setEditedNoteEntities([...editedNoteEntities]);
+        }
 
-        // case: no unsaved notes or this one is the only unsaved note
-        if ((!editedNoteIds.size || (editedNoteIds.size === 1 && editedNoteIds.has(noteEntity.id || -1))) && isLoggedIn)
-            noteUseQueryResult.refetch();
+        // case: no unsaved notes || this one was the only unsaved note
+        if ((!editedNoteEntities.length || (editedNoteEntities.length === 1 && NoteEntityService.includesById(editedNoteEntities, noteEntity.id!))) && isLoggedIn)
+            notesUseQueryResult.refetch();
 
-        // case: got more unsaved notes
+        // case: got more unsaved notes, just remove this note
         else {
-            noteEntities.splice(noteIndex, 1);
-            setNoteEntities([...noteEntities]);
-            
             notes.splice(noteIndex, 1);
             setNotes([...notes]);
         } 
 
-        noteEdited(false);
+        updateNoteEdited(false);
     }
 
 
@@ -296,48 +305,51 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
      * 
      * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```
      */
-    function noteEdited(edited = true): void {
+    function updateNoteEdited(edited = true): void {
 
         // case: propably not rendered yet, or never saved (hence not logged in)
         if (!noteEntity || isNumberFalsy(noteEntity.id))
             return;
 
-        if (edited)
-            editedNoteIds.add(noteEntity.id!);
-        else 
-            editedNoteIds.delete(noteEntity.id!);
+        if (edited && !NoteEntityService.includesById(editedNoteEntities, noteEntity.id!))
+            setEditedNoteEntities([...editedNoteEntities, noteEntity]);
         
-        setEditedNoteIds(new Set(editedNoteIds));
+        else if (!edited) {
+            NoteEntityService.removeById(editedNoteEntities, noteEntity.id!);
+            setEditedNoteEntities([...editedNoteEntities]);
+        }
     }
 
 
     /**
-     * @returns ```true``` if note has a valid id (saved already) and is not edited
+     * @returns ```true``` if note is considered not "edited"
      */
-    function isSaveButtonDisabled(): boolean {
+    function getIsSaveButtonDisabled(): boolean {
 
-        return !isNumberFalsy(noteEntity.id) && !editedNoteIds.has(noteEntity.id || -1);
+        return isLoggedIn && !NoteEntityService.includesById(editedNoteEntities, noteEntity.id!);
     }
 
 
     /**
-     * Update ```noteEntity``` state retrieving the correct note entity from ```noteEntities``` using the jsx element index of this note
+     * Update ```noteEntity``` object retrieving it from ```notesUseQueryResult.data``` using the jsx element index of this note
      */
     function updateNoteEntity(): void {
 
         const noteEntity = getNoteEntityFromState();
         if (noteEntity)
-            setNoteEntity(noteEntity)
+            setNoteEntity(noteEntity);
     }
 
 
     /**
-     * @returns the noteEntity from ```noteEntities``` state using this note's current index in ```notes```
+     * @returns the noteEntity from either ```notesUseQueryResult.data``` or ```editedNoteEntities``` state using this note's current index in ```notes```
      */
     function getNoteEntityFromState(): NoteEntity | undefined {
 
-        // may happen on login / logout
-        if (!noteEntities.length)
+        // the note entities list currently used
+        const noteEntitiesState = isLoggedIn ? notesUseQueryResult.data : editedNoteEntities;
+
+        if (!noteEntitiesState.length)
             return;
 
         const noteEntityIndex = getJsxElementIndexByKey(notes, propsKey);
@@ -346,15 +358,12 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
             return;
         }
 
-        if (noteEntityIndex >= noteEntities.length) {
-            logWarn(`Note entity index ${noteEntityIndex} out of bounds for 'noteEntities' length ${noteEntities.length}`);
+        if (noteEntityIndex >= noteEntitiesState.length) {
+            logWarn(`Note entity index ${noteEntityIndex} out of bounds for 'noteEntitiesState' length ${noteEntitiesState.length}`);
             return;
         }
 
-        // log(noteEntityIndex, noteEntities[noteEntityIndex].title, noteEntities[noteEntityIndex].id, propsKey)
-        // log the props key
-
-        return noteEntities[noteEntityIndex];
+        return noteEntitiesState[noteEntityIndex];
     }
 
 
@@ -392,7 +401,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         noteInputs.splice(fixedDraggedOverNoteInputIndex, 0, draggedNoteInput);
         setNoteInputs([...noteInputs]);
 
-        noteEdited();
+        updateNoteEdited();
     }
     
 
@@ -468,7 +477,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
                             className="saveNoteButton ms-2" 
                             label="Save note"
                             title="Save note"
-                            disabled={isSaveButtonDisabled()}
+                            disabled={isSaveButtonDisabled}
                             ref={saveButtonRef}
                             onClickPromise={handleSave}
                         >
@@ -501,7 +510,7 @@ export const NoteContext = createContext({
     /**
      * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```
      */
-    noteEdited: (edited = true) => {},
+    updateNoteEdited: (edited = true) => {},
 
     gotNewNoteInputs: false as boolean,
     setGotNewNoteInputs: (newNoteInputs: boolean) => {},

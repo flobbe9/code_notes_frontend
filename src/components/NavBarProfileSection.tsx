@@ -28,8 +28,8 @@ export default function NavBarProfileSection({...props}: Props) {
     const componentName = "NavBarProfileSection";
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName, true);
 
-    const { isMobileWidth, editedNoteIds, showPopup } = useContext(AppContext);
-    const { isLoggedIn, isLoggedInUseQueryResult, logout } = useContext(AppFetchContext);
+    const { isMobileWidth, showPopup } = useContext(AppContext);
+    const { editedNoteEntities, isLoggedIn, isLoggedInUseQueryResult, logout } = useContext(AppFetchContext);
 
     
     if (!isLoggedInUseQueryResult.isFetched)
@@ -38,7 +38,7 @@ export default function NavBarProfileSection({...props}: Props) {
 
     function handleLogout(): void {
 
-        if (editedNoteIds.size) {
+        if (editedNoteEntities.length) {
             showPopup(
                 <Confirm 
                     heading={<h2>Discard unsaved changes?</h2>}

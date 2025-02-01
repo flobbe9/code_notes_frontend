@@ -19,7 +19,7 @@ import Oauth2LoginButton from "./../Oauth2LoginButton";
 import ResendConfirmationMail from "./../ResendConfirmationMail";
 import SendPasswordResetMail from "./../SendPasswordResetMail";
 import Register from "./Register";
-import { UNSAVD_NOTES_KEY } from "../../hooks/useNotes";
+import { EDITED_NOTES_KEY } from "../../hooks/useNotes";
 
 
 interface Props extends DefaultProps {
@@ -55,7 +55,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
 
     const { toast, hidePopup, showPopup, replacePopupContent } = useContext(AppContext);
     const { clearUrlQueryParams } = useContext(RouteContext);
-    const { fetchLogin, isLoggedInUseQueryResult, noteEntities } = useContext(AppFetchContext);
+    const { fetchLogin, isLoggedInUseQueryResult, editedNoteEntities } = useContext(AppFetchContext);
     
     const [urlQueryParams, setUrlSearchParams] = useSearchParams();
     
@@ -339,7 +339,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
 
     function handleOauth2ButtonClick(): void {
 
-        localStorage.setItem(UNSAVD_NOTES_KEY, JSON.stringify(noteEntities));
+        localStorage.setItem(EDITED_NOTES_KEY, JSON.stringify(editedNoteEntities));
     }
 
 

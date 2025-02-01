@@ -95,7 +95,7 @@ export default function StartPageSideBar({...props}: Props) {
                 isVisible={isStartPageSideBarVisible}
                 setIsVisible={setIsStartPageSideBarVisible}
                 toggleIcon={<i className="fa-solid fa-filter fa-xl" title="Filter by tags (Ctrl + B)"></i>}
-                maxWidth={isMobileWidth ? "30vw" : "200px"} // 30vw is hardcoded in CodeNoteInput and StartPgaeContainer (0.3)
+                maxWidth={isMobileWidth ? "30vw" : "var(--startPageSideBarWidth)"} // 30vw is hardcoded in CodeNoteInput and StartPgaeContainer (0.3)
                 {...otherProps}
             >
                 {/* SearchBar */}

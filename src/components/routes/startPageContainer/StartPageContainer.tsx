@@ -31,8 +31,8 @@ export default function StartPageContainer({children, ...props}: Props) {
     const [selectedTagEntityNames, setSelectedTagEntityNames] = useState<Set<string>>(new Set());
     const [noteSearchValue, setNoteSearchValue] = useState("");
 
-    const { isMobileWidth, editedNoteIds } = useContext(AppContext);
-    const { setCurrentNotesPage } = useContext(AppFetchContext);
+    const { isMobileWidth } = useContext(AppContext);
+    const { setCurrentNotesPage, editedNoteEntities } = useContext(AppFetchContext);
 
     const context = {
         isStartPageSideBarVisible, 
@@ -56,7 +56,7 @@ export default function StartPageContainer({children, ...props}: Props) {
             removeConfirmPageUnload(handlePageUnload);
         }
 
-    }, [editedNoteIds]); 
+    }, [editedNoteEntities]); 
 
 
     useEffect(() => {
@@ -89,7 +89,7 @@ export default function StartPageContainer({children, ...props}: Props) {
 
     function addOrRemovePageUnloadEvent(): void {
 
-        if (editedNoteIds.size) 
+        if (editedNoteEntities.length) 
             confirmPageUnload(handlePageUnload); 
 
         else 

@@ -218,7 +218,7 @@ export default function PaginationBar({
                 className={`${className} fullWidth`} 
                 horizontalAlign="center" 
                 verticalAlign="center" 
-                rendered={!hideIfOnePage || totalPages !== 1}
+                rendered={!(hideIfOnePage && totalPages === 1)}
                 {...otherProps}
             >
                 {/* Left Arrow */}

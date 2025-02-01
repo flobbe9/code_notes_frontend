@@ -52,7 +52,7 @@ export default function CodeNoteInputWithVariables({
     const inputDivRef = useRef<HTMLDivElement>(null);
 
     const { isKeyPressed } = useContext(AppContext);
-    const { noteEdited } = useContext(NoteContext);
+    const { updateNoteEdited } = useContext(NoteContext);
     const { 
         codeNoteInputWithVariablesLanguage, 
         isNoteInputOverlayVisible,
@@ -500,23 +500,23 @@ export default function CodeNoteInputWithVariables({
         if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
             event.preventDefault();
             appendVariableInputSequence();
-            noteEdited();
+            updateNoteEdited();
         }
 
         if (isEventKeyTakingUpSpace(keyName, true, true) && !(event.target as HTMLElement).classList.contains("variableInput"))
-            noteEdited();
+            updateNoteEdited();
     }
     
 
     function handleCut(event: ClipboardEvent): void {
         
-        noteEdited();
+        updateNoteEdited();
     }
 
 
     function handlePaste(event: ClipboardEvent): void {
 
-        noteEdited();
+        updateNoteEdited();
     }
 
  
@@ -646,7 +646,7 @@ export default function CodeNoteInputWithVariables({
 
         appendVariableInput();
         updateNoteInputEntity();
-        noteEdited();
+        updateNoteEdited();
     }
 
 

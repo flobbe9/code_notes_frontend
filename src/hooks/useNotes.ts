@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { DefinedUseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from '../abstract/entites/AppUserEntity';
@@ -6,77 +6,75 @@ import { NoteEntity } from '../abstract/entites/NoteEntity';
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
-import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NUM_NOTES_PER_PAGE } from "../helpers/constants";
+import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NUM_NOTES_PER_PAGE, START_PAGE_PATH } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { isNumberFalsy, jsonParseDontThrow, logWarn, scrollTop } from "../helpers/utils";
+import { jsonParseDontThrow, logWarn, stringToNumber } from "../helpers/utils";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 
 
-export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
+export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUserEntity: AppUserEntity) {
 
-    const [noteEntities, setNoteEntities] = useState<NoteEntity[]>([]);
-    /** Global search results. Should be set to ```undefined``` if there's no search query */
-    const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[] | undefined>(undefined);
-    /** Is a toggle state, meaning that the boolean does not reflect the states meaning. Implies (on change) that new data has been fetched */
-    const [gotNewData, setGotNewData] = useState(false);
-
+    /** List of noteEntities that have been edited since they were last saved. Order should not matter */
+    const [editedNoteEntities, setEditedNoteEntities] = useState<NoteEntity[]>([]);
     /** 1-based */
     const [currentPage, setCurrentPage] = useState(1);
+    /** Global search results. Should be set to ```undefined``` if there's no search query */
+    const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[] | undefined>(undefined);
 
-    const { toast, setEditedNoteIds } = useContext(AppContext);
+    const { toast } = useContext(AppContext);
 
     const queryClient = useQueryClient();
 
-    const useQueryResult = useQuery<NoteEntity[]>({
-        queryKey: NOTE_QUERY_KEY,
+    const notesUseQueryResult = useQuery<NoteEntity[]>({
+        queryKey: NOTES_QUERY_KEY,
         queryFn: fetchNotes,
-        initialData: queryClient.getQueryData(NOTE_QUERY_KEY) || []
+        initialData: queryClient.getQueryData(NOTES_QUERY_KEY) || []
+    });
+
+    const notesTotalUseQueryResult = useQuery<number>({
+        queryKey: NOTES_TOTAL_QUERY_KEY,
+        queryFn: fetchNotesTotal,
+        initialData: queryClient.getQueryData(NOTES_TOTAL_QUERY_KEY) || 0
     });
 
 
     /** The time (in milliseconds) the note entities' fetch process may take before considering the process "taking longer" */
-    const noteEntitiesFetchDelay = 1000;
-    const isFetchTakingLonger = useIsFetchTakingLong(useQueryResult.isFetched, noteEntitiesFetchDelay, !useQueryResult.isFetched);
+    const noteEntitiesFetchDelay = 500;
+    const isFetchTakingLonger = useIsFetchTakingLong(notesUseQueryResult.isFetched, noteEntitiesFetchDelay, !notesUseQueryResult.isFetched);
+
+
+    useEffect(() => {
+        notesUseQueryResult.refetch();
+        
+    }, [currentPage]);
 
     
     useEffect(() => {
-        if (useQueryResult.data && !getUnsavedNoteEntities().length) {
-            setNoteEntities(getNoteEntitiesPage());
-            // this is to notify the component to map all notes again
-            setGotNewData(!gotNewData);
-        }
+        notesTotalUseQueryResult.refetch();
 
-    }, [useQueryResult.data, noteSearchResults]);
+    }, [notesUseQueryResult.data, noteSearchResults]);
 
 
     useEffect(() => {
-        // page change will refetch forgetting unsaved changes
-        refetchNotesAndUpdateState();
-        setTimeout(() => scrollTop(), 10); // don't ask me
-        setEditedNoteIds(new Set());
+        handleLogin();
 
-    }, [currentPage]);
+    }, [isLoggedInUseQueryResult.data, isLoggedInUseQueryResult.isFetched]);
 
 
-    useEffect(() => {
-        if (isLoggedIn && appUserEntity)
-            useQueryResult.refetch();
-
-    }, [isLoggedIn, appUserEntity]);
-
-
-    useEffect(() => {
-        handleUnsavedNotesTransfer();
-            
-    }, [isLoggedIn]);
-
-
+    /**
+     * Only fetch if is ```START_PAGE_PATH```.
+     * 
+     * ```pageNumber``` param is 0-based and cannot be negative. ```pageSize``` param needs to be greater equal 1
+     * 
+     * @returns fetched editedNoteEntities or empty array
+     */
     async function fetchNotes(): Promise<NoteEntity[]> {
 
-        if (!isLoggedIn || !appUserEntity)
+        if (!isLoggedInUseQueryResult.data || !appUserEntity || window.location.pathname !== START_PAGE_PATH)
             return [];
 
-        const url = `${BACKEND_BASE_URL}/note/get-all-by-appUser`;
+        // -1 because currentPage is 1-based but pageNumber param is 0-based, 
+        const url = `${BACKEND_BASE_URL}/note/get-by-app_user-pageable?pageNumber=${currentPage - 1}&pageSize=${NUM_NOTES_PER_PAGE}`;
 
         const jsonResponse = await fetchJson(url);
         if (isResponseError(jsonResponse)) {
@@ -89,26 +87,25 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
 
     /**
-     * Refetch and update states regardless of whether the data has changed or not.
-     * 
-     * @returns fetched data, just like ```fetchNotes```
+     * @returns total num of notes for the current app user
      */
-    async function refetchNotesAndUpdateState(): Promise<NoteEntity[]> {
-        
-        if (!isLoggedIn || !appUserEntity)
-            return [];
+    async function fetchNotesTotal(): Promise<number> {
 
-        const jsonResponse = await useQueryResult.refetch();
+        if (!isLoggedInUseQueryResult.data || !appUserEntity)
+            return 0;
 
-        if (isResponseError(jsonResponse))
-            return useQueryResult.data;
+        const url = `${BACKEND_BASE_URL}/note/count-by-app_user`;
 
-        setNoteEntities(getNoteEntitiesPage());
-        setGotNewData(!gotNewData);
+        const response = await fetchAny(url);
 
-        return jsonResponse.data || [];
+        if (isResponseError(response)) {
+            toast("Failed to load notes count", DEFAULT_ERROR_MESSAGE, "error");
+            return 0;
+        }
+
+        return stringToNumber(await response.text());
     }
-
+        
 
     /**
      * Save given ```noteEntity``` or return error obj. Will toast on fetch error.
@@ -121,7 +118,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         if (!noteEntity)
             return CustomExceptionFormatService.getInstanceAndLog(500, "Failed to save note entity. 'noteEntity' cannot be falsy");
 
-        if (!isLoggedIn)
+        if (!isLoggedInUseQueryResult.data)
             return CustomExceptionFormatService.getInstanceAndLog(401, "Failed to save note entity. UNAUTHORIZED");
 
         if (!new NoteEntityService().areValidIncludeReferences(toast, noteEntity))
@@ -141,27 +138,21 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
 
 
     /**
-     * Save given ```noteEntities``` or return error obj. Will toast on fetch error.
+     * Save given ```editedNoteEntities``` or return error obj. Will toast on fetch error.
      * 
-     * @param noteEntities to save
+     * @param editedNoteEntities to save
      * @returns the saved note entity or an error obj
      */
-    async function fetchSaveAll(noteEntities: NoteEntity[]): Promise<NoteEntity[] | CustomExceptionFormat> {
+    async function fetchSaveAll(editedNoteEntities: NoteEntity[]): Promise<NoteEntity[] | CustomExceptionFormat> {
 
-        if (!noteEntities)
+        if (!editedNoteEntities)
             return CustomExceptionFormatService.getInstanceAndLog(500, "Failed to save note entities. 'noteEntity' cannot be falsy");
 
-        if (!isLoggedIn)
-            return CustomExceptionFormatService.getInstanceAndLog(401, "Failed to save note entities. UNAUTHORIZED");
-
-        if (!noteEntities.length)
-            return CustomExceptionFormatService.getInstanceAndLog(204, "Failed to save note entities. NO_CONTENT");
-
-        if (!new NoteEntityService().areValidIncludeReferences(toast, ...noteEntities))
+        if (!new NoteEntityService().areValidIncludeReferences(toast, ...editedNoteEntities))
             return CustomExceptionFormatService.getInstanceAndLog(400, "Failed to save note entity. BAD_REQUEST");
 
         const url = `${BACKEND_BASE_URL}/note/save-all`;
-        const jsonResponse = await fetchJson(url, "post", noteEntities);
+        const jsonResponse = await fetchJson(url, "post", editedNoteEntities);
 
         if (isResponseError(jsonResponse)) {
             toast("Failed to save notes", DEFAULT_ERROR_MESSAGE, "error");
@@ -179,7 +170,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
         if (!noteEntity)
             return CustomExceptionFormatService.getInstanceAndLog(500, `${defaultErrorMessage} 'noteEntity' cannot be falsy`);
         
-        if (!isLoggedIn)
+        if (!isLoggedInUseQueryResult.data)
             return CustomExceptionFormatService.getInstanceAndLog(401, `${defaultErrorMessage} UNAUTHORIZED`);
 
         const url = `${BACKEND_BASE_URL}/note/delete?id=${noteEntity.id}`;
@@ -194,96 +185,65 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
     }
 
 
-    /**
-     * Save any unsaved notes, update ```noteEntities``` and notify start page content.
-     */
-    async function handleLogin(): Promise<void> {
+    function getEditedNoteEntitiesFromCache(): NoteEntity[] {
 
-        const unsavedNoteEntities = getUnsavedNoteEntities();
-
-        // case: no unsaved notes
-        if (!unsavedNoteEntities.length) 
-            setNoteEntities([...useQueryResult.data]);
-            
-        else {
-            const jsonResponse = await fetchSaveAll(unsavedNoteEntities);
-            if (isResponseError(jsonResponse))
-                return;
-            
-            toast("Save all notes", "All new notes saved successfully", "success", 4000);
-        }
-
-        localStorage.removeItem(UNSAVD_NOTES_KEY);
-        
-        // this is to notify the component to map all notes again
-        setGotNewData(!gotNewData);
-    }
-
-
-    /**
-     * Use either note serach results or fetched data.
-     * 
-     * @returns slice of ```useQueryResult.data``` depending on the current ```page``` and {@link NUM_NOTES_PER_PAGE}
-     */
-    function getNoteEntitiesPage(): NoteEntity[] {
-
-        let noteEntities = noteSearchResults;
-
-        // case: no search query
-        if (!noteEntities)
-            noteEntities = useQueryResult.data;
-
-        // case: no notes
-        if (!noteEntities || !noteEntities.length)
-            return [];
-
-        let cleanPage = currentPage;
-        
-        if (isNumberFalsy(currentPage) || currentPage < 1) {
-            logWarn("Invalid page. Using page 1 as fallback");
-            cleanPage = 1;
-        }
-
-        const startIndex = (cleanPage - 1) * NUM_NOTES_PER_PAGE;
-        const endIndex = startIndex + NUM_NOTES_PER_PAGE;
-
-        // case: invalid start index, this will work anyway but should not happen
-        if (startIndex < 0 || startIndex >= noteEntities.length)
-            logWarn(`'startIndex' ${startIndex} out of bounds for 'noteEntities' ${noteEntities.length}`);
-
-        return noteEntities.slice(startIndex, endIndex);
-    }
-
-
-    function getUnsavedNoteEntities(): NoteEntity[] {
-
-        const unsavedNoteEntities = jsonParseDontThrow<NoteEntity[]>(localStorage.getItem(UNSAVD_NOTES_KEY));
+        const unsavedNoteEntities = jsonParseDontThrow<NoteEntity[]>(localStorage.getItem(EDITED_NOTES_KEY));
 
         return unsavedNoteEntities || [];
     }
 
 
-    /**
-     * NOTE: oauth2 error redirects (resulting in a not-loggedIn state) will loose unsaved notes
-     */
-    function handleUnsavedNotesTransfer() {
+    function clearEditedNoteEntitiesFromCache(): void {
 
-        // transfer unsaved notes
-        if (isLoggedIn) {
-            if (noteEntities.length)
-                localStorage.setItem(UNSAVD_NOTES_KEY, JSON.stringify(noteEntities));
-    
-            handleLogin();
-        } 
+        localStorage.removeItem(EDITED_NOTES_KEY);
+    }
+
+
+    /**
+     * Fetch saves edited notes (wont refetch). Use notes either from state or cache, will work for both normal and oauth2 login. 
+     * 
+     * NOTE: fetch error during oauth2 login or oauth2 save all will loose edited notes
+     */
+    async function saveEditedNoteEntities(): Promise<void> {
+
+        if (!isLoggedInUseQueryResult.data)
+            return;
+
+        const actualEditedNoteEntities = editedNoteEntities.length ? editedNoteEntities : getEditedNoteEntitiesFromCache();
+
+        if (!actualEditedNoteEntities.length) 
+            return;
+
+        const jsonResponse = await fetchSaveAll(actualEditedNoteEntities);
+        if (isResponseError(jsonResponse)) 
+            logWarn("Failed to transfer unsaved notes", 8000);
+
+        else
+            toast("Saved all notes", "All new notes saved successfully", "success", 4000);
+        
+        setEditedNoteEntities([]);
+        clearEditedNoteEntitiesFromCache();
+    }
+
+
+    /**
+     * Save edited notes and (either way) refetch notes
+     */
+    async function handleLogin(): Promise<void> {
+
+        await saveEditedNoteEntities();
+
+        await notesUseQueryResult.refetch();
     }
 
         
     return {
-        noteEntities, setNoteEntities,
-        noteSearchResults, setNoteSearchResults,
-        useQueryResult,
+        notesUseQueryResult,
         isFetchTakingLonger,
-        gotNewData, setGotNewData,
+        editedNoteEntities, setEditedNoteEntities,
+
+        noteSearchResults, setNoteSearchResults,
+        notesTotalUseQueryResult,
         currentPage, setCurrentPage,
 
         fetchSave,
@@ -292,5 +252,7 @@ export function useNotes(isLoggedIn: boolean, appUserEntity: AppUserEntity) {
     }
 }
 
-export const NOTE_QUERY_KEY = ["notes"];
-export const UNSAVD_NOTES_KEY = "unsavedNotes";
+
+export const NOTES_QUERY_KEY = ["notes"];
+export const NOTES_TOTAL_QUERY_KEY = ["noteTotal"];
+export const EDITED_NOTES_KEY = "unsavedNotes";
