@@ -5,7 +5,7 @@ import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../
 import "../assets/styles/ResetPassword.scss";
 import { BACKEND_BASE_URL, LOGIN_PATH, PASSWORD_REGEX, RESET_PASSWORD_BY_TOKEN_PATH, RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY, RESET_PASSWORD_TOKEN_URL_QUERY_PARAM, START_PAGE_PATH } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { getCurrentUrlWithoutWWW, getHeadTitleText, isBlank, replaceCurrentBrowserHistoryEntry } from "../helpers/utils";
+import { getCurrentUrlWithoutWWW, isBlank, replaceCurrentBrowserHistoryEntry } from "../helpers/utils";
 import { useFormInput } from "../hooks/useFormInput";
 import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextHolder";
@@ -14,6 +14,7 @@ import Flex from "./helpers/Flex";
 import Head from "./helpers/Head";
 import TextInput from "./helpers/TextInput";
 import PasswordAdvice from "./PasswordAdvice";
+import { getHeadTitleText } from "../helpers/projectUtils";
 
 
 interface Props extends DefaultProps {

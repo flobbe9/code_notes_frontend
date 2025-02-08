@@ -6,7 +6,7 @@ import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../
 import "../../assets/styles/Register.scss";
 import { BACKEND_BASE_URL, EMAIL_REGEX, LOGIN_PATH, PASSWORD_REGEX } from "../../helpers/constants";
 import { fetchAny, isResponseError } from "../../helpers/fetchUtils";
-import { getCurrentUrlWithoutWWW, getHeadTitleText, isBlank } from "../../helpers/utils";
+import { getCurrentUrlWithoutWWW, isBlank } from "../../helpers/utils";
 import { useFormInput } from "../../hooks/useFormInput";
 import { AppContext } from "../App";
 import Head from "../helpers/Head";
@@ -18,6 +18,7 @@ import Login from "./Login";
 import Oauth2LoginButton from "../Oauth2LoginButton";
 import PasswordAdvice from "../PasswordAdvice";
 import ResendConfirmationMail from "../ResendConfirmationMail";
+import { getHeadTitleText } from "../../helpers/projectUtils";
 
 
 interface Props extends DefaultProps {

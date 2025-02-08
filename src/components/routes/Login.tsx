@@ -5,8 +5,9 @@ import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../
 import "../../assets/styles/Login.scss";
 import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
-import { getCurrentUrlWithoutWWW, getHeadTitleText, isBlank, isNumberFalsy, setCsrfToken, stringToNumber } from "../../helpers/utils";
+import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, stringToNumber } from "../../helpers/utils";
 import { useFormInput } from "../../hooks/useFormInput";
+import { EDITED_NOTES_KEY } from "../../hooks/useNotes";
 import { RouteContext } from "../RouteContextHolder";
 import { AppContext } from "./../App";
 import { AppFetchContext } from "./../AppFetchContextHolder";
@@ -19,7 +20,7 @@ import Oauth2LoginButton from "./../Oauth2LoginButton";
 import ResendConfirmationMail from "./../ResendConfirmationMail";
 import SendPasswordResetMail from "./../SendPasswordResetMail";
 import Register from "./Register";
-import { EDITED_NOTES_KEY } from "../../hooks/useNotes";
+import { getHeadTitleText, setCsrfToken } from "../../helpers/projectUtils";
 
 
 interface Props extends DefaultProps {

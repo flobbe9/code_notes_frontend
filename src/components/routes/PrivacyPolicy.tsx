@@ -3,8 +3,9 @@ import "../../assets/styles/PrivacyPolicy.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { BASE_URL, HELP_EMAIL, LINK_DEFAULT_REL } from "../../helpers/constants";
 import Flex from "../helpers/Flex";
-import { getCurrentUrlWithoutWWW, getHeadTitleText } from "../../helpers/utils";
+import { getCurrentUrlWithoutWWW } from "../../helpers/utils";
 import Head from "../helpers/Head";
+import { getHeadTitleText } from "../../helpers/projectUtils";
 
 
 interface Props extends DefaultProps {

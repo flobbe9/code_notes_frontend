@@ -4,13 +4,14 @@ import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES, ProgrammingLanguage } from "../../../../abstract/ProgrammingLanguage";
 import "../../../../assets/styles/NoteInputSettings.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../../helpers/constants";
-import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTakingUpSpace, moveCursor } from "../../../../helpers/utils";
+import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
 import SearchBar from "../../../helpers/SearchBar";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import LanguageSearchResults from "./LanguageSearchResults";
 import { NoteContext } from "./Note";
+import { moveCursor } from "../../../../helpers/projectUtils";
 
 
 interface Props extends DefaultProps {
@@ -310,8 +311,9 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
                 disabled={areNoteInputSettingsDisabled}
                 onClick={() => toggleNoteInputSettings()}
             >
-                {/* <i className="fa-solid fa-globe dontSelectText"></i> */}
-                <i className="fa-solid fa-code dontSelectText"></i>
+                {/* <i className="fa-solid fa-code dontSelectText"></i> */}
+                <i className="fa-solid fa-globe"></i>
+                {/* <i className="fa-solid fa-less-than"></i><i className="fa-solid fa-globe"></i><i className="fa-solid fa-greater-than"></i> */}
             </Button>
                 
             {children}

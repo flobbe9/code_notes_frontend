@@ -2,8 +2,9 @@ import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useStat
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/ButtonWithSlideLabel.scss";
-import { animateAndCommit, getTextWidth } from "../../helpers/utils";
+import { animateAndCommit } from "../../helpers/utils";
 import Button from "./Button";
+import { getTextWidth } from "../../helpers/projectUtils";
 
 
 interface Props extends HelperProps {

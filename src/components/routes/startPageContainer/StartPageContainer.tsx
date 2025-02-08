@@ -1,12 +1,13 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import DefaultProps from "../../../abstract/DefaultProps";
-import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, getHeadTitleText, removeConfirmPageUnload } from "../../../helpers/utils";
+import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, removeConfirmPageUnload } from "../../../helpers/utils";
 import { AppContext } from "../../App";
 import Flex from "../../helpers/Flex";
 import Head from "../../helpers/Head";
 import StartPageContent from "./StartPageContent";
 import StartPageSideBar from "./StartPageSideBar";
 import { AppFetchContext } from "../../AppFetchContextHolder";
+import { getHeadTitleText } from "../../../helpers/projectUtils";
 
 
 interface Props extends DefaultProps {

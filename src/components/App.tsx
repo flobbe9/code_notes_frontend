@@ -49,7 +49,7 @@ export default function App() {
     
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
-    const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress(true);
+    const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress, pressedKeys } = useKeyPress(true);
 
     /** Time the toast popup takes to slide up and down in ms. */
     const toastSlideDuration = 400;
@@ -66,6 +66,7 @@ export default function App() {
 
         isKeyPressed,
         isControlKeyPressed,
+        pressedKeys,
 
         isAppOverlayVisible,
         setIsAppOverlayVisible,
@@ -489,7 +490,8 @@ export const AppContext = createContext({
     isDesktopWidth: false as boolean,
 
     isKeyPressed: (keyName: string): boolean => {return false},
-    isControlKeyPressed: () => {return false as boolean},
+    isControlKeyPressed: (nonControlKeys?: string[]) => {return false as boolean},
+    pressedKeys: new Set() as Set<string>,
 
     isAppOverlayVisible: false,
     setIsAppOverlayVisible: (isVisible: boolean) => {},

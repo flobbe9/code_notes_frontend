@@ -1,10 +1,12 @@
-import React, { ClipboardEvent, DragEvent, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { ClipboardEvent, DragEvent, forwardRef, KeyboardEvent, MouseEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/ContentEditableDiv.scss";
 import { getClipboardText, includesIgnoreCase, isBlank, isEmpty, isEventKeyTakingUpSpace } from "../../helpers/utils";
 import HelperDiv from "./HelperDiv";
 import HiddenInput from "./HiddenInput";
+import { getCursorIndex, getCursorLineNum } from "../../helpers/projectUtils";
+import { AppContext } from "../App";
 
 
 interface Props extends HelperProps {
@@ -14,6 +16,9 @@ interface Props extends HelperProps {
      * losing focus on every second click.
      */
     placeholder?: string
+
+    /** Setter for the current cursor position state that is maintained by this component. ```[cursorIndexOfCurrentLine, lineNumber]```, 0-based and 1-based */
+    setCursorPos?: (cursorPos: [number, number]) => void
 }
 
 
@@ -23,12 +28,15 @@ interface Props extends HelperProps {
 export default forwardRef(function ContentEditableDiv(
     {
         disabled = false,
+        setCursorPos: setCursorPosProps,
         onFocus,
         onBlur,
         onKeyUp,
         onKeyDownCapture,
         onPaste,
         onDrop,
+        onMouseDown,
+        onMouseUp,
         rendered = true,
         title = "",
         placeholder = "",
@@ -44,12 +52,15 @@ export default forwardRef(function ContentEditableDiv(
 ) {
 
     const [isFocus, setIsFocus] = useState(false);
+    const [cursorPos, setCursorPos] = useState([0, 1]);
     
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ContentEditableDiv");
 
+    const { isControlKeyPressed } = useContext(AppContext);    
+
     const componentRef = useRef<HTMLDivElement>(null);
     const hiddencomponentRef = useRef<HTMLInputElement>(null);
-    
+
     useImperativeHandle(ref, () => componentRef.current!, []);
 
 
@@ -118,7 +129,7 @@ export default forwardRef(function ContentEditableDiv(
     }
 
 
-    function handleKeyDownCapture(event): void {
+    function handleKeyDownCapture(event: KeyboardEvent): void {
 
         if (disabled)
             return;
@@ -134,7 +145,7 @@ export default forwardRef(function ContentEditableDiv(
     }
 
 
-    function handleKeyUp(event): void {
+    function handleKeyUp(event: KeyboardEvent): void {
 
         if (disabled)
             return;
@@ -144,6 +155,9 @@ export default forwardRef(function ContentEditableDiv(
 
         if (isInputDivEmpty(false))
             appendPlaceholderInputToInputDiv();
+
+        if (!isControlKeyPressed(["Shift", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]))
+            updateCursorPosState();
     }
 
 
@@ -159,6 +173,32 @@ export default forwardRef(function ContentEditableDiv(
 
         if (isInputDivEmpty())
             removePlaceholderInput();
+
+        setTimeout(updateCursorPosState, 1); // wait for text to be pasted i guess
+    }
+    
+
+    function handleMouseDown(event: MouseEvent): void {
+
+        if (disabled)
+            return;
+
+        if (onMouseDown)
+            onMouseDown(event);
+
+        updateCursorPosState();
+    }
+
+    
+    function handleMouseUp(event: MouseEvent): void {
+
+        if (disabled)
+            return;
+
+        if (onMouseUp)
+            onMouseUp(event);
+
+        updateCursorPosState(true);
     }
 
 
@@ -201,7 +241,7 @@ export default forwardRef(function ContentEditableDiv(
     /**
      * Works only if reading clipboard data is permitted.
      */
-    async function handleCut(event: ClipboardEvent): Promise<void> {
+    async function handleCut(): Promise<void> {
 
         if (disabled)
             return;
@@ -212,6 +252,41 @@ export default forwardRef(function ContentEditableDiv(
         // case: cut all content
         if (innerText === clipboardText)
             appendPlaceholderInputToInputDiv();
+
+        setTimeout(updateCursorPosState, 1); // wait for text to be cut i guess
+    }
+    
+
+    /**
+     * Get the current cursor position in this input. Dont update state if input is not selected.
+     * 
+     * Should one of the two position values be -1, that value wont be altered
+     */
+    function updateCursorPosState(dontUpdateLineNum = false): void {
+
+        if (componentRef.current! !== document.activeElement)
+            return;
+
+        const documentSelection = document.getSelection();
+        if (!documentSelection)
+            return;
+
+        let cursorIndex = getCursorIndex(componentRef.current!);
+        let cursorLineNum = dontUpdateLineNum ? cursorPos[1] : getCursorLineNum(componentRef.current!);
+
+        if (cursorIndex === -1)
+            cursorIndex = cursorPos[0];
+
+        if (cursorLineNum === -1)
+            cursorLineNum = cursorPos[1];
+
+        // dont update state if no changes, for efficiency
+        if (cursorIndex === cursorPos[0] && cursorLineNum === cursorPos[1])
+            return;
+
+        setCursorPos([cursorIndex, cursorLineNum]);
+        if (setCursorPosProps)
+            setCursorPosProps([cursorIndex, cursorLineNum]);
     }
 
 
@@ -235,6 +310,8 @@ export default forwardRef(function ContentEditableDiv(
                 onCut={handleCut}
                 onPaste={handlePaste}
                 onDrop={handleDrop}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
                 tabIndex={disabled ? -1 : props.tabIndex}
                 _hover={_hover}
                 {...otherProps}

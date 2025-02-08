@@ -151,6 +151,10 @@ export const CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE = "Plaintext";
 export const CODE_BLOCK_DEFAULT_LANGUAGE = "_plaintext";
 
 
+// PlainTextInput
+export const CODE_SNIPPET_SEQUENCE = "```";
+
+
 /**
  * Input will always be as wide as given ```placeholder``` text. Uses the default placeholder if given ```placeholder``` is blank.
  * 

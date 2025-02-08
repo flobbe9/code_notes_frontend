@@ -15,6 +15,12 @@
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
     color: white;
+
+    &-buttonContainer {
+        &-appendVariableButton {
+            margin-right: .85em !important;
+        }
+    }
     
     &.fullScreen {
         border-radius: var(--borderRadius); // for full screen mode

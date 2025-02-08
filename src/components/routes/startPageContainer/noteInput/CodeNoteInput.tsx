@@ -5,7 +5,7 @@ import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/Default
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInput.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION } from "../../../../helpers/constants";
-import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, log, logWarn, setClipboardText, setCssConstant } from "../../../../helpers/utils";
+import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, logWarn, setClipboardText, setCssConstant } from "../../../../helpers/utils";
 import useWindowResizeCallback from "../../../../hooks/useWindowResizeCallback";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";

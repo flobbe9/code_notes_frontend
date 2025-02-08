@@ -3,12 +3,13 @@ import { DefaultNoteInputProps } from "../../../../abstract/DefaultNoteInputProp
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import "../../../../assets/styles/DefaultNoteInput.scss";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../../../helpers/constants";
-import { addClass, animateAndCommit, getJsxElementIndexByKey, handleRememberMyChoice, isNumberFalsy, removeClass, shortenString } from "../../../../helpers/utils";
+import { addClass, animateAndCommit, getJsxElementIndexByKey, isNumberFalsy, removeClass, shortenString } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
 import Confirm from "../../../helpers/Confirm";
 import Flex from "../../../helpers/Flex";
 import Hr from "../../../helpers/Hr";
 import { NoteContext } from "./Note";
+import { handleRememberMyChoice } from "../../../../helpers/projectUtils";
 
 
 interface Props extends DefaultNoteInputProps {

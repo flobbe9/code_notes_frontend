@@ -7,10 +7,10 @@ import { NoteEntity } from "../abstract/entites/NoteEntity";
 import { AppUserService } from "../abstract/services/AppUserService";
 import { LOGOUT_URL } from "../helpers/constants";
 import fetchJson from "../helpers/fetchUtils";
-import { clearUserCache } from "../helpers/utils";
 import { useAppUser } from "../hooks/useAppUser";
 import { useLoggedIn } from "../hooks/useLoggedIn";
 import { useNotes } from "../hooks/useNotes";
+import { clearUserCache } from "../helpers/projectUtils";
 
 
 /**
@@ -98,13 +98,6 @@ export default function AppFetchContextHolder({ children }) {
 
         clearUserCache();
         setAppUserEntity(AppUserService.getDefaultInstance());
-        // TODO:
-            // add a condition under which this should not be cleared
-                // if loggedout
-                    // only if note id is null, dont display saved user data
-                // only if was "save your unsaved changes, and logout" error
-                    // move edited notes to cache on refresh
-                    // render edited notes from cache on load and login if present, then clear
         setEditedNoteEntities([]); 
     }
 

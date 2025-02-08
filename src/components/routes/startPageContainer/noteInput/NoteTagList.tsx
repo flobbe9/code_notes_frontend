@@ -29,7 +29,7 @@ export default function NoteTagList({...props}: Props) {
 
     const componentRef = useRef<HTMLDivElement>(null);
 
-    const { appUserEntity, editedNoteEntities, notesUseQueryResult } = useContext(AppFetchContext);
+    const { appUserEntity, notesUseQueryResult } = useContext(AppFetchContext);
     const { noteEntity } = useContext(NoteContext);
 
     const context = {

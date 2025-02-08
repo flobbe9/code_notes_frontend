@@ -7,8 +7,9 @@ import HelperProps from "../../../../abstract/HelperProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInputWithVariables.scss";
 import "../../../../assets/styles/highlightJs/vs.css";
-import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
-import { animateAndCommit, cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getCursorIndex, getCursorLineNum, getTextWidth, insertString, isBlank, isEventKeyTakingUpSpace, log, logWarn, moveCursor, setClipboardText } from "../../../../helpers/utils";
+import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
+import { cleanUpSpecialChars, getContentEditableDivLineElements, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
+import { animateAndCommit, getClipboardText, getCssConstant, getCSSValueAsNumber, insertString, isBlank, isEventKeyTakingUpSpace, log, logWarn, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from "../../../App";
 import Button from "../../../helpers/Button";
@@ -19,7 +20,6 @@ import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from "./Note";
 import NoteInputSettings from "./NoteInputSettings";
-import { getContentEditableDivLineElements } from "../../../../helpers/projectUtils";
 
 
 interface Props extends HelperProps {
@@ -49,7 +49,8 @@ export default function CodeNoteInputWithVariables({
 
     const [inputHighlighted, setInputHighlighted] = useState(true);
     
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeNoteInputWithVariables");
+    const componentName = "CodeNoteInputWithVariables";
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName);
     
     const componentRef = useRef<HTMLDivElement>(null);
     const inputDivRef = useRef<HTMLDivElement>(null);
@@ -341,42 +342,6 @@ export default function CodeNoteInputWithVariables({
         lastChildDiv.innerHTML = (lastChildDiv.innerHTML + getDefaultVariableInput(VARIABLE_INPUT_DEFAULT_PLACEHOLDER, getDefaultVariableInputWidth()));
     }
 
-
-    // TODO: put line num and cursor into state
-        // continue here, make this possible for button too, then continue with plain text code snippet
-        // maybe inside content editable?
-        // insert key up buggy
-
-    /**
-     * Get the current cursor position in this input. Dont update state if input is not selected.
-     * 
-     * Should one of the two position values be -1, that value wont be altered
-     */
-    function updateCursorPosState(dontUpdateLineNum = false): void {
-
-        if (inputDivRef.current! !== document.activeElement)
-            return;
-
-        const documentSelection = document.getSelection();
-        if (!documentSelection)
-            return;
-
-        let cursorIndex = getCursorIndex(inputDivRef.current!);
-        let cursorLineNum = dontUpdateLineNum ? cursorPos[1] : getCursorLineNum(inputDivRef.current!);
-
-        if (cursorIndex === -1)
-            cursorIndex = cursorPos[0];
-
-        if (cursorLineNum === -1)
-            cursorLineNum = cursorPos[1];
-
-        // dont update state if no changes, for efficiency
-        if (cursorIndex === cursorPos[0] && cursorLineNum === cursorPos[1])
-            return;
-
-        setCursorPos([cursorIndex, cursorLineNum]);
-    }
-
         
     /**
      * Inserts a default ```$[[VARIABL_NAME]]``` sequence at current cursor pos.
@@ -390,8 +355,9 @@ export default function CodeNoteInputWithVariables({
         
         // all inner divs that represent a line
         const inputInnerDivs = getContentEditableDivLineElements(inputDivRef.current!);
-        const currentInputDiv = inputInnerDivs[currentCursorLineNum - 2] as HTMLDivElement; // - 2 for item() beeing 0-based and the first line not beeing a div
-        const numInutLines = inputInnerDivs.length + 1; // + 1 for the first line which is never a div
+        const isFirstLineADiv = inputDivRef.current!.innerHTML.startsWith("<div>")
+        const currentInputDiv = inputInnerDivs[currentCursorLineNum - 1 - (isFirstLineADiv ? 0 : 1)] as HTMLDivElement; // - 2 for item() beeing 0-based and the first line not beeing a div
+        const numInutLines = inputInnerDivs.length + (isFirstLineADiv ? 0 : 1); 
 
         if (currentCursorIndex === -1 || currentCursorLineNum === -1) {
             logWarn("Failed to get cursor index or cursor line num");
@@ -409,10 +375,10 @@ export default function CodeNoteInputWithVariables({
             );
 
         // case: is empty line
-        } else if (!!currentInputDiv.querySelector("br")) {
+        } else if (!!currentInputDiv.querySelector("br")) 
             currentInputDiv.innerHTML = variableInputSequence;
 
-        } else {
+        else {
             currentInputDiv.innerText = insertString(
                 currentInputDiv.innerText,
                 variableInputSequence, 
@@ -591,31 +557,13 @@ export default function CodeNoteInputWithVariables({
 
     function handleCut(): void {
         
-        setTimeout(() => {
-            updateNoteEdited();
-            updateCursorPosState();
-        }, 1); // wait for text to be cut i guess
+        updateNoteEdited();
     }
 
 
     function handlePaste(): void {
 
-        setTimeout(() => {
-            updateNoteEdited();
-            updateCursorPosState();
-        }, 1); // wait for text to be pasted i guess
-    }
-
-
-    function handleMouseDown(): void {
-
-        updateCursorPosState();
-    }
-
-    
-    function handleMouseUp(): void {
-
-        updateCursorPosState(true);
+        updateNoteEdited();
     }
 
  
@@ -625,9 +573,6 @@ export default function CodeNoteInputWithVariables({
 
         if (keyName === "Backspace" || keyName === "Delete")
             cleanUpEmptyInputDiv();
-
-        if (!isControlKeyPressed(["Shift", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]))
-            updateCursorPosState();
     }
 
 
@@ -771,14 +716,13 @@ export default function CodeNoteInputWithVariables({
                         className="inputDiv fullWidth" 
                         ref={inputDivRef} 
                         spellCheck={false}
+                        setCursorPos={setCursorPos}
                         onKeyDownCapture={handleKeyDownCapture}
                         onKeyUp={handleKeyUp}
                         onFocus={handleFocus}
                         onBlurCapture={handleBlurCapture}
                         onCut={handleCut}
                         onPaste={handlePaste}
-                        onMouseDown={handleMouseDown}
-                        onMouseUp={handleMouseUp}
                     >
                         {inputDivValue}
                     </ContentEditableDiv> 
@@ -795,7 +739,7 @@ export default function CodeNoteInputWithVariables({
                 </Overlay>
             </pre>
 
-            <div className="CodeNoteInputWithVariables-buttonContainer">
+            <div className={`${componentName}-buttonContainer`}>
                 <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
                     {/* Copy */}
                     <Button
@@ -819,7 +763,7 @@ export default function CodeNoteInputWithVariables({
                     {/* Fullscreen */}
                     <Button 
                         className="fullScreenButton defaultNoteInputButton"
-                        title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                        title={isFullScreen ? "Resize (Escape)" : "Fullscreen"}
                         onClick={toggleFullScreen}
                     >
                         {isFullScreen ?
@@ -832,15 +776,15 @@ export default function CodeNoteInputWithVariables({
                 <Flex horizontalAlign="right" flexWrap="nowrap">
                     {/* Add variable */}
                     <Button 
-                        className="appendVariableButton defaultNoteInputButton" 
-                        title="Append variable (Ctrl + Shift + V)"
+                        className={`${componentName}-buttonContainer-appendVariableButton defaultNoteInputButton`}
+                        title="Variable (Ctrl + Shift + V)"
                         onClick={handleAppendVariableButtonClick}
                     >
                         <i className="fa-solid fa-dollar-sign"></i>
                     </Button>
 
                     {/* NoteInput Settings */}
-                    <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
+                    <NoteInputSettings className="me-1" noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
                 </Flex>
             </div>
             
