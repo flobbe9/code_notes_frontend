@@ -144,7 +144,7 @@ export const VARIABLE_INPUT_SEQUENCE_REGEX = /^.*\$\[\[.*\]\].*$/;
 export const VARIABLE_INPUT_DEFAULT_PLACEHOLDER = "VARIABLE_NAME";
 export const VARIABLE_INPUT_START_SEQUENCE = "$[[";
 export const VARIABLE_INPUT_END_SEQUENCE = "]]";
-export const CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE = "_auto";
+export const CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE = "Plaintext";
 
 
 // CodeNoteInput
