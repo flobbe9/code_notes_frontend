@@ -1,16 +1,8 @@
-import parse, { Element } from "html-react-parser";
 import { CSSProperties } from "react";
-import sanitize from "sanitize-html";
-import { useQueryClientObj } from "..";
 import { AnimationEasing } from "../abstract/CSSTypes";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
-import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { isDebugLogLevel, isErrorLogLevel, isInfoLogLevel, isWarnLogLevel, LogLevelName } from "../abstract/LogLevel";
-import { isRememberMyChoiceValue, RememberMyChoiceKey } from "../abstract/RememberMyChoice";
-import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
-import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
-import { NOTES_QUERY_KEY } from "../hooks/useNotes";
-import { APP_NAME_PRETTY, BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_LEVEL_COLORS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
+import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, ENV, HOST, LOG_LEVEL_COLORS } from "./constants";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
 
 
@@ -243,33 +235,19 @@ export function insertString(targetString: string, insertionString: string, inse
 
 
 /**
- * Move cursor a text input element. If ```start === end``` the cursor will be shifted normally to given position.
- * If ```start !== end``` the text between the indices will be marked.
- * 
- * @param textInput text input element to move the cursor in
- * @param start index of selection start, default is 0
- * @param end index of selection end, default is ```start``` param
+ * @param haystack to count needle in
+ * @param needle to count occurrences of
+ * @returns the number of occurrences of ```needle``` in ```haystack``` or -1 if falsy params
  */
-export function moveCursor(textInput: HTMLInputElement, start = 0, end = start): void {
+export function countSubstrings(haystack: string, needle: string | RegExp): number {
 
-    if (!textInput)
-        return;
-
-    textInput.selectionStart = start;
-    textInput.selectionEnd = end;
-}
-
-
-/**
- * @param inputElement to get the cursor for (I believe this only works for "text" input)
- * @returns the current index of the cursor of given text input element or -1. If text is marked, the index of selection start is returned
- */
-export function getCursorIndex(inputElement: HTMLInputElement): number {
-
-    if (!inputElement)
+    if (isStringFalsy(haystack) || needle === null || needle === undefined)
         return -1;
 
-    return inputElement.selectionStart || -1;
+    if (isBlank(haystack))
+        return 0;
+
+    return haystack.split(needle).length - 1;
 }
 
 
@@ -331,44 +309,6 @@ export async function downloadFileByUrl(url: string,
   
     // remove
     document.body.removeChild(linkElement);
-}
-
-
-/**
- * @param text to measure
- * @param fontSize of text, unit should be included
- * @param fontFamily of text
- * @param fontWeight of text, default is "normal"
- * @returns width of text in px
- */
-export function getTextWidth(text: string, fontSize: string, fontFamily: string, fontWeight = "400"): number {
-
-    if (isEmpty(text))
-        return 0;
-
-    const elementId = getRandomString();
-    document.body.append(stringToHtmlElement(
-        `<div
-            id="${elementId}"
-            style='
-                border: none; 
-                width: fit-content;
-                font-size: ${fontSize};
-                font-family:  ${fontFamily};
-                font-weight: ${fontWeight};
-            ' 
-            contenteditable
-        >
-            ${text}
-        </div>`
-    ));
-    const hiddenInputDiv2 = document.getElementById(elementId);
-    
-    const hiddenInputDivWidth2 = hiddenInputDiv2?.offsetWidth;
-
-    hiddenInputDiv2?.remove();
-
-    return hiddenInputDivWidth2 || 0;
 }
 
 
@@ -891,84 +831,6 @@ export function stripTimeFromDate(d: Date): Date {
 
 
 /**
- * Parse given css string to valid css object formatted for react. This means dashes in keys are replaced and keys
- * will use camel case.
- * 
- * @param cssString string using css syntax like in .css files. E.g. "margin: 0; box-shadow: black"
- * @returns css object for react
- */
-export function parseCSSStringToJson(cssString: string): CSSProperties {
-
-    const cssObject = {};
-
-    // array with key value pairs like ["key": "value", "key2": "value2"]
-    const cssKeyValues = cssString.split(";");
-    for (let i = 0; i < cssKeyValues.length; i ++) {
-        const keyValue = cssKeyValues[i].split(":");
-        const key = keyValue[0];
-        const value = keyValue[1];
-
-        let newKey = "";
-        let newValue = value;
-
-        // iterate chars of key
-        for (let j = 0; j < key.length; j++) {
-            const char = key.charAt(j);
-            if (char === "-") {
-                // remove dash, set next char to upperCase
-                const nextChar = key.charAt(j + 1);
-                newKey = replaceAtIndex(key, nextChar.toUpperCase(), j, j + 2)
-            }
-        }
-
-        // clean up key and value
-        newKey = newKey.replace(":", "");
-        newValue = newValue.replace(";", "").trim();
-
-        cssObject[newKey] = newValue;
-    }
-
-    return cssObject;
-}
-
-    
-
-/**
- * Parse given html string and retrieve some attribs.
- * 
- * @param dirtyHtml unsafe html to parse
- * @returns some attributes of the innerHtml of the core/columns noteInput
- */
-export function getHTMLStringAttribs(dirtyHtml: string): {className: string, id: string, style: string} {
-
-    let className = "";
-    let id = "";
-    let style = "";
-
-    // parse html
-    parse(sanitize(dirtyHtml, DEFAULT_HTML_SANTIZER_OPTIONS), {
-        replace(domNode: Element) {
-
-            // get attributes
-            const attribs = domNode.attribs;
-            if (!attribs)
-                return;
-
-            className = attribs.class;
-            id = attribs.id;
-            style = attribs.style
-        }
-    })
-
-    return {
-        className,
-        id,
-        style
-    }
-}
-
-
-/**
  * @param date to format, default is ```new Date()```
  * @returns nicely formatted string formatted like ```year-month-date hours:minutes:seconds:milliseconds```
  */
@@ -1039,22 +901,6 @@ export function isEventKeyRemovingKey(eventKey: string): boolean {
 
 
 /**
- * @param text string to clean up. Wont be altered
- * @returns same text string but with some special chars replaced
-*/
-export function cleanUpSpecialChars(text: string): string {
-
-    let cleanHtml = text;
-    cleanHtml = cleanHtml.replaceAll("&amp;", "&");
-    cleanHtml = cleanHtml.replaceAll("&lt;", "<");
-    cleanHtml = cleanHtml.replaceAll("&gt;", ">");
-    cleanHtml = cleanHtml.replaceAll("&nbsp;", " ");
-
-    return cleanHtml;
-}
-
-
-/**
  * @param str to change first char to upper case of (wont be altered)
  * @returns a copy of given string with the first char to upper case or a blank string
  */
@@ -1097,33 +943,6 @@ export function getCurrentUrlWithoutWWW(): string {
 
 
 /**
- * Removes sensitive data from use query cache.
- */
-export function clearSensitiveCache(): void {
-    
-    if (useQueryClientObj && useQueryClientObj.getQueryData<AppUserEntity>(APP_USER_QUERY_KEY))
-        useQueryClientObj.removeQueries({queryKey: APP_USER_QUERY_KEY});
-
-    localStorage.removeItem(CSRF_TOKEN_QUERY_KEY);
-}
-
-
-/**
- * Removes use query cache data related to app user (not ```isLoggedIn``` though). May be used on logout.
- */
-export function clearUserCache(): void {
-
-    if (!useQueryClientObj)
-        return;
-    
-    clearSensitiveCache();
-
-    if (useQueryClientObj.getQueryData<AppUserEntity>(NOTES_QUERY_KEY))
-        useQueryClientObj.removeQueries({queryKey: NOTES_QUERY_KEY});
-}
-
-
-/**
  * Removes current page from browser history and replaces it with given ```path```.
  * 
  * @param path relative path to replace the current history entry with. Default is the current path
@@ -1131,33 +950,6 @@ export function clearUserCache(): void {
 export function replaceCurrentBrowserHistoryEntry(path: string = window.location.pathname): void {
 
     window.history.replaceState({}, "", path);
-}
-
-
-/**
- * Attempts to retrieve the csrf token from cache. 
- * 
- * @returns the csrf token or a blank string
- */
-export function getCsrfToken(): string {
-
-    const csrfToken = localStorage.getItem(CSRF_TOKEN_QUERY_KEY);
-
-    if (isBlank(csrfToken))
-        return "";
-
-    return csrfToken!;
-}
-
-
-/**
- * Will store given ```csrfToken``` in localStorage (regardless of the token beeing blank or not).
- * 
- * @param csrfToken to encrypt and cache
- */
-export function setCsrfToken(csrfToken: string): void {
-    
-    localStorage.setItem(CSRF_TOKEN_QUERY_KEY, csrfToken);
 }
 
 
@@ -1473,36 +1265,6 @@ export async function animateAndCommit(element: HTMLElement | undefined | null, 
 
 
 /**
- * Find choice in localStorage and possibly call callback.
- * 
- * Will remove localStorage entry if value is invalid.
- * 
- * @param key to determine the right popup. Will prepend {@link REMEMBER_MY_CHOICE_KEY_PREFIX}
- * @param confirmCallback executed if rememberd choice is "confirm"
- * @returns ```true``` if a valid choice was cached (no matter if "confirm" or "cancel")
- */
-export function handleRememberMyChoice(key: RememberMyChoiceKey, confirmCallback?: () => void): boolean {
-
-    const choice = localStorage.getItem(REMEMBER_MY_CHOICE_KEY_PREFIX + key);
-
-    if (!choice) 
-        return false;
-    
-    // case: invalid value in stored in localStorage
-    if (!isRememberMyChoiceValue(choice)) {
-        logWarn(`Choice '${choice}' is not a valid 'RememberMyChoiceValue'. Removing entry`);
-        localStorage.removeItem(REMEMBER_MY_CHOICE_KEY_PREFIX + key);
-        return false;
-    }
-
-    if (choice === "confirm" && confirmCallback)
-        confirmCallback();
-
-    return true;
-}
-
-
-/**
  * Get a substring of given ```str``` with "..." appended. E.g. ```"veeery long string" => "veery lon..."```
  * 
  * @param str to shorten (wont be altered)
@@ -1519,18 +1281,6 @@ export function shortenString(str: string, maxLength = 30, blankReplacement = "<
         return str.substring(0, maxLength) + "...";
 
     return str;
-}
-
-
-/**
- * Get the text for the ```<title>```.
- * 
- * @param pageTitle title of page, not including the company name
- * @returns ```pageTitle | ${companyName}``` or just ```companyName``` if no ```pageTitle```
- */
-export function getHeadTitleText(pageTitle?: string): string {
-
-    return isBlank(pageTitle) ? `${APP_NAME_PRETTY}` : `${pageTitle} | ${APP_NAME_PRETTY}`; 
 }
 
 

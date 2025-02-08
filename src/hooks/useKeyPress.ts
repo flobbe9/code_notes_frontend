@@ -97,13 +97,13 @@ export default function useKeyPress(checkAllKeys = false) {
 
 
     /**
+     * @param nonControlKeys list of keys to not consider a "control" key. Either way will not consider "Space", "Enter", "Backspace" and "Delete" as "control" key
      * @returns ```true``` if the list of pressed keys contains at least one "control" kind of key (that is a key that
      *          doesn't take up or removes any space, e.g. "Shift" or "Control")
      */
-    function isControlKeyPressed(): boolean {
+    function isControlKeyPressed(nonControlKeys = []): boolean {
 
-        // iterate
-        const keysToIgnore = new Set(["Space", "Enter", "Backspace", "Delete"]);
+        const keysToIgnore = new Set(["Space", "Enter", "Backspace", "Delete", ...nonControlKeys]);
 
         for (const pressedKey of pressedKeys) 
             // case: key name is longer than 1 char but not contained in ignore list
@@ -118,6 +118,7 @@ export default function useKeyPress(checkAllKeys = false) {
         isKeyPressed, 
         isControlKeyPressed, 
         handleKeyDownUseKeyPress,
-        handleKeyUpUseKeyPress
+        handleKeyUpUseKeyPress,
+        pressedKeys
     };
 }
