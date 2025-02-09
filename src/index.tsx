@@ -20,7 +20,7 @@ export const useQueryClientObj = new QueryClient({
 });
 
 const persister = createSyncStoragePersister({
-    storage: sessionStorage
+    storage: localStorage
 })
 
 // hide some error messages
