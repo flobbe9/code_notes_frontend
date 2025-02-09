@@ -125,7 +125,7 @@ export function logApiResponse(response: CustomExceptionFormat): void {
  * @param str 
  * @returns the number or -1
  */
-export function stringToNumber(str: string | number | undefined): number {
+export function stringToNumber(str: string | number | undefined | null): number {
 
     if (typeof str === "number")
         return str;

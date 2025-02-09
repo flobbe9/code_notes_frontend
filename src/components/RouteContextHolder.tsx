@@ -18,7 +18,7 @@ export default function RouteContextHolder({children}) {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { moveToast, toast, forceToastTimeout } = useContext(AppContext);
+    const { forceToastTimeout } = useContext(AppContext);
 
     const context = {
         clearUrlQueryParams

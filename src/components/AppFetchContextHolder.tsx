@@ -46,7 +46,8 @@ export default function AppFetchContextHolder({ children }) {
         fetchSave: fetchSaveNoteEntity, 
         fetchSaveAll: fetchSaveAllNoteEntities,
         fetchDelete: fetchDeleteNoteEntity, 
-        currentPage: currentNotesPage, 
+        // currentPage: currentNotesPage, 
+        getCurrentPage: getCurrentNotesPage,
         setCurrentPage: setCurrentNotesPage
     } = useNotes(isLoggedInUseQueryResult, appUserEntity);
 
@@ -67,7 +68,7 @@ export default function AppFetchContextHolder({ children }) {
         fetchSaveNoteEntity, 
         fetchSaveAllNoteEntities,
         fetchDeleteNoteEntity, 
-        currentNotesPage,
+        getCurrentNotesPage,
         setCurrentNotesPage,
 
         isLoggedIn: isLoggedInUseQueryResult.data, 
@@ -77,9 +78,9 @@ export default function AppFetchContextHolder({ children }) {
     }
     
 
-    // revalidate session
     useEffect(() => {
         isLoggedInUseQueryResult.refetch();
+        notesUseQueryResult.refetch();
 
     }, [location]);
     
@@ -139,7 +140,7 @@ export const AppFetchContext = createContext({
     notesUseQueryResult: {} as DefinedUseQueryResult<NoteEntity[]>,
     notesTotalUseQueryResult: {} as DefinedUseQueryResult<number>,
     /** 1-based */
-    currentNotesPage: 1 as number,
+    getCurrentNotesPage: () => 1 as number,
     setCurrentNotesPage: (page: number) => {},
 
     isLoggedIn: false,

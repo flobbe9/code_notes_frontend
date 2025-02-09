@@ -45,6 +45,7 @@ export const OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM = "oauth2-login-error";
 /** Also hard coded in "Utils.java" */
 export const RESET_PASSWORD_TOKEN_URL_QUERY_PARAM = "token";
 export const RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY = "reset-password-token";
+export const NOTE_PAGE_URL_QUERY_PARAM = "page";
 
 
 // Other

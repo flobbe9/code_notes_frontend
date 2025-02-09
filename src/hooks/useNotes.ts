@@ -1,27 +1,30 @@
 import { DefinedUseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { NoteEntity } from '../abstract/entites/NoteEntity';
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
-import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NUM_NOTES_PER_PAGE, START_PAGE_PATH } from "../helpers/constants";
+import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NOTE_PAGE_URL_QUERY_PARAM, NUM_NOTES_PER_PAGE, START_PAGE_PATH } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { jsonParseDontThrow, logWarn, stringToNumber } from "../helpers/utils";
+import { isBlank, isNumberFalsy, jsonParseDontThrow, logWarn, stringToNumber } from "../helpers/utils";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 
 
+/**
+ * @since 0.0.1
+ */
 export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUserEntity: AppUserEntity) {
 
     /** List of noteEntities that have been edited since they were last saved. Order should not matter */
     const [editedNoteEntities, setEditedNoteEntities] = useState<NoteEntity[]>([]);
-    /** 1-based */
-    const [currentPage, setCurrentPage] = useState(1);
     /** Global search results. Should be set to ```undefined``` if there's no search query */
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[] | undefined>(undefined);
 
     const { toast } = useContext(AppContext);
+    const [queryParams, setQueryParams] = useSearchParams();
 
     const queryClient = useQueryClient();
 
@@ -43,12 +46,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
     const isFetchTakingLonger = useIsFetchTakingLong(notesUseQueryResult.isFetched, noteEntitiesFetchDelay, !notesUseQueryResult.isFetched);
 
 
-    useEffect(() => {
-        notesUseQueryResult.refetch();
-        
-    }, [currentPage]);
-
-    
     useEffect(() => {
         notesTotalUseQueryResult.refetch();
 
@@ -74,7 +71,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
             return [];
 
         // -1 because currentPage is 1-based but pageNumber param is 0-based, 
-        const url = `${BACKEND_BASE_URL}/note/get-by-app_user-pageable?pageNumber=${currentPage - 1}&pageSize=${NUM_NOTES_PER_PAGE}`;
+        const url = `${BACKEND_BASE_URL}/note/get-by-app_user-pageable?pageNumber=${getCurrentPage() - 1}&pageSize=${NUM_NOTES_PER_PAGE}`;
 
         const jsonResponse = await fetchJson(url);
         if (isResponseError(jsonResponse)) {
@@ -236,6 +233,43 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         await notesUseQueryResult.refetch();
     }
 
+
+    /**
+     * Will update the {@link NOTE_PAGE_QUERY_PARAM} url query param (even if not present yet) regardless of 
+     * the current path.
+     * 
+     * Do nothing if ```pageNum``` is invalid.
+     * 
+     * @param pageNum 1-based, the page number for note results
+     */
+    function setCurrentPage(pageNum: number): void {
+
+        if (isNumberFalsy(pageNum))
+            return;
+
+        queryParams.set(NOTE_PAGE_URL_QUERY_PARAM, pageNum.toString());
+        setQueryParams(queryParams);
+    }
+
+
+    /**
+     * Retrieves the {@link NOTE_PAGE_URL_QUERY_PARAM} from the current url. 
+     * 
+     * @returns the current page of note results (1-based) or 1 if param is invalid
+     */
+    function getCurrentPage(): number {
+
+        const queryParamValue = queryParams.get(NOTE_PAGE_URL_QUERY_PARAM);
+        if (isBlank(queryParamValue))
+            return 1;
+
+        const pageNum = stringToNumber(queryParamValue);
+        if (isNumberFalsy(pageNum))
+            return 1;
+
+        return pageNum;
+    }
+
         
     return {
         notesUseQueryResult,
@@ -244,7 +278,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
         noteSearchResults, setNoteSearchResults,
         notesTotalUseQueryResult,
-        currentPage, setCurrentPage,
+        getCurrentPage, setCurrentPage,
 
         fetchSave,
         fetchSaveAll,

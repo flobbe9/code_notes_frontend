@@ -4,7 +4,7 @@ import { NoteEntity } from "../../../abstract/entites/NoteEntity";
 import "../../../assets/styles/StartPageContent.scss";
 import { NUM_NOTES_PER_PAGE } from "../../../helpers/constants";
 import { SearchNoteHelper } from "../../../helpers/SearchNoteHelper";
-import { getRandomString, isBlank, scrollTop } from "../../../helpers/utils";
+import { getRandomString, isBlank } from "../../../helpers/utils";
 import { useCsrfToken } from "../../../hooks/useCsrfToken";
 import AddNewNoteButton from "../../AddNewNoteButton";
 import { AppContext } from "../../App";
@@ -45,7 +45,7 @@ export default function StartPageContent({...props}: Props) {
         isFetchNoteEntitiesTakingLonger, 
         notesUseQueryResult, 
         notesTotalUseQueryResult,
-        currentNotesPage, 
+        getCurrentNotesPage, 
         setCurrentNotesPage,
         noteSearchResults,
         setNoteSearchResults,
@@ -107,23 +107,18 @@ export default function StartPageContent({...props}: Props) {
 
 
     useEffect(() => {
-        if (notes && !notes.length)
+        if (!notes?.length && isLoggedIn)
             handleNotePageEmpty();
 
     }, [notes]);
 
-
-    useEffect(() => {
-        setTimeout(() => scrollTop(), 10); // don't ask me
-
-    }, [currentNotesPage]);
-
-
+    
     /**
      * Should be called if all notes on a page have been deleted. Make sure to display some notes if possible.
      */
     function handleNotePageEmpty(): void {
 
+        const currentNotesPage = getCurrentNotesPage();
         if (currentNotesPage !== 1)
             setCurrentNotesPage(currentNotesPage - 1);
     }
@@ -199,8 +194,9 @@ export default function StartPageContent({...props}: Props) {
             const searchResults = searchNoteHelper.getNoteSearchResults(searchValue);
             setNoteSearchResults(searchResults);
 
-            if (currentNotesPage > getTotalPages())
-                setCurrentNotesPage(1);
+            // TODO: should not be triggered on page load
+            // if (getCurrentNotesPage() > getTotalPages())
+            //     setCurrentNotesPage(1);
         }
     }
 
@@ -290,7 +286,7 @@ export default function StartPageContent({...props}: Props) {
                 <PaginationBar 
                     className={`${componentName}-PaginationBar mb-1`} 
                     totalPages={getTotalPages()} 
-                    currentPage={currentNotesPage} 
+                    getCurrentPage={getCurrentNotesPage} 
                     setCurrentPage={handleNotePageChangeClick}
                 />
 

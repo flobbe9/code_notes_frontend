@@ -62,8 +62,8 @@ export default function StartPageContainer({children, ...props}: Props) {
 
     useEffect(() => {
         // case: reset or just started searching
-        if (noteSearchValue.length <= 1 && selectedTagEntityNames.size <= 1) // TODO: && no edited notes
-            setCurrentNotesPage(1);
+        // if (noteSearchValue.length <= 1 && selectedTagEntityNames.size <= 1) // TODO: && no edited notes
+        //     setCurrentNotesPage(1);
 
     }, [noteSearchValue, selectedTagEntityNames]);
     

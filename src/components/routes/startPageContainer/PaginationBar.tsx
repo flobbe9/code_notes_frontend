@@ -7,12 +7,15 @@ import { AppContext } from "../../App";
 import Button from "../../helpers/Button";
 import Flex from "../../helpers/Flex";
 import HelperDiv from "../../helpers/HelperDiv";
+import { useLocation } from "react-router-dom";
 
 
 interface Props extends DefaultProps {
 
     totalPages: number,
-    currentPage: number
+    /** @return the current page */
+    getCurrentPage: () => number,
+    /** Set the current page, should trigger a location change */
     setCurrentPage: (page: number) => void,
     /** The number of page numbers to display aside from ```1``` and ```totalPages```. Default is ```3``` */
     maxVisiblePageNumbers?: number,
@@ -36,11 +39,13 @@ const defaultTabletMaxVisiblePageNumbers = 5;
 
 
 /**
+ * Assuming that a page change triggers a location change, e.g. using the url query params.
+ * 
  * @since 0.0.6
  */
 export default function PaginationBar({
     totalPages,
-    currentPage,
+    getCurrentPage,
     setCurrentPage,
     maxVisiblePageNumbers = defaultMaxVisiblePageNumbers,
     mobileMaxVisiblePageNumbers = defaultMobileMaxVisiblePageNumbers,
@@ -59,7 +64,9 @@ export default function PaginationBar({
 
     const { isMobileWidth, isTableWidth, windowSize } = useContext(AppContext);
 
-    const context = { currentPage, setCurrentPage };
+    const context = { getCurrentPage, setCurrentPage };
+
+    const location = useLocation();
 
 
     useEffect(() => {
@@ -71,7 +78,7 @@ export default function PaginationBar({
     useEffect(() => {
         setPageNumbersInBetween(mapPageNumbersInBetween());
 
-    }, [currentPage, cleanMaxVisiblePageNumbers]);
+    }, [location, cleanMaxVisiblePageNumbers, totalPages]);
 
 
     if (!areComponentPropsValid())
@@ -90,6 +97,7 @@ export default function PaginationBar({
         if (totalPages <= 2)
             return [];
 
+        const currentPage = getCurrentPage();
         const maxHalf = Math.ceil(cleanMaxVisiblePageNumbers / 2);
 
         const pageNumbersInBetween: JSX.Element[] = [];
@@ -130,6 +138,8 @@ export default function PaginationBar({
 
     function areComponentPropsValid(): boolean {
 
+        const currentPage = getCurrentPage();
+
         const isInvalid = 
             isNumberFalsy(totalPages) || 
             isNumberFalsy(currentPage) || 
@@ -145,6 +155,8 @@ export default function PaginationBar({
 
     function goToNextPage(): void {
 
+        const currentPage = getCurrentPage();
+
         if (currentPage === totalPages) 
             return;
 
@@ -153,6 +165,8 @@ export default function PaginationBar({
 
 
     function goToPrevPage(): void {
+
+        const currentPage = getCurrentPage();
 
         if (currentPage === 1) 
             return;
@@ -199,11 +213,13 @@ export default function PaginationBar({
 
     function displayLeftHandDots(): boolean {
 
-        return !canDisplayAllPageNumbers() && currentPage - Math.ceil(cleanMaxVisiblePageNumbers / 2) > 1;
+        return !canDisplayAllPageNumbers() && getCurrentPage() - Math.ceil(cleanMaxVisiblePageNumbers / 2) > 1;
     }
 
 
     function displayRightHandDots(): boolean {
+
+        const currentPage = getCurrentPage();
 
         if (cleanMaxVisiblePageNumbers % 2 === 0)
             return !canDisplayAllPageNumbers() && totalPages - (currentPage + (cleanMaxVisiblePageNumbers / 2) + 1) > 0;
@@ -224,8 +240,8 @@ export default function PaginationBar({
                 {/* Left Arrow */}
                 <Button 
                     className={`${componentName}-arrowButton hoverStrong`}
-                    disabled={currentPage === 1} 
-                    title={currentPage === 1 ? "" : "Previous page"}
+                    disabled={getCurrentPage() === 1} 
+                    title={getCurrentPage() === 1 ? "" : "Previous page"}
                     onClick={goToPrevPage}
                 >
                     <i className={`fa-solid fa-chevron-left`}></i>
@@ -246,8 +262,8 @@ export default function PaginationBar({
                 {/* Right Arrow */}
                 <Button 
                     className={`${componentName}-arrowButton hoverStrong`} 
-                    disabled={currentPage === totalPages} 
-                    title={currentPage === totalPages ? "" : "Next page"}
+                    disabled={getCurrentPage() === totalPages} 
+                    title={getCurrentPage() === totalPages ? "" : "Next page"}
                     onClick={goToNextPage}
                 >
                     <i className={`fa-solid fa-chevron-right`}></i>
@@ -261,7 +277,7 @@ export default function PaginationBar({
 
 
 const PaginationBarContext = createContext({
-    currentPage: 1 as number,
+    getCurrentPage: () => 1 as number,
     setCurrentPage: (page: number) => {}
 })
         
@@ -276,7 +292,7 @@ function PageNumber({page, rendered, ...props}: PageNumberProps): JSX.Element {
     const componentName = "PageNumber";
     const { children, className, ...otherProps } = getCleanDefaultProps(props, componentName);
 
-    const { currentPage, setCurrentPage } = useContext(PaginationBarContext);
+    const { getCurrentPage, setCurrentPage } = useContext(PaginationBarContext);
 
 
     if (isNumberFalsy(page))
@@ -285,12 +301,12 @@ function PageNumber({page, rendered, ...props}: PageNumberProps): JSX.Element {
 
     return (
         <Button 
-            className={`${className} ${page === currentPage && `${componentName}-active`} hoverStrong mx-2`}
+            className={`${className} ${page === getCurrentPage() && `${componentName}-active`} hoverStrong mx-2`}
             rendered={rendered}
             onClick={() => setCurrentPage(page)}
             {...otherProps}
         >
-            {page}
+            {page}  
         </Button>
     );
 }
