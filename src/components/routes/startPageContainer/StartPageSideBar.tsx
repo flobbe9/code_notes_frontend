@@ -8,6 +8,7 @@ import SearchBar from "../../helpers/SearchBar";
 import SideBar from "../../helpers/SideBar";
 import { StartPageContainerContext } from "./StartPageContainer";
 import StartPageSideBarTagList from "./StartPageSideBarTagList";
+import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../helpers/constants";
 
 
 interface Props extends DefaultProps {
@@ -46,6 +47,15 @@ export default function StartPageSideBar({...props}: Props) {
     }, []);
 
 
+    useEffect(() => {
+        if (isStartPageSideBarVisible)
+            setTimeout(() => {
+                searchBarRef.current!.focus();
+            }, BLOCK_SETTINGS_ANIMATION_DURATION);
+
+    }, [isStartPageSideBarVisible])
+
+
     function handleKeyDown(event: KeyboardEvent): void {
 
         const sideBarDislay = (componentRef.current!.querySelector(".SideBar-right") as HTMLElement).style.display;
@@ -53,7 +63,7 @@ export default function StartPageSideBar({...props}: Props) {
 
         if (isKeyPressed("Control") && keyName === "b") {
             event.preventDefault();
-            // NOTE: don't use the state in here because it does not update after this event handler is beeing added to window
+            // NOTE: don't pass the state in here because it does not update after this event handler is beeing added to window
             setIsStartPageSideBarVisible(sideBarDislay !== "block");
         }
     }
