@@ -946,10 +946,34 @@ export function getCurrentUrlWithoutWWW(): string {
  * Removes current page from browser history and replaces it with given ```path```.
  * 
  * @param path relative path to replace the current history entry with. Default is the current path
+ * @param state the ```history.state``` to replace. Default is ```null``` (beeing the current one)
  */
-export function replaceCurrentBrowserHistoryEntry(path: string = window.location.pathname): void {
+export function replaceCurrentBrowserHistoryEntry(path: string | URL | null = window.location.pathname, state: any = null): void {
 
-    window.history.replaceState({}, "", path);
+    window.history.replaceState(state, "", path);
+}
+
+
+/**
+ * Updates the current url's query params without creating a new history entry.
+ * 
+ * @param key url query key. Cannot be blank
+ * @param value url query value. If blank the key will be replaced as well
+ */
+export function updateCurrentUrlQueryParams(key: string, value: string): void {
+
+    if (isBlank(key) || isStringFalsy(value))
+        return;
+
+    const url = new URL(window.location.href);
+
+    // if value is balnk
+    if (isBlank(value))
+        url.searchParams.delete(key);
+    else
+        url.searchParams.set(key, value);
+
+    replaceCurrentBrowserHistoryEntry(url);
 }
 
 
@@ -1330,4 +1354,70 @@ export function jsonParseDontThrow<ReturnType>(value: string | null | undefined)
         logDebug(e.message);
         return null;
     }
+}
+
+
+function getUrlQueryParamsMap(): Map<string, string> {
+
+    const urlQueryParams = window.location.search;
+
+    // case: no params or only a '?'
+    if (urlQueryParams.length <= 1)
+        return new Map();
+
+    const keyValueArr = urlQueryParams.replace("?", "").split("&");
+
+    const keyValueMap = new Map<string, string>();
+
+    keyValueArr
+        .forEach(keyValuePair => {
+            const firstEqualsIndex = keyValuePair.indexOf("=");
+
+            // case: no value
+            if (firstEqualsIndex === -1)
+                keyValueMap.set(keyValuePair, "");
+        
+            else {
+                const key = keyValuePair.substring(0, firstEqualsIndex);
+                let value = keyValuePair.substring(firstEqualsIndex).replace("=", "");
+                value = cleanUpUrlQueryParamValue(value);
+                
+                keyValueMap.set(key, value);
+            }
+        });
+
+    return keyValueMap;
+}
+
+
+/**
+ * Retrieve the url query param value for given key using ```window.location.search```. Usefull if react hooks don't work for some reason.
+ * 
+ * @param key of the url query param value
+ * @returns the value for given key or ```null```
+ */
+export function getUrlQueryParam(key: string): string | null {
+
+    if (isStringFalsy(key))
+        return null;
+
+    return getUrlQueryParamsMap().get(key) || null;
+}
+
+
+/**
+ * Replace some substrings that are used in url query params in place of certain chars with their actual chars. 
+ * E.g. "+" represents a " " and "%sC" a ","
+ * 
+ * @param value from url query param
+ * @returns clean (unaltered) value
+ */
+function cleanUpUrlQueryParamValue(value: string): string {
+
+    if (isBlank(value))
+        return value;
+
+    return value
+        .replaceAll("%2C", ",")
+        .replaceAll("+", " ");
 }

@@ -1,9 +1,9 @@
 import { useContext, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { AppFetchContext } from "../components/AppFetchContextHolder";
-import { CSRF_TOKEN_URL_QUERY_PARAM } from "../helpers/constants";
 import { RouteContext } from "../components/RouteContextHolder";
-import { setCsrfToken, getCsrfToken } from "../helpers/projectUtils";
+import { CSRF_TOKEN_URL_QUERY_PARAM } from "../helpers/constants";
+import { getCsrfToken, setCsrfToken } from "../helpers/projectUtils";
 
 
 /**
@@ -17,8 +17,7 @@ import { setCsrfToken, getCsrfToken } from "../helpers/projectUtils";
  */
 export function useCsrfToken() {
 
-    const [queryParams, setQueryParams] = useSearchParams();
-    const navigate = useNavigate();
+    const [urlQueryParams] = useSearchParams();
 
     const { clearUrlQueryParams } = useContext(RouteContext);
     const { isLoggedIn, isLoggedInUseQueryResult } = useContext(AppFetchContext);
@@ -52,7 +51,7 @@ export function useCsrfToken() {
      */
     function getCsrfTokenFromUrl(): string | null {
 
-        const csrfToken = queryParams.get(CSRF_TOKEN_URL_QUERY_PARAM);
+        const csrfToken = urlQueryParams.get(CSRF_TOKEN_URL_QUERY_PARAM);
 
         // case: no csrf token in url
         if (!csrfToken) 

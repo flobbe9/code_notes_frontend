@@ -1,8 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
+import { useLocation } from "react-router-dom";
 
 
 /**
@@ -16,12 +17,20 @@ export function useLoggedIn() {
 
     const queryClient = useQueryClient();
 
+    const location = useLocation();
+
 
     const useQueryResult = useQuery<boolean>({
         queryKey: LOGGED_IN_QUERY_KEY,
         queryFn: fetchLoggedIn,
         initialData: queryClient.getQueryData(LOGGED_IN_QUERY_KEY) || false,
     });
+
+
+    useEffect(() => {
+        useQueryResult.refetch();
+
+    }, [location]);
 
 
     /**

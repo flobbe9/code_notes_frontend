@@ -7,9 +7,9 @@ import { NoteEntity } from '../abstract/entites/NoteEntity';
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
-import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NOTE_PAGE_URL_QUERY_PARAM, NUM_NOTES_PER_PAGE, START_PAGE_PATH } from "../helpers/constants";
+import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NOTE_PAGE_URL_QUERY_PARAM, NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, NOTE_SEARCH_TAGS_URL_QUERY_PARAM, NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR, NUM_NOTES_PER_PAGE, START_PAGE_PATH } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { isBlank, isNumberFalsy, jsonParseDontThrow, logWarn, stringToNumber } from "../helpers/utils";
+import { getUrlQueryParam, isBlank, isNumberFalsy, isStringFalsy, jsonParseDontThrow, logWarn, stringToNumber, updateCurrentUrlQueryParams } from "../helpers/utils";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 
 
@@ -23,8 +23,8 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
     /** Global search results. Should be set to ```undefined``` if there's no search query */
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[] | undefined>(undefined);
 
-    const { toast } = useContext(AppContext);
-    const [queryParams, setQueryParams] = useSearchParams();
+    const { toast, gotNewUrlQueryParams, notifyUrlQueryParamsChange } = useContext(AppContext);
+    const [urlQueryParams, setUrlQueryParams] = useSearchParams();
 
     const queryClient = useQueryClient();
 
@@ -58,6 +58,12 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
     }, [isLoggedInUseQueryResult.data, isLoggedInUseQueryResult.isFetched]);
 
 
+    useEffect(() => {
+        notesUseQueryResult.refetch();
+        
+    }, [notifyUrlQueryParamsChange]);
+
+
     /**
      * Only fetch if is ```START_PAGE_PATH```.
      * 
@@ -70,8 +76,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         if (!isLoggedInUseQueryResult.data || !appUserEntity || window.location.pathname !== START_PAGE_PATH)
             return [];
 
-        // -1 because currentPage is 1-based but pageNumber param is 0-based, 
-        const url = `${BACKEND_BASE_URL}/note/get-by-app_user-pageable?pageNumber=${getCurrentPage() - 1}&pageSize=${NUM_NOTES_PER_PAGE}`;
+        const url = `${BACKEND_BASE_URL}/note/get-by-app_user-pageable?${getFetchNotesUrlQueryParams()}`;
 
         const jsonResponse = await fetchJson(url);
         if (isResponseError(jsonResponse)) {
@@ -80,6 +85,16 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         }
 
         return jsonResponse;
+    }
+
+
+    /**
+     * @returns the url query params for {@link fetchNotes()}, not prepending a "?" or a "/"
+     */
+    function getFetchNotesUrlQueryParams(): string {
+
+        // -1 because currentPage is 1-based but pageNumber param is 0-based
+        return `pageNumber=${getCurrentPage() - 1}&pageSize=${NUM_NOTES_PER_PAGE}&${NOTE_SEARCH_PHRASE_URL_QUERY_PARAM}=${getSearchPhrase()}&${NOTE_SEARCH_TAGS_URL_QUERY_PARAM}=${concatTagNames(getSearchTags())}`;
     }
 
 
@@ -247,8 +262,8 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         if (isNumberFalsy(pageNum))
             return;
 
-        queryParams.set(NOTE_PAGE_URL_QUERY_PARAM, pageNum.toString());
-        setQueryParams(queryParams);
+        urlQueryParams.set(NOTE_PAGE_URL_QUERY_PARAM, pageNum.toString());
+        setUrlQueryParams(urlQueryParams);
     }
 
 
@@ -259,7 +274,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      */
     function getCurrentPage(): number {
 
-        const queryParamValue = queryParams.get(NOTE_PAGE_URL_QUERY_PARAM);
+        const queryParamValue = urlQueryParams.get(NOTE_PAGE_URL_QUERY_PARAM);
         if (isBlank(queryParamValue))
             return 1;
 
@@ -270,14 +285,94 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         return pageNum;
     }
 
+
+    function getSearchPhrase() {
+
+        const queryParamValue = getUrlQueryParam(NOTE_SEARCH_PHRASE_URL_QUERY_PARAM);
+        if (isBlank(queryParamValue))
+            return "";
+
+        return queryParamValue!;
+    }
+
+
+    /**
+     * Updates the url query param {@link NOTE_SEARCH_PHRASE_URL_QUERY_PARAM} but only if given ```searchPhrase``` is
+     * a valid string.
+     * 
+     * @param searchPhrase input from note searchbar 
+     */
+    function setSearchPhrase(searchPhrase: string): void {
+
+        if (isStringFalsy(searchPhrase))
+            return;
+
+        if (isBlank(searchPhrase)) 
+            updateCurrentUrlQueryParams(NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, "");
+
+        else 
+            updateCurrentUrlQueryParams(NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, searchPhrase);
+
+        gotNewUrlQueryParams();
+    }
+
+
+    function getSearchTags(): Set<string> {
+
+        const queryParamValue = getUrlQueryParam(NOTE_SEARCH_TAGS_URL_QUERY_PARAM);
+        if (isBlank(queryParamValue))
+            return new Set();
+
+        return new Set(queryParamValue!.split(NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR));
+    }
+
+
+    function concatTagNames(searchTags: Set<string> | string[]): string {
+
+        const searchTagsArray = [...searchTags || []];
+
+        if (!searchTagsArray.length)
+            return "";
+
+        return [...searchTags]
+            .reduce((prev, curr) => `${prev}${NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR}${curr}`);
+    }
+
+
+    /**
+     * Updates the url query param {@link NOTE_SEARCH_TAGS_URL_QUERY_PARAM} but only if given ```tagNames``` is
+     * a valid array.
+     * 
+     * @param tagNames input from note searchbar 
+     */
+    function setSearchTags(tagNames: Set<string>): void {
+
+        if (!tagNames)
+            return;
+
+        // case: no tags selected
+        if (!tagNames.size)
+            updateCurrentUrlQueryParams(NOTE_SEARCH_TAGS_URL_QUERY_PARAM, "");
+
+        else {
+            const searchTagsString = concatTagNames(tagNames);
+            updateCurrentUrlQueryParams(NOTE_SEARCH_TAGS_URL_QUERY_PARAM, searchTagsString);
+        }
+
+        gotNewUrlQueryParams();
+    }
+
         
     return {
         notesUseQueryResult,
         isFetchTakingLonger,
         editedNoteEntities, setEditedNoteEntities,
+        notesTotalUseQueryResult,
 
         noteSearchResults, setNoteSearchResults,
-        notesTotalUseQueryResult,
+        getSearchPhrase, setSearchPhrase,
+        getSearchTags, setSearchTags,
+
         getCurrentPage, setCurrentPage,
 
         fetchSave,

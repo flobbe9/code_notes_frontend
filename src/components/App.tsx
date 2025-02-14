@@ -46,6 +46,9 @@ export default function App() {
     const [popupContent, setPopupContent] = useState<ReactNode | undefined>([]);
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
     const [popup2Content, setPopup2Content] = useState<ReactNode>([]);
+
+    /** Meant to be triggered when the url query params are changed but the location stays the same */
+    const [notifyUrlQueryParamsChange, setNotifyUrlQueryParamsChange] = useState(false);
     
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
@@ -79,7 +82,10 @@ export default function App() {
 
         showPopup,
         hidePopup,
-        replacePopupContent
+        replacePopupContent,
+
+        notifyUrlQueryParamsChange,
+        gotNewUrlQueryParams
     }
 
     const toastRef = useRef<HTMLDivElement>(null);
@@ -181,7 +187,7 @@ export default function App() {
      * 
      * @param event 
      */
-    function handleToastMouseEnter(event: MouseEvent): void {
+    function handleToastMouseEnter(): void {
 
         clearTimeout(toastScreenTimeTimeout);
         pauseAnimations(toastRef.current!);
@@ -399,6 +405,12 @@ export default function App() {
             isBottomMostPopup: false
         };
     }
+    
+
+    function gotNewUrlQueryParams(): void {
+
+        setNotifyUrlQueryParamsChange(!notifyUrlQueryParamsChange);
+    }
 
 
     return (
@@ -505,4 +517,7 @@ export const AppContext = createContext({
     showPopup: (popupContent?: ReactNode | undefined) => {},
     hidePopup: () => {},
     replacePopupContent: (content: ReactNode | undefined) => {},
+
+    notifyUrlQueryParamsChange: false as boolean,
+    gotNewUrlQueryParams: () => {},
 });

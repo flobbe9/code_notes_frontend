@@ -23,12 +23,9 @@ export default function StartPageSideBar({...props}: Props) {
     /** Tag search value eagerly updated on change event */
     const [searchValue, setSearchValue] = useState("");
 
-    /** Refers to ```selectedTagEntityNames``` beeing not empty */
-    const [anyTagsSelected, setAnyTagsSelected] = useState(false);
-
     const { isKeyPressed, isMobileWidth } = useContext(AppContext);
-    const { appUserEntity, isLoggedIn } = useContext(AppFetchContext);
-    const { isStartPageSideBarVisible, setIsStartPageSideBarVisible, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
+    const { appUserEntity, isLoggedIn, getNoteSearchTags, setNoteSearchTags } = useContext(AppFetchContext);
+    const { isStartPageSideBarVisible, setIsStartPageSideBarVisible } = useContext(StartPageContainerContext);
 
     const { children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
 
@@ -47,12 +44,6 @@ export default function StartPageSideBar({...props}: Props) {
             window.removeEventListener("keydown", handleKeyDown);
         }
     }, []);
-
-
-    useEffect(() => {
-        setAnyTagsSelected(!!selectedTagEntityNames.size)
-
-    }, [selectedTagEntityNames]);
 
 
     function handleKeyDown(event: KeyboardEvent): void {
@@ -82,7 +73,7 @@ export default function StartPageSideBar({...props}: Props) {
 
     function handleResetClick(): void {
 
-        setSelectedTagEntityNames(new Set());
+        setNoteSearchTags(new Set());
         searchBarRef.current!.value = "";
         setSearchValue("");
     }
@@ -118,7 +109,7 @@ export default function StartPageSideBar({...props}: Props) {
                     <Button 
                         className="resetButton hover" 
                         title="Reset tag filter" 
-                        disabled={!anyTagsSelected || !isLoggedIn}
+                        disabled={!getNoteSearchTags().size || !isLoggedIn}
                         onClick={handleResetClick} 
                     >
                         Reset   

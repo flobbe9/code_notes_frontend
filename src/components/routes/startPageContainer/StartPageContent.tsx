@@ -3,7 +3,6 @@ import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultPro
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
 import "../../../assets/styles/StartPageContent.scss";
 import { NUM_NOTES_PER_PAGE } from "../../../helpers/constants";
-import { SearchNoteHelper } from "../../../helpers/SearchNoteHelper";
 import { getRandomString, isBlank } from "../../../helpers/utils";
 import { useCsrfToken } from "../../../hooks/useCsrfToken";
 import AddNewNoteButton from "../../AddNewNoteButton";
@@ -16,7 +15,6 @@ import SearchBar from "../../helpers/SearchBar";
 import Note from "./noteInput/Note";
 import PaginationBar from "./PaginationBar";
 import SaveAllNotesButton from "./SaveAllNotesButton";
-import { StartPageContainerContext } from "./StartPageContainer";
 
 
 interface Props extends DefaultProps {
@@ -49,10 +47,11 @@ export default function StartPageContent({...props}: Props) {
         setCurrentNotesPage,
         noteSearchResults,
         setNoteSearchResults,
-        isLoggedIn
+        isLoggedIn,
+        getNoteSearchPhrase,
+        setNoteSearchPhrase
     } = useContext(AppFetchContext);
-    const { selectedTagEntityNames, noteSearchValue, setNoteSearchValue } = useContext(StartPageContainerContext);
-    const searchNoteHelper = new SearchNoteHelper(notesUseQueryResult.data, selectedTagEntityNames);
+    // const searchNoteHelper = new SearchNoteHelper(notesUseQueryResult.data, selectedTagEntityNames);
     
     const componentRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
@@ -71,6 +70,8 @@ export default function StartPageContent({...props}: Props) {
 
 
     useEffect(() => {
+        searchInputRef.current!.value = getNoteSearchPhrase();
+
         window.addEventListener("keydown",  handleKeyDown);
 
         return () => {
@@ -153,8 +154,8 @@ export default function StartPageContent({...props}: Props) {
 
     function handleSearchKeyDown(event: React.KeyboardEvent): void {
 
-        if (event.key === "Enter")
-            handleSearch((event.target as HTMLInputElement).value)
+        // if (event.key === "Enter")
+        //     handleSearch((event.target as HTMLInputElement).value)
     }
     
 
@@ -162,43 +163,46 @@ export default function StartPageContent({...props}: Props) {
 
         const currentSearchValue = (event.target as HTMLInputElement).value;
 
-        handleSearch(currentSearchValue);
+        // handleSearch(currentSearchValue);
 
-        setNoteSearchValue(currentSearchValue);
+        // setNoteSearchValue(currentSearchValue);
+
+        setNoteSearchPhrase(currentSearchValue);
     }
 
 
     function handleSearchXIconClick(): void {
 
-        handleSearch("");
+        // handleSearch("");
+        setNoteSearchPhrase("");
     }
 
 
-    /**
-     * Update the ```searchResults``` state with matching note entities and go to page 1.
-     * 
-     * @param searchValue the search bar input. Default is ```noteSearchValue```
-     */
-    function handleSearch(searchValue = noteSearchValue): void {
+    // /**
+    //  * Update the ```searchResults``` state with matching note entities and go to page 1.
+    //  * 
+    //  * @param searchValue the search bar input. Default is ```noteSearchValue```
+    //  */
+    // function handleSearch(searchValue = noteSearchValue): void {
 
-        if (editedNoteEntities.length && isLoggedIn) {
-            toast("Cannot search", "Please save your pending changes first.", "warn", 4000);
-            return;
-        }
+    //     if (editedNoteEntities.length && isLoggedIn) {
+    //         toast("Cannot search", "Please save your pending changes first.", "warn", 4000);
+    //         return;
+    //     }
         
-        // case: no search query
-        if (isBlank(searchValue) && !selectedTagEntityNames.size)
-            setNoteSearchResults(undefined);
+    //     // case: no search query
+    //     if (isBlank(searchValue) && !selectedTagEntityNames.size)
+    //         setNoteSearchResults(undefined);
 
-        else {
-            const searchResults = searchNoteHelper.getNoteSearchResults(searchValue);
-            setNoteSearchResults(searchResults);
+    //     else {
+    //         const searchResults = searchNoteHelper.getNoteSearchResults(searchValue);
+    //         setNoteSearchResults(searchResults);
 
-            // TODO: should not be triggered on page load
-            // if (getCurrentNotesPage() > getTotalPages())
-            //     setCurrentNotesPage(1);
-        }
-    }
+    //         // TODO: should not be triggered on page load
+    //         // if (getCurrentNotesPage() > getTotalPages())
+    //         //     setCurrentNotesPage(1);
+    //     }
+    // }
 
 
     /**
@@ -280,7 +284,7 @@ export default function StartPageContent({...props}: Props) {
                     className="textCenter"
                     hidden={!notesUseQueryResult.data.length || !!notesUseQueryResult.data.length}
                 >
-                    No search results{!isBlank(noteSearchValue) && ` for '${noteSearchValue}'`}...
+                    No search results{!isBlank(getNoteSearchPhrase()) && ` for '${getNoteSearchPhrase()}'`}...
                 </h2>
 
                 <PaginationBar 

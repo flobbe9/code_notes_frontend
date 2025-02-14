@@ -5,6 +5,7 @@ import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../
 import "../../assets/styles/Login.scss";
 import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
+import { getHeadTitleText, setCsrfToken } from "../../helpers/projectUtils";
 import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, stringToNumber } from "../../helpers/utils";
 import { useFormInput } from "../../hooks/useFormInput";
 import { EDITED_NOTES_KEY } from "../../hooks/useNotes";
@@ -20,7 +21,6 @@ import Oauth2LoginButton from "./../Oauth2LoginButton";
 import ResendConfirmationMail from "./../ResendConfirmationMail";
 import SendPasswordResetMail from "./../SendPasswordResetMail";
 import Register from "./Register";
-import { getHeadTitleText, setCsrfToken } from "../../helpers/projectUtils";
 
 
 interface Props extends DefaultProps {
@@ -58,7 +58,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     const { clearUrlQueryParams } = useContext(RouteContext);
     const { fetchLogin, isLoggedInUseQueryResult, editedNoteEntities } = useContext(AppFetchContext);
     
-    const [urlQueryParams, setUrlSearchParams] = useSearchParams();
+    const [urlQueryParams] = useSearchParams();
     
     type InputName = "email" | "password";
     const inputValidationWrappers: Record<InputName, InputValidationWrapper[]> = {
