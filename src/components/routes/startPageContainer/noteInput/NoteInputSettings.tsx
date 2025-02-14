@@ -168,7 +168,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
     }
     
     
-    function handleLanguageSearchBlur(event): void {
+    function handleLanguageSearchBlur(): void {
 
         setShowLanguageSearchResults(false);
     }
