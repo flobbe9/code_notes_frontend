@@ -188,7 +188,7 @@ export default function StartPageContent({...props}: Props) {
                         placeHolder="Search notes..." 
                         title="Search notes (Ctrl + Shift + F)"
                         ref={searchInputRef}
-                        disabled={!notesUseQueryResult.data.results.length}
+                        disabled={!notesUseQueryResult.data.results.length && isBlank(getNoteSearchPhrase())}
                         onChange={handleSearchValueChange}
                         onKeyDown={handleSearchKeyDown}
                         onXIconClick={handleSearchXIconClick}
