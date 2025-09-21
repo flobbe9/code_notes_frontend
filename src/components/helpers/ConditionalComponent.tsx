@@ -47,5 +47,9 @@ export default function ConditionalComponent({condition, children, redirectPath}
     }, [condition, location]);
 
 
-    return condition ? children : <Fragment />;
+    return (
+        <Fragment>
+            {condition && children}
+        </Fragment>
+    )
 }

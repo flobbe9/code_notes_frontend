@@ -29,10 +29,10 @@ export default forwardRef(function Checkbox({
         rendered = true,
         disabled = false,
         title = "",
-        onClick,
         isChecked = false,
         setIsChecked,
         dontHideChildren = false,
+        onClick,
         _hover = {},
         _disabled = {
             cursor: "default",

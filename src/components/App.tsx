@@ -4,7 +4,7 @@ import '../assets/styles/App.scss';
 import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, pauseAnimations, playAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
-import AppFetchContextHolder from "./AppFetchContextHolder";
+import AppFetchContextProvider from "./AppFetchContextProvider";
 import Footer from "./Footer";
 import ConditionalComponent from './helpers/ConditionalComponent';
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
@@ -46,13 +46,13 @@ export default function App() {
     const [popupContent, setPopupContent] = useState<ReactNode | undefined>([]);
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
     const [popup2Content, setPopup2Content] = useState<ReactNode>([]);
+
+    /** Meant to be triggered when the url query params are changed but the location stays the same */
+    const [notifyUrlQueryParamsChange, setNotifyUrlQueryParamsChange] = useState(false);
     
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
-    /** List of note ids that have been edited since they were last saved. Remove a note id from this list, once the note gets saved */
-    const [editedNoteIds, setEditedNoteIds] = useState<Set<Number>>(new Set());
-
-    const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress(true);
+    const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress, pressedKeys } = useKeyPress(true);
 
     /** Time the toast popup takes to slide up and down in ms. */
     const toastSlideDuration = 400;
@@ -69,6 +69,7 @@ export default function App() {
 
         isKeyPressed,
         isControlKeyPressed,
+        pressedKeys,
 
         isAppOverlayVisible,
         setIsAppOverlayVisible,
@@ -83,20 +84,17 @@ export default function App() {
         hidePopup,
         replacePopupContent,
 
-        editedNoteIds,
-        setEditedNoteIds,
+        notifyUrlQueryParamsChange,
+        gotNewUrlQueryParams
     }
 
     const toastRef = useRef<HTMLDivElement>(null);
 
-    
     useEffect(() => {
         window.addEventListener("keydown", handleWindowKeyDown);
         window.addEventListener("keyup", handleWindowKeyUp);
         window.addEventListener("resize", handleWindowResize);
-
     }, []);
-
 
     /**
      * Set given text to toast and slide it up.
@@ -108,7 +106,6 @@ export default function App() {
      *                   the popup wont hide by itself.
      */
     function toast(summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number): void {
-
         setToastSummary(summary);
         setToastMessage(message);
         setToastSevirity(sevirity);
@@ -126,7 +123,6 @@ export default function App() {
         setTimeout(moveToast, 10)
     }
 
-
     /**
      * Start a timeout for toast to hide if it doesn't hide automatically.
      * 
@@ -134,7 +130,6 @@ export default function App() {
      *                   the popup wont hide by itself.
      */
     function forceToastTimeout(screenTime = 8000): void {
-
         // case: no toast present or will hide on it's own
         if (isBlank(toastSummary) || !isNumberFalsy(toastScreenTime))
             return;
@@ -148,14 +143,12 @@ export default function App() {
         setToastScreenTimeTimeout(toastTimeout);
     }
 
-
     /**
      * Show toast or hide it if ```hideToast``` is ```true```. Has a 10 milliseconds delay.
      * 
      * @param hideToast if true, toast will definitely by hidden regardless of it's state before. Default is ```false```
      */
     async function moveToast(hideToast = false): Promise<void> {
-
         let targetBottom = "30px";
 
         // toast height including message
@@ -179,19 +172,16 @@ export default function App() {
             10
         ); // wait for css to complete
     }
-        
 
     /**
      * Will cancel the toast timeout and possibly pause ongoing toast animations.
      * 
      * @param event 
      */
-    function handleToastMouseEnter(event: MouseEvent): void {
-
+    function handleToastMouseEnter(): void {
         clearTimeout(toastScreenTimeTimeout);
         pauseAnimations(toastRef.current!);
     }
-    
 
     /**
      * Will restart the toast timeout to hide itself (if was set) and possibly resume ongoing toast animations.
@@ -199,7 +189,6 @@ export default function App() {
      * @param event 
      */
     function handleToastMouseLeave(event: MouseEvent): void {
-        
         playAnimations(toastRef.current!)
 
         // case: toast does hide automatically
@@ -209,7 +198,6 @@ export default function App() {
     
 
     function handleWindowResize(event): void {
-
         setWindowSize([window.innerWidth, window.innerHeight]);
     }
     
@@ -404,13 +392,18 @@ export default function App() {
             isBottomMostPopup: false
         };
     }
+    
+
+    function gotNewUrlQueryParams(): void {
+        setNotifyUrlQueryParamsChange(!notifyUrlQueryParamsChange);
+    }
 
 
     return (
         <AppContext.Provider value={context}>
-            <BrowserRouter>
+            <BrowserRouter future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
                 <RouteContextHolder>
-                    <AppFetchContextHolder>
+                    <AppFetchContextProvider>
                         <div id="App" className="App">
                             <Overlay 
                                 id="App"
@@ -476,7 +469,7 @@ export default function App() {
                                 onMouseLeave={handleToastMouseLeave}
                             />  
                         </div>
-                    </AppFetchContextHolder>
+                    </AppFetchContextProvider>
                 </RouteContextHolder>
             </BrowserRouter>
         </AppContext.Provider>
@@ -495,7 +488,8 @@ export const AppContext = createContext({
     isDesktopWidth: false as boolean,
 
     isKeyPressed: (keyName: string): boolean => {return false},
-    isControlKeyPressed: () => {return false as boolean},
+    isControlKeyPressed: (nonControlKeys?: string[]) => {return false as boolean},
+    pressedKeys: new Set() as Set<string>,
 
     isAppOverlayVisible: false,
     setIsAppOverlayVisible: (isVisible: boolean) => {},
@@ -510,6 +504,6 @@ export const AppContext = createContext({
     hidePopup: () => {},
     replacePopupContent: (content: ReactNode | undefined) => {},
 
-    editedNoteIds: new Set<Number>(),
-    setEditedNoteIds: (ids: Set<Number>) => {}
+    notifyUrlQueryParamsChange: false as boolean,
+    gotNewUrlQueryParams: () => {},
 });

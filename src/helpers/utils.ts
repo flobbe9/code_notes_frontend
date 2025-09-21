@@ -1,16 +1,8 @@
-import parse, { Element } from "html-react-parser";
 import { CSSProperties } from "react";
-import sanitize from "sanitize-html";
-import { useQueryClientObj } from "..";
 import { AnimationEasing } from "../abstract/CSSTypes";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
-import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { isDebugLogLevel, isErrorLogLevel, isInfoLogLevel, isWarnLogLevel, LogLevelName } from "../abstract/LogLevel";
-import { isRememberMyChoiceValue, RememberMyChoiceKey } from "../abstract/RememberMyChoice";
-import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
-import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
-import { NOTE_QUERY_KEY } from "../hooks/useNotes";
-import { APP_NAME_PRETTY, BASE_URL, CONSOLE_MESSAGES_TO_AVOID, DEFAULT_HTML_SANTIZER_OPTIONS, ENV, HOST, LOG_LEVEL_COLORS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
+import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, ENV, HOST, LOG_LEVEL_COLORS } from "./constants";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
 
 
@@ -28,9 +20,10 @@ export function logDebug(message?: any, ...optionalParams: any[]): void {
     if (!isDebugLogLevel())
         return;
 
-    const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
+    // const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
     
-    console.log(getTimeStamp(), errorObj, ...optionalParams);
+    // console.log(getTimeStamp(), errorObj, ...optionalParams);
+    console.log(getTimeStamp(), message, ...optionalParams);
 }
 
 
@@ -112,7 +105,8 @@ function logColored(logLevelName: LogLevelName, obj?: any, ...optionalParams: an
     // get log color by sevirity
     const color = LOG_LEVEL_COLORS[logLevelName];
 
-    console.log("%c" + obj, "background: " + color, ...optionalParams);
+    // console.log("%c" + obj, "background: " + color, ...optionalParams);
+    console.log(obj, ...optionalParams);
 }
 
 
@@ -133,7 +127,7 @@ export function logApiResponse(response: CustomExceptionFormat): void {
  * @param str 
  * @returns the number or -1
  */
-export function stringToNumber(str: string | number | undefined): number {
+export function stringToNumber(str: string | number | undefined | null): number {
 
     if (typeof str === "number")
         return str;
@@ -147,9 +141,15 @@ export function stringToNumber(str: string | number | undefined): number {
     }
 }
 
+/**
+ * @param obj 
+ * @returns `true` if, and only if, `obj` is `undefined` or `null`
+ */
+export function isFalsy(obj: any): boolean {
+    return obj === undefined || obj === null;
+}
 
-export function isNumberFalsy(num: number | null | undefined): boolean {
-
+export function isNumberFalsy(num: any): boolean {
     return num === undefined || num === null || isNaN(num);
 }
 
@@ -243,33 +243,19 @@ export function insertString(targetString: string, insertionString: string, inse
 
 
 /**
- * Move cursor a text input element. If ```start === end``` the cursor will be shifted normally to given position.
- * If ```start !== end``` the text between the indices will be marked.
- * 
- * @param textInput text input element to move the cursor in
- * @param start index of selection start, default is 0
- * @param end index of selection end, default is ```start``` param
+ * @param haystack to count needle in
+ * @param needle to count occurrences of
+ * @returns the number of occurrences of ```needle``` in ```haystack``` or -1 if falsy params
  */
-export function moveCursor(textInput: HTMLInputElement, start = 0, end = start): void {
+export function countSubstrings(haystack: string, needle: string | RegExp): number {
 
-    if (!textInput)
-        return;
-
-    textInput.selectionStart = start;
-    textInput.selectionEnd = end;
-}
-
-
-/**
- * @param inputElement to get the cursor for (I believe this only works for "text" input)
- * @returns the current index of the cursor of given text input element or -1. If text is marked, the index of selection start is returned
- */
-export function getCursorIndex(inputElement: HTMLInputElement): number {
-
-    if (!inputElement)
+    if (isStringFalsy(haystack) || needle === null || needle === undefined)
         return -1;
 
-    return inputElement.selectionStart || -1;
+    if (isBlank(haystack))
+        return 0;
+
+    return haystack.split(needle).length - 1;
 }
 
 
@@ -331,44 +317,6 @@ export async function downloadFileByUrl(url: string,
   
     // remove
     document.body.removeChild(linkElement);
-}
-
-
-/**
- * @param text to measure
- * @param fontSize of text, unit should be included
- * @param fontFamily of text
- * @param fontWeight of text, default is "normal"
- * @returns width of text in px
- */
-export function getTextWidth(text: string, fontSize: string, fontFamily: string, fontWeight = "400"): number {
-
-    if (isEmpty(text))
-        return 0;
-
-    const elementId = getRandomString();
-    document.body.append(stringToHtmlElement(
-        `<div
-            id="${elementId}"
-            style='
-                border: none; 
-                width: fit-content;
-                font-size: ${fontSize};
-                font-family:  ${fontFamily};
-                font-weight: ${fontWeight};
-            ' 
-            contenteditable
-        >
-            ${text}
-        </div>`
-    ));
-    const hiddenInputDiv2 = document.getElementById(elementId);
-    
-    const hiddenInputDivWidth2 = hiddenInputDiv2?.offsetWidth;
-
-    hiddenInputDiv2?.remove();
-
-    return hiddenInputDivWidth2 || 0;
 }
 
 
@@ -891,84 +839,6 @@ export function stripTimeFromDate(d: Date): Date {
 
 
 /**
- * Parse given css string to valid css object formatted for react. This means dashes in keys are replaced and keys
- * will use camel case.
- * 
- * @param cssString string using css syntax like in .css files. E.g. "margin: 0; box-shadow: black"
- * @returns css object for react
- */
-export function parseCSSStringToJson(cssString: string): CSSProperties {
-
-    const cssObject = {};
-
-    // array with key value pairs like ["key": "value", "key2": "value2"]
-    const cssKeyValues = cssString.split(";");
-    for (let i = 0; i < cssKeyValues.length; i ++) {
-        const keyValue = cssKeyValues[i].split(":");
-        const key = keyValue[0];
-        const value = keyValue[1];
-
-        let newKey = "";
-        let newValue = value;
-
-        // iterate chars of key
-        for (let j = 0; j < key.length; j++) {
-            const char = key.charAt(j);
-            if (char === "-") {
-                // remove dash, set next char to upperCase
-                const nextChar = key.charAt(j + 1);
-                newKey = replaceAtIndex(key, nextChar.toUpperCase(), j, j + 2)
-            }
-        }
-
-        // clean up key and value
-        newKey = newKey.replace(":", "");
-        newValue = newValue.replace(";", "").trim();
-
-        cssObject[newKey] = newValue;
-    }
-
-    return cssObject;
-}
-
-    
-
-/**
- * Parse given html string and retrieve some attribs.
- * 
- * @param dirtyHtml unsafe html to parse
- * @returns some attributes of the innerHtml of the core/columns noteInput
- */
-export function getHTMLStringAttribs(dirtyHtml: string): {className: string, id: string, style: string} {
-
-    let className = "";
-    let id = "";
-    let style = "";
-
-    // parse html
-    parse(sanitize(dirtyHtml, DEFAULT_HTML_SANTIZER_OPTIONS), {
-        replace(domNode: Element) {
-
-            // get attributes
-            const attribs = domNode.attribs;
-            if (!attribs)
-                return;
-
-            className = attribs.class;
-            id = attribs.id;
-            style = attribs.style
-        }
-    })
-
-    return {
-        className,
-        id,
-        style
-    }
-}
-
-
-/**
  * @param date to format, default is ```new Date()```
  * @returns nicely formatted string formatted like ```year-month-date hours:minutes:seconds:milliseconds```
  */
@@ -1039,22 +909,6 @@ export function isEventKeyRemovingKey(eventKey: string): boolean {
 
 
 /**
- * @param text string to clean up. Wont be altered
- * @returns same text string but with some special chars replaced
-*/
-export function cleanUpSpecialChars(text: string): string {
-
-    let cleanHtml = text;
-    cleanHtml = cleanHtml.replaceAll("&amp;", "&");
-    cleanHtml = cleanHtml.replaceAll("&lt;", "<");
-    cleanHtml = cleanHtml.replaceAll("&gt;", ">");
-    cleanHtml = cleanHtml.replaceAll("&nbsp;", " ");
-
-    return cleanHtml;
-}
-
-
-/**
  * @param str to change first char to upper case of (wont be altered)
  * @returns a copy of given string with the first char to upper case or a blank string
  */
@@ -1097,67 +951,37 @@ export function getCurrentUrlWithoutWWW(): string {
 
 
 /**
- * Removes sensitive data from use query cache.
- */
-export function clearSensitiveCache(): void {
-    
-    if (useQueryClientObj && useQueryClientObj.getQueryData<AppUserEntity>(APP_USER_QUERY_KEY))
-        useQueryClientObj.removeQueries({queryKey: APP_USER_QUERY_KEY});
-
-    localStorage.removeItem(CSRF_TOKEN_QUERY_KEY);
-}
-
-
-/**
- * Removes use query cache data related to app user (not ```isLoggedIn``` though). May be used on logout.
- */
-export function clearUserCache(): void {
-
-    if (!useQueryClientObj)
-        return;
-    
-    clearSensitiveCache();
-
-    if (useQueryClientObj.getQueryData<AppUserEntity>(NOTE_QUERY_KEY))
-        useQueryClientObj.removeQueries({queryKey: NOTE_QUERY_KEY});
-}
-
-
-/**
  * Removes current page from browser history and replaces it with given ```path```.
  * 
  * @param path relative path to replace the current history entry with. Default is the current path
+ * @param state the ```history.state``` to replace. Default is ```null``` (beeing the current one)
  */
-export function replaceCurrentBrowserHistoryEntry(path: string = window.location.pathname): void {
+export function replaceCurrentBrowserHistoryEntry(path: string | URL | null = window.location.pathname, state: any = null): void {
 
-    window.history.replaceState({}, "", path);
+    window.history.replaceState(state, "", path);
 }
 
 
 /**
- * Attempts to retrieve the csrf token from cache. 
+ * Updates the current url's query params without creating a new history entry.
  * 
- * @returns the csrf token or a blank string
+ * @param key url query key. Cannot be blank
+ * @param value url query value. If blank the key will be replaced as well
  */
-export function getCsrfToken(): string {
+export function updateCurrentUrlQueryParams(key: string, value: string): void {
 
-    const csrfToken = localStorage.getItem(CSRF_TOKEN_QUERY_KEY);
+    if (isBlank(key) || isStringFalsy(value))
+        return;
 
-    if (isBlank(csrfToken))
-        return "";
+    const url = new URL(window.location.href);
 
-    return csrfToken!;
-}
+    // if value is balnk
+    if (isBlank(value))
+        url.searchParams.delete(key);
+    else
+        url.searchParams.set(key, value);
 
-
-/**
- * Will store given ```csrfToken``` in localStorage (regardless of the token beeing blank or not).
- * 
- * @param csrfToken to encrypt and cache
- */
-export function setCsrfToken(csrfToken: string): void {
-    
-    localStorage.setItem(CSRF_TOKEN_QUERY_KEY, csrfToken);
+    replaceCurrentBrowserHistoryEntry(url);
 }
 
 
@@ -1465,42 +1289,10 @@ export async function animateAndCommit(element: HTMLElement | undefined | null, 
     } catch (e) {
     }
     
-    animation.cancel();
-
     if (onComplete)
         onComplete();
 
     return animation
-}
-
-
-/**
- * Find choice in localStorage and possibly call callback.
- * 
- * Will remove localStorage entry if value is invalid.
- * 
- * @param key to determine the right popup. Will prepend {@link REMEMBER_MY_CHOICE_KEY_PREFIX}
- * @param confirmCallback executed if rememberd choice is "confirm"
- * @returns ```true``` if a valid choice was cached (no matter if "confirm" or "cancel")
- */
-export function handleRememberMyChoice(key: RememberMyChoiceKey, confirmCallback?: () => void): boolean {
-
-    const choice = localStorage.getItem(REMEMBER_MY_CHOICE_KEY_PREFIX + key);
-
-    if (!choice) 
-        return false;
-    
-    // case: invalid value in stored in localStorage
-    if (!isRememberMyChoiceValue(choice)) {
-        logWarn(`Choice '${choice}' is not a valid 'RememberMyChoiceValue'. Removing entry`);
-        localStorage.removeItem(REMEMBER_MY_CHOICE_KEY_PREFIX + key);
-        return false;
-    }
-
-    if (choice === "confirm" && confirmCallback)
-        confirmCallback();
-
-    return true;
 }
 
 
@@ -1521,18 +1313,6 @@ export function shortenString(str: string, maxLength = 30, blankReplacement = "<
         return str.substring(0, maxLength) + "...";
 
     return str;
-}
-
-
-/**
- * Get the text for the ```<title>```.
- * 
- * @param pageTitle title of page, not including the company name
- * @returns ```pageTitle | ${companyName}``` or just ```companyName``` if no ```pageTitle```
- */
-export function getHeadTitleText(pageTitle?: string): string {
-
-    return isBlank(pageTitle) ? `${APP_NAME_PRETTY}` : `${pageTitle} | ${APP_NAME_PRETTY}`; 
 }
 
 
@@ -1582,4 +1362,140 @@ export function jsonParseDontThrow<ReturnType>(value: string | null | undefined)
         logDebug(e.message);
         return null;
     }
+}
+
+/**
+ * Throws at the first arg beeing falsy (but not if no args are specified). Use util "isFalsy" methods for primitive types.
+ *
+ * @param args to check
+ */
+export function assertFalsyAndThrow(...args: any[]): void {
+    if (!args || !args.length) return;
+
+    for (let i = 0; i < args.length; i++) {
+        const arg = args[i];
+
+        let falsy = false;
+
+        if (typeof arg === "number") falsy = isNumberFalsy(arg);
+        else falsy = isFalsy(arg);
+
+        if (falsy) throw new Error(`Invalid arg at index ${i}`);
+    }
+}
+
+/**
+ * @returns hash map of url query param key values of current url (empty map if none present)
+ */
+function parseUrlQueryParams(): Map<string, string> {
+    const urlQueryParams = window.location.search;
+
+    // case: no params or only a '?'
+    if (urlQueryParams.length <= 1)
+        return new Map();
+
+    const keyValueArr = urlQueryParams.replace("?", "").split("&");
+
+    const keyValueMap = new Map<string, string>();
+
+    keyValueArr
+        .forEach(keyValuePair => {
+            const firstEqualsIndex = keyValuePair.indexOf("=");
+
+            // case: no value
+            if (firstEqualsIndex === -1)
+                keyValueMap.set(keyValuePair, "");
+        
+            else {
+                const key = keyValuePair.substring(0, firstEqualsIndex);
+                let value = keyValuePair.substring(firstEqualsIndex).replace("=", "");
+                value = cleanUpUrlQueryParamValue(value);
+                
+                keyValueMap.set(key, value);
+            }
+        });
+
+    return keyValueMap;
+}
+
+/**
+ * @param queryParamsMap hashmap containing url query param key values
+ * @returns url query param string starting with '?' or blank string if map is falsy
+ */
+function parseQueryParamsMap(queryParamsMap: Map<string, string>): string {
+    if (!queryParamsMap)
+        return "";
+
+    let queryParams = '?';
+    Array.from(queryParamsMap.entries())
+        .forEach(([key, value], i) => {
+            if (isBlank(key)) {
+                logWarn(`Invalid query param key '${key}'`);
+                return;
+            }
+
+            if (isBlank(value))
+                value = '';
+
+            if (i > 0)
+                queryParams += '&';
+
+            queryParams += `${key}=${value}`
+        })
+
+    return queryParams;
+}
+
+
+/**
+ * Retrieve the url query param value for given key using ```window.location.search```. Usefull if react hooks don't work for some reason.
+ * 
+ * @param key of the url query param value
+ * @returns the value for given key or ```null```
+ */
+export function getUrlQueryParam(key: string): string | null {
+    if (isStringFalsy(key))
+        return null;
+
+    return parseUrlQueryParams().get(key) || null;
+}
+
+/**
+ * Update / add url query param with `key`, do nothing if `key` is falsy.
+ * 
+ * @param key query param key
+ * @param value query param value
+ * @param navigate optional navigation function, will refresh page if not specified
+ */
+export function setUrlQueryParam(key: string, value: string, navigate?: (to: string) => void): void {
+    if (isFalsy(key))
+        return;
+
+    const queryParamsMap = parseUrlQueryParams();
+    queryParamsMap.set(key, value);
+
+    const updatedQueryParams = parseQueryParamsMap(queryParamsMap);
+
+    if (navigate)
+        navigate(`${window.location.pathname}${updatedQueryParams}`);
+
+    else
+        window.location.search = updatedQueryParams;
+}
+
+/**
+ * Replace some substrings that are used in url query params in place of certain chars with their actual chars. 
+ * E.g. "+" represents a " " and "%sC" a ","
+ * 
+ * @param value from url query param
+ * @returns clean (unaltered) value
+ */
+function cleanUpUrlQueryParamValue(value: string): string {
+
+    if (isBlank(value))
+        return value;
+
+    return value
+        .replaceAll("%2C", ",")
+        .replaceAll("+", " ");
 }

@@ -22,7 +22,7 @@ export class AppUserService {
     public static getDefaultInstance(): AppUserEntity {
 
         return {
-            id: -1, 
+            id: null, 
             created: "", 
             updated: "", 
             email: "", 
@@ -127,16 +127,16 @@ export class AppUserService {
 
 
     /**
-     * @param noteEntities to check for given ```tagEntity```
+     * @param editedNoteEntities to check for given ```tagEntity```
      * @param tag to search
-     * @returns ```true``` if given tag is present at least in one note of ```noteEntities```, else ```false```
+     * @returns ```true``` if given tag is present at least in one note of ```editedNoteEntities```, else ```false```
      */
-    public static isTagEntityPresentInANote(noteEntities: NoteEntity[], tag: TagEntity): boolean {
+    public static isTagEntityPresentInANote(editedNoteEntities: NoteEntity[], tag: TagEntity): boolean {
 
-        if (!tag || !noteEntities)
+        if (!tag || !editedNoteEntities)
             return false;
 
-        return !!noteEntities
+        return !!editedNoteEntities
             .find(noteEntity => 
                 !!(noteEntity.tags || [])
                     .find(tagEntity => 
@@ -145,18 +145,18 @@ export class AppUserService {
 
 
     /**
-     * Remove tagEtities from given app user that are not used in any of given ```noteEntities```.
+     * Remove tagEtities from given app user that are not used in any of given ```editedNoteEntities```.
      * 
      * @param appUserEntity to remove tags from
-     * @param noteEntities to check for tags
+     * @param editedNoteEntities to check for tags
      */
-    public static removeUnusedTags(appUserEntity: AppUserEntity | undefined | null, noteEntities: NoteEntity[]): void {
+    public static removeUnusedTags(appUserEntity: AppUserEntity | undefined | null, editedNoteEntities: NoteEntity[]): void {
 
-        if (!appUserEntity || !appUserEntity.tags || !appUserEntity.tags.length || !noteEntities)
+        if (!appUserEntity || !appUserEntity.tags || !appUserEntity.tags.length || !editedNoteEntities)
             return;
 
         // case: no notes, therefore no tags
-        if (!noteEntities.length) {
+        if (!editedNoteEntities.length) {
             appUserEntity.tags = [];
             return;
         }
@@ -165,7 +165,7 @@ export class AppUserService {
 
         appUserTags
             .forEach((tagEntity, i) => {
-                if (!this.isTagEntityPresentInANote(noteEntities, tagEntity))
+                if (!this.isTagEntityPresentInANote(editedNoteEntities, tagEntity))
                     appUserEntity.tags?.splice(i, 1);
             });
     }

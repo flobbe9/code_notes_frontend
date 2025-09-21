@@ -1,12 +1,13 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import DefaultProps from "../../../abstract/DefaultProps";
-import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, getHeadTitleText, removeConfirmPageUnload } from "../../../helpers/utils";
+import { getHeadTitleText } from "../../../helpers/projectUtils";
+import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, removeConfirmPageUnload } from "../../../helpers/utils";
 import { AppContext } from "../../App";
+import { AppFetchContext } from "../../AppFetchContextProvider";
 import Flex from "../../helpers/Flex";
 import Head from "../../helpers/Head";
 import StartPageContent from "./StartPageContent";
 import StartPageSideBar from "./StartPageSideBar";
-import { AppFetchContext } from "../../AppFetchContextHolder";
 
 
 interface Props extends DefaultProps {
@@ -27,12 +28,8 @@ export default function StartPageContainer({children, ...props}: Props) {
     /** State that will trigger the sidebar tag list to update. ```undefined``` should stay the init value */
     const [isUpdateSideBarTagList, setIsUpdateSideBarTagList] = useState<boolean>();
 
-    /** List of tag entities inside ```<StartPageSideBarTagList>``` that are checked */
-    const [selectedTagEntityNames, setSelectedTagEntityNames] = useState<Set<string>>(new Set());
-    const [noteSearchValue, setNoteSearchValue] = useState("");
-
-    const { isMobileWidth, editedNoteIds } = useContext(AppContext);
-    const { setCurrentNotesPage } = useContext(AppFetchContext);
+    const { isMobileWidth } = useContext(AppContext);
+    const { editedNoteEntities } = useContext(AppFetchContext);
 
     const context = {
         isStartPageSideBarVisible, 
@@ -43,9 +40,6 @@ export default function StartPageContainer({children, ...props}: Props) {
         updateStartPageSideBarTagList,
 
         getStartPageSideBarWidth,
-
-        selectedTagEntityNames, setSelectedTagEntityNames,
-        noteSearchValue, setNoteSearchValue
     }
 
 
@@ -56,16 +50,8 @@ export default function StartPageContainer({children, ...props}: Props) {
             removeConfirmPageUnload(handlePageUnload);
         }
 
-    }, [editedNoteIds]); 
+    }, [editedNoteEntities]); 
 
-
-    useEffect(() => {
-        // case: reset or just started searching
-        if (noteSearchValue.length <= 1 && selectedTagEntityNames.size <= 1) // TODO: && no edited notes
-            setCurrentNotesPage(1);
-
-    }, [noteSearchValue, selectedTagEntityNames]);
-    
 
     /**
      * Simply toggle the ```isIsUpdateSideBarTagList``` state.
@@ -89,7 +75,7 @@ export default function StartPageContainer({children, ...props}: Props) {
 
     function addOrRemovePageUnloadEvent(): void {
 
-        if (editedNoteIds.size) 
+        if (editedNoteEntities.length) 
             confirmPageUnload(handlePageUnload); 
 
         else 
@@ -131,9 +117,4 @@ export const StartPageContainerContext = createContext({
     updateStartPageSideBarTagList: () => {},
 
     getStartPageSideBarWidth: () => {return 0 as number},
-
-    selectedTagEntityNames: new Set() as Set<string>, 
-    setSelectedTagEntityNames: (tagEntities: Set<string>) => {},
-    noteSearchValue: "" as string, 
-    setNoteSearchValue: (value: string) => {}
 });

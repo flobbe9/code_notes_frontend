@@ -45,6 +45,10 @@ export const OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM = "oauth2-login-error";
 /** Also hard coded in "Utils.java" */
 export const RESET_PASSWORD_TOKEN_URL_QUERY_PARAM = "token";
 export const RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY = "reset-password-token";
+export const NOTE_PAGE_URL_QUERY_PARAM = "page";
+export const NOTE_SEARCH_PHRASE_URL_QUERY_PARAM = "searchPhrase";
+export const NOTE_SEARCH_TAGS_URL_QUERY_PARAM = "tagNames";
+export const NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR = ",";
 
 
 // Other
@@ -67,6 +71,7 @@ export const HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES = 12;
 /** Will be prepended to the localStorage key to prevent key name collisions. */
 export const REMEMBER_MY_CHOICE_KEY_PREFIX = "code_notes-rememberMyChoice-";
 export const HELP_EMAIL = "help.codenotes@gmail.com";
+/** Min is 1 for backend */
 export const NUM_NOTES_PER_PAGE = 5;
 
 
@@ -143,11 +148,15 @@ export const VARIABLE_INPUT_SEQUENCE_REGEX = /^.*\$\[\[.*\]\].*$/;
 export const VARIABLE_INPUT_DEFAULT_PLACEHOLDER = "VARIABLE_NAME";
 export const VARIABLE_INPUT_START_SEQUENCE = "$[[";
 export const VARIABLE_INPUT_END_SEQUENCE = "]]";
-export const CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE = "_auto";
+export const CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE = "Plaintext";
 
 
 // CodeNoteInput
 export const CODE_BLOCK_DEFAULT_LANGUAGE = "_plaintext";
+
+
+// PlainTextInput
+export const CODE_SNIPPET_SEQUENCE = "```";
 
 
 /**

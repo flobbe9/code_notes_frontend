@@ -2,7 +2,7 @@ import React, { forwardRef, KeyboardEvent, Ref, useContext, useEffect, useImpera
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import "../../../../assets/styles/NoteTitle.scss";
 import { INVALID_INPUT_CLASS_NAME, MAX_NOTE_TITLE_VALUE_LENGTH } from "../../../../helpers/constants";
-import { flashClass, isEventKeyTakingUpSpace, log } from "../../../../helpers/utils";
+import { flashClass, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
 import { NoteContext } from "./Note";
 
@@ -23,7 +23,7 @@ export default forwardRef(function NoteTitle({...props}: Props, ref: Ref<HTMLInp
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteTitle");
 
     const { toast } = useContext(AppContext);
-    const { noteEntity, noteEdited } = useContext(NoteContext);
+    const { noteEntity, updateNoteEdited } = useContext(NoteContext);
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -41,7 +41,7 @@ export default forwardRef(function NoteTitle({...props}: Props, ref: Ref<HTMLInp
 
         noteEntity.title = inputRef.current!.value;
 
-        noteEdited();
+        updateNoteEdited();
     }
 
 

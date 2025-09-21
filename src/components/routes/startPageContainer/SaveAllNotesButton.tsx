@@ -6,9 +6,10 @@ import "../../../assets/styles/SaveAllNotesButton.scss";
 import { isResponseError } from "../../../helpers/fetchUtils";
 import { isNumberFalsy } from '../../../helpers/utils';
 import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextHolder";
+import { AppFetchContext } from "../../AppFetchContextProvider";
 import Button from "../../helpers/Button";
 import Login from "../Login";
+import { NoteEntityService } from "../../../abstract/services/NoteEntityService";
 
 
 interface Props extends ButtonProps {
@@ -21,8 +22,8 @@ interface Props extends ButtonProps {
  */
 export default function SaveAllNotesButton({...props}: Props) {
 
-    const { toast, showPopup, editedNoteIds, setEditedNoteIds } = useContext(AppContext);
-    const { noteEntities, isLoggedIn, fetchSaveAllNoteEntities, noteUseQueryResult } = useContext(AppFetchContext);
+    const { toast, showPopup } = useContext(AppContext);
+    const { editedNoteEntities, setEditedNoteEntities, isLoggedIn, fetchSaveAllNoteEntities, notesUseQueryResult } = useContext(AppFetchContext);
 
     const {className, children, ...otherProps} = getCleanDefaultProps(props, "SaveAllNotesButton", true);
 
@@ -44,28 +45,28 @@ export default function SaveAllNotesButton({...props}: Props) {
             // error handled by fetch method
             return;
 
-        noteUseQueryResult.refetch();
+        notesUseQueryResult.refetch();
 
         toast("Save all notes", "All notes saved successfully", "success", 4000);
 
         // mark all notes as "not-edited" for confirm popup to be removed
-        setEditedNoteIds(new Set());
+        setEditedNoteEntities([]);
     }
 
 
     /**
-     * @returns object formatted like <noteEntityIndex, noteEntity>. Contains the noteEntities matching ```editedNoteIds``` or having no id (not beeing saved once yet)
+     * @returns object formatted like <noteEntityIndex, noteEntity>. Contains the editedNoteEntities matching ```editedNoteEntities``` or having no id (not beeing saved once yet)
      */
     function getEditedNoteEntities(): Record<number, NoteEntity> { 
 
-        if (!noteEntities || !editedNoteIds)
+        if (!editedNoteEntities || !editedNoteEntities.length)
             return [];
 
         const editedNoteEntitiesAndIndices: Record<number, NoteEntity> = {};
 
-        noteEntities
+        editedNoteEntities
             .forEach((noteEntity, i) => {
-                if (isNumberFalsy(noteEntity.id) || editedNoteIds.has(noteEntity.id!))
+                if (isNumberFalsy(noteEntity.id) || NoteEntityService.includesById(editedNoteEntities, noteEntity.id!))
                     editedNoteEntitiesAndIndices[i] = noteEntity;
             });
 

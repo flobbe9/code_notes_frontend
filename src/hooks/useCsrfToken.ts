@@ -1,9 +1,9 @@
 import { useContext, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { AppFetchContext } from "../components/AppFetchContextHolder";
-import { CSRF_TOKEN_URL_QUERY_PARAM } from "../helpers/constants";
-import { getCsrfToken, replaceCurrentBrowserHistoryEntry, setCsrfToken } from "../helpers/utils";
+import { useSearchParams } from "react-router-dom";
+import { AppFetchContext } from "../components/AppFetchContextProvider";
 import { RouteContext } from "../components/RouteContextHolder";
+import { CSRF_TOKEN_URL_QUERY_PARAM } from "../helpers/constants";
+import { getCsrfToken, setCsrfToken } from "../helpers/projectUtils";
 
 
 /**
@@ -11,14 +11,13 @@ import { RouteContext } from "../components/RouteContextHolder";
  * 
  * Does not fetch. 
  * 
- * Needs to be wrapped in ```<BrowserRouter>``` and ```<AppFetchContextHolder>``` since ```useNavigate``` and global fetch states are used.
+ * Needs to be wrapped in ```<BrowserRouter>``` and ```<AppFetchContextProvider>``` since ```useNavigate``` and global fetch states are used.
  * 
  * @since 0.0.1
  */
 export function useCsrfToken() {
 
-    const [queryParams, setQueryParams] = useSearchParams();
-    const navigate = useNavigate();
+    const [urlQueryParams] = useSearchParams();
 
     const { clearUrlQueryParams } = useContext(RouteContext);
     const { isLoggedIn, isLoggedInUseQueryResult } = useContext(AppFetchContext);
@@ -52,7 +51,7 @@ export function useCsrfToken() {
      */
     function getCsrfTokenFromUrl(): string | null {
 
-        const csrfToken = queryParams.get(CSRF_TOKEN_URL_QUERY_PARAM);
+        const csrfToken = urlQueryParams.get(CSRF_TOKEN_URL_QUERY_PARAM);
 
         // case: no csrf token in url
         if (!csrfToken) 

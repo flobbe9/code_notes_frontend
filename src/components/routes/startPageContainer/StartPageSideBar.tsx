@@ -2,12 +2,13 @@ import React, { ChangeEvent, createContext, useContext, useEffect, useRef, useSt
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import "../../../assets/styles/StartPageSideBar.scss";
 import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextHolder";
+import { AppFetchContext } from "../../AppFetchContextProvider";
 import Button from "../../helpers/Button";
 import SearchBar from "../../helpers/SearchBar";
 import SideBar from "../../helpers/SideBar";
 import { StartPageContainerContext } from "./StartPageContainer";
 import StartPageSideBarTagList from "./StartPageSideBarTagList";
+import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../helpers/constants";
 
 
 interface Props extends DefaultProps {
@@ -23,12 +24,9 @@ export default function StartPageSideBar({...props}: Props) {
     /** Tag search value eagerly updated on change event */
     const [searchValue, setSearchValue] = useState("");
 
-    /** Refers to ```selectedTagEntityNames``` beeing not empty */
-    const [anyTagsSelected, setAnyTagsSelected] = useState(false);
-
     const { isKeyPressed, isMobileWidth } = useContext(AppContext);
-    const { appUserEntity, isLoggedIn } = useContext(AppFetchContext);
-    const { isStartPageSideBarVisible, setIsStartPageSideBarVisible, setSelectedTagEntityNames, selectedTagEntityNames } = useContext(StartPageContainerContext);
+    const { appUserEntity, isLoggedIn, getNoteSearchTags, setNoteSearchTags } = useContext(AppFetchContext);
+    const { isStartPageSideBarVisible, setIsStartPageSideBarVisible } = useContext(StartPageContainerContext);
 
     const { children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBar", true);
 
@@ -50,9 +48,12 @@ export default function StartPageSideBar({...props}: Props) {
 
 
     useEffect(() => {
-        setAnyTagsSelected(!!selectedTagEntityNames.size)
+        if (isStartPageSideBarVisible)
+            setTimeout(() => {
+                searchBarRef.current!.focus();
+            }, BLOCK_SETTINGS_ANIMATION_DURATION);
 
-    }, [selectedTagEntityNames]);
+    }, [isStartPageSideBarVisible])
 
 
     function handleKeyDown(event: KeyboardEvent): void {
@@ -62,7 +63,7 @@ export default function StartPageSideBar({...props}: Props) {
 
         if (isKeyPressed("Control") && keyName === "b") {
             event.preventDefault();
-            // NOTE: don't use the state in here because it does not update after this event handler is beeing added to window
+            // NOTE: don't pass the state in here because it does not update after this event handler is beeing added to window
             setIsStartPageSideBarVisible(sideBarDislay !== "block");
         }
     }
@@ -82,7 +83,7 @@ export default function StartPageSideBar({...props}: Props) {
 
     function handleResetClick(): void {
 
-        setSelectedTagEntityNames(new Set());
+        setNoteSearchTags(new Set());
         searchBarRef.current!.value = "";
         setSearchValue("");
     }
@@ -95,7 +96,7 @@ export default function StartPageSideBar({...props}: Props) {
                 isVisible={isStartPageSideBarVisible}
                 setIsVisible={setIsStartPageSideBarVisible}
                 toggleIcon={<i className="fa-solid fa-filter fa-xl" title="Filter by tags (Ctrl + B)"></i>}
-                maxWidth={isMobileWidth ? "30vw" : "200px"} // 30vw is hardcoded in CodeNoteInput and StartPgaeContainer (0.3)
+                maxWidth={isMobileWidth ? "30vw" : "var(--startPageSideBarWidth)"} // 30vw is hardcoded in CodeNoteInput and StartPgaeContainer (0.3)
                 {...otherProps}
             >
                 {/* SearchBar */}
@@ -118,7 +119,7 @@ export default function StartPageSideBar({...props}: Props) {
                     <Button 
                         className="resetButton hover" 
                         title="Reset tag filter" 
-                        disabled={!anyTagsSelected || !isLoggedIn}
+                        disabled={!getNoteSearchTags().size || !isLoggedIn}
                         onClick={handleResetClick} 
                     >
                         Reset   

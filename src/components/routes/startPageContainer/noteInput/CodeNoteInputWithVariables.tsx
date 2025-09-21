@@ -1,14 +1,15 @@
 import hljs from "highlight.js";
 import parse from 'html-react-parser';
-import React, { ClipboardEvent, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { FocusEvent, KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInputWithVariables.scss";
 import "../../../../assets/styles/highlightJs/vs.css";
-import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
-import { animateAndCommit, cleanUpSpecialChars, getClipboardText, getCssConstant, getCSSValueAsNumber, getTextWidth, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
+import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
+import { cleanUpSpecialChars, getContentEditableDivLineElements, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
+import { animateAndCommit, getClipboardText, getCssConstant, getCSSValueAsNumber, insertString, isBlank, isEventKeyTakingUpSpace, log, logWarn, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from "../../../App";
 import Button from "../../../helpers/Button";
@@ -41,18 +42,21 @@ export default function CodeNoteInputWithVariables({
 }: Props) {
 
     const [inputDivValue, setInputDivValue] = useState<any>()
+    /** ```[cursorIndex, cursorLineNumber]``` inside this input. ```cursorIndex``` is 0-based, ```cursorLineNumber``` is 1-based */
+    const [cursorPos, setCursorPos] = useState([0, 1]);
     
     const [hasComponentRendered, sethasComponentRendered] = useState(false);
 
     const [inputHighlighted, setInputHighlighted] = useState(true);
     
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeNoteInputWithVariables");
+    const componentName = "CodeNoteInputWithVariables";
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName);
     
     const componentRef = useRef<HTMLDivElement>(null);
     const inputDivRef = useRef<HTMLDivElement>(null);
 
-    const { isKeyPressed } = useContext(AppContext);
-    const { noteEdited } = useContext(NoteContext);
+    const { isKeyPressed, isControlKeyPressed } = useContext(AppContext);
+    const { updateNoteEdited } = useContext(NoteContext);
     const { 
         codeNoteInputWithVariablesLanguage, 
         isNoteInputOverlayVisible,
@@ -335,15 +339,53 @@ export default function CodeNoteInputWithVariables({
 
         
     /**
-     * Appends a default ```$[[VARIABL_NAME]]``` sequence to the end of the inputDiv.
+     * Inserts a default ```$[[VARIABL_NAME]]``` sequence at current cursor pos.
      */
-    function appendVariableInputSequence(): void {
+    function insertVariableInputSequence(): void {
 
-        const inputDiv = inputDivRef.current!;
-        const inputDivChildDivs = inputDiv.querySelectorAll("div");
-        const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.item(inputDivChildDivs.length - 1) : inputDiv;
+        const variableInputSequence = VARIABLE_INPUT_START_SEQUENCE + VARIABLE_INPUT_DEFAULT_PLACEHOLDER + VARIABLE_INPUT_END_SEQUENCE;
+        
+        let currentCursorIndex = cursorPos[0];
+        let currentCursorLineNum = cursorPos[1];
+        
+        // all inner divs that represent a line
+        const inputInnerDivs = getContentEditableDivLineElements(inputDivRef.current!);
+        const isFirstLineADiv = inputDivRef.current!.innerHTML.startsWith("<div>")
+        const currentInputDiv = inputInnerDivs[currentCursorLineNum - 1 - (isFirstLineADiv ? 0 : 1)] as HTMLDivElement; // - 2 for item() beeing 0-based and the first line not beeing a div
+        const numInutLines = inputInnerDivs.length + (isFirstLineADiv ? 0 : 1); 
 
-        lastChildDiv.innerHTML = lastChildDiv.innerHTML + VARIABLE_INPUT_START_SEQUENCE + VARIABLE_INPUT_DEFAULT_PLACEHOLDER + VARIABLE_INPUT_END_SEQUENCE;
+        if (currentCursorIndex === -1 || currentCursorLineNum === -1) {
+            logWarn("Failed to get cursor index or cursor line num");
+            // assume cursor at end of input value
+            currentCursorIndex = inputDivRef.current!.innerText.length - 1;
+            currentCursorLineNum = numInutLines;
+        }
+
+        // case: is first line, not a div
+        if (!currentInputDiv) {
+            inputDivRef.current!.innerHTML = insertString(
+                inputDivRef.current!.innerHTML,
+                variableInputSequence, 
+                currentCursorIndex
+            );
+
+        // case: is empty line
+        } else if (!!currentInputDiv.querySelector("br")) 
+            currentInputDiv.innerHTML = variableInputSequence;
+
+        else {
+            currentInputDiv.innerText = insertString(
+                currentInputDiv.innerText,
+                variableInputSequence, 
+                currentCursorIndex
+            );
+        }
+
+        // select placeholder sequence
+        moveCursor(currentInputDiv || inputDivRef.current!, 
+            currentCursorIndex + VARIABLE_INPUT_START_SEQUENCE.length, 
+            currentCursorIndex + VARIABLE_INPUT_START_SEQUENCE.length + VARIABLE_INPUT_DEFAULT_PLACEHOLDER.length
+        );
     }
 
 
@@ -469,7 +511,7 @@ export default function CodeNoteInputWithVariables({
     }
 
 
-    async function handleFocus(event): Promise<void> {
+    async function handleFocus(event: FocusEvent): Promise<void> {
 
         if (event.target.className !== "variableInput")
             await unHighlightInputDivContent();
@@ -499,37 +541,37 @@ export default function CodeNoteInputWithVariables({
         
         if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
             event.preventDefault();
-            appendVariableInputSequence();
-            noteEdited();
+            insertVariableInputSequence();
+            updateNoteEdited();
         }
 
         if (isEventKeyTakingUpSpace(keyName, true, true) && !(event.target as HTMLElement).classList.contains("variableInput"))
-            noteEdited();
+            updateNoteEdited();
     }
     
 
-    function handleCut(event: ClipboardEvent): void {
+    function handleCut(): void {
         
-        noteEdited();
+        updateNoteEdited();
     }
 
 
-    function handlePaste(event: ClipboardEvent): void {
+    function handlePaste(): void {
 
-        noteEdited();
+        updateNoteEdited();
     }
 
  
-    function handleKeyUp(event): void {
+    function handleKeyUp(event: KeyboardEvent): void {
 
         const keyName = event.key;
 
         if (keyName === "Backspace" || keyName === "Delete")
-            cleanUpEmptyInputDiv(event);
+            cleanUpEmptyInputDiv();
     }
 
 
-    function cleanUpEmptyInputDiv(event): void {
+    function cleanUpEmptyInputDiv(): void {
 
         const inputDiv = inputDivRef.current!;
         const inputBreaks = inputDiv.querySelectorAll("br");
@@ -541,18 +583,18 @@ export default function CodeNoteInputWithVariables({
     }
 
 
-    function handleInputDivContainerClick(event): void {
+    function handleInputDivContainerClick(event: MouseEvent): void {
 
         const inputDiv = inputDivRef.current!;
 
         // case: not focuesd yet and not clicking a variableInput
-        if (!inputDiv.matches(":focus") && event.target.className !== "variableInput")
+        if (!inputDiv.matches(":focus") && (event.target as HTMLElement).className !== "variableInput")
             // focus input div
             inputDiv.focus();
     }
 
 
-    async function handleCopyClick(event): Promise<void> {
+    async function handleCopyClick(): Promise<void> {
 
         animateCopyIcon();
 
@@ -638,7 +680,7 @@ export default function CodeNoteInputWithVariables({
 
     function isAutoDetectLanguage(): boolean {
 
-        return codeNoteInputWithVariablesLanguage === CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE;
+        return codeNoteInputWithVariablesLanguage === "_auto";
     }
 
 
@@ -646,7 +688,7 @@ export default function CodeNoteInputWithVariables({
 
         appendVariableInput();
         updateNoteInputEntity();
-        noteEdited();
+        updateNoteEdited();
     }
 
 
@@ -669,6 +711,7 @@ export default function CodeNoteInputWithVariables({
                         className="inputDiv fullWidth" 
                         ref={inputDivRef} 
                         spellCheck={false}
+                        setCursorPos={setCursorPos}
                         onKeyDownCapture={handleKeyDownCapture}
                         onKeyUp={handleKeyUp}
                         onFocus={handleFocus}
@@ -691,7 +734,7 @@ export default function CodeNoteInputWithVariables({
                 </Overlay>
             </pre>
 
-            <div className="CodeNoteInputWithVariables-buttonContainer">
+            <div className={`${componentName}-buttonContainer`}>
                 <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
                     {/* Copy */}
                     <Button
@@ -715,7 +758,7 @@ export default function CodeNoteInputWithVariables({
                     {/* Fullscreen */}
                     <Button 
                         className="fullScreenButton defaultNoteInputButton"
-                        title={isFullScreen ? "Normal screen" : "Fullscreen"}
+                        title={isFullScreen ? "Resize (Escape)" : "Fullscreen"}
                         onClick={toggleFullScreen}
                     >
                         {isFullScreen ?
@@ -728,15 +771,15 @@ export default function CodeNoteInputWithVariables({
                 <Flex horizontalAlign="right" flexWrap="nowrap">
                     {/* Add variable */}
                     <Button 
-                        className="appendVariableButton defaultNoteInputButton" 
-                        title="Append variable (Ctrl + Shift + V)"
+                        className={`${componentName}-buttonContainer-appendVariableButton defaultNoteInputButton`}
+                        title="Variable (Ctrl + Shift + V)"
                         onClick={handleAppendVariableButtonClick}
                     >
                         <i className="fa-solid fa-dollar-sign"></i>
                     </Button>
 
                     {/* NoteInput Settings */}
-                    <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
+                    <NoteInputSettings className="me-1" noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
                 </Flex>
             </div>
             

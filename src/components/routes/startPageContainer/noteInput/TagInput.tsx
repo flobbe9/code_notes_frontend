@@ -7,7 +7,7 @@ import "../../../../assets/styles/TagInput.scss";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../../../helpers/constants";
 import { getJsxElementIndexByKey, isBlank, logWarn, shortenString } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
-import { AppFetchContext } from "../../../AppFetchContextHolder";
+import { AppFetchContext } from "../../../AppFetchContextProvider";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
 import { StartPageContainerContext } from "../StartPageContainer";
@@ -35,9 +35,9 @@ export default function TagInput({propsKey, ...props}: Props) {
     const componentRef = useRef<HTMLDivElement>(null);
 
     const { toast } = useContext(AppContext);
-    const { appUserEntity, noteUseQueryResult } = useContext(AppFetchContext);
+    const { appUserEntity, notesUseQueryResult } = useContext(AppFetchContext);
     const { updateStartPageSideBarTagList } = useContext(StartPageContainerContext);
-    const { noteEdited } = useContext(NoteContext);
+    const { updateNoteEdited } = useContext(NoteContext);
 
     const { 
         getTagElementIndex, 
@@ -86,7 +86,7 @@ export default function TagInput({propsKey, ...props}: Props) {
 
         tagEntity.name = inputRef.current!.value;
 
-        noteEdited();
+        updateNoteEdited();
     }
 
 
@@ -117,7 +117,7 @@ export default function TagInput({propsKey, ...props}: Props) {
         else
             handleNewTag(numBlankTags);
 
-        AppUserService.removeUnusedTags(appUserEntity, noteUseQueryResult.data);
+        AppUserService.removeUnusedTags(appUserEntity, notesUseQueryResult.data.results);
 
         updateStartPageSideBarTagList();
     }
@@ -166,7 +166,7 @@ export default function TagInput({propsKey, ...props}: Props) {
         if (event)
             updateStartPageSideBarTagList();
 
-        noteEdited();
+        updateNoteEdited();
     }
 
 

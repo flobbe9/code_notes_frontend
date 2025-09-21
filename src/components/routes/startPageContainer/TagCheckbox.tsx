@@ -3,8 +3,10 @@ import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";
 import "../../../assets/styles/TagCheckbox.scss";
+import { AppContext } from "../../App";
+import { AppFetchContext } from "../../AppFetchContextProvider";
 import Checkbox from "../../helpers/Checkbox";
-import { StartPageContainerContext } from "./StartPageContainer";
+import { useHasComponentMounted } from './../../../hooks/useHasComponentMounted';
 
 
 interface Props extends HelperProps {
@@ -19,27 +21,24 @@ interface Props extends HelperProps {
  */
 export default function TagCheckbox({tagEntity, ...props}: Props) {
 
-    const [hasComponentMounted, setHasComponentMounted] = useState(false);
     const [isSelected, setIsSelected] = useState(false);
-    const { selectedTagEntityNames, setSelectedTagEntityNames } = useContext(StartPageContainerContext);
+
+    const { notifyUrlQueryParamsChange } = useContext(AppContext);
+    const { setNoteSearchTags, getNoteSearchTags, isLoggedIn } = useContext(AppFetchContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagCheckbox");
 
-
-    useEffect(() => {
-        setHasComponentMounted(true);
-
-    }, []);
+    const hasComponentMounted = useHasComponentMounted();
 
 
     useEffect(() => {
-        setIsSelected(selectedTagEntityNames.has(tagEntity.name))
+        setIsSelected(getNoteSearchTags().has(tagEntity.name))
 
-    }, [selectedTagEntityNames]);
+    }, [notifyUrlQueryParamsChange]);
 
 
     useEffect(() => {
-        if (hasComponentMounted)
+        if (hasComponentMounted && isLoggedIn)
             handleIsSelectedChange();
 
     }, [isSelected]);
@@ -48,27 +47,33 @@ export default function TagCheckbox({tagEntity, ...props}: Props) {
     function handleIsSelectedChange(): void {
 
         // case: switched from not-checked to checked
-        if (isSelected && !selectedTagEntityNames.has(tagEntity.name))
-            addTagToSelectedTagEntityNames();
+        if (isSelected)
+            addTagToUrlQueryParam();
 
         // case: switched from checked to not-checked
-        else if (!isSelected && selectedTagEntityNames.has(tagEntity.name))
-            removeTagFromSelectedEntities();
+        else if (!isSelected)
+            removeTagFromUrlQueryParam();
     }
 
 
-    function addTagToSelectedTagEntityNames(): void {
+    /**
+     * Add if not exists in "tags=..." list.
+     */
+    function addTagToUrlQueryParam(): void {
 
-        setSelectedTagEntityNames(new Set([tagEntity.name, ...selectedTagEntityNames]))
+        const noteSearchTags = getNoteSearchTags();
+
+        if (!noteSearchTags.has(tagEntity.name))
+            setNoteSearchTags(new Set([...noteSearchTags, tagEntity.name]));
     }
 
 
-    function removeTagFromSelectedEntities(): void {
+    function removeTagFromUrlQueryParam(): void {
 
-        const newSelectedTagEntityNames = selectedTagEntityNames;
-        newSelectedTagEntityNames.delete(tagEntity.name);
+        const selectedTagEntityNames = new Set(getNoteSearchTags());
+        selectedTagEntityNames.delete(tagEntity.name);
 
-        setSelectedTagEntityNames(new Set(newSelectedTagEntityNames));
+        setNoteSearchTags(new Set([...selectedTagEntityNames]));
     }
 
 

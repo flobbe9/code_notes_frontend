@@ -2,8 +2,9 @@ import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useStat
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/ButtonWithSlideLabel.scss";
-import { animateAndCommit, getTextWidth } from "../../helpers/utils";
+import { animateAndCommit } from "../../helpers/utils";
 import Button from "./Button";
+import { getTextWidth } from "../../helpers/projectUtils";
 
 
 interface Props extends HelperProps {
@@ -47,7 +48,6 @@ export default forwardRef(function ButtonWithSlideLabel(
 
 
     function slideExpand(): void {
-
         // case: initial width not set yet
         if (!initialNoteInputButtonLabelWidth)
             return;
@@ -68,7 +68,6 @@ export default forwardRef(function ButtonWithSlideLabel(
 
 
     function slideCollapse(): void {
-
         // case: called this method because the button was unrendered
         if (!labelContainerRef.current)
             return;
@@ -98,7 +97,6 @@ export default forwardRef(function ButtonWithSlideLabel(
 
 
     function getNoteInputButtonLabelWidth(): string {
-
         if (!componentRef.current)
             return "0";
 

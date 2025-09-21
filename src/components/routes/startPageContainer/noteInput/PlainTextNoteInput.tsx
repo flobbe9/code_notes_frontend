@@ -5,9 +5,11 @@ import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../../../abstract/HelperProps";
 import "../../../../assets/styles/PlainTextNoteInput.scss";
-import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
-import { animateAndCommit, getClipboardText, getCssConstant, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
+import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, CODE_SNIPPET_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
+import { getContentEditableDivLineElements, moveCursor } from '../../../../helpers/projectUtils';
+import { animateAndCommit, getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, logWarn, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
+import { AppContext } from '../../../App';
 import Button from "../../../helpers/Button";
 import ContentEditableDiv from "../../../helpers/ContentEditableDiv";
 import Flex from "../../../helpers/Flex";
@@ -33,10 +35,13 @@ export default function PlainTextNoteInput({
     onKeyUp,
     ...props}: Props) {
     
-    const [inputDivValue, setInputDivValue] = useState<any>()
+    const [inputDivValue, setInputDivValue] = useState<any>();
+    /** ```[cursorIndex, cursorLineNumber]``` inside this input. ```cursorIndex``` is 0-based, ```cursorLineNumber``` is 1-based */
+    const [cursorPos, setCursorPos] = useState([0, 1]);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
-    const { noteEdited } = useContext(NoteContext);
+    const { isKeyPressed } = useContext(AppContext);
+    const { updateNoteEdited } = useContext(NoteContext);
     const { 
         isNoteInputOverlayVisible,
         setIsNoteInputOverlayVisible, 
@@ -86,7 +91,14 @@ export default function PlainTextNoteInput({
         const parsedText = await parseCodeTextToCodeHtml();
 
         inputDivRef.current!.innerHTML = parsedText;
-        noteInputEntity.value = parsedText;
+
+        updateNoteInputEntity(parsedText);
+    }
+
+
+    async function updateNoteInputEntity(parsedText?: string): Promise<void> {
+
+        noteInputEntity.value = parsedText ?? await parseCodeTextToCodeHtml();
     }
 
 
@@ -106,10 +118,10 @@ export default function PlainTextNoteInput({
             setTimeout(() => {
                 const inputDiv = inputDivRef.current!;
                 const inputText = inputDiv.innerHTML;
-                const inputTextArray = inputText.split("```");
+                const inputTextArray = inputText.split(CODE_SNIPPET_SEQUENCE);
             
-                // case: too short to have code noteInputs or no code noteInputs at all
-                if (inputText.length <= 6 || inputTextArray.length <= 2) {
+                // case: no code noteInputs at all
+                if (inputTextArray.length <= 2) {
                     res(inputText);
                     return;
                 }
@@ -154,8 +166,8 @@ export default function PlainTextNoteInput({
         let inputHtml = inputDiv.innerHTML;
 
         let newInputText = inputHtml;
-        newInputText = newInputText.replaceAll("<code>", "```");
-        newInputText = newInputText.replaceAll("</code>", "```");
+        newInputText = newInputText.replaceAll("<code>", CODE_SNIPPET_SEQUENCE);
+        newInputText = newInputText.replaceAll("</code>", CODE_SNIPPET_SEQUENCE);
 
         return newInputText;
     }
@@ -207,6 +219,12 @@ export default function PlainTextNoteInput({
 
         if (keyName === "Control")
             sanitizeClipboardText();
+                
+        if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
+            event.preventDefault();
+            insertVariableInputSequence();
+            updateNoteEdited();
+        }
     }
 
 
@@ -224,19 +242,19 @@ export default function PlainTextNoteInput({
             cleanUpEmptyInputDiv();
         
         if (isEventKeyTakingUpSpace(keyName, true, true))
-            noteEdited();
+            updateNoteEdited();
     }
 
 
     function handleCut(): void {
         
-        noteEdited();
+        updateNoteEdited();
     }
 
 
     function handlePaste(): void {
 
-        noteEdited();
+        updateNoteEdited();
     }
 
 
@@ -309,6 +327,75 @@ export default function PlainTextNoteInput({
         )
     }
 
+    
+    /**
+     * Appends a default ```<input>``` to the end of the inputDiv.
+     */
+    function appendVariableInput(): void {
+
+        const inputDiv = inputDivRef.current!;
+        const inputDivChildDivs = inputDiv.querySelectorAll("div");
+        const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.item(inputDivChildDivs.length - 1) : inputDiv;
+
+        lastChildDiv.innerHTML = (lastChildDiv.innerHTML + "<code>code</code>");
+    }
+
+    
+    /**
+     * Inserts a default ```$[[VARIABL_NAME]]``` sequence at current cursor pos.
+     */
+    function insertVariableInputSequence(): void {
+
+        const variableInputSequence = CODE_SNIPPET_SEQUENCE + CODE_SNIPPET_SEQUENCE;
+        
+        let currentCursorIndex = cursorPos[0];
+        let currentCursorLineNum = cursorPos[1];
+        
+        // all inner divs that represent a line
+        const inputInnerDivs = getContentEditableDivLineElements(inputDivRef.current!);
+        const isFirstLineADiv = inputDivRef.current!.innerHTML.startsWith("<div>")
+        const currentInputDiv = inputInnerDivs[currentCursorLineNum - 1 - (isFirstLineADiv ? 0 : 1)] as HTMLDivElement; // - 2 for item() beeing 0-based and the first line not beeing a div
+        const numInutLines = inputInnerDivs.length + (isFirstLineADiv ? 0 : 1); 
+
+        if (currentCursorIndex === -1 || currentCursorLineNum === -1) {
+            logWarn("Failed to get cursor index or cursor line num");
+            // assume cursor at end of input value
+            currentCursorIndex = inputDivRef.current!.innerText.length - 1;
+            currentCursorLineNum = numInutLines;
+        }
+
+        // case: is first line, not a div
+        if (!currentInputDiv) {
+            inputDivRef.current!.innerHTML = insertString(
+                inputDivRef.current!.innerHTML,
+                variableInputSequence, 
+                currentCursorIndex
+            );
+
+        // case: is empty line
+        } else if (!!currentInputDiv.querySelector("br")) 
+            currentInputDiv.innerHTML = variableInputSequence;
+
+        else {
+            currentInputDiv.innerText = insertString(
+                currentInputDiv.innerText,
+                variableInputSequence, 
+                currentCursorIndex
+            );
+        }
+
+        // select placeholder sequence
+        moveCursor(currentInputDiv || inputDivRef.current!, currentCursorIndex + 3);
+    }
+    
+
+    function handleAppendCodeSnippet(): void {
+
+        appendVariableInput();
+        updateNoteInputEntity();
+        updateNoteEdited();
+    }
+
 
     return (
         <Flex 
@@ -324,6 +411,7 @@ export default function PlainTextNoteInput({
                 <ContentEditableDiv 
                     className="plainTextInput fullWidth" 
                     spellCheck={false} 
+                    setCursorPos={setCursorPos}
                     ref={inputDivRef}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
@@ -345,37 +433,52 @@ export default function PlainTextNoteInput({
                     <i className={"fa-solid fa-circle-notch rotating"}></i>
                 </Overlay>
             </pre>
+                    
+            <div className="CodeNoteInputWithVariables-buttonContainer">
+                <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
+                    {/* Copy */}
+                    <Button
+                        className="defaultNoteInputButton copyButton"
+                        title="Copy"
+                        onClick={handleCopyClick}
+                        >
+                        <i className="fa-solid fa-copy"></i>
+                        <i className="fa-solid fa-copy"></i>
+                    </Button>
 
-            {/* Copy */}
-            <Button
-                className="defaultNoteInputButton copyButton"
-                title="Copy"
-                onClick={handleCopyClick}
-            >
-                <i className="fa-solid fa-copy"></i>
-                <i className="fa-solid fa-copy"></i>
-            </Button>
+                    {/* Delete */}
+                    <Button 
+                        className="deleteNoteButton defaultNoteInputButton" 
+                        title="Delete section"
+                        onClick={handleDeleteNote}
+                    >
+                        <i className="fa-solid fa-xmark fa-lg"></i>
+                    </Button>
 
-            {/* Delete */}
-            <Button 
-                className="deleteNoteButton defaultNoteInputButton" 
-                title="Delete section"
-                onClick={handleDeleteNote}
-            >
-                <i className="fa-solid fa-xmark fa-lg"></i>
-            </Button>
+                    {/* Fullscreen */}
+                    <Button 
+                        className="fullScreenButton defaultNoteInputButton"
+                        title={isFullScreen ? "Resize (Escape)" : "Fullscreen"}
+                        onClick={toggleFullScreen}
+                        >
+                        {isFullScreen ?
+                            <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
+                            <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        }
+                    </Button>
+                </Flex>
 
-             {/* Fullscreen */}
-             <Button 
-                className="fullScreenButton defaultNoteInputButton"
-                title={isFullScreen ? "Normal screen" : "Fullscreen"}
-                onClick={toggleFullScreen}
-            >
-                {isFullScreen ?
-                    <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
-                    <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
-                }
-            </Button>
+                <Flex horizontalAlign="right" flexWrap="nowrap">
+                    {/* Add code highlighted text */}
+                    <Button 
+                        className="mt-2 defaultNoteInputButton" 
+                        title="Code snippet (Ctrl + Shift + V)"
+                        onClick={handleAppendCodeSnippet}
+                    >
+                        <i className="fa-solid fa-code dontSelectText"></i>
+                    </Button>
+                </Flex>
+            </div>
 
             {children}
         </Flex>
