@@ -5,7 +5,7 @@ import { AppUserService } from "../../../../abstract/services/AppUserService";
 import { TagEntityService } from "../../../../abstract/services/TagEntityService";
 import "../../../../assets/styles/NoteTagList.scss";
 import { getRandomString, isBlank } from '../../../../helpers/utils';
-import { AppFetchContext } from "../../../AppFetchContextHolder";
+import { AppFetchContext } from "../../../AppFetchContextProvider";
 import Flex from "../../../helpers/Flex";
 import HelperDiv from "../../../helpers/HelperDiv";
 import { NoteContext } from "./Note";
@@ -107,7 +107,7 @@ export default function NoteTagList({...props}: Props) {
 
         // case: tagEntity is used somewhere else
         // TODO: unsaved notes wont be considered...
-        if (AppUserService.isTagEntityPresentInANote(notesUseQueryResult.data, tagToRemove))
+        if (AppUserService.isTagEntityPresentInANote(notesUseQueryResult.data.results, tagToRemove))
             return;
                 
         AppUserService.removeTagEntity(appUserEntity, tagToRemove);

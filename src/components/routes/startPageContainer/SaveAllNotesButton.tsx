@@ -6,7 +6,7 @@ import "../../../assets/styles/SaveAllNotesButton.scss";
 import { isResponseError } from "../../../helpers/fetchUtils";
 import { isNumberFalsy } from '../../../helpers/utils';
 import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextHolder";
+import { AppFetchContext } from "../../AppFetchContextProvider";
 import Button from "../../helpers/Button";
 import Login from "../Login";
 import { NoteEntityService } from "../../../abstract/services/NoteEntityService";

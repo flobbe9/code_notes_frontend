@@ -3,7 +3,7 @@ import DefaultProps from "../../../abstract/DefaultProps";
 import { getHeadTitleText } from "../../../helpers/projectUtils";
 import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, removeConfirmPageUnload } from "../../../helpers/utils";
 import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextHolder";
+import { AppFetchContext } from "../../AppFetchContextProvider";
 import Flex from "../../helpers/Flex";
 import Head from "../../helpers/Head";
 import StartPageContent from "./StartPageContent";

@@ -7,7 +7,7 @@ import { BACKEND_BASE_URL } from "../../../../helpers/constants";
 import { fetchAny, isResponseError } from "../../../../helpers/fetchUtils";
 import { getCurrentUrlWithoutWWW, isBlank } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
-import { AppFetchContext } from "../../../AppFetchContextHolder";
+import { AppFetchContext } from "../../../AppFetchContextProvider";
 import ResetPassword from "../../../ResetPassword";
 import Button from "../../../helpers/Button";
 import Confirm from "../../../helpers/Confirm";

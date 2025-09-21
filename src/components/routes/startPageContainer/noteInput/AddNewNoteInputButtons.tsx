@@ -5,7 +5,7 @@ import { NoteInputType } from "../../../../abstract/NoteInputType";
 import "../../../../assets/styles/AddNewNoteInputButtons.scss";
 import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../../../helpers/constants";
 import { sleep } from "../../../../helpers/utils";
-import { AppFetchContext } from "../../../AppFetchContextHolder";
+import { AppFetchContext } from "../../../AppFetchContextProvider";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
 import Flex from "../../../helpers/Flex";
 import { NoteContext } from "./Note";
@@ -68,7 +68,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
     function getNewNoteInputEntityPlainText(): NoteInputEntity {
 
         let value = "";
-        const noteEntities = isLoggedIn ? notesUseQueryResult.data : editedNoteEntities;
+        const noteEntities = isLoggedIn ? notesUseQueryResult.data.results : editedNoteEntities;
 
         // case: is first note and first noteInput
         if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("PLAIN_TEXT"))
@@ -85,7 +85,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
     function getNewNoteInputEntityWithVariables(): NoteInputEntity {
 
         let value = "";
-        const noteEntities = isLoggedIn ? notesUseQueryResult.data : editedNoteEntities;
+        const noteEntities = isLoggedIn ? notesUseQueryResult.data.results : editedNoteEntities;
 
         // case: is first note and first noteInput
         if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE_WITH_VARIABLES"))
@@ -103,7 +103,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
     function getNewNoteInputEntityCode(): NoteInputEntity {
 
         let value = "";
-        const noteEntities = isLoggedIn ? notesUseQueryResult.data : editedNoteEntities;
+        const noteEntities = isLoggedIn ? notesUseQueryResult.data.results : editedNoteEntities;
 
         // case: is first note and first noteInput
         if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE"))

@@ -2,7 +2,7 @@ import React, { ChangeEvent, createContext, useContext, useEffect, useRef, useSt
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import "../../../assets/styles/StartPageSideBar.scss";
 import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextHolder";
+import { AppFetchContext } from "../../AppFetchContextProvider";
 import Button from "../../helpers/Button";
 import SearchBar from "../../helpers/SearchBar";
 import SideBar from "../../helpers/SideBar";

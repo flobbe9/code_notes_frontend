@@ -4,7 +4,7 @@ import '../assets/styles/App.scss';
 import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, pauseAnimations, playAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
-import AppFetchContextHolder from "./AppFetchContextHolder";
+import AppFetchContextProvider from "./AppFetchContextProvider";
 import Footer from "./Footer";
 import ConditionalComponent from './helpers/ConditionalComponent';
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
@@ -90,14 +90,11 @@ export default function App() {
 
     const toastRef = useRef<HTMLDivElement>(null);
 
-    
     useEffect(() => {
         window.addEventListener("keydown", handleWindowKeyDown);
         window.addEventListener("keyup", handleWindowKeyUp);
         window.addEventListener("resize", handleWindowResize);
-
     }, []);
-
 
     /**
      * Set given text to toast and slide it up.
@@ -109,7 +106,6 @@ export default function App() {
      *                   the popup wont hide by itself.
      */
     function toast(summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number): void {
-
         setToastSummary(summary);
         setToastMessage(message);
         setToastSevirity(sevirity);
@@ -127,7 +123,6 @@ export default function App() {
         setTimeout(moveToast, 10)
     }
 
-
     /**
      * Start a timeout for toast to hide if it doesn't hide automatically.
      * 
@@ -135,7 +130,6 @@ export default function App() {
      *                   the popup wont hide by itself.
      */
     function forceToastTimeout(screenTime = 8000): void {
-
         // case: no toast present or will hide on it's own
         if (isBlank(toastSummary) || !isNumberFalsy(toastScreenTime))
             return;
@@ -149,14 +143,12 @@ export default function App() {
         setToastScreenTimeTimeout(toastTimeout);
     }
 
-
     /**
      * Show toast or hide it if ```hideToast``` is ```true```. Has a 10 milliseconds delay.
      * 
      * @param hideToast if true, toast will definitely by hidden regardless of it's state before. Default is ```false```
      */
     async function moveToast(hideToast = false): Promise<void> {
-
         let targetBottom = "30px";
 
         // toast height including message
@@ -180,7 +172,6 @@ export default function App() {
             10
         ); // wait for css to complete
     }
-        
 
     /**
      * Will cancel the toast timeout and possibly pause ongoing toast animations.
@@ -188,11 +179,9 @@ export default function App() {
      * @param event 
      */
     function handleToastMouseEnter(): void {
-
         clearTimeout(toastScreenTimeTimeout);
         pauseAnimations(toastRef.current!);
     }
-    
 
     /**
      * Will restart the toast timeout to hide itself (if was set) and possibly resume ongoing toast animations.
@@ -200,7 +189,6 @@ export default function App() {
      * @param event 
      */
     function handleToastMouseLeave(event: MouseEvent): void {
-        
         playAnimations(toastRef.current!)
 
         // case: toast does hide automatically
@@ -210,7 +198,6 @@ export default function App() {
     
 
     function handleWindowResize(event): void {
-
         setWindowSize([window.innerWidth, window.innerHeight]);
     }
     
@@ -416,7 +403,7 @@ export default function App() {
         <AppContext.Provider value={context}>
             <BrowserRouter future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
                 <RouteContextHolder>
-                    <AppFetchContextHolder>
+                    <AppFetchContextProvider>
                         <div id="App" className="App">
                             <Overlay 
                                 id="App"
@@ -482,7 +469,7 @@ export default function App() {
                                 onMouseLeave={handleToastMouseLeave}
                             />  
                         </div>
-                    </AppFetchContextHolder>
+                    </AppFetchContextProvider>
                 </RouteContextHolder>
             </BrowserRouter>
         </AppContext.Provider>

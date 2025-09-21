@@ -105,7 +105,8 @@ function logColored(logLevelName: LogLevelName, obj?: any, ...optionalParams: an
     // get log color by sevirity
     const color = LOG_LEVEL_COLORS[logLevelName];
 
-    console.log("%c" + obj, "background: " + color, ...optionalParams);
+    // console.log("%c" + obj, "background: " + color, ...optionalParams);
+    console.log(obj, ...optionalParams);
 }
 
 

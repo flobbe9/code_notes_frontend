@@ -3,7 +3,7 @@ import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";
 import { isResponseError } from "../helpers/fetchUtils";
-import { AppFetchContext } from "./AppFetchContextHolder";
+import { AppFetchContext } from "./AppFetchContextProvider";
 import Button from "./helpers/Button";
 import { StartPageContentContext } from "./routes/startPageContainer/StartPageContent";
 import { AppContext } from "./App";
@@ -23,7 +23,7 @@ export default function AddNewNoteButton({onClick, ...props}: Props) {
     const [isDisabled, setIsDisabled] = useState(props.disabled);
 
     const { toast } = useContext(AppContext);
-    const { editedNoteEntities, setEditedNoteEntities, isLoggedIn, fetchSaveNoteEntity, notesUseQueryResult, noteSearchResults } = useContext(AppFetchContext);
+    const { editedNoteEntities, setEditedNoteEntities, isLoggedIn, fetchSaveNoteEntity, notesUseQueryResult } = useContext(AppFetchContext);
     const { setIsFocusFirstNote } = useContext(StartPageContentContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteButton", true);
@@ -55,7 +55,7 @@ export default function AddNewNoteButton({onClick, ...props}: Props) {
             newNoteEntity = jsonResponse;
         }
 
-        if (noteSearchResults || !isLoggedIn) {
+        if (!isLoggedIn) {
             // set focus first to true
             setEditedNoteEntities([newNoteEntity, ...editedNoteEntities]);
             

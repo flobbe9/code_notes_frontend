@@ -8,7 +8,7 @@ import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
 import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, logError, logWarn, shortenString } from '../../../../helpers/utils';
 import { AppContext } from "../../../App";
-import { AppFetchContext } from "../../../AppFetchContextHolder";
+import { AppFetchContext } from "../../../AppFetchContextProvider";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
 import Confirm from "../../../helpers/Confirm";
 import Flex from "../../../helpers/Flex";
@@ -348,7 +348,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     function getNoteEntityFromState(): NoteEntity | undefined {
 
         // the note entities list currently used
-        const noteEntitiesState = isLoggedIn ? notesUseQueryResult.data : editedNoteEntities;
+        const noteEntitiesState = isLoggedIn ? notesUseQueryResult.data.results : editedNoteEntities;
 
         if (!noteEntitiesState.length)
             return;

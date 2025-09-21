@@ -4,7 +4,7 @@ import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";
 import "../../../assets/styles/TagCheckbox.scss";
 import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextHolder";
+import { AppFetchContext } from "../../AppFetchContextProvider";
 import Checkbox from "../../helpers/Checkbox";
 import { useHasComponentMounted } from './../../../hooks/useHasComponentMounted';
 

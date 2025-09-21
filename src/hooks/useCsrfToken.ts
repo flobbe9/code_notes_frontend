@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { AppFetchContext } from "../components/AppFetchContextHolder";
+import { AppFetchContext } from "../components/AppFetchContextProvider";
 import { RouteContext } from "../components/RouteContextHolder";
 import { CSRF_TOKEN_URL_QUERY_PARAM } from "../helpers/constants";
 import { getCsrfToken, setCsrfToken } from "../helpers/projectUtils";
@@ -11,7 +11,7 @@ import { getCsrfToken, setCsrfToken } from "../helpers/projectUtils";
  * 
  * Does not fetch. 
  * 
- * Needs to be wrapped in ```<BrowserRouter>``` and ```<AppFetchContextHolder>``` since ```useNavigate``` and global fetch states are used.
+ * Needs to be wrapped in ```<BrowserRouter>``` and ```<AppFetchContextProvider>``` since ```useNavigate``` and global fetch states are used.
  * 
  * @since 0.0.1
  */

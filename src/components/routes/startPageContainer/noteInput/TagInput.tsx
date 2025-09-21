@@ -7,7 +7,7 @@ import "../../../../assets/styles/TagInput.scss";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../../../helpers/constants";
 import { getJsxElementIndexByKey, isBlank, logWarn, shortenString } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
-import { AppFetchContext } from "../../../AppFetchContextHolder";
+import { AppFetchContext } from "../../../AppFetchContextProvider";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
 import { StartPageContainerContext } from "../StartPageContainer";
@@ -117,7 +117,7 @@ export default function TagInput({propsKey, ...props}: Props) {
         else
             handleNewTag(numBlankTags);
 
-        AppUserService.removeUnusedTags(appUserEntity, notesUseQueryResult.data);
+        AppUserService.removeUnusedTags(appUserEntity, notesUseQueryResult.data.results);
 
         updateStartPageSideBarTagList();
     }

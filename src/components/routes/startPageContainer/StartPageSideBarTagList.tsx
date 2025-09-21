@@ -5,7 +5,7 @@ import HelperProps from "../../../abstract/HelperProps";
 import "../../../assets/styles/StartPageSideBarTagList.scss";
 import { matchStringsConsiderWhiteSpace } from "../../../helpers/searchUtils";
 import { getRandomString, isBlank } from "../../../helpers/utils";
-import { AppFetchContext } from "../../AppFetchContextHolder";
+import { AppFetchContext } from "../../AppFetchContextProvider";
 import HelperDiv from "../../helpers/HelperDiv";
 import { StartPageContainerContext } from "./StartPageContainer";
 import { StartPageSideBarContext } from "./StartPageSideBar";

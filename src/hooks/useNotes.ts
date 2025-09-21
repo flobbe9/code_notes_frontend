@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { NoteEntity } from '../abstract/entites/NoteEntity';
+import { SearchNoteResultDto } from "../abstract/SearchNoteResultDto";
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
@@ -20,24 +21,18 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
     /** List of noteEntities that have been edited since they were last saved. Order should not matter */
     const [editedNoteEntities, setEditedNoteEntities] = useState<NoteEntity[]>([]);
-    /** Global search results. Should be set to ```undefined``` if there's no search query */
-    const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[] | undefined>(undefined);
+    /** Num pages of not search results. */
+    const [totalPages, setTotalPages] = useState(0);
 
     const { toast, gotNewUrlQueryParams, notifyUrlQueryParamsChange } = useContext(AppContext);
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
-    const notesUseQueryResult = useQuery<NoteEntity[]>({
+    const notesUseQueryResult = useQuery<SearchNoteResultDto>({
         queryKey: NOTES_QUERY_KEY,
         queryFn: fetchNotes,
-        initialData: queryClient.getQueryData(NOTES_QUERY_KEY) || []
-    });
-
-    const notesTotalUseQueryResult = useQuery<number>({
-        queryKey: NOTES_TOTAL_QUERY_KEY,
-        queryFn: fetchNotesTotal,
-        initialData: queryClient.getQueryData(NOTES_TOTAL_QUERY_KEY) || 0
+        initialData: queryClient.getQueryData(NOTES_QUERY_KEY) ?? SearchNoteResultDto.emptyInstance()
     });
 
 
@@ -45,76 +40,42 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
     const noteEntitiesFetchDelay = 500;
     const isFetchTakingLonger = useIsFetchTakingLong(notesUseQueryResult.isFetched, noteEntitiesFetchDelay, !notesUseQueryResult.isFetched);
 
-
-    useEffect(() => {
-        notesTotalUseQueryResult.refetch();
-    }, [notesUseQueryResult.data, noteSearchResults]);
-
-
     useEffect(() => {
         handleLogin();
     }, [isLoggedInUseQueryResult.data, isLoggedInUseQueryResult.isFetched]);
-
 
     useEffect(() => {
         notesUseQueryResult.refetch();
     }, [notifyUrlQueryParamsChange]);
 
+    useEffect(() => {
+        setTotalPages(getTotalPages());
+    }, [notesUseQueryResult.data])
 
     /**
      * Only fetch if is ```START_PAGE_PATH```.
      * 
      * ```pageNumber``` param is 0-based and cannot be negative. ```pageSize``` param needs to be greater equal 1
      * 
-     * @returns fetched editedNoteEntities or empty array
+     * @returns fetched editedNoteEntities or an instance with an empty array and 0 as total results value, never `null`
      */
-    async function fetchNotes(): Promise<NoteEntity[]> {
+    async function fetchNotes(): Promise<SearchNoteResultDto> {
         if (!isLoggedInUseQueryResult.data || !appUserEntity || window.location.pathname !== START_PAGE_PATH)
-            return [];
+            return SearchNoteResultDto.emptyInstance();
 
-        const url = `${BACKEND_BASE_URL}/note/get-by-app_user-pageable?${getFetchNotesUrlQueryParams()}`;
+        const url = `${BACKEND_BASE_URL}/note/get-by-app_user-pageable?pageNumber=${getCurrentPage() - 1
+            }&pageSize=${NUM_NOTES_PER_PAGE
+            }&${NOTE_SEARCH_PHRASE_URL_QUERY_PARAM}=${getSearchPhrase()
+            }&${NOTE_SEARCH_TAGS_URL_QUERY_PARAM}=${concatTagNames(getSearchTags())}`;
 
         const jsonResponse = await fetchJson(url);
         if (isResponseError(jsonResponse)) {
             toast("Failed to load notes", DEFAULT_ERROR_MESSAGE, "error");
-            return [];
+            return SearchNoteResultDto.emptyInstance();
         }
 
         return jsonResponse;
     }
-
-
-    /**
-     * @returns the url query params for {@link fetchNotes()}, not prepending a "?" or a "/"
-     */
-    function getFetchNotesUrlQueryParams(): string {
-        // -1 because currentPage is 1-based but pageNumber param is 0-based
-        return `pageNumber=${getCurrentPage() - 1
-            }&pageSize=${NUM_NOTES_PER_PAGE
-            }&${NOTE_SEARCH_PHRASE_URL_QUERY_PARAM}=${getSearchPhrase()
-            }&${NOTE_SEARCH_TAGS_URL_QUERY_PARAM}=${concatTagNames(getSearchTags())}`;
-    }
-
-
-    /**
-     * @returns total num of notes for the current app user
-     */
-    async function fetchNotesTotal(): Promise<number> {
-        if (!isLoggedInUseQueryResult.data || !appUserEntity)
-            return 0;
-
-        const url = `${BACKEND_BASE_URL}/note/count-by-app_user`;
-
-        const response = await fetchAny(url);
-
-        if (isResponseError(response)) {
-            toast("Failed to load notes count", DEFAULT_ERROR_MESSAGE, "error");
-            return 0;
-        }
-
-        return stringToNumber(await response.text());
-    }
-        
 
     /**
      * Save given ```noteEntity``` or return error obj. Will toast on fetch error.
@@ -273,7 +234,10 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
         return pageNum;
     }
-
+    
+    function getTotalPages(): number {
+        return Math.ceil(notesUseQueryResult.data.totalResults / NUM_NOTES_PER_PAGE);
+    }
 
     function getSearchPhrase() {
         const queryParamValue = getUrlQueryParam(NOTE_SEARCH_PHRASE_URL_QUERY_PARAM);
@@ -351,13 +315,10 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         notesUseQueryResult,
         isFetchTakingLonger,
         editedNoteEntities, setEditedNoteEntities,
-        notesTotalUseQueryResult,
-
-        noteSearchResults, setNoteSearchResults,
         getSearchPhrase, setSearchPhrase,
         getSearchTags, setSearchTags,
 
-        getCurrentPage, setCurrentPage,
+        getCurrentPage, setCurrentPage, totalPages,
 
         fetchSave,
         fetchSaveAll,

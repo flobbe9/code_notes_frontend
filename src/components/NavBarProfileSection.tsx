@@ -4,7 +4,7 @@ import { PROFILE_PATH } from "../helpers/constants";
 import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
 import "./../assets/styles/NavBarProfileSection.scss";
 import { AppContext } from "./App";
-import { AppFetchContext } from "./AppFetchContextHolder";
+import { AppFetchContext } from "./AppFetchContextProvider";
 import Button from "./helpers/Button";
 import ButtonWithSlideLabel from "./helpers/ButtonWithSlideLabel";
 import Confirm from "./helpers/Confirm";
