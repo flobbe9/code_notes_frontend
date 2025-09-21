@@ -1,6 +1,6 @@
 import { DefinedUseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { NoteEntity } from '../abstract/entites/NoteEntity';
@@ -9,7 +9,7 @@ import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NOTE_PAGE_URL_QUERY_PARAM, NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, NOTE_SEARCH_TAGS_URL_QUERY_PARAM, NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR, NUM_NOTES_PER_PAGE, START_PAGE_PATH } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { getUrlQueryParam, isBlank, isNumberFalsy, isStringFalsy, jsonParseDontThrow, logWarn, stringToNumber, updateCurrentUrlQueryParams } from "../helpers/utils";
+import { getUrlQueryParam, isBlank, isNumberFalsy, isStringFalsy, jsonParseDontThrow, logWarn, setUrlQueryParam, stringToNumber, updateCurrentUrlQueryParams } from "../helpers/utils";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 
 
@@ -24,7 +24,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
     const [noteSearchResults, setNoteSearchResults] = useState<NoteEntity[] | undefined>(undefined);
 
     const { toast, gotNewUrlQueryParams, notifyUrlQueryParamsChange } = useContext(AppContext);
-    const [urlQueryParams, setUrlQueryParams] = useSearchParams();
+    const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
@@ -48,19 +48,16 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
     useEffect(() => {
         notesTotalUseQueryResult.refetch();
-
     }, [notesUseQueryResult.data, noteSearchResults]);
 
 
     useEffect(() => {
         handleLogin();
-
     }, [isLoggedInUseQueryResult.data, isLoggedInUseQueryResult.isFetched]);
 
 
     useEffect(() => {
         notesUseQueryResult.refetch();
-        
     }, [notifyUrlQueryParamsChange]);
 
 
@@ -92,7 +89,10 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      */
     function getFetchNotesUrlQueryParams(): string {
         // -1 because currentPage is 1-based but pageNumber param is 0-based
-        return `pageNumber=${getCurrentPage() - 1}&pageSize=${NUM_NOTES_PER_PAGE}&${NOTE_SEARCH_PHRASE_URL_QUERY_PARAM}=${getSearchPhrase()}&${NOTE_SEARCH_TAGS_URL_QUERY_PARAM}=${concatTagNames(getSearchTags())}`;
+        return `pageNumber=${getCurrentPage() - 1
+            }&pageSize=${NUM_NOTES_PER_PAGE
+            }&${NOTE_SEARCH_PHRASE_URL_QUERY_PARAM}=${getSearchPhrase()
+            }&${NOTE_SEARCH_TAGS_URL_QUERY_PARAM}=${concatTagNames(getSearchTags())}`;
     }
 
 
@@ -251,8 +251,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         if (isNumberFalsy(pageNum))
             return;
 
-        urlQueryParams.set(NOTE_PAGE_URL_QUERY_PARAM, pageNum.toString());
-        setUrlQueryParams(urlQueryParams);
+        setUrlQueryParam(NOTE_PAGE_URL_QUERY_PARAM, pageNum.toString(), navigate);
 
         gotNewUrlQueryParams();
     }
@@ -264,7 +263,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * @returns the current page of note results (1-based) or 1 if param is invalid
      */
     function getCurrentPage(): number {
-        const queryParamValue = urlQueryParams.get(NOTE_PAGE_URL_QUERY_PARAM);
+        const queryParamValue = getUrlQueryParam(NOTE_PAGE_URL_QUERY_PARAM);
         if (isBlank(queryParamValue))
             return 1;
 

@@ -20,9 +20,10 @@ export function logDebug(message?: any, ...optionalParams: any[]): void {
     if (!isDebugLogLevel())
         return;
 
-    const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
+    // const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
     
-    console.log(getTimeStamp(), errorObj, ...optionalParams);
+    // console.log(getTimeStamp(), errorObj, ...optionalParams);
+    console.log(getTimeStamp(), message, ...optionalParams);
 }
 
 
@@ -139,9 +140,15 @@ export function stringToNumber(str: string | number | undefined | null): number 
     }
 }
 
+/**
+ * @param obj 
+ * @returns `true` if, and only if, `obj` is `undefined` or `null`
+ */
+export function isFalsy(obj: any): boolean {
+    return obj === undefined || obj === null;
+}
 
-export function isNumberFalsy(num: number | null | undefined): boolean {
-
+export function isNumberFalsy(num: any): boolean {
     return num === undefined || num === null || isNaN(num);
 }
 
@@ -1356,9 +1363,30 @@ export function jsonParseDontThrow<ReturnType>(value: string | null | undefined)
     }
 }
 
+/**
+ * Throws at the first arg beeing falsy (but not if no args are specified). Use util "isFalsy" methods for primitive types.
+ *
+ * @param args to check
+ */
+export function assertFalsyAndThrow(...args: any[]): void {
+    if (!args || !args.length) return;
 
-function getUrlQueryParamsMap(): Map<string, string> {
+    for (let i = 0; i < args.length; i++) {
+        const arg = args[i];
 
+        let falsy = false;
+
+        if (typeof arg === "number") falsy = isNumberFalsy(arg);
+        else falsy = isFalsy(arg);
+
+        if (falsy) throw new Error(`Invalid arg at index ${i}`);
+    }
+}
+
+/**
+ * @returns hash map of url query param key values of current url (empty map if none present)
+ */
+function parseUrlQueryParams(): Map<string, string> {
     const urlQueryParams = window.location.search;
 
     // case: no params or only a '?'
@@ -1389,6 +1417,34 @@ function getUrlQueryParamsMap(): Map<string, string> {
     return keyValueMap;
 }
 
+/**
+ * @param queryParamsMap hashmap containing url query param key values
+ * @returns url query param string starting with '?' or blank string if map is falsy
+ */
+function parseQueryParamsMap(queryParamsMap: Map<string, string>): string {
+    if (!queryParamsMap)
+        return "";
+
+    let queryParams = '?';
+    Array.from(queryParamsMap.entries())
+        .forEach(([key, value], i) => {
+            if (isBlank(key)) {
+                logWarn(`Invalid query param key '${key}'`);
+                return;
+            }
+
+            if (isBlank(value))
+                value = '';
+
+            if (i > 0)
+                queryParams += '&';
+
+            queryParams += `${key}=${value}`
+        })
+
+    return queryParams;
+}
+
 
 /**
  * Retrieve the url query param value for given key using ```window.location.search```. Usefull if react hooks don't work for some reason.
@@ -1397,13 +1453,34 @@ function getUrlQueryParamsMap(): Map<string, string> {
  * @returns the value for given key or ```null```
  */
 export function getUrlQueryParam(key: string): string | null {
-
     if (isStringFalsy(key))
         return null;
 
-    return getUrlQueryParamsMap().get(key) || null;
+    return parseUrlQueryParams().get(key) || null;
 }
 
+/**
+ * Update / add url query param with `key`, do nothing if `key` is falsy.
+ * 
+ * @param key query param key
+ * @param value query param value
+ * @param navigate optional navigation function, will refresh page if not specified
+ */
+export function setUrlQueryParam(key: string, value: string, navigate?: (to: string) => void): void {
+    if (isFalsy(key))
+        return;
+
+    const queryParamsMap = parseUrlQueryParams();
+    queryParamsMap.set(key, value);
+
+    const updatedQueryParams = parseQueryParamsMap(queryParamsMap);
+
+    if (navigate)
+        navigate(`${window.location.pathname}${updatedQueryParams}`);
+
+    else
+        window.location.search = updatedQueryParams;
+}
 
 /**
  * Replace some substrings that are used in url query params in place of certain chars with their actual chars. 

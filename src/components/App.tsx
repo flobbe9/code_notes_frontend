@@ -408,7 +408,6 @@ export default function App() {
     
 
     function gotNewUrlQueryParams(): void {
-
         setNotifyUrlQueryParamsChange(!notifyUrlQueryParamsChange);
     }
 
