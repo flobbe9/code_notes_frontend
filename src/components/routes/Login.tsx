@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../../abstract/InputValidationWrapper";
 import "../../assets/styles/Login.scss";
-import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
+import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, OAUTH2_AUTH_LINK_GOOGLE, OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
 import { getHeadTitleText, setCsrfToken } from "../../helpers/projectUtils";
 import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, stringToNumber } from "../../helpers/utils";
@@ -341,6 +341,12 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     function handleOauth2ButtonClick(): void {
 
         localStorage.setItem(EDITED_NOTES_KEY, JSON.stringify(editedNoteEntities));
+        // TODO: continue here
+        // window.open(OAUTH2_AUTH_LINK_GOOGLE, "test", "popup=true,width=500,height=700")
+        // open
+        // authenticate
+        // close
+        // redirect to home
     }
 
 

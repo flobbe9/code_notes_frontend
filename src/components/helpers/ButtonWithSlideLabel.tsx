@@ -48,7 +48,6 @@ export default forwardRef(function ButtonWithSlideLabel(
 
 
     function slideExpand(): void {
-
         // case: initial width not set yet
         if (!initialNoteInputButtonLabelWidth)
             return;
@@ -69,7 +68,6 @@ export default forwardRef(function ButtonWithSlideLabel(
 
 
     function slideCollapse(): void {
-
         // case: called this method because the button was unrendered
         if (!labelContainerRef.current)
             return;
@@ -99,7 +97,6 @@ export default forwardRef(function ButtonWithSlideLabel(
 
 
     function getNoteInputButtonLabelWidth(): string {
-
         if (!componentRef.current)
             return "0";
 

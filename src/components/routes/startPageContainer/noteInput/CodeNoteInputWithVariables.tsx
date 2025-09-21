@@ -92,11 +92,6 @@ export default function CodeNoteInputWithVariables({
 
 
     useEffect(() => {
-        log(cursorPos)
-    }, [cursorPos])
-
-
-    useEffect(() => {
         handleLanguageChange();
 
     }, [codeNoteInputWithVariablesLanguage]);

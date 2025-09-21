@@ -6,19 +6,19 @@ import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../
 import "../../assets/styles/Register.scss";
 import { BACKEND_BASE_URL, EMAIL_REGEX, LOGIN_PATH, PASSWORD_REGEX } from "../../helpers/constants";
 import { fetchAny, isResponseError } from "../../helpers/fetchUtils";
+import { getHeadTitleText } from "../../helpers/projectUtils";
 import { getCurrentUrlWithoutWWW, isBlank } from "../../helpers/utils";
 import { useFormInput } from "../../hooks/useFormInput";
 import { AppContext } from "../App";
-import Head from "../helpers/Head";
 import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
+import Head from "../helpers/Head";
 import Hr from "../helpers/Hr";
 import TextInput from "../helpers/TextInput";
-import Login from "./Login";
 import Oauth2LoginButton from "../Oauth2LoginButton";
 import PasswordAdvice from "../PasswordAdvice";
 import ResendConfirmationMail from "../ResendConfirmationMail";
-import { getHeadTitleText } from "../../helpers/projectUtils";
+import Login from "./Login";
 
 
 interface Props extends DefaultProps {
@@ -203,7 +203,7 @@ export default function Register({isPopupContent = false, ...props}: Props) {
     }
 
 
-    function showResendConfirmationMailPopup(event: MouseEvent): void {
+    function showResendConfirmationMailPopup(): void {
 
         showPopup(<ResendConfirmationMail isParentPopupContent={isPopupContent} />);
     }

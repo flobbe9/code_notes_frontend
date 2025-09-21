@@ -1,9 +1,8 @@
 import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { BACKEND_BASE_URL, CSRF_TOKEN_HEADER_NAME } from "./constants";
-import { getCsrfToken, clearSensitiveCache } from './projectUtils';
+import { clearSensitiveCache, getCsrfToken } from './projectUtils';
 import { isNumberFalsy, logApiResponse, sleep } from "./utils";
-
 
 /**
  * Call ```fetchAny``` with given params.
@@ -16,7 +15,6 @@ import { isNumberFalsy, logApiResponse, sleep } from "./utils";
  * @returns response as json
  */
 export default async function fetchJson(url: string, method = "get", body?: any, headers?: HeadersInit, debug = true): Promise<CustomExceptionFormat | any> {
-
     const response = await fetchAny(url, method, body, headers, debug);
 
     // case: failed to fetch, already streamed to json
@@ -45,7 +43,6 @@ export default async function fetchJson(url: string, method = "get", body?: any,
  * @returns a promise with the response or an {@link CustomExceptionFormat} object in it
  */
 export async function fetchAny(url: string, method = "get", body?: any, headers?: HeadersInit, debug = true): Promise<Response | CustomExceptionFormat> {
-    
     // set headers
     const fetchConfig: RequestInit = {
         method: method,
@@ -127,7 +124,6 @@ export async function fetchAnyReturnBlobUrl(url: string, method = "get", body?: 
  * @returns true if status code is informational (1xx), successful (2xx) or redirectional (3xx), else false
  */
 export function isHttpStatusCodeAlright(statusCode: number): boolean {
-
     return statusCode <= 399;
 }
 
@@ -137,7 +133,6 @@ export function isHttpStatusCodeAlright(statusCode: number): boolean {
  * @returns ```true``` if given response is truthy, has a ```status``` field and that ```status``` field is not "alright" (see {@link isHttpStatusCodeAlright})
  */
 export function isResponseError(response: any): response is CustomExceptionFormat {
-
     return response && !isNumberFalsy(response.status) && !isHttpStatusCodeAlright(response.status);
 }
 
@@ -151,7 +146,6 @@ export function isResponseError(response: any): response is CustomExceptionForma
  * @returns ```headers``` object with necessary props set 
  */
 function getFetchHeaders(headers?: HeadersInit): HeadersInit {
-
     const contentType = {"Content-Type": "application/json"};
 
     if (!headers)

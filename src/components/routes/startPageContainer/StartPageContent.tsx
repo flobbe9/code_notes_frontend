@@ -256,11 +256,11 @@ export default function StartPageContent({...props}: Props) {
                 ref={componentRef}
                 {...otherProps}
             >
-                <Flex className="mt-2 mb-4" flexWrap="nowrap" verticalAlign="center">
+                <Flex className="mb-4" flexWrap="nowrap" verticalAlign="center">
                     <SearchBar 
                         id="StartPage"
                         className="fullWidth" 
-                        placeHolder="Search for note title or tag" 
+                        placeHolder="Search notes..." 
                         title="Search notes (Ctrl + Shift + F)"
                         ref={searchInputRef}
                         disabled={!notesUseQueryResult.data.length}

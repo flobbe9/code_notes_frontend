@@ -46,8 +46,8 @@ export const OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM = "oauth2-login-error";
 export const RESET_PASSWORD_TOKEN_URL_QUERY_PARAM = "token";
 export const RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY = "reset-password-token";
 export const NOTE_PAGE_URL_QUERY_PARAM = "page";
-export const NOTE_SEARCH_PHRASE_URL_QUERY_PARAM = "search";
-export const NOTE_SEARCH_TAGS_URL_QUERY_PARAM = "tags";
+export const NOTE_SEARCH_PHRASE_URL_QUERY_PARAM = "searchPhrase";
+export const NOTE_SEARCH_TAGS_URL_QUERY_PARAM = "tagNames";
 export const NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR = ",";
 
 

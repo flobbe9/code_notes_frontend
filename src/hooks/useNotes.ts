@@ -72,7 +72,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * @returns fetched editedNoteEntities or empty array
      */
     async function fetchNotes(): Promise<NoteEntity[]> {
-
         if (!isLoggedInUseQueryResult.data || !appUserEntity || window.location.pathname !== START_PAGE_PATH)
             return [];
 
@@ -92,7 +91,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * @returns the url query params for {@link fetchNotes()}, not prepending a "?" or a "/"
      */
     function getFetchNotesUrlQueryParams(): string {
-
         // -1 because currentPage is 1-based but pageNumber param is 0-based
         return `pageNumber=${getCurrentPage() - 1}&pageSize=${NUM_NOTES_PER_PAGE}&${NOTE_SEARCH_PHRASE_URL_QUERY_PARAM}=${getSearchPhrase()}&${NOTE_SEARCH_TAGS_URL_QUERY_PARAM}=${concatTagNames(getSearchTags())}`;
     }
@@ -102,7 +100,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * @returns total num of notes for the current app user
      */
     async function fetchNotesTotal(): Promise<number> {
-
         if (!isLoggedInUseQueryResult.data || !appUserEntity)
             return 0;
 
@@ -126,7 +123,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * @returns the saved note entity or an error obj
      */
     async function fetchSave(noteEntity: NoteEntity): Promise<NoteEntity | CustomExceptionFormat> {
-
         if (!noteEntity)
             return CustomExceptionFormatService.getInstanceAndLog(500, "Failed to save note entity. 'noteEntity' cannot be falsy");
 
@@ -156,7 +152,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * @returns the saved note entity or an error obj
      */
     async function fetchSaveAll(editedNoteEntities: NoteEntity[]): Promise<NoteEntity[] | CustomExceptionFormat> {
-
         if (!editedNoteEntities)
             return CustomExceptionFormatService.getInstanceAndLog(500, "Failed to save note entities. 'noteEntity' cannot be falsy");
 
@@ -176,7 +171,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
 
     async function fetchDelete(noteEntity: NoteEntity): Promise<CustomExceptionFormat | Response> {
-
         const defaultErrorMessage = "Failed to delete note.";
 
         if (!noteEntity)
@@ -198,7 +192,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
 
     function getEditedNoteEntitiesFromCache(): NoteEntity[] {
-
         const unsavedNoteEntities = jsonParseDontThrow<NoteEntity[]>(localStorage.getItem(EDITED_NOTES_KEY));
 
         return unsavedNoteEntities || [];
@@ -206,7 +199,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
 
     function clearEditedNoteEntitiesFromCache(): void {
-
         localStorage.removeItem(EDITED_NOTES_KEY);
     }
 
@@ -217,7 +209,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * NOTE: fetch error during oauth2 login or oauth2 save all will loose edited notes
      */
     async function saveEditedNoteEntities(): Promise<void> {
-
         if (!isLoggedInUseQueryResult.data)
             return;
 
@@ -242,7 +233,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * Save edited notes and (either way) refetch notes
      */
     async function handleLogin(): Promise<void> {
-
         await saveEditedNoteEntities();
 
         await notesUseQueryResult.refetch();
@@ -258,12 +248,13 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * @param pageNum 1-based, the page number for note results
      */
     function setCurrentPage(pageNum: number): void {
-
         if (isNumberFalsy(pageNum))
             return;
 
         urlQueryParams.set(NOTE_PAGE_URL_QUERY_PARAM, pageNum.toString());
         setUrlQueryParams(urlQueryParams);
+
+        gotNewUrlQueryParams();
     }
 
 
@@ -273,7 +264,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * @returns the current page of note results (1-based) or 1 if param is invalid
      */
     function getCurrentPage(): number {
-
         const queryParamValue = urlQueryParams.get(NOTE_PAGE_URL_QUERY_PARAM);
         if (isBlank(queryParamValue))
             return 1;
@@ -287,7 +277,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
 
     function getSearchPhrase() {
-
         const queryParamValue = getUrlQueryParam(NOTE_SEARCH_PHRASE_URL_QUERY_PARAM);
         if (isBlank(queryParamValue))
             return "";
@@ -303,7 +292,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * @param searchPhrase input from note searchbar 
      */
     function setSearchPhrase(searchPhrase: string): void {
-
         if (isStringFalsy(searchPhrase))
             return;
 
@@ -318,7 +306,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
 
     function getSearchTags(): Set<string> {
-
         const queryParamValue = getUrlQueryParam(NOTE_SEARCH_TAGS_URL_QUERY_PARAM);
         if (isBlank(queryParamValue))
             return new Set();
@@ -328,7 +315,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
 
     function concatTagNames(searchTags: Set<string> | string[]): string {
-
         const searchTagsArray = [...searchTags || []];
 
         if (!searchTagsArray.length)
@@ -346,7 +332,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      * @param tagNames input from note searchbar 
      */
     function setSearchTags(tagNames: Set<string>): void {
-
         if (!tagNames)
             return;
 
