@@ -1499,3 +1499,18 @@ function cleanUpUrlQueryParamValue(value: string): string {
         .replaceAll("%2C", ",")
         .replaceAll("+", " ");
 }
+
+/**
+ * 
+ * @param percent the value to convert to pixels. Anything between 0 and 100
+ * @param unit will determine whether to use width or height
+ * @param fullSizeInPixels `[fullWidth, fullHeight]` the full size of the container to calculate percent for. Default is window.outerHeight/Width
+ * @returns the absolute pixels relative to fullSize
+ */
+export function percentToPixels(percent: number, unit: "vw" | "vh" | "%", fullSizeInPixels = [window.outerWidth, window.outerHeight]): number {
+    assertFalsyAndThrow(percent, unit, fullSizeInPixels);
+
+    const windowSize = unit === "vh" ? fullSizeInPixels[1] : fullSizeInPixels[0];
+
+    return windowSize * (percent / 100);
+}

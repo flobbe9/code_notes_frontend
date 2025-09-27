@@ -16,7 +16,6 @@ export default function useWindowResizeCallback(callback: () => any, timeout = 2
 
     const { windowSize } = useContext(AppContext);
 
-
     useEffect(() => {
         clearTimeout(resizeTimeout);
         setResizeTimeout(setTimeout(callback, timeout));
