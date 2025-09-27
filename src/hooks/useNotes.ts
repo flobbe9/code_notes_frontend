@@ -1,6 +1,6 @@
 import { DefinedUseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { NoteEntity } from '../abstract/entites/NoteEntity';
@@ -10,7 +10,7 @@ import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NOTE_PAGE_URL_QUERY_PARAM, NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, NOTE_SEARCH_TAGS_URL_QUERY_PARAM, NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR, NUM_NOTES_PER_PAGE, START_PAGE_PATH } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { getUrlQueryParam, isBlank, isNumberFalsy, isStringFalsy, jsonParseDontThrow, logWarn, setUrlQueryParam, stringToNumber, updateCurrentUrlQueryParams } from "../helpers/utils";
+import { getUrlQueryParam, isBlank, isNumberFalsy, isStringFalsy, jsonParseDontThrow, logWarn, setUrlQueryParam, stringToNumber } from "../helpers/utils";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
 
 
@@ -24,8 +24,9 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
     /** Num pages of not search results. */
     const [totalPages, setTotalPages] = useState(0);
 
-    const { toast, gotNewUrlQueryParams, notifyUrlQueryParamsChange } = useContext(AppContext);
+    const { toast } = useContext(AppContext);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const queryClient = useQueryClient();
 
@@ -46,7 +47,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
     useEffect(() => {
         notesUseQueryResult.refetch();
-    }, [notifyUrlQueryParamsChange]);
+    }, [location]);
 
     useEffect(() => {
         setTotalPages(getTotalPages());
@@ -105,7 +106,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         return jsonResponse;
     }
 
-
     /**
      * Save given ```editedNoteEntities``` or return error obj. Will toast on fetch error.
      * 
@@ -130,7 +130,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         return jsonResponse;
     } 
 
-
     async function fetchDelete(noteEntity: NoteEntity): Promise<CustomExceptionFormat | Response> {
         const defaultErrorMessage = "Failed to delete note.";
 
@@ -151,18 +150,15 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         return response;
     }
 
-
     function getEditedNoteEntitiesFromCache(): NoteEntity[] {
         const unsavedNoteEntities = jsonParseDontThrow<NoteEntity[]>(localStorage.getItem(EDITED_NOTES_KEY));
 
         return unsavedNoteEntities || [];
     }
 
-
     function clearEditedNoteEntitiesFromCache(): void {
         localStorage.removeItem(EDITED_NOTES_KEY);
     }
-
 
     /**
      * Fetch saves edited notes (wont refetch). Use notes either from state or cache, will work for both normal and oauth2 login. 
@@ -189,7 +185,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         clearEditedNoteEntitiesFromCache();
     }
 
-
     /**
      * Save edited notes and (either way) refetch notes
      */
@@ -198,7 +193,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
         await notesUseQueryResult.refetch();
     }
-
 
     /**
      * Will update the {@link NOTE_PAGE_QUERY_PARAM} url query param (even if not present yet) regardless of 
@@ -213,10 +207,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
             return;
 
         setUrlQueryParam(NOTE_PAGE_URL_QUERY_PARAM, pageNum.toString(), navigate);
-
-        gotNewUrlQueryParams();
     }
-
 
     /**
      * Retrieves the {@link NOTE_PAGE_URL_QUERY_PARAM} from the current url. 
@@ -247,7 +238,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         return queryParamValue!;
     }
 
-
     /**
      * Updates the url query param {@link NOTE_SEARCH_PHRASE_URL_QUERY_PARAM} but only if given ```searchPhrase``` is
      * a valid string.
@@ -259,14 +249,11 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
             return;
 
         if (isBlank(searchPhrase)) 
-            updateCurrentUrlQueryParams(NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, "");
+            setUrlQueryParam(NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, "", navigate);
 
         else 
-            updateCurrentUrlQueryParams(NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, searchPhrase);
-
-        gotNewUrlQueryParams();
+            setUrlQueryParam(NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, searchPhrase, navigate);
     }
-
 
     function getSearchTags(): Set<string> {
         const queryParamValue = getUrlQueryParam(NOTE_SEARCH_TAGS_URL_QUERY_PARAM);
@@ -275,7 +262,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
         return new Set(queryParamValue!.split(NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR));
     }
-
 
     function concatTagNames(searchTags: Set<string> | string[]): string {
         const searchTagsArray = [...searchTags || []];
@@ -286,7 +272,6 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         return [...searchTags]
             .reduce((prev, curr) => `${prev}${NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR}${curr}`);
     }
-
 
     /**
      * Updates the url query param {@link NOTE_SEARCH_TAGS_URL_QUERY_PARAM} but only if given ```tagNames``` is
@@ -300,16 +285,13 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
 
         // case: no tags selected
         if (!tagNames.size)
-            updateCurrentUrlQueryParams(NOTE_SEARCH_TAGS_URL_QUERY_PARAM, "");
+            setUrlQueryParam(NOTE_SEARCH_TAGS_URL_QUERY_PARAM, "", navigate);
 
         else {
             const searchTagsString = concatTagNames(tagNames);
-            updateCurrentUrlQueryParams(NOTE_SEARCH_TAGS_URL_QUERY_PARAM, searchTagsString);
+            setUrlQueryParam(NOTE_SEARCH_TAGS_URL_QUERY_PARAM, searchTagsString, navigate);
         }
-
-        gotNewUrlQueryParams();
     }
-
         
     return {
         notesUseQueryResult,

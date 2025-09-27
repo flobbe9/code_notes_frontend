@@ -963,29 +963,6 @@ export function replaceCurrentBrowserHistoryEntry(path: string | URL | null = wi
 
 
 /**
- * Updates the current url's query params without creating a new history entry.
- * 
- * @param key url query key. Cannot be blank
- * @param value url query value. If blank the key will be replaced as well
- */
-export function updateCurrentUrlQueryParams(key: string, value: string): void {
-
-    if (isBlank(key) || isStringFalsy(value))
-        return;
-
-    const url = new URL(window.location.href);
-
-    // if value is balnk
-    if (isBlank(value))
-        url.searchParams.delete(key);
-    else
-        url.searchParams.set(key, value);
-
-    replaceCurrentBrowserHistoryEntry(url);
-}
-
-
-/**
  * Indicates whether given ```path``` is relative. Will return ```true``` if ```path``` does not look absolute.
  * 
  * @param path to check
@@ -1472,7 +1449,10 @@ export function setUrlQueryParam(key: string, value: string, navigate?: (to: str
         return;
 
     const queryParamsMap = parseUrlQueryParams();
-    queryParamsMap.set(key, value);
+    if (isBlank(value))
+        queryParamsMap.delete(key);
+    else
+        queryParamsMap.set(key, value);
 
     const updatedQueryParams = parseQueryParamsMap(queryParamsMap);
 

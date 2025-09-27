@@ -47,6 +47,9 @@ export const RESET_PASSWORD_TOKEN_URL_QUERY_PARAM = "token";
 export const RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY = "reset-password-token";
 export const NOTE_PAGE_URL_QUERY_PARAM = "page";
 export const NOTE_SEARCH_PHRASE_URL_QUERY_PARAM = "searchPhrase";
+export const NOTE_SEARCH_PHRASE_MIN_LENGTH = 4;
+/** Time to wait before making a note search request to backend. In ms */
+export const NOTE_SEARCH_PHRASE_USER_INPUT_DELAY = 500;
 export const NOTE_SEARCH_TAGS_URL_QUERY_PARAM = "tagNames";
 export const NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR = ",";
 

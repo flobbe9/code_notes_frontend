@@ -1,8 +1,10 @@
 import React, { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
 import "../../../assets/styles/StartPageContent.scss";
-import { getRandomString, isBlank } from "../../../helpers/utils";
+import { NOTE_SEARCH_PHRASE_MIN_LENGTH, NOTE_SEARCH_PHRASE_USER_INPUT_DELAY } from "../../../helpers/constants";
+import { getRandomString, isBlank, logDebug } from "../../../helpers/utils";
 import { useCsrfToken } from "../../../hooks/useCsrfToken";
 import AddNewNoteButton from "../../AddNewNoteButton";
 import { AppContext } from "../../App";
@@ -27,13 +29,19 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 export default function StartPageContent({...props}: Props) {
-
     const componentName = "StartPageContent";
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName, true);
+
+    const location = useLocation();
     
     /** Make sure that ```notes``` and ```notesUseQueryResult.data``` are ordered the same at all times! */
     const [notes, setNotes] = useState<JSX.Element[]>([]);
     const [isFocusFirstNote, setIsFocusFirstNote] = useState(false);
+
+    const [isNoteSearchDisabled, setNoteSearchDisabled] = useState(false);
+    const [isAddNewNoteButtonDisabled, setNewNoteButtonDisabled] = useState(false);
+
+    const [noteSearchUserInputTimeout, setNoteSearchUserInputTimeout] = useState<NodeJS.Timeout>();
 
     const { isKeyPressed, showPopup } = useContext(AppContext);
     const { 
@@ -46,7 +54,8 @@ export default function StartPageContent({...props}: Props) {
         setCurrentNotesPage,
         isLoggedIn,
         getNoteSearchPhrase,
-        setNoteSearchPhrase
+        setNoteSearchPhrase,
+        getNoteSearchTags
     } = useContext(AppFetchContext);
     
     const componentRef = useRef<HTMLDivElement>(null);
@@ -58,7 +67,10 @@ export default function StartPageContent({...props}: Props) {
 
         setIsFocusFirstNote,
 
-        createNoteByNoteEntity
+        createNoteByNoteEntity,
+
+        isSearchingNotes,
+        isEditingNotes
     }
 
     useCsrfToken();
@@ -72,6 +84,11 @@ export default function StartPageContent({...props}: Props) {
             window.removeEventListener("keydown", handleKeyDown);
         }
     }, []);
+
+    useEffect(() => {
+        setNoteSearchDisabled(isEditingNotes() || hasNoSavedNotes());
+        setNewNoteButtonDisabled(isSearchingNotes() || isEditingNotes());
+    }, [editedNoteEntities, isLoggedIn, location, notesUseQueryResult.data]);
 
     useEffect(() => {
         setIsFocusFirstNote(false);
@@ -122,19 +139,40 @@ export default function StartPageContent({...props}: Props) {
         return <Note key={key} propsKey={String(key)} focusOnRender={focusOnRender} /> 
     }
 
-    function handleSearchKeyDown(event: React.KeyboardEvent): void {
-        if (event.key === "Enter")
-            notesUseQueryResult.refetch();
-    }
-
     function handleSearchValueChange(event: ChangeEvent): void {
-        const currentSearchValue = (event.target as HTMLInputElement).value;
+        const noteSearchPhrase = (event.target as HTMLInputElement).value;
 
-        setNoteSearchPhrase(currentSearchValue);
+        handleNoteSearch(noteSearchPhrase);
     }
 
     function handleSearchXIconClick(): void {
-        setNoteSearchPhrase("");
+        handleNoteSearch("");
+    }
+
+    /**
+     * Update url query params for note search which should trigger a refetch. Delay a bit to wait for user to finish typing.
+     * 
+     * Don't update url if not enough search chars.
+     * 
+     * @param searchPhrase to update url with 
+     */
+    function handleNoteSearch(searchPhrase: string): void {
+        // clear timeout whether search will be done or not
+        if (noteSearchUserInputTimeout)
+            clearTimeout(noteSearchUserInputTimeout);
+
+        // case: not enough search chars
+        if (!isBlank(searchPhrase) && searchPhrase.length < NOTE_SEARCH_PHRASE_MIN_LENGTH)
+            return;
+
+        logDebug("search", searchPhrase)
+
+        // wait for user to finish typing to avoid unnecessary fetch requests
+        const timeout = setTimeout(() => {
+            setNoteSearchPhrase(searchPhrase);
+        }, NOTE_SEARCH_PHRASE_USER_INPUT_DELAY);
+
+        setNoteSearchUserInputTimeout(timeout);
     }
 
     /**
@@ -165,6 +203,41 @@ export default function StartPageContent({...props}: Props) {
         } else 
             handle();
     }
+    
+    /**
+     * Indicates that the user is filtering / searching notes.
+     * 
+     * @returns `true` if either search phrase or search tags are present 
+     */
+    function isSearchingNotes(): boolean {
+        return !isBlank(getNoteSearchPhrase()) || getNoteSearchTags().size > 0;
+    }
+
+    /**
+     * Indicates that user has at least one unsaved note.
+     * 
+     * @returns `true` if at least one edited note exists
+     */
+    function isEditingNotes(): boolean {
+        return !!editedNoteEntities.length && isLoggedIn;
+    }
+
+    function hasNoSavedNotes(): boolean {
+        return (!notesUseQueryResult.data.results.length && !isSearchingNotes()) || !isLoggedIn ;
+    }
+    
+    function getNoteSearchTitle(): string {
+        const noNotesMessage = "No saved notes yet...";
+        const isEditingMessage = "save your pending changes";
+
+        if (isEditingNotes())
+            return `Please ${isEditingMessage} first.`;
+
+        if (hasNoSavedNotes())
+            return `${noNotesMessage}`;
+
+        return "Search notes (Ctrl + Shift + F)";
+    }
 
     return (
         <StartPageContentContext.Provider value={context}>
@@ -186,11 +259,10 @@ export default function StartPageContent({...props}: Props) {
                         id="StartPage"
                         className="fullWidth" 
                         placeHolder="Search notes..." 
-                        title="Search notes (Ctrl + Shift + F)"
+                        title={getNoteSearchTitle()}
                         ref={searchInputRef}
-                        disabled={!notesUseQueryResult.data.results.length && isBlank(getNoteSearchPhrase())}
+                        disabled={isNoteSearchDisabled}
                         onChange={handleSearchValueChange}
-                        onKeyDown={handleSearchKeyDown}
                         onXIconClick={handleSearchXIconClick}
                         _focus={{borderColor: "var(--accentColor)"}}
                         _searchIcon={{color: "var(--matteBlackLighter)"}}
@@ -199,7 +271,7 @@ export default function StartPageContent({...props}: Props) {
 
                 <Flex className="mb-4" horizontalAlign="right">
                     <SaveAllNotesButton className="mt-2" disabled={!editedNoteEntities.length && isLoggedIn} rendered={notesUseQueryResult.data.results.length > 1} />
-                    <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-2 mt-2`} />
+                    <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-2 mt-2`} disabled={isAddNewNoteButtonDisabled} />
                 </Flex>
 
                 {notes}
@@ -232,5 +304,7 @@ export const StartPageContentContext = createContext({
 
     setIsFocusFirstNote: (focus: boolean) => {},
 
-    createNoteByNoteEntity: (noteEntity: NoteEntity, focusOnRender = false) => {return <></>}
+    createNoteByNoteEntity: (noteEntity: NoteEntity, focusOnRender = false) => {return <></>},
+    isSearchingNotes: () => false as boolean,
+    isEditingNotes: () => false as boolean
 })

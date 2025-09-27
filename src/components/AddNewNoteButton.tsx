@@ -1,45 +1,33 @@
-import React, { MouseEvent, useContext, useEffect, useState } from "react";
+import React, { MouseEvent, useContext } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";
+import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { isResponseError } from "../helpers/fetchUtils";
+import { AppContext } from "./App";
 import { AppFetchContext } from "./AppFetchContextProvider";
 import Button from "./helpers/Button";
 import { StartPageContentContext } from "./routes/startPageContainer/StartPageContent";
-import { AppContext } from "./App";
-import { NoteEntityService } from "../abstract/services/NoteEntityService";
 
 
 interface Props extends HelperProps {
 
 }
 
-
 /**
  * @since 0.0.1
  */
 export default function AddNewNoteButton({onClick, ...props}: Props) {
-
-    const [isDisabled, setIsDisabled] = useState(props.disabled);
-
     const { toast } = useContext(AppContext);
     const { editedNoteEntities, setEditedNoteEntities, isLoggedIn, fetchSaveNoteEntity, notesUseQueryResult } = useContext(AppFetchContext);
-    const { setIsFocusFirstNote } = useContext(StartPageContentContext);
+    const { setIsFocusFirstNote, isEditingNotes, isSearchingNotes } = useContext(StartPageContentContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteButton", true);
-
-
-    useEffect(() => {
-        setIsDisabled((isLoggedIn && !!editedNoteEntities.length) || props.disabled);
-
-    }, [editedNoteEntities, isLoggedIn, props.disabled]);
-
 
     /**
      * Prepend a new ```note``` to both ```editedNoteEntities``` and ```notes``` and save it. Dont add if there's unsaved notes.
      */
     async function prependNote(): Promise<void> {
-
         if (editedNoteEntities.length && isLoggedIn) {
             toast("Add new note", "Please save your pending changes before adding a new note", "warn", 8000);
             return;
@@ -65,10 +53,8 @@ export default function AddNewNoteButton({onClick, ...props}: Props) {
         setIsFocusFirstNote(true);
     }
 
-
     async function handleClick(event: MouseEvent): Promise<void> {
-
-        if (isDisabled)
+        if (props.disabled)
             return;
 
         if (onClick)
@@ -77,14 +63,28 @@ export default function AddNewNoteButton({onClick, ...props}: Props) {
         await prependNote();
     }
 
+    function getTitle(): string {
+        const isSearchingMessage = "clear all search filters";
+        const isEditingMessage = "save your pending changes";
+
+        if (isEditingNotes() && isSearchingNotes())
+            return `Please ${isEditingMessage} first and ${isSearchingMessage}.`;
+
+        if (isEditingNotes())
+            return `Please ${isEditingMessage} first.`;
+
+        if (isSearchingNotes())
+            return `Please ${isSearchingMessage} first.`;
+
+        return 'Add a new note';
+    }
 
     return (
         <Button
             id={id} 
             className={className + " hover"}
             style={style}
-            disabled={isDisabled}
-            title={`${isDisabled ? 'Please save your pending changes first' : 'Add a new note'}`}
+            title={getTitle()}
             onClickPromise={handleClick}
             {...otherProps}
         >

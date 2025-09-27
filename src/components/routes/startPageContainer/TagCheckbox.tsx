@@ -7,6 +7,7 @@ import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextProvider";
 import Checkbox from "../../helpers/Checkbox";
 import { useHasComponentMounted } from './../../../hooks/useHasComponentMounted';
+import { useLocation } from "react-router-dom";
 
 
 interface Props extends HelperProps {
@@ -23,18 +24,19 @@ export default function TagCheckbox({tagEntity, ...props}: Props) {
 
     const [isSelected, setIsSelected] = useState(false);
 
-    const { notifyUrlQueryParamsChange } = useContext(AppContext);
     const { setNoteSearchTags, getNoteSearchTags, isLoggedIn } = useContext(AppFetchContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagCheckbox");
 
     const hasComponentMounted = useHasComponentMounted();
 
+    const location = useLocation();
+
 
     useEffect(() => {
         setIsSelected(getNoteSearchTags().has(tagEntity.name))
 
-    }, [notifyUrlQueryParamsChange]);
+    }, [location]);
 
 
     useEffect(() => {
