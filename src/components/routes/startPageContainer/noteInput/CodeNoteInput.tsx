@@ -361,7 +361,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
      * @returns the most outer container (a ```<section>```) of the monaco editor. The ```editorRef``` is somewhere deeper inside
      */
     function getOuterEditorContainer(): HTMLElement | null {
-
         if (!componentRef.current)
             return null;
 
@@ -413,6 +412,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         // center
         defaultCodeNoteInput.style.left = "5vw";
         editor.style.width = "100%";
+        editor.style.maxHeight = "unset";
         updateFullEditorWidth();
         
         animateAndCommit(
@@ -425,9 +425,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         editorRef.current!.focus();
     }
 
-
     function deactivateFullScreenStyles(): void {
-
         const editor = getOuterEditorContainer()!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef!.current!
         
@@ -442,6 +440,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         
         defaultCodeNoteInput.style.left = "auto";
         editor.style.height = editorHeight + "px";
+        editor.style.maxHeight = getCssConstant("noteInputMaxHeight");
         editor.style.width = (isShowNoteInputSettings ? editorWidth : fullEditorWidth) + "px";
 
         // animate to start pos

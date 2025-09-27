@@ -39,6 +39,7 @@
         section {
             background-color: var(--matteBlack);
             color: white;
+            max-height: var(--noteInputMaxHeight);
             
             .vsCodeEditor {
                 margin: 3px 0;

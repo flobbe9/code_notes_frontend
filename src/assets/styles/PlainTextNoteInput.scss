@@ -43,7 +43,7 @@
             color: white;
             font-family: roundFont;
             height: 100%;
-            max-height: 20vh;
+            max-height: var(--noteInputMaxHeight);
             overflow: auto;
             padding: 8px var(--noteInputPaddingX);
             white-space: pre-wrap;

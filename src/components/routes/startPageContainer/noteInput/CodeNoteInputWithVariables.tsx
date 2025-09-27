@@ -612,7 +612,7 @@ export default function CodeNoteInputWithVariables({
         
         defaultCodeNoteInput.style.left = "auto";
         inputDivContainer.style.height = "100%";
-        inputDiv.style.maxHeight = "var(--codeNoteInputWithVariablesMinHeight)";
+        inputDiv.style.maxHeight = "var(--noteInputMaxHeight)";
 
         // animate to start pos
         animateAndCommit(

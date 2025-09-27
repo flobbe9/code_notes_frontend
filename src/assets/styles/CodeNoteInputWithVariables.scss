@@ -2,7 +2,6 @@
 
 
 :root {
-    --codeNoteInputWithVariablesMinHeight: 20vh;
     --variableInputFontFamily: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --variableInputFontSize: 1em;
     --variableInputPaddingLeftRight: 0px;
@@ -60,7 +59,7 @@
             line-height: 1.6em;
             height: 100%;
             margin: 0;
-            max-height: var(--codeNoteInputWithVariablesMinHeight);
+            max-height: var(--noteInputMaxHeight);
             min-height: 41px;
             overflow: auto;
             padding: 10px var(--noteInputPaddingX);
