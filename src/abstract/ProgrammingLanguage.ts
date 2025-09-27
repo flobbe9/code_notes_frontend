@@ -1095,7 +1095,22 @@ export const CODE_BLOCK_WITH_VARIABLES_LANGUAGES: ProgrammingLanguage[] = [
         ]
     },
     {
-        name: "HTML, XML",
+        name: "HTML",
+        aliases: [
+            "xml",
+            "html",
+            "xhtml",
+            "rss",
+            "atom",
+            "xjb",
+            "xsd",
+            "xsl",
+            "plist",
+            "svg"
+        ]
+    },
+    {
+        name: "XML",
         aliases: [
             "xml",
             "html",

@@ -102,8 +102,7 @@ export default function CodeNoteInputWithVariables({
      * @returns highlighted and then sanitized html string (using {@link DEFAULT_HTML_SANTIZER_OPTIONS})
      */
     function highlightAndSanitizeDefault(text: string): string {
-
-        let highlightedText: string;
+        let highlightedText = text;
         if (isAutoDetectLanguage())
             highlightedText= hljs.highlightAuto(text).value;
 
@@ -122,7 +121,6 @@ export default function CodeNoteInputWithVariables({
      * @return the highlighted inner html
      */
     async function highlightInputDivContent(): Promise<string> {
-
         setIsNoteInputOverlayVisible(true);
 
         const highlightPromise = await new Promise<string>((res, rej) => {
@@ -144,6 +142,8 @@ export default function CodeNoteInputWithVariables({
 
                 if (!isBlank(firstLine))
                     highlightedHtmlString += "</div>";
+
+                logDebug("first line", firstLine)
 
                 // iterate lines after first line
                 Array.from(inputChildren).forEach(inputChild => {
@@ -246,7 +246,6 @@ export default function CodeNoteInputWithVariables({
         return !isBlank(str) && str.replaceAll("\n", "\\n").match(VARIABLE_INPUT_SEQUENCE_REGEX) !== null;
     }
 
-
     /**
      * Calls {@link highlightAndSanitizeWithVariableInput()} until all ```$[[]]``` sequences are replaced.
      * 
@@ -254,23 +253,23 @@ export default function CodeNoteInputWithVariables({
      * @returns the highlighted and sanitized html string possibly with ```<input>```s
      */
     function highlightAndSanitizeWithVariableInputs(text: string): string {
-
         // dont alter param
         let alteredText = text;
 
         // result string
-        let highlightedtext = "";
+        let highlightedText = "";
 
         while (alteredText.includes(VARIABLE_INPUT_START_SEQUENCE) && alteredText.includes(VARIABLE_INPUT_END_SEQUENCE)) {
-            highlightedtext += highlightAndSanitizeWithVariableInput(alteredText);
+            // highlight until first sequence start
+            highlightedText += highlightAndSanitizeWithVariableInput(alteredText);
 
+            // highlight anything after sequence
             alteredText = alteredText.substring(alteredText.indexOf(VARIABLE_INPUT_END_SEQUENCE) + 2);
         }
 
         // consider text after last "]]"
-        return highlightedtext + alteredText;
+        return highlightedText + highlightAndSanitizeDefault(alteredText);
     }
-
 
     /**
      * Highlight and sanitize given string until the first occurence of a ```$[[``` string (not considering if it's closed).
@@ -282,13 +281,11 @@ export default function CodeNoteInputWithVariables({
      * @returns highlighted html and possibly an ```<input>``` replacement
      */
     function highlightAndSanitizeWithVariableInput(innerHtml: string): string {
-
         const openingSequenceStartIndex = innerHtml.indexOf(VARIABLE_INPUT_START_SEQUENCE);
         const textBeforeSequence = innerHtml.substring(0, openingSequenceStartIndex);
 
         return highlightAndSanitizeDefault(textBeforeSequence) + parseVariableInputSequenceToVariableInput(innerHtml)
     }
-
 
     /**
      * Get the ```<input>``` tag that will replace the ```$[[]]``` sequence.
@@ -297,7 +294,6 @@ export default function CodeNoteInputWithVariables({
      * @returns an ```<input>``` passing the value of the ```$[[]]``` sequence as placeholder (or "" if ```$[[]]``` not found)
      */
     function parseVariableInputSequenceToVariableInput(innerHtml: string): string {
-
         const openingSequenceStartIndex = innerHtml.indexOf(VARIABLE_INPUT_START_SEQUENCE);
         const openingSequenceEndIndex = innerHtml.indexOf(VARIABLE_INPUT_END_SEQUENCE);
 
@@ -310,13 +306,11 @@ export default function CodeNoteInputWithVariables({
         return getDefaultVariableInput(placeholder, getDefaultVariableInputWidth(placeholder));
     }
 
-
     /**
      * @param placeholder of input. Default is {@link VARIABLE_INPUT_DEFAULT_PLACEHOLDER}
      * @returns the width of a variableInput as if the ```placeholder``` was it's value and the width was 'fit-content'
      */
     function getDefaultVariableInputWidth(placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER): number {
-        
         const placeholderWidth = getTextWidth(placeholder, getCssConstant("variableInputFontSize"), getCssConstant("variableInputFontFamily"));
         const variableInputPadding = getCSSValueAsNumber(getCssConstant("variableInputPaddingLeftRight"), 2) * 2;
         const variableInputBorderWidth = getCSSValueAsNumber(getCssConstant("variableInputBorderWidth"), 2) * 2;
@@ -324,25 +318,21 @@ export default function CodeNoteInputWithVariables({
         return placeholderWidth + variableInputPadding + variableInputBorderWidth;
     }
     
-    
     /**
      * Appends a default ```<input>``` to the end of the inputDiv.
      */
     function appendVariableInput(): void {
-
         const inputDiv = inputDivRef.current!;
         const inputDivChildDivs = inputDiv.querySelectorAll("div");
         const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.item(inputDivChildDivs.length - 1) : inputDiv;
 
         lastChildDiv.innerHTML = (lastChildDiv.innerHTML + getDefaultVariableInput(VARIABLE_INPUT_DEFAULT_PLACEHOLDER, getDefaultVariableInputWidth()));
     }
-
         
     /**
      * Inserts a default ```$[[VARIABL_NAME]]``` sequence at current cursor pos.
      */
     function insertVariableInputSequence(): void {
-
         const variableInputSequence = VARIABLE_INPUT_START_SEQUENCE + VARIABLE_INPUT_DEFAULT_PLACEHOLDER + VARIABLE_INPUT_END_SEQUENCE;
         
         let currentCursorIndex = cursorPos[0];
@@ -388,7 +378,6 @@ export default function CodeNoteInputWithVariables({
         );
     }
 
-
     /**
      * Replace all ```<input>``` with "$[[]]" sequence and placeholder attribute key with "". Assuming that all other attributes have been 
      * removed already.
@@ -397,7 +386,6 @@ export default function CodeNoteInputWithVariables({
      * @returns given ```html``` with replacments
      */
     function parseVariableInputToVariableInputSequence(html: string): string {
-
         let alteredHtml = html;
 
         alteredHtml = alteredHtml.replaceAll("<input ", VARIABLE_INPUT_START_SEQUENCE);
@@ -407,25 +395,21 @@ export default function CodeNoteInputWithVariables({
         return alteredHtml;
     }
 
-
     /**
      * @param dirtyHtml html string to sanitize
      * @returns html string with only ```div```, ```br``` and ```input``` tags and only ```placeholder``` attributes
      */
     function sanitizeForInputDiv(dirtyHtml: string): string {
-
         return sanitize(dirtyHtml, {
             allowedTags: ["div", "br", "input"],
             allowedAttributes: {"input": ["placeholder"]}
         }); 
     }
     
-
     /**
      * Sanitize and update clipboard text (if allowed) in order to paste plain text into inputs instead of styled html.
      */
     async function sanitizeAndUpdateClipboardText(): Promise<void> {
-
         // get clipboard text
         let clipboardText = await getClipboardText();
 
@@ -441,7 +425,6 @@ export default function CodeNoteInputWithVariables({
         setClipboardText(clipboardText);
     }
 
-
     /**
      * Copy content of inputDiv to clipboard considering the variableInput values, line breaks as well as spaces.
      * 
@@ -449,7 +432,6 @@ export default function CodeNoteInputWithVariables({
      * inside a ```<pre>``` tag will keep the line breaks and spaces.
      */
     async function copyInputDivContentToClipboard(): Promise<void> {
-
         const inputDiv = inputDivRef.current!;
         let inputDivHtml = inputDiv.innerHTML;
 
@@ -479,12 +461,10 @@ export default function CodeNoteInputWithVariables({
         hiddenDiv.remove();
     }
 
-
     /**
      * @returns list of values of variableInputs inside inputDiv
      */
     function getVariableInputValues(): string[] {
-
         let values: string[] = [];
 
         inputDivRef.current!.querySelectorAll("input")
@@ -497,12 +477,10 @@ export default function CodeNoteInputWithVariables({
         return values;
     }
 
-
     /**
      * Set all noteInputEntity fields for this noteInput.
      */
     function updateNoteInputEntity(): void {
-
         // value
         noteInputEntity.value = inputDivRef.current!.innerHTML;
 
@@ -510,16 +488,12 @@ export default function CodeNoteInputWithVariables({
         noteInputEntity.programmingLanguage = codeNoteInputWithVariablesLanguage;
     }
 
-
     async function handleFocus(event: FocusEvent): Promise<void> {
-
         if (event.target.className !== "variableInput")
             await unHighlightInputDivContent();
     }
 
-
     async function handleBlurCapture(event): Promise<void> {
-
         if (disabled)
             return;
 
