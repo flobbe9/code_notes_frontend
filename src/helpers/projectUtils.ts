@@ -46,24 +46,14 @@ export function isContentEditableDiv(element: HTMLElement): boolean {
  * @param direction to move the cursor to when unselecting. Default is 'left'
  */
 export function unselectContentEditableDivText(inputElement: HTMLDivElement, direction: "left" | "right" = "left"): void {
-
     if (!isContentEditableDiv(inputElement))
         return;
 
-    const selection = document.getSelection();
-    if (!selection)
+    if (!isTextSelected())
         return;
-
-    const selectionStart = selection.anchorOffset;
-    const selectionEnd = selection.focusOffset;
-
-    // case: no selected text
-    if (selectionStart === selectionEnd)
-        return;
-
-    selection.modify("move", direction, "character");
+    
+    document.getSelection()!.modify("move", direction, "character");
 }
-
 
 /**
  * Move cursor of a text input element or a content editable div. If ```start === end``` the cursor will be shifted normally to given position.
@@ -74,7 +64,6 @@ export function unselectContentEditableDivText(inputElement: HTMLDivElement, dir
  * @param end index of selection end, default is ```start``` param
  */
 export function moveCursor(inputElement: HTMLInputElement | HTMLDivElement, start = 0, end = start): void {
-
     if (!inputElement)
         return;
 
@@ -199,7 +188,6 @@ export function getCursorLineNum(inputElement: HTMLTextAreaElement | HTMLDivElem
  * @returns 
  */
 function isCursorLineEmptyInContentEditableDiv(): boolean {
-
     const documentSelection = document.getSelection();
     if (!documentSelection)
         return false;
@@ -390,4 +378,16 @@ export function handleRememberMyChoice(key: RememberMyChoiceKey, confirmCallback
 export function getHeadTitleText(pageTitle?: string): string {
 
     return isBlank(pageTitle) ? `${APP_NAME_PRETTY}` : `${pageTitle} | ${APP_NAME_PRETTY}`; 
+}
+
+/**
+ * @returns `true` if some text somewhere in the document is user selected
+ */
+export function isTextSelected(): boolean {
+    const currentSelection = document.getSelection();
+
+    if (!currentSelection)
+        return false;
+
+    return currentSelection.anchorOffset !== currentSelection.focusOffset;
 }

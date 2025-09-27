@@ -1,12 +1,12 @@
-import React, { ClipboardEvent, DragEvent, forwardRef, KeyboardEvent, MouseEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { ClipboardEvent, DragEvent, forwardRef, Fragment, KeyboardEvent, MouseEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import "../../assets/styles/ContentEditableDiv.scss";
+import { getCursorIndex, getCursorLineNum } from "../../helpers/projectUtils";
 import { getClipboardText, includesIgnoreCase, isBlank, isEmpty, isEventKeyTakingUpSpace } from "../../helpers/utils";
+import { AppContext } from "../App";
 import HelperDiv from "./HelperDiv";
 import HiddenInput from "./HiddenInput";
-import { getCursorIndex, getCursorLineNum } from "../../helpers/projectUtils";
-import { AppContext } from "../App";
 
 
 interface Props extends HelperProps {
@@ -146,7 +146,6 @@ export default forwardRef(function ContentEditableDiv(
 
 
     function handleKeyUp(event: KeyboardEvent): void {
-
         if (disabled)
             return;
 
@@ -156,13 +155,12 @@ export default forwardRef(function ContentEditableDiv(
         if (isInputDivEmpty(false))
             appendPlaceholderInputToInputDiv();
 
-        if (!isControlKeyPressed(["Shift", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]))
+        if (!isControlKeyPressed(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]))
             updateCursorPosState();
     }
 
 
     function handlePaste(event: ClipboardEvent): void {
-
         if (disabled) {
             event.preventDefault();
             return;
@@ -179,7 +177,6 @@ export default forwardRef(function ContentEditableDiv(
     
 
     function handleMouseDown(event: MouseEvent): void {
-
         if (disabled)
             return;
 
@@ -255,7 +252,6 @@ export default forwardRef(function ContentEditableDiv(
 
         setTimeout(updateCursorPosState, 1); // wait for text to be cut i guess
     }
-    
 
     /**
      * Get the current cursor position in this input. Dont update state if input is not selected.
@@ -263,7 +259,6 @@ export default forwardRef(function ContentEditableDiv(
      * Should one of the two position values be -1, that value wont be altered
      */
     function updateCursorPosState(dontUpdateLineNum = false): void {
-
         if (componentRef.current! !== document.activeElement)
             return;
 
@@ -289,9 +284,8 @@ export default forwardRef(function ContentEditableDiv(
             setCursorPosProps([cursorIndex, cursorLineNum]);
     }
 
-
     return (
-        <>
+        <Fragment>
             <HelperDiv 
                 id={id} 
                 className={className}
@@ -321,6 +315,6 @@ export default forwardRef(function ContentEditableDiv(
 
             {/* for deviating the focus if disabled */}
             <HiddenInput type="radio" ref={hiddencomponentRef} tabIndex={-1} />
-        </>
+        </Fragment>
     )
 })

@@ -8,8 +8,8 @@ import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInputWithVariables.scss";
 import "../../../../assets/styles/highlightJs/vs.css";
 import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
-import { cleanUpSpecialChars, getContentEditableDivLineElements, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
-import { animateAndCommit, getClipboardText, getCssConstant, getCSSValueAsNumber, insertString, isBlank, isEventKeyTakingUpSpace, log, logWarn, setClipboardText } from "../../../../helpers/utils";
+import { cleanUpSpecialChars, getContentEditableDivLineElements, getTextWidth, isTextSelected, moveCursor } from "../../../../helpers/projectUtils";
+import { animateAndCommit, getClipboardText, getCssConstant, getCSSValueAsNumber, insertString, isBlank, isEventKeyTakingUpSpace, logDebug, logWarn, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from "../../../App";
 import Button from "../../../helpers/Button";
@@ -533,7 +533,6 @@ export default function CodeNoteInputWithVariables({
     
 
     async function handleKeyDownCapture(event: KeyboardEvent): Promise<void> {
-
         const keyName = event.key;
 
         if (isKeyPressed("Control"))
@@ -545,34 +544,33 @@ export default function CodeNoteInputWithVariables({
             updateNoteEdited();
         }
 
-        if (isEventKeyTakingUpSpace(keyName, true, true) && !(event.target as HTMLElement).classList.contains("variableInput"))
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed() && !isVariableInputFocused())
             updateNoteEdited();
     }
     
-
-    function handleCut(): void {
-        
-        updateNoteEdited();
+    async function handleCut(): Promise<void> {
+        if (isTextSelected())
+            updateNoteEdited();
     }
 
 
-    function handlePaste(): void {
-
-        updateNoteEdited();
+    async function handlePaste(): Promise<void> {
+        if (!isVariableInputFocused())
+            updateNoteEdited();
     }
-
  
     function handleKeyUp(event: KeyboardEvent): void {
-
         const keyName = event.key;
 
         if (keyName === "Backspace" || keyName === "Delete")
             cleanUpEmptyInputDiv();
     }
 
+    function isVariableInputFocused(): boolean {
+        return !!document.activeElement && document.activeElement.classList.contains("variableInput");
+    }
 
     function cleanUpEmptyInputDiv(): void {
-
         const inputDiv = inputDivRef.current!;
         const inputBreaks = inputDiv.querySelectorAll("br");
         
@@ -582,9 +580,7 @@ export default function CodeNoteInputWithVariables({
             inputDiv.innerHTML = "";
     }
 
-
     function handleInputDivContainerClick(event: MouseEvent): void {
-
         const inputDiv = inputDivRef.current!;
 
         // case: not focuesd yet and not clicking a variableInput
@@ -593,17 +589,13 @@ export default function CodeNoteInputWithVariables({
             inputDiv.focus();
     }
 
-
     async function handleCopyClick(): Promise<void> {
-
         animateCopyIcon();
 
         await copyInputDivContentToClipboard();
     }
 
-
     function activateFullScreenStyles(): void {
-
         const inputDiv = inputDivRef.current!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
         const inputDivContainer = componentRef.current!.querySelector(".inputDivContainer") as HTMLElement;
@@ -633,7 +625,6 @@ export default function CodeNoteInputWithVariables({
 
 
     function deactivateFullScreenStyles(): void {
-
         const inputDiv = inputDivRef.current!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
         const inputDivContainer = componentRef.current!.querySelector(".inputDivContainer") as HTMLElement;

@@ -6,8 +6,8 @@ import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../../../abstract/HelperProps";
 import "../../../../assets/styles/PlainTextNoteInput.scss";
 import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, CODE_SNIPPET_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
-import { getContentEditableDivLineElements, moveCursor } from '../../../../helpers/projectUtils';
-import { animateAndCommit, getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, logWarn, setClipboardText } from "../../../../helpers/utils";
+import { getContentEditableDivLineElements, isTextSelected, moveCursor } from '../../../../helpers/projectUtils';
+import { animateAndCommit, getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, logDebug, logWarn, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from '../../../App';
 import Button from "../../../helpers/Button";
@@ -19,7 +19,6 @@ import { NoteContext } from './Note';
 
 
 interface Props extends HelperProps {
-
     noteInputEntity: NoteInputEntity,
 }
 
@@ -40,7 +39,7 @@ export default function PlainTextNoteInput({
     const [cursorPos, setCursorPos] = useState([0, 1]);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
-    const { isKeyPressed } = useContext(AppContext);
+    const { isKeyPressed, isControlKeyPressed } = useContext(AppContext);
     const { updateNoteEdited } = useContext(NoteContext);
     const { 
         isNoteInputOverlayVisible,
@@ -212,9 +211,7 @@ export default function PlainTextNoteInput({
         return cleanHtml;
     }
 
-
     function handleKeyDownCapture(event: KeyboardEvent): void {
-
         const keyName = event.key;
 
         if (keyName === "Control")
@@ -222,14 +219,15 @@ export default function PlainTextNoteInput({
                 
         if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
             event.preventDefault();
-            insertVariableInputSequence();
+            insertCodeSnippetSequence();
             updateNoteEdited();
         }
+        
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed())
+            updateNoteEdited();
     }
 
-
     function handleKeyUp(event: KeyboardEvent): void {
-
         if (disabled)
             return;
 
@@ -241,25 +239,20 @@ export default function PlainTextNoteInput({
         if (keyName === "Backspace" || keyName === "Delete")
             cleanUpEmptyInputDiv();
         
-        if (isEventKeyTakingUpSpace(keyName, true, true))
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed())
             updateNoteEdited();
     }
 
-
     function handleCut(): void {
-        
-        updateNoteEdited();
+        if (isTextSelected())
+            updateNoteEdited();
     }
-
 
     function handlePaste(): void {
-
         updateNoteEdited();
     }
 
-
     function cleanUpEmptyInputDiv(): void {
-
         const inputDiv = inputDivRef.current!;
         const inputBreaks = inputDiv.querySelectorAll("br");
         
@@ -269,17 +262,13 @@ export default function PlainTextNoteInput({
             inputDiv.innerHTML = "";
     }
 
-
     async function handleCopyClick(): Promise<void> {
-
         animateCopyIcon();
 
         setClipboardText(inputDivRef.current!.textContent || "");
     }
 
-
     function activateFullScreenStyles(): void {
-
         const plainTextNoteInput = componentRef.current!;
 
         const appOverlayZIndex = getCssConstant("overlayZIndex");
@@ -302,7 +291,6 @@ export default function PlainTextNoteInput({
 
 
     function deactivateFullScreenStyles(): void {
-
         const plainTextNoteInput = componentRef.current!;
         
         // move up just a little bit
@@ -326,26 +314,22 @@ export default function PlainTextNoteInput({
             }
         )
     }
-
     
     /**
      * Appends a default ```<input>``` to the end of the inputDiv.
      */
     function appendVariableInput(): void {
-
         const inputDiv = inputDivRef.current!;
         const inputDivChildDivs = inputDiv.querySelectorAll("div");
         const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.item(inputDivChildDivs.length - 1) : inputDiv;
 
         lastChildDiv.innerHTML = (lastChildDiv.innerHTML + "<code>code</code>");
     }
-
     
     /**
-     * Inserts a default ```$[[VARIABL_NAME]]``` sequence at current cursor pos.
+     * Inserts a `\`` sequence at current cursor pos.
      */
-    function insertVariableInputSequence(): void {
-
+    function insertCodeSnippetSequence(): void {
         const variableInputSequence = CODE_SNIPPET_SEQUENCE + CODE_SNIPPET_SEQUENCE;
         
         let currentCursorIndex = cursorPos[0];
@@ -365,7 +349,7 @@ export default function PlainTextNoteInput({
         }
 
         // case: is first line, not a div
-        if (!currentInputDiv) {
+        if (!currentInputDiv)
             inputDivRef.current!.innerHTML = insertString(
                 inputDivRef.current!.innerHTML,
                 variableInputSequence, 
@@ -373,29 +357,25 @@ export default function PlainTextNoteInput({
             );
 
         // case: is empty line
-        } else if (!!currentInputDiv.querySelector("br")) 
+        else if (!!currentInputDiv.querySelector("br"))
             currentInputDiv.innerHTML = variableInputSequence;
 
-        else {
+        else
             currentInputDiv.innerText = insertString(
                 currentInputDiv.innerText,
                 variableInputSequence, 
                 currentCursorIndex
             );
-        }
 
         // select placeholder sequence
-        moveCursor(currentInputDiv || inputDivRef.current!, currentCursorIndex + 3);
+        moveCursor(currentInputDiv || inputDivRef.current!, currentCursorIndex + CODE_SNIPPET_SEQUENCE.length);
     }
-    
 
     function handleAppendCodeSnippet(): void {
-
         appendVariableInput();
         updateNoteInputEntity();
         updateNoteEdited();
     }
-
 
     return (
         <Flex 

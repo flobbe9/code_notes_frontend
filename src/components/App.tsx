@@ -30,7 +30,6 @@ import StartPageContainer from './routes/startPageContainer/StartPageContainer';
  * @since 0.0.1
  */
 export default function App() {
-
     const [toastSummary, setToastSummary] = useState("");
     const [toastMessage, setToastMessage] = useState("");
     const [toastSevirity, setToastSevirity] = useState<ToastSevirity>("info");
@@ -195,12 +194,10 @@ export default function App() {
         if (!isNumberFalsy(toastScreenTime))
             setToastScreenTimeTimeout(setTimeout(() => moveToast(true), toastScreenTime));
     }
-    
 
     function handleWindowResize(event): void {
         setWindowSize([window.innerWidth, window.innerHeight]);
     }
-    
 
     /**
      * Col grid:
@@ -236,7 +233,6 @@ export default function App() {
 
 
     function handleWindowKeyDown(event: KeyboardEvent): void {
-
         const key = event.key;
 
         handleKeyDownUseKeyPress(event);
@@ -249,7 +245,6 @@ export default function App() {
 
 
     function handleWindowKeyUp(event): void {
-
         handleKeyUpUseKeyPress(event);
     }
 
@@ -260,7 +255,6 @@ export default function App() {
      * @param overlayContent the content to put below the pending icon
      */
     function showPendingOverlay(overlayContent?: ReactNode): void {
-
         setIsAppOverlayVisible(true);
         setAppOverlayContent(
             <>
@@ -277,7 +271,6 @@ export default function App() {
      * Hides the app overlay and resets all overlay states to default.
      */
     function hidePendingOverlay(): void {
-
         setIsAppOverlayVisible(false);
         setAppOverlayContent(<></>);
         setIsAppOverlayHideOnClick(true);
@@ -291,7 +284,6 @@ export default function App() {
      * @param popupContent will only update state if this is not ```undefined```
      */
     function showPopup(popupContent?: ReactNode | undefined): void {
-
         const { setIsPopupVisible, setPopupContent, isBottomMostPopup } = getPopupAfterTopMostVisiblePopup();
 
         if (popupContent !== undefined)
@@ -308,7 +300,6 @@ export default function App() {
      * Hide topmost visible popup and app overlay.
      */
     function hidePopup(): void {
-
         const { setIsPopupVisible, isBottomMostPopup } = getTopMostVisiblePopup();
 
         setIsPopupVisible(false);
