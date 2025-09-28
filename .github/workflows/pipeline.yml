@@ -75,7 +75,9 @@ jobs:
     needs: push_to_DockerHub
 
     steps:
-      # connect to vpn
+        # connect to vpn
+      - name: Checkout repository 
+        uses: actions/checkout@v4
       - name: Install OpenVPN
         run: |
             sudo apt update
