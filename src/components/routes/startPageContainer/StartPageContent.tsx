@@ -91,6 +91,10 @@ export default function StartPageContent({...props}: Props) {
     }, [editedNoteEntities, isLoggedIn, location, notesUseQueryResult.data]);
 
     useEffect(() => {
+        handleLocationChange();
+    }, [location]);
+
+    useEffect(() => {
         setIsFocusFirstNote(false);
     }, [notesUseQueryResult.data, editedNoteEntities]);
 
@@ -137,6 +141,16 @@ export default function StartPageContent({...props}: Props) {
     function createNoteByNoteEntity(noteEntity: NoteEntity, focusOnRender = false): JSX.Element {
         const key = noteEntity.id ?? getRandomString();
         return <Note key={key} propsKey={String(key)} focusOnRender={focusOnRender} /> 
+    }
+
+    function handleLocationChange(): void {
+        let searchPhrase = getNoteSearchPhrase();
+        if (isBlank(searchPhrase))
+            searchPhrase = "";
+
+        // update searchbar value using url query params
+        if (searchInputRef.current)
+            searchInputRef.current.value = searchPhrase!;        
     }
 
     function handleSearchValueChange(event: ChangeEvent): void {
