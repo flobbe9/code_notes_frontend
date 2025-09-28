@@ -14,11 +14,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository 
+      - name: Checkout repository
         uses: actions/checkout@v4
       - run: npm i
+      - run: npx tsc -b
       - run: npm run build
         env: 
+            # don't fail on build warnings
             CI: ""
 
   push_to_DockerHub:

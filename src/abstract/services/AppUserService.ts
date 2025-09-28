@@ -58,7 +58,7 @@ export class AppUserService {
 
         this.SENSITIVE_FIELDS.forEach(prop => {
             if (appUserEntity[prop] && typeof appUserEntity[prop] === "string")
-                appUserEntity[prop.toString()] = cryptoHelper.encrypt(appUserEntity[prop]);
+                appUserEntity[prop.toString()] = cryptoHelper.encrypt(appUserEntity[prop] as string);
         });
 
         return appUserEntity;

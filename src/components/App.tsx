@@ -329,7 +329,8 @@ export default function App() {
     } {
 
         // case: popup2 is visible
-        if (document.querySelector("#Popup2")?.computedStyleMap().get("display")?.toString() !== "none")
+        const popup2 = document.querySelector("#Popup2");
+        if (popup2 && window.getComputedStyle(popup2).getPropertyValue("display") !== "none")
             return { 
                 popupContent: popup2Content,
                 setPopupContent: setPopup2Content,
@@ -358,9 +359,9 @@ export default function App() {
         setIsPopupVisible: (isVisible: boolean) => void,
         isBottomMostPopup: boolean
     } {
-
+        const popup1 = document.querySelector("#Popup1");
         // case: popup 1 is visible
-        if (document.querySelector("#Popup1")?.computedStyleMap().get("display")?.toString() === "none")
+        if (popup1 && getComputedStyle(popup1).getPropertyValue("display") === "none")
             return {
                 popupContent,
                 setPopupContent,
