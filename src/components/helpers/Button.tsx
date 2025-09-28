@@ -3,7 +3,6 @@ import { ButtonProps } from "../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import "../../assets/styles/Button.scss";
 import { isObjectFalsy } from "../../helpers/utils";
-import { useInitialStyles } from "../../hooks/useInitialStyles";
 
 
 interface Props extends ButtonProps {
@@ -43,18 +42,12 @@ export default forwardRef(function Button({
     const componentRef = useRef<HTMLButtonElement>(null);
 
     useImperativeHandle(ref, () => componentRef.current!, []);
-
     
-    // set min width for promise buttons
-    useInitialStyles(componentRef.current, (onClickPromise ? [["min-width", "width"], ["min-height", "height"]] : []), 200);
-
-
     useEffect(() => {
         if (onRender) 
             onRender();
 
     }, []);
-
 
     useEffect(() => {
         setIsDisabled(disabled);
@@ -120,7 +113,6 @@ export default forwardRef(function Button({
 
 
     async function handleClickPromise(event): Promise<any> {
-
         if (disabled)
             return;
 
@@ -128,11 +120,21 @@ export default forwardRef(function Button({
         if (!onClickPromise)
             return;
 
+        const currentWidth = getComputedStyle(componentRef.current!).getPropertyValue("width");
+        const currentMinWidth = getComputedStyle(componentRef.current!).getPropertyValue("min-width");
+        const currentHeight = getComputedStyle(componentRef.current!).getPropertyValue("height");
+        const currentMinHeight = getComputedStyle(componentRef.current!).getPropertyValue("min-height");
+        
+        // make sure to maintain button dimensions while spinner is beeing displayed
+        componentRef.current!.style.minWidth = currentWidth;
+        componentRef.current!.style.minHeight = currentHeight;
         setIsDisabled(true);
         setIsAwaitingPromise(true);
         
         await onClickPromise(event);
 
+        componentRef.current!.style.minWidth = currentMinWidth;
+        componentRef.current!.style.minHeight = currentMinHeight;
         setIsAwaitingPromise(false);
         setIsDisabled(false);
     }

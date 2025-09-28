@@ -214,7 +214,6 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
      * @param event 
      */
     async function handleSave(): Promise<void> {
-
         if (!isLoggedIn) {
             showPopup(<Login isPopupContent />);
             return;
@@ -242,7 +241,6 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
 
     function handleDeleteNoteClick(): void {
-
         if (handleRememberMyChoice("deleteNote", handleDeleteNote))
             return;
 
@@ -259,12 +257,10 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         );
     }
 
-
     /**
      * Fetch delete notes and update both ```editedNoteEntities``` and ```notes``` state.
      */
     async function handleDeleteNote(): Promise<void> {
-
         if (!appUserEntity)
             return;
         
@@ -300,14 +296,12 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         updateNoteEdited(false);
     }
 
-
     /**
      * Mark ```noteEntity``` as edited or saved. Wont do anything if ```noteEntity.id``` is falsy.
      * 
      * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```
      */
     function updateNoteEdited(edited = true): void {
-
         // case: propably not rendered yet, or never saved (hence not logged in)
         if (!noteEntity || isNumberFalsy(noteEntity.id))
             return;

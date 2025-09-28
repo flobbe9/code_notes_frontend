@@ -4,7 +4,7 @@ import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultPro
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
 import "../../../assets/styles/StartPageContent.scss";
 import { NOTE_SEARCH_PHRASE_MIN_LENGTH, NOTE_SEARCH_PHRASE_USER_INPUT_DELAY } from "../../../helpers/constants";
-import { getRandomString, isBlank, logDebug } from "../../../helpers/utils";
+import { getRandomString, isBlank } from "../../../helpers/utils";
 import { useCsrfToken } from "../../../hooks/useCsrfToken";
 import AddNewNoteButton from "../../AddNewNoteButton";
 import { AppContext } from "../../App";
@@ -164,8 +164,6 @@ export default function StartPageContent({...props}: Props) {
         // case: not enough search chars
         if (!isBlank(searchPhrase) && searchPhrase.length < NOTE_SEARCH_PHRASE_MIN_LENGTH)
             return;
-
-        logDebug("search", searchPhrase)
 
         // wait for user to finish typing to avoid unnecessary fetch requests
         const timeout = setTimeout(() => {
