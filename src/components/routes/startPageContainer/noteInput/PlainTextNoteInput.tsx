@@ -5,9 +5,9 @@ import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../../../abstract/HelperProps";
 import "../../../../assets/styles/PlainTextNoteInput.scss";
-import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, CODE_SNIPPET_SEQUENCE, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
+import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
 import { getContentEditableDivLineElements, isTextSelected, moveCursor } from '../../../../helpers/projectUtils';
-import { animateAndCommit, getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, logDebug, logWarn, setClipboardText } from "../../../../helpers/utils";
+import { animateAndCommit, getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, logWarn, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from '../../../App';
 import Button from "../../../helpers/Button";
@@ -100,9 +100,8 @@ export default function PlainTextNoteInput({
         noteInputEntity.value = parsedText ?? await parseCodeTextToCodeHtml();
     }
 
-
     /**
-     * Parses inner text of inputDiv replacing with ```"``````"``` with ```<code></code>```. Will consider
+     * Parses inner html of inputDiv replacing text code sequences with html code sequences. Will consider
      * unclosed code sequences.
      * 
      * Wont actually update the inputDiv's inner html.
@@ -110,68 +109,71 @@ export default function PlainTextNoteInput({
      * @returns parsed inner html of inputDiv
      */
     async function parseCodeTextToCodeHtml(): Promise<string> {
-
         setIsNoteInputOverlayVisible(true);
 
-        const parsedText = await new Promise<string>((res, rej) => {
-            setTimeout(() => {
-                const inputDiv = inputDivRef.current!;
-                const inputText = inputDiv.innerHTML;
-                const inputTextArray = inputText.split(CODE_SNIPPET_SEQUENCE);
-            
-                // case: no code noteInputs at all
-                if (inputTextArray.length <= 2) {
-                    res(inputText);
-                    return;
-                }
-                    
-                let inputHtmlString = "";
-            
-                inputTextArray.forEach((text, i) => {
-                    const isEvenIndex = i % 2 === 0;
-            
-                    // case: not inside a code noteInput
-                    if (i === 0 || i === inputTextArray.length - 1 || isEvenIndex)
-                        inputHtmlString += text;
-            
-                    // case: inside a code noteInput
-                    else if (!isEvenIndex)
-                        inputHtmlString += "<code>" + text + "</code>";
-                })
+        const parseCallback = (codeText: string, snippetSequence: string, htmlStartSequence: string, htmlEndSequence: string): string => {
+            const snippetContents = codeText.split(snippetSequence);
+        
+            // case: no code snippets at all
+            if (snippetContents.length <= 2)
+                return codeText;
+                
+            let codeHtml = "";
+        
+            snippetContents.forEach((snippetContent, i) => {
+                const isEvenIndex = i % 2 === 0;
+        
+                // case: not inside a code snippet
+                if (i === 0 || i === snippetContents.length - 1 || isEvenIndex)
+                    codeHtml += snippetContent;
+        
+                // case: inside a code snippet
+                else if (!isEvenIndex)
+                    codeHtml += `${htmlStartSequence}${snippetContent}${htmlEndSequence}`;
+            })
 
-                res(inputHtmlString);
+            return codeHtml;
+        }
+
+        const codeHtml = await new Promise<string>((res, rej) => {
+            setTimeout(() => {
+                let parsed = parseCallback(inputDivRef.current!.innerHTML, CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END);
+                parsed = parseCallback(parsed, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END);
+
+                res(parsed);
             }, 0); // somehow necessary for states to update properly, 0 milliseconds is fine
         });
 
-        // sanitize
-        const sanitizedInputDivValue = sanitize(parsedText, DEFAULT_HTML_SANTIZER_OPTIONS);
+        const sanitizedCodeHtml = sanitize(codeHtml, DEFAULT_HTML_SANTIZER_OPTIONS);
         
         setIsNoteInputOverlayVisible(false);
 
-        return sanitizedInputDivValue;
+        return sanitizedCodeHtml;
     }
 
-
     /**
-     * Parses inner html of inputDiv replacing ```<code></code>``` with ```"``````"```. 
+     * Parses inner html of inputDiv replacing html code sequences with text code sequences.
      * 
      * Wont actually update the inputDiv's inner text.
      * 
      * @returns parsed inner text of inputDiv
      */
     function parseCodeHtmlToCodeText(): string {
-
         const inputDiv = inputDivRef.current!;
         let inputHtml = inputDiv.innerHTML;
 
         let newInputText = inputHtml;
-        newInputText = newInputText.replaceAll("<code>", CODE_SNIPPET_SEQUENCE);
-        newInputText = newInputText.replaceAll("</code>", CODE_SNIPPET_SEQUENCE);
+        // multiline
+        newInputText = newInputText.replaceAll(CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_MULTILINE);
+        newInputText = newInputText.replaceAll(CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END, CODE_SNIPPET_SEQUENCE_MULTILINE);
+
+        // single line
+        newInputText = newInputText.replaceAll(CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE);
+        newInputText = newInputText.replaceAll(CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END, CODE_SNIPPET_SEQUENCE_SINGLELINE);
 
         return newInputText;
     }
         
-
     /**
      * Sanitize clipboard text (if allowed) in order to paste plain text in inputs instead of styled html.
      */
@@ -330,7 +332,7 @@ export default function PlainTextNoteInput({
      * Inserts a `\`` sequence at current cursor pos.
      */
     function insertCodeSnippetSequence(): void {
-        const variableInputSequence = CODE_SNIPPET_SEQUENCE + CODE_SNIPPET_SEQUENCE;
+        const variableInputSequence = CODE_SNIPPET_SEQUENCE_SINGLELINE + CODE_SNIPPET_SEQUENCE_SINGLELINE;
         
         let currentCursorIndex = cursorPos[0];
         let currentCursorLineNum = cursorPos[1];
@@ -368,7 +370,7 @@ export default function PlainTextNoteInput({
             );
 
         // select placeholder sequence
-        moveCursor(currentInputDiv || inputDivRef.current!, currentCursorIndex + CODE_SNIPPET_SEQUENCE.length);
+        moveCursor(currentInputDiv || inputDivRef.current!, currentCursorIndex + CODE_SNIPPET_SEQUENCE_SINGLELINE.length);
     }
 
     function handleAppendCodeSnippet(): void {

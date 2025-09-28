@@ -78,54 +78,6 @@ export const HELP_EMAIL = "help.codenotes@gmail.com";
 export const NUM_NOTES_PER_PAGE = 5;
 
 
-// Sanitizer
-const ALLOWED_TAG_ATTRIBUTES = ["class", "id", "title", "style"];
-export const DEFAULT_HTML_SANTIZER_OPTIONS: sanitize.IOptions = {
-    allowedTags: [
-        "a",
-        "bdo",
-        "br",
-        "code",
-        "div",
-        "em",
-        "figcaption",
-        "figure",
-        "h1", "h2", "h3", "h4", "h5", "h6",
-        "i",
-        "img",
-        "input",
-        "kbd",
-        "mark",
-        "p",
-        "s",
-        "span",
-        "strong",
-        "sub",
-        "sup",
-        "svg",
-    ],
-    allowedAttributes: {
-        "a": ["href", "alt", "target", "rel", ...ALLOWED_TAG_ATTRIBUTES],
-        "bdo": ["lang", "dir", ...ALLOWED_TAG_ATTRIBUTES],
-        "div": [...ALLOWED_TAG_ATTRIBUTES],
-        "figure": [...ALLOWED_TAG_ATTRIBUTES],
-        "h1": [...ALLOWED_TAG_ATTRIBUTES],
-        "h2": [...ALLOWED_TAG_ATTRIBUTES],
-        "h3": [...ALLOWED_TAG_ATTRIBUTES],
-        "h4": [...ALLOWED_TAG_ATTRIBUTES],
-        "h5": [...ALLOWED_TAG_ATTRIBUTES],
-        "h6": [...ALLOWED_TAG_ATTRIBUTES],
-        "i": [...ALLOWED_TAG_ATTRIBUTES],
-        "img": ["src", "alt", ...ALLOWED_TAG_ATTRIBUTES],
-        "input": ["placeholder", "value", "defaultValue", ...ALLOWED_TAG_ATTRIBUTES],
-        "mark": ["alt", "color", ...ALLOWED_TAG_ATTRIBUTES],
-        "p": [...ALLOWED_TAG_ATTRIBUTES],
-        "span": [...ALLOWED_TAG_ATTRIBUTES],
-    },
-    parseStyleAttributes: false
-}
-
-
 // Crypto
 export const CRYPTO_KEY = process.env.REACT_APP_CRYPTO_KEY || "";
 export const CRYPTO_IV = process.env.REACT_APP_CRYPTO_IV || "";
@@ -159,7 +111,12 @@ export const CODE_BLOCK_DEFAULT_LANGUAGE = "_plaintext";
 
 
 // PlainTextInput
-export const CODE_SNIPPET_SEQUENCE = "```";
+export const CODE_SNIPPET_SEQUENCE_MULTILINE = "```";
+export const CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START = "<pre><code>";
+export const CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END = "</code></pre>";
+export const CODE_SNIPPET_SEQUENCE_SINGLELINE = "`";
+export const CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START = "<code>";
+export const CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END = "</code>";
 
 
 /**
@@ -176,4 +133,53 @@ export function getDefaultVariableInput(placeholder = VARIABLE_INPUT_DEFAULT_PLA
         placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER;
 
     return `<input type="text" style="width: ${inputWidth}px" class="variableInput" placeholder="${placeholder}" />`;
+}
+
+
+// Sanitizer
+const ALLOWED_TAG_ATTRIBUTES = ["class", "id", "title", "style"];
+export const DEFAULT_HTML_SANTIZER_OPTIONS: sanitize.IOptions = {
+    allowedTags: [
+        "a",
+        "bdo",
+        "br",
+        "code",
+        "div",
+        "em",
+        "figcaption",
+        "figure",
+        "h1", "h2", "h3", "h4", "h5", "h6",
+        "i",
+        "img",
+        "input",
+        "kbd",
+        "mark",
+        "p",
+        "pre",
+        "s",
+        "span",
+        "strong",
+        "sub",
+        "sup",
+        "svg",
+    ],
+    allowedAttributes: {
+        "a": ["href", "alt", "target", "rel", ...ALLOWED_TAG_ATTRIBUTES],
+        "bdo": ["lang", "dir", ...ALLOWED_TAG_ATTRIBUTES],
+        "div": [...ALLOWED_TAG_ATTRIBUTES],
+        "figure": [...ALLOWED_TAG_ATTRIBUTES],
+        "h1": [...ALLOWED_TAG_ATTRIBUTES],
+        "h2": [...ALLOWED_TAG_ATTRIBUTES],
+        "h3": [...ALLOWED_TAG_ATTRIBUTES],
+        "h4": [...ALLOWED_TAG_ATTRIBUTES],
+        "h5": [...ALLOWED_TAG_ATTRIBUTES],
+        "h6": [...ALLOWED_TAG_ATTRIBUTES],
+        "i": [...ALLOWED_TAG_ATTRIBUTES],
+        "img": ["src", "alt", ...ALLOWED_TAG_ATTRIBUTES],
+        "input": ["placeholder", "value", "defaultValue", ...ALLOWED_TAG_ATTRIBUTES],
+        "mark": ["alt", "color", ...ALLOWED_TAG_ATTRIBUTES],
+        "p": [...ALLOWED_TAG_ATTRIBUTES],
+        "span": [...ALLOWED_TAG_ATTRIBUTES],
+    },
+    parseStyleAttributes: false
 }
