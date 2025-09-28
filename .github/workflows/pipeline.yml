@@ -1,11 +1,12 @@
-name: code_notes_frontend main
+name: code_notes_frontend
 
 
 run-name: ${{ github.event.head_commit.message }}
 on: 
-  push: 
-    branches: 
-      - main
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
 
 
 jobs:
@@ -21,6 +22,8 @@ jobs:
             CI: ""
 
   push_to_DockerHub:
+    # NOTE: ${{}} syntax does not work here
+    if: (github.head_ref || github.ref_name) == 'main'
     runs-on: ubuntu-latest
     needs: build
 
@@ -70,6 +73,17 @@ jobs:
     needs: push_to_DockerHub
 
     steps:
+      # connect to vpn
+      - name: Install OpenVPN
+        run: |
+            sudo apt update
+            sudo apt install -y openvpn openvpn-systemd-resolved
+      - name: Connect to VPN
+        uses: "kota65535/github-openvpn-connect-action@v3"
+        with:
+            config_file: .github/workflows/config.ovpn
+            client_key: ${{ secrets.OPEN_VPN_PRIVATE_KEY }}
+
       - uses: appleboy/ssh-action@v1.2.0
         with: 
           host: ${{ vars.SSH_HOST }}
