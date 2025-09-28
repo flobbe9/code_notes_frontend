@@ -6,6 +6,7 @@ import { NoteEntityService } from "../../../../abstract/services/NoteEntityServi
 import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
+import { handleRememberMyChoice } from "../../../../helpers/projectUtils";
 import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, logError, logWarn, shortenString } from '../../../../helpers/utils';
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextProvider";
@@ -23,7 +24,6 @@ import DefaultNoteInput from "./DefaultNoteInput";
 import NoteTagList from "./NoteTagList";
 import NoteTitle from "./NoteTitle";
 import PlainTextNoteInput from "./PlainTextNoteInput";
-import { handleRememberMyChoice } from "../../../../helpers/projectUtils";
 
 
 interface Props extends DefaultProps {
@@ -75,7 +75,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         fetchDeleteNoteEntity,
         notesUseQueryResult
     } = useContext(AppFetchContext);
-    const { notes, setNotes } = useContext(StartPageContentContext);
+    const { notes, setNotes, mapNoteEntitiesToJsx } = useContext(StartPageContentContext);
 
     const componentRef = useRef<HTMLDivElement>(null);
     const titleInputRef = useRef<HTMLInputElement>(null);
@@ -286,11 +286,13 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         // case: no unsaved notes || this one was the only unsaved note
         if ((!editedNoteEntities.length || (editedNoteEntities.length === 1 && NoteEntityService.includesById(editedNoteEntities, noteEntity.id!))) && isLoggedIn)
             notesUseQueryResult.refetch();
-
+        
         // case: got more unsaved notes, just remove this note
         else {
-            notes.splice(noteIndex, 1);
-            setNotes([...notes]);
+            // NOTE: don't splice the state with the react elements, note titles will shift weirdly
+            const noteEntities = notesUseQueryResult.data.results;
+            noteEntities.splice(noteIndex, 1);
+            setNotes(mapNoteEntitiesToJsx(noteEntities));
         } 
 
         updateNoteEdited(false);

@@ -47,7 +47,6 @@ export class AppUserService {
             tags: appUserEntity.tags,
         }
     }
-
     
     /**
      * @param appUserEntity app user to encrypt fields for. Will be altered
@@ -55,7 +54,6 @@ export class AppUserService {
      * @deprecated see CryptoJSImpl NOTE
      */
     public static encryptSensitiveFields(appUserEntity: AppUserEntity): AppUserEntity {
-
         const cryptoHelper = new CryptoJSImpl();
 
         this.SENSITIVE_FIELDS.forEach(prop => {
@@ -66,14 +64,12 @@ export class AppUserService {
         return appUserEntity;
     }
 
-
     /**
      * @param appUserEntity app user to decrypt fields for. Wont be altered
      * @returns a copy of ```appUserEntity``` instance with decrypted {@link SENSITIVE_FIELDS}.
      * @deprecated see CryptoJSImpl NOTE
      */
     public static decryptSensitiveFields(appUserEntity: AppUserEntity): AppUserEntity {
-
         const cryptoHelper = new CryptoJSImpl();
 
         const appUserEntityCopy = this.clone(appUserEntity);
@@ -86,7 +82,6 @@ export class AppUserService {
         return appUserEntityCopy;
     }
 
-    
     /**
      * Adds given tag to ```appUserEntity.tags``` if not contains.
      * 
@@ -94,14 +89,12 @@ export class AppUserService {
      * @param tagEntity to add to ```this.tags```
      */
     public static addTagEntity(appUserEntity: AppUserEntity, tagEntity: TagEntity): void {
-
         if (!appUserEntity.tags)
             appUserEntity.tags = [];
 
         if (!TagEntityService.contains(appUserEntity.tags, tagEntity))
             appUserEntity.tags = [...appUserEntity.tags, tagEntity]
     }
-
 
     /**
      * Remove given tag from ```appUserEntity.tags```.

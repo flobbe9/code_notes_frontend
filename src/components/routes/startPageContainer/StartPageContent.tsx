@@ -64,6 +64,7 @@ export default function StartPageContent({...props}: Props) {
     const context = {
         notes,
         setNotes,
+        mapNoteEntitiesToJsx,
 
         setIsFocusFirstNote,
 
@@ -193,7 +194,6 @@ export default function StartPageContent({...props}: Props) {
      * @param page the new ```currentPage```
      */
     function handleNotePageChangeClick(page: number): void {
-
         const handle = () => {
             setCurrentNotesPage(page);
             setEditedNoteEntities([]);
@@ -313,6 +313,7 @@ export default function StartPageContent({...props}: Props) {
 export const StartPageContentContext = createContext({
     notes: [<></>],
     setNotes: (notes: JSX.Element[]) => {},
+    mapNoteEntitiesToJsx: (noteEntities: NoteEntity[]): JSX.Element[] => [],
 
     setIsFocusFirstNote: (focus: boolean) => {},
 
