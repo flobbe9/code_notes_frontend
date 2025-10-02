@@ -48,21 +48,17 @@
                     background-color: var(--matteBlack);
                     border-left: var(--noteInputDefaultBorder) var(--codeNoteInputColor);
                     border-right: var(--noteInputDefaultBorder) var(--codeNoteInputColor);
-                    padding: 0 var(--noteInputPaddingX);
                     transition: background-color var(--transitionTime), width var(--transitionTime);
                     
-                    // line number container
+                    /** line number container */
                     .margin {
-                        // NOTE: this area still has a different click event, dont know from where...
-                        display: none;
+                        left: 0;
                     }
                     
+                    /** text container */
                     .monaco-scrollable-element {
-                        left: var(--noteInputPaddingX) !important;
-                        
                         .decorationsOverviewRuler {
                             display: none !important;
-                            
                         }
                         
                         .iPadShowKeyboard {
@@ -77,7 +73,7 @@
                             background-color: var(--matteBlack);
                             transition: background-color var(--transitionTime);
                             
-                            // line container
+                            /** line container */
                             .view-lines {
                                 width: var(--fullEditorWidth) !important;
                                 

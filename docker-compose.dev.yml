@@ -6,7 +6,6 @@ services:
       context: .
       args:
         NODE_VERSION: ${NODE_VERSION}
-        HTTPS: false
         PORT: 3000
     # NOTE: this does not override application .env vars
     environment:

@@ -4,8 +4,8 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInput.scss";
-import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION } from "../../../../helpers/constants";
-import { animateAndCommit, getCssConstant, getCSSValueAsNumber, getRandomString, isNumberFalsy, logDebug, logWarn, percentToPixels, setClipboardText, setCssConstant } from "../../../../helpers/utils";
+import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../../helpers/constants";
+import { animateAndCommit, getCssConstant, getCSSValueAsNumber, getRandomString, isNumberFalsy, logWarn, setClipboardText, setCssConstant } from "../../../../helpers/utils";
 import useWindowResizeCallback from "../../../../hooks/useWindowResizeCallback";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
@@ -363,13 +363,9 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         editor.style.width = "100%";
         editor.style.maxHeight = "unset";
         updateFullEditorWidth();
-        
-        animateAndCommit(
-            defaultCodeNoteInput, 
-            [{ top: window.getComputedStyle(defaultCodeNoteInput).getPropertyValue("top") }, { top: "10vh" }], 
-            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION }
-        );
-        animateAndCommit(editor, {height: "80vh"}, {duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION});
+
+        defaultCodeNoteInput.style.top = "10vh";
+        editor.style.height = "80vh";
 
         editorRef.current!.focus();
     }
@@ -387,20 +383,14 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         updateActualEditorWidth();
         
         defaultCodeNoteInput.style.left = "auto";
+        defaultCodeNoteInput.style.position = "static";
+        defaultCodeNoteInput.style.top = "auto";
+        defaultCodeNoteInput.style.zIndex = "0";
+        rerenderEditor();
 
-        // animate to start pos
-        animateAndCommit(
-            defaultCodeNoteInput,
-            { top: 0 },
-            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION },
-            () => {
-                // reset to initial styles
-                defaultCodeNoteInput.style.position = "static";
-                defaultCodeNoteInput.style.top = "auto";
-                defaultCodeNoteInput.style.zIndex = "0";
-                rerenderEditor();
-            }
-        )
+        setTimeout(() => {
+            editorRef.current!.focus();
+        }, 100); // wait for rerender to be finished
     }
 
 

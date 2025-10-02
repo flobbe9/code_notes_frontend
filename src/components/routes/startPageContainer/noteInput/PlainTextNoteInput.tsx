@@ -5,9 +5,9 @@ import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../../../abstract/HelperProps";
 import "../../../../assets/styles/PlainTextNoteInput.scss";
-import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
+import { CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
 import { getContentEditableDivLineElements, isTextSelected, moveCursor } from '../../../../helpers/projectUtils';
-import { animateAndCommit, getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, logWarn, setClipboardText } from "../../../../helpers/utils";
+import { getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, logWarn, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from '../../../App';
 import Button from "../../../helpers/Button";
@@ -280,15 +280,10 @@ export default function PlainTextNoteInput({
         // center
         plainTextNoteInput.style.left = "5vw";
         plainTextNoteInput.style.zIndex = appOverlayZIndex + 1;
+        plainTextNoteInput.style.height = "80vh";
+        plainTextNoteInput.style.top = "10vh";
 
-        animateAndCommit(
-            plainTextNoteInput,
-            [
-                { height: window.getComputedStyle(plainTextNoteInput).getPropertyValue("height"), top: window.getComputedStyle(plainTextNoteInput).getPropertyValue("top") }, 
-                { height: "80vh", top: "10vh" }
-            ], 
-            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION },
-        );
+        inputDivRef.current!.focus();
     }
 
 
@@ -296,25 +291,17 @@ export default function PlainTextNoteInput({
         const plainTextNoteInput = componentRef.current!;
         
         // move up just a little bit
-        plainTextNoteInput.style.height = "unset";
+        plainTextNoteInput.style.height = "100%";
         plainTextNoteInput.style.position = "relative";
         plainTextNoteInput.style.top = "30px";
         plainTextNoteInput.style.width = "100%";
         
         plainTextNoteInput.style.left = "auto";
-        
-        // animate to start pos
-        animateAndCommit(
-            plainTextNoteInput,
-            { top: 0 },
-            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION },
-            () => {
-                // reset to initial styles
-                plainTextNoteInput.style.position = "static";
-                plainTextNoteInput.style.top = "auto";
-                plainTextNoteInput.style.zIndex = "0";
-            }
-        )
+        plainTextNoteInput.style.position = "static";
+        plainTextNoteInput.style.top = "auto";
+        plainTextNoteInput.style.zIndex = "0";
+
+        inputDivRef.current!.focus();
     }
     
     /**

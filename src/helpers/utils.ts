@@ -1386,7 +1386,7 @@ function parseUrlQueryParams(): Map<string, string> {
             else {
                 const key = keyValuePair.substring(0, firstEqualsIndex);
                 let value = keyValuePair.substring(firstEqualsIndex).replace("=", "");
-                value = cleanUpUrlQueryParamValue(value);
+                value = decodeURI(value);
                 
                 keyValueMap.set(key, value);
             }
@@ -1461,23 +1461,6 @@ export function setUrlQueryParam(key: string, value: string, navigate?: (to: str
 
     else
         window.location.search = updatedQueryParams;
-}
-
-/**
- * Replace some substrings that are used in url query params in place of certain chars with their actual chars. 
- * E.g. "+" represents a " " and "%sC" a ","
- * 
- * @param value from url query param
- * @returns clean (unaltered) value
- */
-function cleanUpUrlQueryParamValue(value: string): string {
-
-    if (isBlank(value))
-        return value;
-
-    return value
-        .replaceAll("%2C", ",")
-        .replaceAll("+", " ");
 }
 
 /**
