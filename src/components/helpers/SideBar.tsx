@@ -23,7 +23,7 @@ interface Props extends HelperProps {
 /**
  * Generic side bar. ```children``` are rendered into the "right" content that can slide.
  * 
- * @since latest
+ * @since 1.0.0
  */
 export default forwardRef(function SideBar(
     {

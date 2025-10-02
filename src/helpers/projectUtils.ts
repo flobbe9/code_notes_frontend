@@ -12,7 +12,7 @@ import { getRandomString, isBlank, isEmpty, logWarn, stringToHtmlElement } from 
 /**
  * Meant to provide specific util methods that are not needed in any project.
  * 
- * @since latest
+ * @since 1.0.0
  */
 
 
