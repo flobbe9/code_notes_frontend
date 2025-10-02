@@ -54,6 +54,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6.10.0
         with:
+          # explicitly specify context in order for .dockerignore to be considered
           context: .
           push: true
           tags: |

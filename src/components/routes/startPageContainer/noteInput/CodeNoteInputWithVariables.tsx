@@ -7,9 +7,9 @@ import HelperProps from "../../../../abstract/HelperProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInputWithVariables.scss";
 import "../../../../assets/styles/highlightJs/vs.css";
-import { CODE_INPUT_FULLSCREEN_ANIMATION_DURATION, DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
+import { DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
 import { cleanUpSpecialChars, getContentEditableDivLineElements, getTextWidth, isTextSelected, moveCursor } from "../../../../helpers/projectUtils";
-import { animateAndCommit, getClipboardText, getCssConstant, getCSSValueAsNumber, insertString, isBlank, isEventKeyTakingUpSpace, logDebug, logWarn, setClipboardText } from "../../../../helpers/utils";
+import { getClipboardText, getCssConstant, getCSSValueAsNumber, insertString, isBlank, isEventKeyTakingUpSpace, logDebug, logWarn, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from "../../../App";
 import Button from "../../../helpers/Button";
@@ -581,20 +581,23 @@ export default function CodeNoteInputWithVariables({
         defaultCodeNoteInput.style.width = "90vw";
         // center
         defaultCodeNoteInput.style.left = "5vw";
+        defaultCodeNoteInput.style.top = "10vh";
+        inputDivContainer.style.height = "80vh";
+        inputDiv.style.maxHeight = "80vh";
 
-        animateAndCommit(
-            defaultCodeNoteInput,
-            [{ top: window.getComputedStyle(defaultCodeNoteInput).getPropertyValue("top") }, { top: "10vh" }], 
-            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION }
-        );
+        // animateAndCommit(
+        //     defaultCodeNoteInput,
+        //     [{ top: window.getComputedStyle(defaultCodeNoteInput).getPropertyValue("top") }, { top: "10vh" }], 
+        //     { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION }
+        // );
 
-        animateAndCommit(
-            inputDivContainer, 
-            [{ height: window.getComputedStyle(defaultCodeNoteInput).getPropertyValue("height") }, { height: "80vh" }], 
-            { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION}
-        );
+        // animateAndCommit(
+        //     inputDivContainer, 
+        //     [{ height: window.getComputedStyle(defaultCodeNoteInput).getPropertyValue("height") }, { height: "80vh" }], 
+        //     { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION}
+        // );
 
-        animateAndCommit(inputDiv, { maxHeight: "80vh" });
+        // animateAndCommit(inputDiv, { maxHeight: "80vh" });
     }
 
 
@@ -613,19 +616,11 @@ export default function CodeNoteInputWithVariables({
         defaultCodeNoteInput.style.left = "auto";
         inputDivContainer.style.height = "100%";
         inputDiv.style.maxHeight = "var(--noteInputMaxHeight)";
+        defaultCodeNoteInput.style.position = "static";
+        defaultCodeNoteInput.style.top = "auto";
+        defaultCodeNoteInput.style.zIndex = "0";
 
-        // animate to start pos
-        animateAndCommit(
-            defaultCodeNoteInput,
-            { top: 0 },
-            { duration: 300 },
-            () => {
-                // reset to initial styles
-                defaultCodeNoteInput.style.position = "static";
-                defaultCodeNoteInput.style.top = "auto";
-                defaultCodeNoteInput.style.zIndex = "0";
-            }
-        )
+        inputDiv.focus();
     }
 
 
