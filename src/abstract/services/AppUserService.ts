@@ -1,6 +1,5 @@
 
 import { isBlank, logWarn } from '../../helpers/utils';
-import CryptoJSImpl from '../CryptoJSImpl';
 import { AppUserEntity } from '../entites/AppUserEntity';
 import { NoteEntity } from '../entites/NoteEntity';
 import { TagEntity } from '../entites/TagEntity';
@@ -46,40 +45,6 @@ export class AppUserService {
             role: appUserEntity.role,
             tags: appUserEntity.tags,
         }
-    }
-    
-    /**
-     * @param appUserEntity app user to encrypt fields for. Will be altered
-     * @returns ```appUserEntity``` with {@link SENSITIVE_FIELDS} beeing encrypted
-     * @deprecated see CryptoJSImpl NOTE
-     */
-    public static encryptSensitiveFields(appUserEntity: AppUserEntity): AppUserEntity {
-        const cryptoHelper = new CryptoJSImpl();
-
-        this.SENSITIVE_FIELDS.forEach(prop => {
-            if (appUserEntity[prop] && typeof appUserEntity[prop] === "string")
-                appUserEntity[prop.toString()] = cryptoHelper.encrypt(appUserEntity[prop] as string);
-        });
-
-        return appUserEntity;
-    }
-
-    /**
-     * @param appUserEntity app user to decrypt fields for. Wont be altered
-     * @returns a copy of ```appUserEntity``` instance with decrypted {@link SENSITIVE_FIELDS}.
-     * @deprecated see CryptoJSImpl NOTE
-     */
-    public static decryptSensitiveFields(appUserEntity: AppUserEntity): AppUserEntity {
-        const cryptoHelper = new CryptoJSImpl();
-
-        const appUserEntityCopy = this.clone(appUserEntity);
-
-        this.SENSITIVE_FIELDS.forEach(prop => {
-            if (appUserEntity[prop] && typeof appUserEntity[prop] === "string")
-                appUserEntityCopy[prop.toString()] = cryptoHelper.decrypt(appUserEntityCopy[prop] as string);
-        });
-
-        return appUserEntityCopy;
     }
 
     /**
