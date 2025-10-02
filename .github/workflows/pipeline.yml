@@ -57,7 +57,6 @@ jobs:
           # explicitly specify context in order for .dockerignore to be considered
           context: .
           push: true
-          context: .
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:${{env.REACT_APP_VERSION}}
