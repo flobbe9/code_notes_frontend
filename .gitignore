@@ -4,6 +4,6 @@ build
 DefaultComponent.tsx
 package-lock.json
 *.csr
-*.md
+notes.md
 test.*
 .nginx
