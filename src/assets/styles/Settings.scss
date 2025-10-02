@@ -1,0 +1,34 @@
+@import "./global/variables.scss";
+
+
+.Settings {
+    min-height: 100vh;
+    position: relative;
+
+    @media screen and (min-width: $tabletMinWidth) {
+        justify-content: center;
+    }
+
+    &-container {
+        &.defaultPageContent {
+            width: 85vw !important;
+            
+            @media screen and (max-width: $mobileMaxWidth) {
+                margin: 0 !important;
+                width: 100% !important;
+            }
+        }
+
+        &-pseudoHr {
+            background-color: black;
+            height: 100%;
+            width: 2px;
+        }
+
+        &-right {
+            @media screen and (max-width: $mobileMaxWidth) {
+                margin: 0 2em;
+            }
+        }
+    }
+}

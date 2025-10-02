@@ -5,7 +5,7 @@ import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/Default
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/CodeNoteInput.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION, CODE_INPUT_FULLSCREEN_ANIMATION_DURATION } from "../../../../helpers/constants";
-import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isNumberFalsy, setClipboardText, setCssConstant } from "../../../../helpers/utils";
+import { animateAndCommit, getCssConstant, getCSSValueAsNumber, getRandomString, isNumberFalsy, logDebug, logWarn, percentToPixels, setClipboardText, setCssConstant } from "../../../../helpers/utils";
 import useWindowResizeCallback from "../../../../hooks/useWindowResizeCallback";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
@@ -17,7 +17,6 @@ import NoteInputSettings from "./NoteInputSettings";
 
 
 interface Props extends DefaultProps {
-
     noteInputEntity: NoteInputEntity
 }
 
@@ -33,7 +32,6 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
-
     /** Height of one line of the monaco vscode editor in px */
     const editorLineHeight = 19; // px
 
@@ -49,9 +47,10 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     const [editorTransition, setEditorTransition] = useState(0);
     const [numEditorLines, setNumEditorLines] = useState(1);
     const [editorHeight, setEditorHeight] = useState(0);
+    const [editorKey, setEditorKey] = useState("initialKey");
 
-    const { isShowSideBar, getStartPageSideBarWidth } = useContext(StartPageContainerContext);
-    const { noteEdited } = useContext(NoteContext);
+    const { isStartPageSideBarVisible, getStartPageSideBarWidth } = useContext(StartPageContainerContext);
+    const { updateNoteEdited } = useContext(NoteContext);
     const { 
         isShowNoteInputSettings, 
         areNoteInputSettingsDisabled, 
@@ -74,7 +73,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
     const copyButtonRef = useRef(null);
     const fullScreenButtonRef = useRef(null);
-
     
     useEffect(() => {
         setAreNoteInputSettingsDisabled(true);
@@ -84,14 +82,12 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         
     }, []);
 
-
     useEffect(() => {
         if (focusOnRender && isEditorMounted)
             editorRef.current!.focus();
 
     }, [isEditorMounted, editorRef.current]);
     
-
     useEffect(() => {
         if (isEditorMounted)
             updateActualEditorHeight();
@@ -100,13 +96,11 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     }, [editorHeight, numEditorLines]);
 
-    
     useEffect(() => {
         if (isEditorMounted)
             updateActualEditorWidth(); 
 
     }, [editorWidth]);
-
 
     useEffect(() => {
         // case: init width has ben set
@@ -115,15 +109,13 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     }, [isShowNoteInputSettings]);
 
-
     useEffect(() => {
         // case: init width has ben set
         if (!isNumberFalsy(fullEditorWidth))
             handleToggleSideBar();
 
-    }, [isShowSideBar]);
+    }, [isStartPageSideBarVisible]);
 
-    
     useEffect(() => {
         if (!isEditorMounted)
             return;
@@ -134,7 +126,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     }, [isEditorMounted]);
 
-
     useEffect(() => {
         if (!isEditorMounted)
             return;
@@ -143,26 +134,21 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     }, [codeNoteInputLanguage]);
 
-
     useWindowResizeCallback(handleWindowResize);
 
-
     function handleChange(value: string): void {
-
         if (!isFullScreen)
             setTimeout(() => setNumEditorLines(getNumEditorValueLines(value)), 5);
 
         updateNoteEntity(value);
 
-        noteEdited();
+        updateNoteEdited();
     }
-
 
     /**
      * Set ```noteInputEntity``` values using this noteInput.
      */
     function updateNoteEntity(value: string | null): void {
-
         if (value !== null)
             noteInputEntity.value = value;
 
@@ -170,29 +156,23 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         noteInputEntity.programmingLanguage = codeNoteInputLanguage;
     }
 
-
     function updateFullScreenSetterStates(): void {
-
         setActivateFullScreenStyles(() => {return activateFullScreenStyles});
         setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
     }
-
 
     /**
      * @param value complete content of the editor
      * @returns the current number of lines of the editor value
      */
     function getNumEditorValueLines(value: string): number {
-
         return value.split("\n").length;
     }
-
 
     /**
      * Check if editor height still fits number of rendered lines and adjust if not.
      */
     function updateActualEditorHeight(): void {
-
         const editorLinesHeightComparison = compareEditorHeightToLinesHeight();
 
         // increase editor height if possible
@@ -204,7 +184,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
             handleRemoveLine();
     }
 
-
     /**
      * Describes the height of the editor in comparison to the height of all rendered editor lines.
      * 
@@ -213,7 +192,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
      * @returns -1 if the editor is too small, 0 if it's the right height and 1 if it's too big
      */
     function compareEditorHeightToLinesHeight(): number {
-
         const totalEditorLinesHeight = getTotalEditorLinesHeight();
         const heightDifference = editorHeight - totalEditorLinesHeight - (1 * editorLineHeight);
 
@@ -224,19 +202,14 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         return heightDifference / Math.abs(heightDifference);
     }
 
-
     /**
      * @returns the total height of all lines inside the editor
      */
     function getTotalEditorLinesHeight(): number {
-
         return numEditorLines * editorLineHeight;
-
     }
     
-
     function handleAddLine(): void {
-
         // case: reached max editor height
         if (isMaxEditorHeight())
             return;
@@ -244,19 +217,15 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         setEditorHeight(editorHeight + 19);
     }
 
-
     function handleRemoveLine(): void {
-
         setEditorHeight(editorHeight - 19);
     }
-
 
     /**
      * 
      * @returns the initial height of the editor depending on the initial number of lines of the ```noteEntityInput.value``` and ```minNumInitialLines```
      */
     function getInitialEditorHeight(): number {
-
         let numEditorValueLines = getNumEditorValueLines(noteInputEntity.value);
 
         if (numEditorValueLines < minNumInitialLines)
@@ -267,24 +236,18 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         return numEditorValueLines * editorLineHeight;
     }
 
-
     function isMaxEditorHeight(): boolean {
-
         return editorHeight === maxNumLines * editorLineHeight;
     }
 
-
     function isMinEditorHeight(): boolean {
-
         return editorHeight === minNumInitialLines * editorLineHeight;
     }
-
 
     /**
      * Increase or decrease the editors width by the ```<NoteInputSettings>``` width depending on whether the noteInput settings are visible or not.
      */
     function handleToggleNoteInputSettings(): void {
-
         // case: show noteInput settings
         if (isShowNoteInputSettings) {
             const fullEditorWidth = updateFullEditorWidth();
@@ -309,11 +272,10 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
      * Increase or decrease the editors width by the ```<StartPageSideBar>``` width depending on whether the it's visible or not.
      */
     function handleToggleSideBar(): void {
-
-        setEditorTransition(isShowSideBar ? 0 : BLOCK_SETTINGS_ANIMATION_DURATION + 10);
+        setEditorTransition(isStartPageSideBarVisible ? 0 : BLOCK_SETTINGS_ANIMATION_DURATION + 10);
 
         // case: show side bar
-        if (isShowSideBar) {
+        if (isStartPageSideBarVisible) {
             const fullEditorWidth = updateFullEditorWidth();
             const sideBarWidth = getStartPageSideBarWidth();
 
@@ -328,65 +290,57 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     /**
      * Animate the width of the editor to ```editorWidth``` using ```editorTransition``` as animation duration.
      */ 
-    function updateActualEditorWidth(): void {
-
+    function updateActualEditorWidth(targetWdith = editorWidth): void {
         const editor = getOuterEditorContainer();
+
+        if (!targetWdith || targetWdith.includes("NaN")) {
+            logWarn("Invalid targetWdith");
+            return;
+        }
 
         animateAndCommit(
             editor,
-            { width: editorWidth },
+            { width: targetWdith },
             { duration: editorTransition },
             () => setTimeout(() => 
                 getOuterEditorContainer()!.style.width = "100%", 300) // wait for possible sidebar animations to finish, even though editor is done
         );
     }
 
-
     function handleWindowResize(): void {
-
-        if (isShowNoteInputSettings)
-            setFullEditorWidth(getOuterEditorContainer()!.offsetWidth! - getNoteInputSettingsWidth());
-
-        else
-            updateFullEditorWidth();
+        if (!isFullScreen)
+            // reload editors width
+            rerenderEditor();
     }
-
 
     /**
      * @returns the most outer container (a ```<section>```) of the monaco editor. The ```editorRef``` is somewhere deeper inside
      */
     function getOuterEditorContainer(): HTMLElement | null {
-
         if (!componentRef.current)
             return null;
 
         return componentRef.current!.querySelector("section") as HTMLElement;
     }
 
-
     async function handleCopyClick(event): Promise<void> {
-
         animateCopyIcon();
 
         setClipboardText((editorRef.current as any).getValue())
     }
 
-
     function handleEditorMount(editor: editor.IStandaloneCodeEditor, monaco: Monaco): void {
-
         // assign ref
         (editorRef.current as any) = editor;
 
         setIsEditorMounted(true);
     }
 
-
     /**
      * Update ```fullEditorWidth``` state with the current outer width of the editor container in px.
      */
     function updateFullEditorWidth(): number {
-
-        const newFullEditorWidth = getOuterEditorContainer()?.offsetWidth || 0;
+        let newFullEditorWidth = getOuterEditorContainer()?.offsetWidth || 0;
 
         setFullEditorWidth(newFullEditorWidth);
         setCssConstant("fullEditorWidth", newFullEditorWidth + "px");
@@ -396,7 +350,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     
 
     function activateFullScreenStyles(): void {
-
         const editor = getOuterEditorContainer()!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef!.current!
 
@@ -408,6 +361,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         // center
         defaultCodeNoteInput.style.left = "5vw";
         editor.style.width = "100%";
+        editor.style.maxHeight = "unset";
         updateFullEditorWidth();
         
         animateAndCommit(
@@ -420,10 +374,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         editorRef.current!.focus();
     }
 
-
     function deactivateFullScreenStyles(): void {
-
-        const editor = getOuterEditorContainer()!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef!.current!
         
         // move up just a little bit
@@ -436,8 +387,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         updateActualEditorWidth();
         
         defaultCodeNoteInput.style.left = "auto";
-        editor.style.height = editorHeight + "px";
-        editor.style.width = (isShowNoteInputSettings ? editorWidth : fullEditorWidth) + "px";
 
         // animate to start pos
         animateAndCommit(
@@ -449,6 +398,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
                 defaultCodeNoteInput.style.position = "static";
                 defaultCodeNoteInput.style.top = "auto";
                 defaultCodeNoteInput.style.zIndex = "0";
+                rerenderEditor();
             }
         )
     }
@@ -459,12 +409,17 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
      *          mobile mode.
      */
     function getNoteInputSettingsWidth(): number {
-
         const languageSearchBarWidth = getCSSValueAsNumber(getCssConstant("languageSearchBarWidth"), 2);
         
         return languageSearchBarWidth;
     }
 
+    /**
+     * Change the `key` of the editor for it to be rerendered.
+     */
+    function rerenderEditor(): void {
+        setEditorKey(getRandomString());
+    }
 
     return (
         <Flex 
@@ -479,6 +434,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
             {/* Editor */}
             <div className="fullWidth editorContainer">
                 <Editor 
+                    key={editorKey}
                     className="vsCodeEditor" 
                     height={editorHeight} 
                     language={codeNoteInputLanguage.toLowerCase()}

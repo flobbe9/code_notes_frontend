@@ -57,6 +57,7 @@ export default function Oauth2LoginButton({
             <Link
                 className="Oauth2LoginButton-link blackLink fullWidth"
                 to={getLink()}
+                // to="/login"
                 target={target}
             >
                 <Flex flexWrap="nowrap" verticalAlign="center">

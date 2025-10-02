@@ -23,12 +23,25 @@
         }
 
         &-dragIcon {
-            color: white;
             font-size: 1.4em;
         }
+    }
+    
+    &:has(.CodeNoteInputWithVariables) {
+        .DefaultNoteInput-dragArea-dragIcon {
+            color: var(--codeNoteInputWithVariablesColor);
+        }
+    }
+    
+    &:has(.CodeNoteInput) {
+        .DefaultNoteInput-dragArea-dragIcon {
+            color: var(--codeNoteInputColor);
+        }
+    }
 
-        .fa-grip {
-            color: white;
+    &:has(.PlainTextNoteInput) {
+        .DefaultNoteInput-dragArea-dragIcon {
+            color: var(--plainTextNoteInputColor);
         }
     }
 

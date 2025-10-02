@@ -45,6 +45,13 @@ export const OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM = "oauth2-login-error";
 /** Also hard coded in "Utils.java" */
 export const RESET_PASSWORD_TOKEN_URL_QUERY_PARAM = "token";
 export const RESET_PASSWORD_TOKEN_LOCAL_STORAGE_KEY = "reset-password-token";
+export const NOTE_PAGE_URL_QUERY_PARAM = "page";
+export const NOTE_SEARCH_PHRASE_URL_QUERY_PARAM = "searchPhrase";
+export const NOTE_SEARCH_PHRASE_MIN_LENGTH = 4;
+/** Time to wait before making a note search request to backend. In ms */
+export const NOTE_SEARCH_PHRASE_USER_INPUT_DELAY = 500;
+export const NOTE_SEARCH_TAGS_URL_QUERY_PARAM = "tagNames";
+export const NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR = ",";
 
 
 // Other
@@ -67,55 +74,8 @@ export const HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES = 12;
 /** Will be prepended to the localStorage key to prevent key name collisions. */
 export const REMEMBER_MY_CHOICE_KEY_PREFIX = "code_notes-rememberMyChoice-";
 export const HELP_EMAIL = "help.codenotes@gmail.com";
+/** Min is 1 for backend */
 export const NUM_NOTES_PER_PAGE = 5;
-
-
-// Sanitizer
-const ALLOWED_TAG_ATTRIBUTES = ["class", "id", "title", "style"];
-export const DEFAULT_HTML_SANTIZER_OPTIONS: sanitize.IOptions = {
-    allowedTags: [
-        "a",
-        "bdo",
-        "br",
-        "code",
-        "div",
-        "em",
-        "figcaption",
-        "figure",
-        "h1", "h2", "h3", "h4", "h5", "h6",
-        "i",
-        "img",
-        "input",
-        "kbd",
-        "mark",
-        "p",
-        "s",
-        "span",
-        "strong",
-        "sub",
-        "sup",
-        "svg",
-    ],
-    allowedAttributes: {
-        "a": ["href", "alt", "target", "rel", ...ALLOWED_TAG_ATTRIBUTES],
-        "bdo": ["lang", "dir", ...ALLOWED_TAG_ATTRIBUTES],
-        "div": [...ALLOWED_TAG_ATTRIBUTES],
-        "figure": [...ALLOWED_TAG_ATTRIBUTES],
-        "h1": [...ALLOWED_TAG_ATTRIBUTES],
-        "h2": [...ALLOWED_TAG_ATTRIBUTES],
-        "h3": [...ALLOWED_TAG_ATTRIBUTES],
-        "h4": [...ALLOWED_TAG_ATTRIBUTES],
-        "h5": [...ALLOWED_TAG_ATTRIBUTES],
-        "h6": [...ALLOWED_TAG_ATTRIBUTES],
-        "i": [...ALLOWED_TAG_ATTRIBUTES],
-        "img": ["src", "alt", ...ALLOWED_TAG_ATTRIBUTES],
-        "input": ["placeholder", "value", "defaultValue", ...ALLOWED_TAG_ATTRIBUTES],
-        "mark": ["alt", "color", ...ALLOWED_TAG_ATTRIBUTES],
-        "p": [...ALLOWED_TAG_ATTRIBUTES],
-        "span": [...ALLOWED_TAG_ATTRIBUTES],
-    },
-    parseStyleAttributes: false
-}
 
 
 // Crypto
@@ -143,11 +103,20 @@ export const VARIABLE_INPUT_SEQUENCE_REGEX = /^.*\$\[\[.*\]\].*$/;
 export const VARIABLE_INPUT_DEFAULT_PLACEHOLDER = "VARIABLE_NAME";
 export const VARIABLE_INPUT_START_SEQUENCE = "$[[";
 export const VARIABLE_INPUT_END_SEQUENCE = "]]";
-export const CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE = "_auto";
+export const CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE = "Plaintext";
 
 
 // CodeNoteInput
 export const CODE_BLOCK_DEFAULT_LANGUAGE = "_plaintext";
+
+
+// PlainTextInput
+export const CODE_SNIPPET_SEQUENCE_MULTILINE = "```";
+export const CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START = "<pre><code>";
+export const CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END = "</code></pre>";
+export const CODE_SNIPPET_SEQUENCE_SINGLELINE = "`";
+export const CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START = "<code>";
+export const CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END = "</code>";
 
 
 /**
@@ -164,4 +133,53 @@ export function getDefaultVariableInput(placeholder = VARIABLE_INPUT_DEFAULT_PLA
         placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER;
 
     return `<input type="text" style="width: ${inputWidth}px" class="variableInput" placeholder="${placeholder}" />`;
+}
+
+
+// Sanitizer
+const ALLOWED_TAG_ATTRIBUTES = ["class", "id", "title", "style"];
+export const DEFAULT_HTML_SANTIZER_OPTIONS: sanitize.IOptions = {
+    allowedTags: [
+        "a",
+        "bdo",
+        "br",
+        "code",
+        "div",
+        "em",
+        "figcaption",
+        "figure",
+        "h1", "h2", "h3", "h4", "h5", "h6",
+        "i",
+        "img",
+        "input",
+        "kbd",
+        "mark",
+        "p",
+        "pre",
+        "s",
+        "span",
+        "strong",
+        "sub",
+        "sup",
+        "svg",
+    ],
+    allowedAttributes: {
+        "a": ["href", "alt", "target", "rel", ...ALLOWED_TAG_ATTRIBUTES],
+        "bdo": ["lang", "dir", ...ALLOWED_TAG_ATTRIBUTES],
+        "div": [...ALLOWED_TAG_ATTRIBUTES],
+        "figure": [...ALLOWED_TAG_ATTRIBUTES],
+        "h1": [...ALLOWED_TAG_ATTRIBUTES],
+        "h2": [...ALLOWED_TAG_ATTRIBUTES],
+        "h3": [...ALLOWED_TAG_ATTRIBUTES],
+        "h4": [...ALLOWED_TAG_ATTRIBUTES],
+        "h5": [...ALLOWED_TAG_ATTRIBUTES],
+        "h6": [...ALLOWED_TAG_ATTRIBUTES],
+        "i": [...ALLOWED_TAG_ATTRIBUTES],
+        "img": ["src", "alt", ...ALLOWED_TAG_ATTRIBUTES],
+        "input": ["placeholder", "value", "defaultValue", ...ALLOWED_TAG_ATTRIBUTES],
+        "mark": ["alt", "color", ...ALLOWED_TAG_ATTRIBUTES],
+        "p": [...ALLOWED_TAG_ATTRIBUTES],
+        "span": [...ALLOWED_TAG_ATTRIBUTES],
+    },
+    parseStyleAttributes: false
 }

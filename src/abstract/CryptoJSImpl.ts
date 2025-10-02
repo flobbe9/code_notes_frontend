@@ -18,6 +18,8 @@ export default class CryptoJSImpl {
 
 
     /**
+     * NOTE: don't use encryption with keys, it's not safe in frontend.
+     * 
      * @param key secret string used by alogrithm. Needs to be either 16 or 32 chars long. Default is {@link CRYPTO_KEY}.
      * @param iv secret string used by alogrithm. Necessary for encryption to always return the same value. Default is {@link CRYPTO_IV}
      *           Needs to be 16 chars long

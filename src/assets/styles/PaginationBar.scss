@@ -10,6 +10,7 @@
             padding: 0;
 
             &-active {
+                color: var(--accentColor);
                 font-weight: bold;
             }
         }

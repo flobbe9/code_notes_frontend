@@ -33,7 +33,7 @@ export default function LanguageSearchResults({
 
     const [searchResultElements, setSearchResultElements] = useState<JSX.Element[]>([]);
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "LanguageSearchResults");
+    const { children, ...otherProps } = getCleanDefaultProps(props, "LanguageSearchResults");
 
     const componentRef = useRef<HTMLDivElement>(null);
     const hiddenCheckboxRef = useRef<HTMLInputElement>(null);
@@ -207,7 +207,7 @@ export default function LanguageSearchResults({
         if (rendered)
             slideDown(componentRef.current!, 100, "ease", {}, () => {
                 // makes height adjust to number of results
-                componentRef.current!.style.height = "unset";
+                componentRef.current!.style.height = "unset !important";
             });
             
         else
@@ -216,14 +216,7 @@ export default function LanguageSearchResults({
 
 
     return (
-        <HelperDiv 
-            id={id} 
-            className={className}
-            style={style}
-            ref={componentRef}
-            // rendered={rendered}
-            {...otherProps}
-        >
+        <HelperDiv ref={componentRef} {...otherProps}>
             {searchResultElements}
 
             {children}

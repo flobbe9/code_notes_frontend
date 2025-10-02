@@ -1,13 +1,13 @@
 import { DefinedUseQueryResult } from "@tanstack/react-query";
 import React, { createContext, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
+import { SearchNoteResultDto } from "../abstract/SearchNoteResultDto";
 import { AppUserService } from "../abstract/services/AppUserService";
 import { LOGOUT_URL } from "../helpers/constants";
 import fetchJson from "../helpers/fetchUtils";
-import { clearUserCache } from "../helpers/utils";
+import { clearUserCache } from "../helpers/projectUtils";
 import { useAppUser } from "../hooks/useAppUser";
 import { useLoggedIn } from "../hooks/useLoggedIn";
 import { useNotes } from "../hooks/useNotes";
@@ -21,14 +21,9 @@ import { useNotes } from "../hooks/useNotes";
  * @parent ```<App>```
  * @since 0.0.1
  */
-export default function AppFetchContextHolder({ children }) {
+export default function AppFetchContextProvider({ children }) {
 
-    const location = useLocation();
-    
-    const { 
-        isLoggedIn, 
-        useQueryResult: isLoggedInUseQueryResult
-    } = useLoggedIn();
+    const isLoggedInUseQueryResult = useLoggedIn();
 
     const { 
         appUserEntity, 
@@ -36,23 +31,22 @@ export default function AppFetchContextHolder({ children }) {
         useQueryResult: appUserEntityUseQueryResult,
         fetchSave: fetchSaveAppUserEntity, 
         fetchLogin, 
-    } = useAppUser(isLoggedIn);
+    } = useAppUser(isLoggedInUseQueryResult.data);
 
     const { 
-        noteEntities, 
-        setNoteEntities,
-        noteSearchResults, 
-        setNoteSearchResults,
-        useQueryResult: noteUseQueryResult ,
+        editedNoteEntities, 
+        setEditedNoteEntities,
+        getSearchPhrase, setSearchPhrase,
+        getSearchTags, setSearchTags,
+        notesUseQueryResult,
         isFetchTakingLonger: isFetchNoteEntitiesTakingLonger, 
         fetchSave: fetchSaveNoteEntity, 
         fetchSaveAll: fetchSaveAllNoteEntities,
         fetchDelete: fetchDeleteNoteEntity, 
-        gotNewData: gotNewNoteEntities, 
-        setGotNewData: setGotNewNoteEntities,
-        currentPage: currentNotesPage, 
-        setCurrentPage: setCurrentNotesPage
-    } = useNotes(isLoggedIn, appUserEntity);
+        getCurrentPage: getCurrentNotesPage,
+        setCurrentPage: setCurrentNotesPage,
+        totalPages: totalNotePages
+    } = useNotes(isLoggedInUseQueryResult, appUserEntity);
 
     const context = {
         appUserEntity, 
@@ -61,41 +55,32 @@ export default function AppFetchContextHolder({ children }) {
         fetchSaveAppUserEntity, 
         fetchLogin, 
 
-        noteEntities, 
-        setNoteEntities, 
-        noteSearchResults,
-        setNoteSearchResults,
-        noteUseQueryResult,
+        editedNoteEntities, 
+        setEditedNoteEntities, 
+        getNoteSearchPhrase: getSearchPhrase, 
+        setNoteSearchPhrase: setSearchPhrase,
+        getNoteSearchTags: getSearchTags, 
+        setNoteSearchTags: setSearchTags,
+        notesUseQueryResult,
         isFetchNoteEntitiesTakingLonger, 
         fetchSaveNoteEntity, 
         fetchSaveAllNoteEntities,
         fetchDeleteNoteEntity, 
-        gotNewNoteEntities,
-        setGotNewNoteEntities,
-        currentNotesPage,
+        getCurrentNotesPage,
         setCurrentNotesPage,
+        totalNotePages,
 
-        isLoggedIn, 
+        isLoggedIn: isLoggedInUseQueryResult.data, 
         isLoggedInUseQueryResult,
 
         logout
     }
-    
-
-    // revalidate session
-    useEffect(() => {
-        isLoggedInUseQueryResult.refetch();
-
-    }, [location]);
-    
 
     useEffect(() => {
         if (!isLoggedInUseQueryResult.data && isLoggedInUseQueryResult.isFetched)
             handleSessionInvalid();
-
     }, [isLoggedInUseQueryResult.data, isLoggedInUseQueryResult.isFetched]);
 
-    
     /**
      * Clear user related use query cache and user related global states.
      */
@@ -103,7 +88,7 @@ export default function AppFetchContextHolder({ children }) {
 
         clearUserCache();
         setAppUserEntity(AppUserService.getDefaultInstance());
-        setNoteEntities([]);
+        setEditedNoteEntities([]); 
     }
 
 
@@ -111,12 +96,10 @@ export default function AppFetchContextHolder({ children }) {
      * Reset global states, clear use query cache and fetch logout.
      */
     async function logout(): Promise<void> {
-
         await fetchJson(LOGOUT_URL, "post");
 
         isLoggedInUseQueryResult.refetch();
     }
-
 
     return (
         <AppFetchContext.Provider value={context}>
@@ -133,19 +116,21 @@ export const AppFetchContext = createContext({
     fetchSaveAppUserEntity: async (appUserToSave?: AppUserEntity, decrypt = true) => {return {} as Promise<AppUserEntity | CustomExceptionFormat> },
     fetchLogin: async (email: string, password: string) => {return {} as Promise<CustomExceptionFormat | Response>},
 
-    noteEntities: [] as NoteEntity[],
-    setNoteEntities: (noteEntities: NoteEntity[]) => {},
-    noteSearchResults: undefined as NoteEntity[] | undefined, 
-    setNoteSearchResults: (results: NoteEntity[] | undefined) => {},
+    editedNoteEntities: [] as NoteEntity[],
+    setEditedNoteEntities: (editedNoteEntities: NoteEntity[]) => {},
+    getNoteSearchPhrase: () => "" as string,
+    setNoteSearchPhrase: (phrase: string) => {},
+    getNoteSearchTags: () => new Set<string>(),
+    setNoteSearchTags: (tags: Set<string>) => {},
     fetchSaveNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<NoteEntity | CustomExceptionFormat>},
-    fetchSaveAllNoteEntities: async (noteEntities: NoteEntity[]) => {return {} as Promise<NoteEntity[] | CustomExceptionFormat>},
+    fetchSaveAllNoteEntities: async (editedNoteEntities: NoteEntity[]) => {return {} as Promise<NoteEntity[] | CustomExceptionFormat>},
     fetchDeleteNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<Response | CustomExceptionFormat>},
     isFetchNoteEntitiesTakingLonger: false as boolean,
-    noteUseQueryResult: {} as DefinedUseQueryResult<NoteEntity[]>,
-    gotNewNoteEntities: false as boolean,
-    setGotNewNoteEntities: (newNoteEntities: boolean) => {},
-    currentNotesPage: 1 as number,
+    notesUseQueryResult: {} as DefinedUseQueryResult<SearchNoteResultDto>,
+    /** 1-based */
+    getCurrentNotesPage: () => 1 as number,
     setCurrentNotesPage: (page: number) => {},
+    totalNotePages: 0 as number,
 
     isLoggedIn: false,
     isLoggedInUseQueryResult: {} as DefinedUseQueryResult<boolean>,

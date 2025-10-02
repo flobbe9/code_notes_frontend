@@ -26,6 +26,10 @@ $desktopMinWidth: 992px;
     --matteBlackLight: #292929;
     --matteBlackLighter: #3a3a3a;
 
+    // input specific
+    /** The max height of a note input when collapsed */
+    --noteInputMaxHeight: 20vh;
+
     --mobileMaxWidth: #{$mobileMaxWidth};
     --tabletMinWidth: #{$tabletMinWidth};
     --tabletMaxWidth: #{$tabletMaxWidth};

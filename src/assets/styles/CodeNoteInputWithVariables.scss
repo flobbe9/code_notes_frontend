@@ -2,7 +2,6 @@
 
 
 :root {
-    --codeNoteInputWithVariablesMinHeight: 20vh;
     --variableInputFontFamily: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --variableInputFontSize: 1em;
     --variableInputPaddingLeftRight: 0px;
@@ -15,6 +14,12 @@
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
     color: white;
+
+    &-buttonContainer {
+        &-appendVariableButton {
+            margin-right: .85em !important;
+        }
+    }
     
     &.fullScreen {
         border-radius: var(--borderRadius); // for full screen mode
@@ -54,7 +59,7 @@
             line-height: 1.6em;
             height: 100%;
             margin: 0;
-            max-height: var(--codeNoteInputWithVariablesMinHeight);
+            max-height: var(--noteInputMaxHeight);
             min-height: 41px;
             overflow: auto;
             padding: 10px var(--noteInputPaddingX);

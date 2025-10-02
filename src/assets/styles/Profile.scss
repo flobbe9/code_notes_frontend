@@ -1,11 +1,18 @@
 @import "./global/functions.scss";
 @import "./global/variables.scss";
 
+
 .Profile {
     $disabledOpacity: .8;
     $inputPaddingY: .3em;
 
-    padding: 2em 0 2em 3em;
+    position: relative;
+    min-height: 100%;
+
+    // ~ mobile landscape mode
+    @media screen and (max-height: 600px) {
+        min-height: 500px;
+    }
 
     &-userDetail {
         &-accountImage {
@@ -77,7 +84,9 @@
     }
 
     &-deleteAccountContainer {
-        margin-top: 30vh;
+        // stick to bottom
+        bottom: 0;
+        position: absolute;
 
         &-deleteButton {
             border: 2px solid var(--matteBlueLight);

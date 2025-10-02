@@ -3,13 +3,15 @@ import { Link, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../../abstract/InputValidationWrapper";
 import "../../assets/styles/Login.scss";
-import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
+import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, OAUTH2_AUTH_LINK_GOOGLE, OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
-import { getCurrentUrlWithoutWWW, getHeadTitleText, isBlank, isNumberFalsy, setCsrfToken, stringToNumber } from "../../helpers/utils";
+import { getHeadTitleText, setCsrfToken } from "../../helpers/projectUtils";
+import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, stringToNumber } from "../../helpers/utils";
 import { useFormInput } from "../../hooks/useFormInput";
+import { EDITED_NOTES_KEY } from "../../hooks/useNotes";
 import { RouteContext } from "../RouteContextHolder";
 import { AppContext } from "./../App";
-import { AppFetchContext } from "./../AppFetchContextHolder";
+import { AppFetchContext } from "./../AppFetchContextProvider";
 import Button from "./../helpers/Button";
 import Flex from "./../helpers/Flex";
 import Head from "./../helpers/Head";
@@ -19,7 +21,6 @@ import Oauth2LoginButton from "./../Oauth2LoginButton";
 import ResendConfirmationMail from "./../ResendConfirmationMail";
 import SendPasswordResetMail from "./../SendPasswordResetMail";
 import Register from "./Register";
-import { UNSAVD_NOTES_KEY } from "../../hooks/useNotes";
 
 
 interface Props extends DefaultProps {
@@ -55,9 +56,9 @@ export default function Login({isPopupContent = false, ...props}: Props) {
 
     const { toast, hidePopup, showPopup, replacePopupContent } = useContext(AppContext);
     const { clearUrlQueryParams } = useContext(RouteContext);
-    const { fetchLogin, isLoggedInUseQueryResult, noteEntities } = useContext(AppFetchContext);
+    const { fetchLogin, isLoggedInUseQueryResult, editedNoteEntities } = useContext(AppFetchContext);
     
-    const [urlQueryParams, setUrlSearchParams] = useSearchParams();
+    const [urlQueryParams] = useSearchParams();
     
     type InputName = "email" | "password";
     const inputValidationWrappers: Record<InputName, InputValidationWrapper[]> = {
@@ -339,7 +340,13 @@ export default function Login({isPopupContent = false, ...props}: Props) {
 
     function handleOauth2ButtonClick(): void {
 
-        localStorage.setItem(UNSAVD_NOTES_KEY, JSON.stringify(noteEntities));
+        localStorage.setItem(EDITED_NOTES_KEY, JSON.stringify(editedNoteEntities));
+        // TODO: continue here
+        // window.open(OAUTH2_AUTH_LINK_GOOGLE, "test", "popup=true,width=500,height=700")
+        // open
+        // authenticate
+        // close
+        // redirect to home
     }
 
 

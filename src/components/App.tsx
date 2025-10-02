@@ -4,7 +4,7 @@ import '../assets/styles/App.scss';
 import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, pauseAnimations, playAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
-import AppFetchContextHolder from "./AppFetchContextHolder";
+import AppFetchContextProvider from "./AppFetchContextProvider";
 import Footer from "./Footer";
 import ConditionalComponent from './helpers/ConditionalComponent';
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
@@ -22,7 +22,7 @@ import NotFound from './routes/NotFound';
 import PrivacyPolicy from "./routes/PrivacyPolicy";
 import Register from "./routes/Register";
 import Profile from './routes/settings/profile/Profile';
-import SettingsPage from './routes/settings/SettingsPage';
+import Settings from './routes/settings/Settings';
 import StartPageContainer from './routes/startPageContainer/StartPageContainer';
 
 
@@ -30,7 +30,6 @@ import StartPageContainer from './routes/startPageContainer/StartPageContainer';
  * @since 0.0.1
  */
 export default function App() {
-
     const [toastSummary, setToastSummary] = useState("");
     const [toastMessage, setToastMessage] = useState("");
     const [toastSevirity, setToastSevirity] = useState<ToastSevirity>("info");
@@ -46,13 +45,10 @@ export default function App() {
     const [popupContent, setPopupContent] = useState<ReactNode | undefined>([]);
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
     const [popup2Content, setPopup2Content] = useState<ReactNode>([]);
-    
+
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
 
-    /** List of note ids that have been edited since they were last saved. Remove a note id from this list, once the note gets saved */
-    const [editedNoteIds, setEditedNoteIds] = useState<Set<Number>>(new Set());
-
-    const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress } = useKeyPress(true);
+    const { isKeyPressed, isControlKeyPressed, handleKeyDownUseKeyPress, handleKeyUpUseKeyPress, pressedKeys } = useKeyPress(true);
 
     /** Time the toast popup takes to slide up and down in ms. */
     const toastSlideDuration = 400;
@@ -69,6 +65,7 @@ export default function App() {
 
         isKeyPressed,
         isControlKeyPressed,
+        pressedKeys,
 
         isAppOverlayVisible,
         setIsAppOverlayVisible,
@@ -82,21 +79,15 @@ export default function App() {
         showPopup,
         hidePopup,
         replacePopupContent,
-
-        editedNoteIds,
-        setEditedNoteIds,
     }
 
     const toastRef = useRef<HTMLDivElement>(null);
 
-    
     useEffect(() => {
         window.addEventListener("keydown", handleWindowKeyDown);
         window.addEventListener("keyup", handleWindowKeyUp);
         window.addEventListener("resize", handleWindowResize);
-
     }, []);
-
 
     /**
      * Set given text to toast and slide it up.
@@ -108,7 +99,6 @@ export default function App() {
      *                   the popup wont hide by itself.
      */
     function toast(summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number): void {
-
         setToastSummary(summary);
         setToastMessage(message);
         setToastSevirity(sevirity);
@@ -126,7 +116,6 @@ export default function App() {
         setTimeout(moveToast, 10)
     }
 
-
     /**
      * Start a timeout for toast to hide if it doesn't hide automatically.
      * 
@@ -134,7 +123,6 @@ export default function App() {
      *                   the popup wont hide by itself.
      */
     function forceToastTimeout(screenTime = 8000): void {
-
         // case: no toast present or will hide on it's own
         if (isBlank(toastSummary) || !isNumberFalsy(toastScreenTime))
             return;
@@ -148,14 +136,12 @@ export default function App() {
         setToastScreenTimeTimeout(toastTimeout);
     }
 
-
     /**
      * Show toast or hide it if ```hideToast``` is ```true```. Has a 10 milliseconds delay.
      * 
      * @param hideToast if true, toast will definitely by hidden regardless of it's state before. Default is ```false```
      */
     async function moveToast(hideToast = false): Promise<void> {
-
         let targetBottom = "30px";
 
         // toast height including message
@@ -179,19 +165,16 @@ export default function App() {
             10
         ); // wait for css to complete
     }
-        
 
     /**
      * Will cancel the toast timeout and possibly pause ongoing toast animations.
      * 
      * @param event 
      */
-    function handleToastMouseEnter(event: MouseEvent): void {
-
+    function handleToastMouseEnter(): void {
         clearTimeout(toastScreenTimeTimeout);
         pauseAnimations(toastRef.current!);
     }
-    
 
     /**
      * Will restart the toast timeout to hide itself (if was set) and possibly resume ongoing toast animations.
@@ -199,20 +182,16 @@ export default function App() {
      * @param event 
      */
     function handleToastMouseLeave(event: MouseEvent): void {
-        
         playAnimations(toastRef.current!)
 
         // case: toast does hide automatically
         if (!isNumberFalsy(toastScreenTime))
             setToastScreenTimeTimeout(setTimeout(() => moveToast(true), toastScreenTime));
     }
-    
 
     function handleWindowResize(event): void {
-
         setWindowSize([window.innerWidth, window.innerHeight]);
     }
-    
 
     /**
      * Col grid:
@@ -248,7 +227,6 @@ export default function App() {
 
 
     function handleWindowKeyDown(event: KeyboardEvent): void {
-
         const key = event.key;
 
         handleKeyDownUseKeyPress(event);
@@ -261,7 +239,6 @@ export default function App() {
 
 
     function handleWindowKeyUp(event): void {
-
         handleKeyUpUseKeyPress(event);
     }
 
@@ -272,7 +249,6 @@ export default function App() {
      * @param overlayContent the content to put below the pending icon
      */
     function showPendingOverlay(overlayContent?: ReactNode): void {
-
         setIsAppOverlayVisible(true);
         setAppOverlayContent(
             <>
@@ -289,7 +265,6 @@ export default function App() {
      * Hides the app overlay and resets all overlay states to default.
      */
     function hidePendingOverlay(): void {
-
         setIsAppOverlayVisible(false);
         setAppOverlayContent(<></>);
         setIsAppOverlayHideOnClick(true);
@@ -303,7 +278,6 @@ export default function App() {
      * @param popupContent will only update state if this is not ```undefined```
      */
     function showPopup(popupContent?: ReactNode | undefined): void {
-
         const { setIsPopupVisible, setPopupContent, isBottomMostPopup } = getPopupAfterTopMostVisiblePopup();
 
         if (popupContent !== undefined)
@@ -320,7 +294,6 @@ export default function App() {
      * Hide topmost visible popup and app overlay.
      */
     function hidePopup(): void {
-
         const { setIsPopupVisible, isBottomMostPopup } = getTopMostVisiblePopup();
 
         setIsPopupVisible(false);
@@ -356,7 +329,8 @@ export default function App() {
     } {
 
         // case: popup2 is visible
-        if (document.querySelector("#Popup2")?.computedStyleMap().get("display")?.toString() !== "none")
+        const popup2 = document.querySelector("#Popup2");
+        if (popup2 && window.getComputedStyle(popup2).getPropertyValue("display") !== "none")
             return { 
                 popupContent: popup2Content,
                 setPopupContent: setPopup2Content,
@@ -385,9 +359,9 @@ export default function App() {
         setIsPopupVisible: (isVisible: boolean) => void,
         isBottomMostPopup: boolean
     } {
-
+        const popup1 = document.querySelector("#Popup1");
         // case: popup 1 is visible
-        if (document.querySelector("#Popup1")?.computedStyleMap().get("display")?.toString() === "none")
+        if (popup1 && getComputedStyle(popup1).getPropertyValue("display") === "none")
             return {
                 popupContent,
                 setPopupContent,
@@ -405,12 +379,11 @@ export default function App() {
         };
     }
 
-
     return (
         <AppContext.Provider value={context}>
-            <BrowserRouter>
+            <BrowserRouter future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
                 <RouteContextHolder>
-                    <AppFetchContextHolder>
+                    <AppFetchContextProvider>
                         <div id="App" className="App">
                             <Overlay 
                                 id="App"
@@ -423,19 +396,6 @@ export default function App() {
                             >
                                 {appOverlayContent}
                             </Overlay>
-
-                            <Popup 
-                                id="1"
-                                isPopupVisible={isPopupVisible} 
-                                popupContent={popupContent}
-                                setPopupContent={setPopupContent}
-                            />
-                            <Popup
-                                id="2" 
-                                isPopupVisible={isPopup2Visible} 
-                                popupContent={popup2Content}
-                                setPopupContent={setPopup2Content}
-                             />
 
                             <NavBar />
 
@@ -454,9 +414,9 @@ export default function App() {
                                     <Route path={RESET_PASSWORD_BY_TOKEN_PATH} element={<ResetPassword />} />
                                     <Route path={PROFILE_PATH} element={
                                         <LoggedInComponent>
-                                            <SettingsPage>
+                                            <Settings>
                                                 <Profile />
-                                            </SettingsPage>
+                                            </Settings>
                                         </LoggedInComponent>
                                     } />
                                     <Route path="*" element={<NotFound></NotFound>} />
@@ -464,6 +424,20 @@ export default function App() {
                             </div>
 
                             <Footer />
+
+                            <Popup 
+                                id="1"
+                                isPopupVisible={isPopupVisible} 
+                                popupContent={popupContent}
+                                setPopupContent={setPopupContent}
+                            />
+                            
+                            <Popup
+                                id="2" 
+                                isPopupVisible={isPopup2Visible} 
+                                popupContent={popup2Content}
+                                setPopupContent={setPopup2Content}
+                            />
 
                             {/* Toast popup */}
                             <Toast 
@@ -475,7 +449,7 @@ export default function App() {
                                 onMouseLeave={handleToastMouseLeave}
                             />  
                         </div>
-                    </AppFetchContextHolder>
+                    </AppFetchContextProvider>
                 </RouteContextHolder>
             </BrowserRouter>
         </AppContext.Provider>
@@ -494,7 +468,8 @@ export const AppContext = createContext({
     isDesktopWidth: false as boolean,
 
     isKeyPressed: (keyName: string): boolean => {return false},
-    isControlKeyPressed: () => {return false as boolean},
+    isControlKeyPressed: (nonControlKeys?: string[]) => {return false as boolean},
+    pressedKeys: new Set() as Set<string>,
 
     isAppOverlayVisible: false,
     setIsAppOverlayVisible: (isVisible: boolean) => {},
@@ -508,7 +483,4 @@ export const AppContext = createContext({
     showPopup: (popupContent?: ReactNode | undefined) => {},
     hidePopup: () => {},
     replacePopupContent: (content: ReactNode | undefined) => {},
-
-    editedNoteIds: new Set<Number>(),
-    setEditedNoteIds: (ids: Set<Number>) => {}
 });

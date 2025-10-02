@@ -5,15 +5,16 @@ import { CustomExceptionFormatService } from "../../../../abstract/services/Cust
 import "../../../../assets/styles/Profile.scss";
 import { BACKEND_BASE_URL } from "../../../../helpers/constants";
 import { fetchAny, isResponseError } from "../../../../helpers/fetchUtils";
-import { getCurrentUrlWithoutWWW, getHeadTitleText, isBlank } from "../../../../helpers/utils";
+import { getCurrentUrlWithoutWWW, isBlank } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
-import { AppFetchContext } from "../../../AppFetchContextHolder";
+import { AppFetchContext } from "../../../AppFetchContextProvider";
 import ResetPassword from "../../../ResetPassword";
 import Button from "../../../helpers/Button";
 import Confirm from "../../../helpers/Confirm";
 import ContentEditableDiv from "../../../helpers/ContentEditableDiv";
 import Head from "../../../helpers/Head";
 import TextInput from "../../../helpers/TextInput";
+import { getHeadTitleText } from "../../../../helpers/projectUtils";
 
 
 interface Props extends DefaultProps {

@@ -8,7 +8,6 @@ import Flex from "./Flex";
 
 
 interface Props extends HelperProps {
-
     /** Default is "Search..." */
     placeHolder?: string,
     /** Indicates whether to hide the x button that clears the search value. Default is ```false``` */
@@ -23,7 +22,6 @@ interface Props extends HelperProps {
     /** Styles for the "delete search value" icon. Default is {} */
     _xIcon?: CSSProperties,
 }
-
 
 /**
  * @since 0.0.1
@@ -53,7 +51,6 @@ export default forwardRef(function SearchBar(
     }: Props, 
     ref: Ref<HTMLInputElement>
 ) {
-
     const [isFocus, setIsFocus] = useState(false);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "SearchBar");
@@ -63,9 +60,7 @@ export default forwardRef(function SearchBar(
 
     useImperativeHandle(ref, () => inputRef.current!, []);
 
-
     function handleXIconClick(event): void {
-
         if (disabled)
             return;
 
@@ -75,15 +70,11 @@ export default forwardRef(function SearchBar(
             onXIconClick(event);
     }
 
-
     function clearInputValue(): void {
-
         getSearchBarInput().value = "";
     }
 
-
     function handleClick(event): void {
-
         if (disabled)
             return;
 
@@ -95,9 +86,7 @@ export default forwardRef(function SearchBar(
             onClick(event);
     }
 
-
     function handleInputFocus(event): void {
-
         if (disabled)
             return;
 
@@ -107,9 +96,7 @@ export default forwardRef(function SearchBar(
             onFocus(event);
     }
 
-
     function handleBlur(event): void {
-
         if (disabled)
             return;
 
@@ -119,12 +106,9 @@ export default forwardRef(function SearchBar(
             onBlur(event);
     }
 
-
     function getSearchBarInput(): HTMLInputElement {
-
         return componentRef.current!.querySelector(".searchInput") as HTMLInputElement;
     }
-    
     
     /**
      * Indicates whether to use the default disabled style or not.
@@ -132,10 +116,8 @@ export default forwardRef(function SearchBar(
      * @returns ```true``` if ```disabled``` and ```_disabled``` style is falsy
      */
     function isDefaultDisabledStyle(): boolean {
-
         return disabled && isObjectFalsy(_disabled);
     }
-
 
     return (
         <Flex 

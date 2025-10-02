@@ -1,6 +1,5 @@
 import { useContext, useEffect } from "react";
 import { AppContext } from "../components/App";
-import { logWarn } from "../helpers/utils";
 
 
 
@@ -53,7 +52,6 @@ export function useInitialStyles(
 
 
     function handleWindowResize(): void {
-        
         if (!element) 
             return;
 
