@@ -1,7 +1,7 @@
 ARG NODE_VERSION
 
 
-FROM node:${NODE_VERSION}-alpine as build
+FROM node:${NODE_VERSION}-alpine AS build
 
 WORKDIR /app
 
@@ -20,7 +20,6 @@ RUN npm run build
 # COPY ./build ./build
 
 
-# FROM node:${NODE_VERSION}-alpine
 # NOTE: mount nginx.conf using compose
 FROM nginx:alpine
 
