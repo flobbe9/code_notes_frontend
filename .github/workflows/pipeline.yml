@@ -55,6 +55,7 @@ jobs:
         uses: docker/build-push-action@v6.10.0
         with:
           push: true
+          context: .
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:${{env.REACT_APP_VERSION}}
