@@ -3,8 +3,7 @@ node_modules
 build
 DefaultComponent.tsx
 package-lock.json
-.env.*
 *.csr
-*.p12
 *.md
 test.*
+.nginx
