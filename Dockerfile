@@ -10,7 +10,7 @@ COPY ./public ./public
 COPY ./package.json \
      ./tsconfig.json \
      ./.env \
-     ./.env.loca[l] \
+    #  ./.env.loca[l] \
      ./
 
 RUN npm i
