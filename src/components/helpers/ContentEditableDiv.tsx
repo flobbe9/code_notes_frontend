@@ -10,7 +10,6 @@ import HiddenInput from "./HiddenInput";
 
 
 interface Props extends HelperProps {
-
     /** 
      * Default is "". Avoid replacing inner html when placeholder is present since this will result in 
      * losing focus on every second click.
