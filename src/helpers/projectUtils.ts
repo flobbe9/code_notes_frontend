@@ -7,7 +7,7 @@ import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTES_QUERY_KEY } from "../hooks/useNotes";
 import { APP_NAME_PRETTY, DEFAULT_HTML_SANTIZER_OPTIONS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
-import { getRandomString, isBlank, isEmpty, logWarn, stringToHtmlElement } from "./utils";
+import { assertFalsyAndLog, getRandomString, isBlank, isEmpty, logWarn, stringToHtmlElement } from "./utils";
 
 /**
  * Meant to provide specific util methods that are not needed in any project.
@@ -103,7 +103,6 @@ export function moveCursor(inputElement: HTMLInputElement | HTMLDivElement, star
  * @returns the current index of the cursor of given text input element or -1. If text is marked, the index of selection start is returned
  */
 export function getCursorIndex(inputElement: HTMLInputElement | HTMLDivElement): number {
-
     if (!inputElement)
         return -1;
 
@@ -119,15 +118,10 @@ export function getCursorIndex(inputElement: HTMLInputElement | HTMLDivElement):
 
 
 /**
- * Works for textarea and contenteditable div.
- * 
- * NOTE: I don't think this is reliable when having selected multiple lines
- * 
  * @param inputElement to get the line number for
- * @returns the 1-based line number of the current selection start in given ```inputElement```
+ * @returns the 1-based line number of the current selection start in given ```inputElement``` or -1 if falsy params
  */
 export function getCursorLineNum(inputElement: HTMLTextAreaElement | HTMLDivElement): number {
-
     if (!inputElement)
         return -1;
 
@@ -140,59 +134,36 @@ export function getCursorLineNum(inputElement: HTMLTextAreaElement | HTMLDivElem
 
     if (inputElement instanceof HTMLDivElement) {
         const documentSelection = document.getSelection();
-        const cursorIndex = getCursorIndex(inputElement);
-        const isTextSelected = documentSelection?.anchorOffset !== documentSelection?.focusOffset;
-        const selectionEnd = documentSelection?.focusOffset || cursorIndex;
+        const initialAnchorOffset = documentSelection?.anchorOffset!;
+        const initialFocusOffset = documentSelection?.focusOffset!;
+        const initiallySelectedText = isTextSelected();
 
-        let currentLine = 1;
-
-        // move cursor to start of line
-        moveCursor(inputElement, 0);
+        if (assertFalsyAndLog(documentSelection, initialAnchorOffset, initialFocusOffset))
+            return -1;
         
-        // select line above
-        documentSelection?.modify("extend", "left", "line");
+        // move to start of line (pos (0, y))
+        documentSelection?.modify("move", "left", "lineboundary")
 
-        if (isCursorLineEmptyInContentEditableDiv())
-            // empty lines have 2 line breaks for some reason, remove one
-            currentLine--;
-
-        // case: actually selected something => got a prev line
-        while (!documentSelection?.isCollapsed) {
-            documentSelection?.modify("move", "left", "character");
-            documentSelection?.modify("extend", "left", "line");
-
-            if (!isCursorLineEmptyInContentEditableDiv())
-                currentLine++;
+        let lineCount = 1; // 1-based
+        // move up to pos (0, 0)
+        while (documentSelection?.anchorOffset! > 0) {
+            lineCount++;
+            documentSelection?.modify("move", "backward", "line")
         }
 
-        // move cursor back to initial line
-        for (let i = 0; i < currentLine - 1; i++)
-            documentSelection?.modify("move", "forward", "line");
+        // move back
+        moveCursor(inputElement, initialAnchorOffset);
 
-        // move cursor back to initial index, consider selection
-        moveCursor(inputElement, cursorIndex, isTextSelected ? selectionEnd : cursorIndex)
+        // select initially selected text
+        if (initiallySelectedText)
+            for (let i = documentSelection?.anchorOffset!; i < initialFocusOffset; i++)
+                documentSelection?.modify("extend", "forward", "character")
 
-        return currentLine;
+        return lineCount;
     }
 
     logWarn("Invalid 'inputElement' type");
     return -1;
-}
-
-
-/**
- * ```anchorOffset``` is the selection start
- * 
- * ```focusOffset``` is the selection end
- * 
- * @returns 
- */
-function isCursorLineEmptyInContentEditableDiv(): boolean {
-    const documentSelection = document.getSelection();
-    if (!documentSelection)
-        return false;
-
-    return documentSelection?.anchorOffset === 0 && documentSelection.focusOffset !== 0;
 }
 
 

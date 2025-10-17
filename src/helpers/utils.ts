@@ -45,10 +45,12 @@ export function logWarnFiltered(message?: any, ...optionalParams: any[]): void {
 
 
 export function logError(message?: any, ...optionalParams: any[]): void {
-
     if (!isErrorLogLevel())
         return;
 
+    if (message instanceof Error)
+        message = message.message;
+    
     const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
 
     console.error(getTimeStamp(), errorObj, ...optionalParams);
@@ -1476,4 +1478,21 @@ export function percentToPixels(percent: number, unit: "vw" | "vh" | "%", fullSi
     const windowSize = unit === "vh" ? fullSizeInPixels[1] : fullSizeInPixels[0];
 
     return windowSize * (percent / 100);
+}
+
+
+/**
+ * See {@link assertFalsyAndThrow}
+ * 
+ * @param args 
+ * @returns `true` if at least one arg is falsy
+ */
+export function assertFalsyAndLog(...args: any[]): boolean {
+    try {
+        assertFalsyAndThrow(...args);
+        return false;
+    } catch (e) {
+        logError(e);
+        return true;
+    }
 }

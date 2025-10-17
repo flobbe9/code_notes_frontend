@@ -203,7 +203,6 @@ export default function PlainTextNoteInput({
      * @returns same html string but with some special chars replaced. Does not alter given string
      */
     function cleanUpHtml(html: string): string {
-
         let cleanHtml = html;
         cleanHtml = cleanHtml.replaceAll("&amp;", "&");
         cleanHtml = cleanHtml.replaceAll("&lt;", "<");
