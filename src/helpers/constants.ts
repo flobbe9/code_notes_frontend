@@ -1,7 +1,7 @@
 import sanitize from "sanitize-html";
 import { Env } from "../abstract/Env";
+import { LogLevel } from "../abstract/LogLevel";
 import { isBlank } from "./utils";
-import { LogLevelName } from "../abstract/LogLevel";
 
 // App
 export const ENV: Env = process.env.NODE_ENV as Env;
@@ -9,7 +9,7 @@ export const PROTOCOL = process.env.REACT_APP_PROTOCOL as string;
 export const HOST = process.env.REACT_APP_HOST as string;
 export const VERSION = process.env.REACT_APP_VERSION as string;
 export const APP_NAME_PRETTY = "Code Notes";
-export const LOG_LEVEL = process.env.REACT_APP_LOG_LEVEL as string;
+export const LOG_LEVEL = LogLevel[process.env.REACT_APP_LOG_LEVEL as string];
 
 
 // URLs
@@ -81,15 +81,6 @@ export const NUM_NOTES_PER_PAGE = 5;
 // Crypto
 export const CRYPTO_KEY = process.env.REACT_APP_CRYPTO_KEY || "";
 export const CRYPTO_IV = process.env.REACT_APP_CRYPTO_IV || "";
-
-
-// Custom log
-export const LOG_LEVEL_COLORS: Record<LogLevelName, string> = {
-    "INFO": "white",
-    "WARN": "rgb(255, 233, 174)",
-    "ERROR": "rgb(255, 230, 230)",
-    "DEBUG": "white"
-}
 
 /** Dont log to console if the 'message' contains one of these strings */
 export const CONSOLE_MESSAGES_TO_AVOID: (string | number)[] = [

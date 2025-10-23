@@ -1,126 +1,9 @@
 import { CSSProperties } from "react";
 import { AnimationEasing } from "../abstract/CSSTypes";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
-import { isDebugLogLevel, isErrorLogLevel, isInfoLogLevel, isWarnLogLevel, LogLevelName } from "../abstract/LogLevel";
-import { BASE_URL, CONSOLE_MESSAGES_TO_AVOID, ENV, HOST, LOG_LEVEL_COLORS } from "./constants";
+import { BASE_URL, ENV, HOST } from "./constants";
 import { fetchAnyReturnBlobUrl } from "./fetchUtils";
-
-
-export function log(message?: any, ...optionalParams: any[]): void {
-
-    if (!isInfoLogLevel())
-        return;
-
-    console.log(message, ...optionalParams);
-}
-
-
-export function logDebug(message?: any, ...optionalParams: any[]): void {
-
-    if (!isDebugLogLevel())
-        return;
-
-    // const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
-    
-    // console.log(getTimeStamp(), errorObj, ...optionalParams);
-    console.log(getTimeStamp(), message, ...optionalParams);
-}
-
-
-export function logWarn(message?: any, ...optionalParams: any[]): void {
-    
-    if (!isWarnLogLevel())
-        return;
-
-    const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
-
-    console.warn(getTimeStamp(), errorObj, ...optionalParams);
-}
-
-
-export function logWarnFiltered(message?: any, ...optionalParams: any[]): void {
-
-    logFiltered("WARN", message, ...optionalParams);
-}
-
-
-export function logError(message?: any, ...optionalParams: any[]): void {
-    if (!isErrorLogLevel())
-        return;
-
-    if (message instanceof Error)
-        message = message.message;
-    
-    const errorObj = typeof message === "string" ? new Error(message) : new Error("<no message>");
-
-    console.error(getTimeStamp(), errorObj, ...optionalParams);
-}
-
-
-export function logErrorFiltered(message?: any, ...optionalParams: any[]): void {
-
-    logFiltered("ERROR", message, ...optionalParams);
-}
-
-
-/**
- * Dont log given ```obj``` if it contains one of {@link CONSOLE_MESSAGES_TO_AVOID}s strings. Log normally if ```obj``` is not
- * of type ```string```, ```number``` or ```Error```.
- * 
- * @param logLevelName of obj to choose text background color
- * @param obj to filter before logging
- * @param optionalParams 
- */
-function logFiltered(logLevelName: LogLevelName, obj?: any, ...optionalParams: any[]): void {
-
-    let messageToCheck = obj;
-
-    // case: cannot filter obj
-    if (!obj || (typeof obj !== "string" && typeof obj !== "number" && !(obj instanceof Error))) {
-       logColored(logLevelName, obj, ...optionalParams);
-       return;
-    }
-
-    // case: Error
-    if (obj instanceof Error)
-        messageToCheck = obj.stack;
-
-    // compare to avoid messages
-    for (const messageToAvoid of CONSOLE_MESSAGES_TO_AVOID) 
-        // case: avoid obj
-        if (includesIgnoreCaseTrim(messageToCheck, messageToAvoid)) 
-            return; 
-        
-    logColored(logLevelName, messageToCheck, ...optionalParams);
-}
-
-
-/**
- * Don't use custom logs here, since the default ```console.log``` metods are overriden with this an must work independently from LogLevel.
- *  
- * @param logLevelName 
- * @param obj 
- * @param optionalParams 
- */
-function logColored(logLevelName: LogLevelName, obj?: any, ...optionalParams: any[]): void {
-
-    // get log color by sevirity
-    const color = LOG_LEVEL_COLORS[logLevelName];
-
-    // console.log("%c" + obj, "background: " + color, ...optionalParams);
-    console.log(obj, ...optionalParams);
-}
-
-
-/**
- * Log the all props of given {@link CustomExceptionFormat} response and include the stacktrace.
- * 
- * @param response idealy formatted as {@link CustomExceptionFormat}
- */
-export function logApiResponse(response: CustomExceptionFormat): void {
-
-    logError(response.timestamp + " (" + response.status + "): " + response.message + (response.path ? " " + response.path : ""));
-}
+import { logError, logWarn, logDebug } from "./logUtils";
 
 
 /**
@@ -828,7 +711,6 @@ export function dateMinusDays(days: number, date = new Date()): Date {
 
 
 export function stripTimeFromDate(d: Date): Date {
-
     const date = new Date(d);
 
     date.setMilliseconds(0);
@@ -838,34 +720,6 @@ export function stripTimeFromDate(d: Date): Date {
 
     return date;
 }
-
-
-/**
- * @param date to format, default is ```new Date()```
- * @returns nicely formatted string formatted like ```year-month-date hours:minutes:seconds:milliseconds```
- */
-export function getTimeStamp(date = new Date()): string {
-
-    return date.getFullYear() + "-" + prepend0ToNumber(date.getMonth() + 1) + "-" + prepend0ToNumber(date.getDate()) + " " + 
-           prepend0ToNumber(date.getHours()) + ":" + prepend0ToNumber(date.getMinutes()) + ":" + prepend0ToNumber(date.getSeconds()) + ":" + date.getMilliseconds();
-}
-
-
-/**
- * @param num to prepend a 0 to
- * @returns a string representation of given number with a 0 prended if the number has only one digit
- */
-function prepend0ToNumber(num: number): string {
-
-    let str = num.toString();
-
-    // case: one digit only
-    if (num / 10 < 1)
-        str = "0" + str;
-
-    return str;
-}
-
 
 /**
  * Note: user will need to consent for this function to work.
@@ -1495,4 +1349,41 @@ export function assertFalsyAndLog(...args: any[]): boolean {
         logError(e);
         return true;
     }
+}
+
+/**
+ * @param date to format, default is ```new Date()```
+ * @returns nicely formatted string formatted like ```year-month-date hours:minutes:seconds:milliseconds```
+ */
+export function getTimeStamp(date = new Date()): string {
+    return (
+        date.getFullYear() +
+        "-" +
+        prepend0ToNumber(date.getMonth() + 1) +
+        "-" +
+        prepend0ToNumber(date.getDate()) +
+        " " +
+        prepend0ToNumber(date.getHours()) +
+        ":" +
+        prepend0ToNumber(date.getMinutes()) +
+        ":" +
+        prepend0ToNumber(date.getSeconds()) +
+        ":" +
+        prepend0ToNumber(date.getMilliseconds(), 3)
+    );
+}
+
+/**
+ * @param num to prepend a 0 to
+ * @param totalDigits number of digits (including `num`) to stop prepending zeros at. Default is 2, that would make `5 => 05`
+ * @returns a string representation of given number with a 0 prended if the number has only one digit
+ */
+function prepend0ToNumber(num: number, totalDigits = 2): string {
+    let str = num.toString();
+
+    while (str.length < totalDigits)
+        // case: one digit only
+        str = "0" + str;        
+
+    return str;
 }

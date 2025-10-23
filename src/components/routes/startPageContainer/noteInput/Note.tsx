@@ -7,7 +7,7 @@ import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
 import { handleRememberMyChoice } from "../../../../helpers/projectUtils";
-import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, logError, logWarn, shortenString } from '../../../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, shortenString } from '../../../../helpers/utils';
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextProvider";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
@@ -24,6 +24,7 @@ import DefaultNoteInput from "./DefaultNoteInput";
 import NoteTagList from "./NoteTagList";
 import NoteTitle from "./NoteTitle";
 import PlainTextNoteInput from "./PlainTextNoteInput";
+import { logWarn, logError } from "../../../../helpers/logUtils";
 
 
 interface Props extends DefaultProps {

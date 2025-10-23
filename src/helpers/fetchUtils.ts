@@ -1,8 +1,9 @@
 import { CustomExceptionFormat } from '../abstract/CustomExceptionFormat';
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { BACKEND_BASE_URL, CSRF_TOKEN_HEADER_NAME } from "./constants";
+import { logApiResponse } from './logUtils';
 import { clearSensitiveCache, getCsrfToken } from './projectUtils';
-import { isNumberFalsy, logApiResponse, sleep } from "./utils";
+import { isNumberFalsy, sleep } from "./utils";
 
 /**
  * Call ```fetchAny``` with given params.

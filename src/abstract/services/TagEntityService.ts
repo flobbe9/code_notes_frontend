@@ -1,5 +1,5 @@
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../helpers/constants";
-import { logWarn } from "../../helpers/utils";
+import { logWarn } from "../../helpers/logUtils";
 import { TagEntity } from "../entites/TagEntity";
 import { AbstractService } from "./AbstractService";
 

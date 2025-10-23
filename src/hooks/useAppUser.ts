@@ -7,7 +7,8 @@ import { CustomExceptionFormatService } from "../abstract/services/CustomExcepti
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
-import { isBlank, logError } from "../helpers/utils";
+import { isBlank } from "../helpers/utils";
+import { logError } from "../helpers/logUtils";
 
 
 /**

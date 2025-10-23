@@ -1,5 +1,6 @@
 
-import { isBlank, logWarn } from '../../helpers/utils';
+import { logWarn } from '../../helpers/logUtils';
+import { isBlank } from '../../helpers/utils';
 import { AppUserEntity } from '../entites/AppUserEntity';
 import { NoteEntity } from '../entites/NoteEntity';
 import { TagEntity } from '../entites/TagEntity';
