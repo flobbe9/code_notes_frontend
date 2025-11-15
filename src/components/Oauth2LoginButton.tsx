@@ -1,12 +1,11 @@
 import React, { HTMLAttributeAnchorTarget } from "react";
-import "../assets/styles/Oauth2LoginButton.scss";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";
-import Button from "./helpers/Button";
-import { Link } from "react-router-dom";
-import { OAUTH2_AUTH_LINK_AZURE, OAUTH2_AUTH_LINK_GITHUB, OAUTH2_AUTH_LINK_GOOGLE } from "../helpers/constants";
-import Flex from "./helpers/Flex";
 import { Oauth2ClientRegistrationId } from "../abstract/Oauth2ClientRegistrationId";
+import "../assets/styles/Oauth2LoginButton.scss";
+import { OAUTH2_AUTH_LINK_AZURE, OAUTH2_AUTH_LINK_GITHUB, OAUTH2_AUTH_LINK_GOOGLE } from "../helpers/constants";
+import Button from "./helpers/Button";
+import Flex from "./helpers/Flex";
 
 
 interface Props extends HelperProps {
@@ -17,7 +16,6 @@ interface Props extends HelperProps {
     clientRegistrationId: Oauth2ClientRegistrationId,
     target?: HTMLAttributeAnchorTarget
 }
-
 
 /**
  * @since 0.0.1
@@ -54,10 +52,9 @@ export default function Oauth2LoginButton({
             tabIndex={-1}
             {...otherProps}
         >
-            <Link
+            <a
                 className="Oauth2LoginButton-link blackLink fullWidth"
-                to={getLink()}
-                // to="/login"
+                href={getLink()}
                 target={target}
             >
                 <Flex flexWrap="nowrap" verticalAlign="center">
@@ -69,7 +66,7 @@ export default function Oauth2LoginButton({
                     />
                     <span className="fullWidth">{children}</span>
                 </Flex>
-            </Link>
+            </a>
         </Button>
     )
 }

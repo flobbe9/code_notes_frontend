@@ -52,8 +52,8 @@ export async function fetchAny(url: string, method = "get", body?: any, headers?
     }
 
     // case: request has body
-    if (body) 
-        fetchConfig.body = JSON.stringify(body);
+    if (body)
+        fetchConfig.body = fetchConfig.headers?.["Content-Type"] === "application/json" ? JSON.stringify(body) : body;
 
     let response: Response | CustomExceptionFormat | undefined = undefined;
     try {
@@ -162,7 +162,6 @@ function getFetchHeaders(headers?: HeadersInit): HeadersInit {
     return headers!;
 }
 
-
 /**
  * Possibly log error and clear sensitive data from cache.
  * 
@@ -170,7 +169,6 @@ function getFetchHeaders(headers?: HeadersInit): HeadersInit {
  * @param debug indicates whether to log the error
  */
 async function handleResponseError(errorResponse: CustomExceptionFormat, debug: boolean): Promise<void> {
-
     if (!errorResponse)
         return;
 

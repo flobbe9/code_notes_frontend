@@ -18,6 +18,10 @@ function logByLogLevel(logLevel: LogLevel, ...optionalParams: any[]): void {
     let jsLogLevel = logLevelToString(logLevel).toLowerCase();
     if (logLevel === LogLevel.FATAL)
         jsLogLevel = logLevelToString(LogLevel.ERROR).toLowerCase();
+    
+    // prevent annoying stack trace
+    if (logLevel === LogLevel.TRACE)
+        jsLogLevel = logLevelToString(LogLevel.DEBUG).toLowerCase();
 
     console[jsLogLevel](getLogStartOfLine(logLevel), ...optionalParams);
 }

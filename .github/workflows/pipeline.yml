@@ -20,8 +20,8 @@ jobs:
       - run: npx tsc -b
       - run: npm run build
         env: 
-            # don't fail on build warnings
-            CI: ""
+          # don't fail on build warnings
+          CI: ""
 
   push_to_DockerHub:
     # NOTE: ${{}} syntax does not work here
@@ -37,6 +37,7 @@ jobs:
         run: |
           echo $(cat .env | grep '^REACT_APP_VERSION=.*$') >> $GITHUB_ENV
           echo $(cat .env | grep '^NODE_VERSION=.*$') >> $GITHUB_ENV
+          echo $(cat .env | grep '^FRONTEND_PORT=.*$') >> $GITHUB_ENV
         shell: bash
 
       - name: Set up QEMU
@@ -88,6 +89,10 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           debug: true
           script: |
+            chmod 777 ./${{ vars.SSH_TARGET_FOLDER }}/writeToEnvFile.sh 
+            ./${{ vars.SSH_TARGET_FOLDER }}/writeToEnvFile.sh \
+              FRONTEND_PORT='${{env.FRONTEND_PORT}}'
+
             docker compose -f './${{ vars.SSH_TARGET_FOLDER }}/docker-compose.yml' pull frontend
             yes | docker rm $(docker container ls --all --filter=ancestor=$(docker images -f "dangling=true" -q) --format "{{.ID}}") --force
             yes | docker image rm $(docker images -f "dangling=true" -q)

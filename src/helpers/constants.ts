@@ -5,15 +5,15 @@ import { isBlank } from "./utils";
 
 // App
 export const ENV: Env = process.env.NODE_ENV as Env;
-export const PROTOCOL = process.env.REACT_APP_PROTOCOL as string;
-export const HOST = process.env.REACT_APP_HOST as string;
+export const PROTOCOL = process.env.REACT_APP_GATEWAY_PROTOCOL as string;
+export const HOST = process.env.REACT_APP_GATEWAY_HOST as string;
 export const VERSION = process.env.REACT_APP_VERSION as string;
 export const APP_NAME_PRETTY = "Code Notes";
 export const LOG_LEVEL = LogLevel[process.env.REACT_APP_LOG_LEVEL as string];
 
 
 // URLs
-export const BASE_URL = process.env.REACT_APP_BASE_URL as string;
+export const BASE_URL = process.env.REACT_APP_GATEWAY_BASE_URL as string;
 export const BACKEND_BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL as string;
 /** Default rel attr to pass to any external link */
 export const LINK_DEFAULT_REL = "noopener noreferrer nofollow";
