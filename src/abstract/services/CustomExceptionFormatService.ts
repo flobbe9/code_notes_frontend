@@ -1,5 +1,6 @@
+import { logApiResponse } from "../../helpers/logUtils";
+import { getTimeStamp } from "../../helpers/utils";
 import { CustomExceptionFormat } from "../CustomExceptionFormat";
-import { getTimeStamp, logApiResponse } from "../../helpers/utils";
 
 
 /**
@@ -13,7 +14,6 @@ export class CustomExceptionFormatService {
      * @returns instance using "now" as timestamp and the current ```window.location.pathname``` as path
      */
     public static getInstance(status: number, message: string): CustomExceptionFormat {
-
         return {
             status: status, 
             timestamp: getTimeStamp(),
@@ -31,7 +31,6 @@ export class CustomExceptionFormatService {
      * @returns instance using "now" as timestamp and the current ```window.location.pathname``` as path
      */
     public static getInstanceAndLog(status: number, message: string): CustomExceptionFormat {
-
         const instance = {
             status: status, 
             timestamp: getTimeStamp(),

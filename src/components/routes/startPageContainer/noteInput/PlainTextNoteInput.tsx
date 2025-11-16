@@ -7,7 +7,7 @@ import HelperProps from "../../../../abstract/HelperProps";
 import "../../../../assets/styles/PlainTextNoteInput.scss";
 import { CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
 import { getContentEditableDivLineElements, isTextSelected, moveCursor } from '../../../../helpers/projectUtils';
-import { getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, logWarn, setClipboardText } from "../../../../helpers/utils";
+import { getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from '../../../App';
 import Button from "../../../helpers/Button";
@@ -16,6 +16,7 @@ import Flex from "../../../helpers/Flex";
 import Overlay from '../../../helpers/Overlay';
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from './Note';
+import { logWarn } from '../../../../helpers/logUtils';
 
 
 interface Props extends HelperProps {

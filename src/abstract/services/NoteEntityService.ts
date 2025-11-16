@@ -1,5 +1,6 @@
 import { MAX_NOTE_TITLE_VALUE_LENGTH } from "../../helpers/constants";
-import { isNumberFalsy, logWarn } from "../../helpers/utils";
+import { logWarn } from "../../helpers/logUtils";
+import { isNumberFalsy } from "../../helpers/utils";
 import { NoteEntity } from "../entites/NoteEntity";
 import { AbstractService } from "./AbstractService";
 import { NoteInputEntityService } from "./NoteInputEntityService";

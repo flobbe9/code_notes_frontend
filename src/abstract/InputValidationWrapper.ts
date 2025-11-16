@@ -1,4 +1,4 @@
-import { logWarn } from "../helpers/utils";
+import { logWarn } from "../helpers/logUtils";
 
 
 /**
@@ -27,7 +27,6 @@ export interface InputValidationWrapper {
  * @returns ```true``` if all wrapper predicates return ```true```, else ```false```
  */
 export function isInputValidationWrapperRecordValid(inputValidationWrapperRecord: Record<any, InputValidationWrapper[]>, predicateArgs?: any[]): boolean {
-    
     if (!inputValidationWrapperRecord)
         return false;
 

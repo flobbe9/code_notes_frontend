@@ -1,7 +1,7 @@
 import { NoteInputEntity } from "../entites/NoteInputEntity";
 import { MAX_NOTE_INPUT_VALUE_LENGTH } from "../../helpers/constants";
 import { AbstractService } from "./AbstractService";
-import { logWarn } from "../../helpers/utils";
+import { logWarn } from "../../helpers/logUtils";
 
 
 /**

@@ -1,9 +1,11 @@
-ARG NODE_VERSION
+ARG NODE_VERSION=latest
 
 
 FROM node:${NODE_VERSION}-alpine AS build
 
 WORKDIR /app
+
+ARG APP_ENV=production
 
 COPY ./src ./src
 COPY ./public ./public
@@ -13,6 +15,7 @@ COPY ./package.json \
      ./.env.loca[l] \
      ./
 
+ENV NODE_ENV=APP_ENV
 RUN npm i
 RUN npm run build
 

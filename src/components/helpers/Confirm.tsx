@@ -2,13 +2,14 @@ import React, { forwardRef, Ref, useContext, useImperativeHandle, useRef, useSta
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { RememberMyChoiceKey, RememberMyChoiceValue } from "../../abstract/RememberMyChoice";
 import "../../assets/styles/Confirm.scss";
-import { isBooleanFalsy, logWarn } from "../../helpers/utils";
+import { isBooleanFalsy } from "../../helpers/utils";
 import { AppContext } from "../App";
 import Button from "./Button";
 import Checkbox from "./Checkbox";
 import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";
 import { REMEMBER_MY_CHOICE_KEY_PREFIX } from "../../helpers/constants";
+import { logWarn } from "../../helpers/logUtils";
 
 
 interface Props extends DefaultProps {

@@ -15,13 +15,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - run: npm i
       - run: npx tsc -b
       - run: npm run build
         env: 
-            # don't fail on build warnings
-            CI: ""
+          # don't fail on build warnings
+          CI: ""
 
   push_to_DockerHub:
     # NOTE: ${{}} syntax does not work here
@@ -31,12 +31,13 @@ jobs:
 
     steps:
       - name: Checkout repository 
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
   
       - name: move .env vars to pipeline
         run: |
           echo $(cat .env | grep '^REACT_APP_VERSION=.*$') >> $GITHUB_ENV
           echo $(cat .env | grep '^NODE_VERSION=.*$') >> $GITHUB_ENV
+          echo $(cat .env | grep '^APP_ENV=.*$') >> $GITHUB_ENV
         shell: bash
 
       - name: Set up QEMU
@@ -59,9 +60,10 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:${{env.REACT_APP_VERSION}}
+            ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:${{ env.REACT_APP_VERSION }}
           build-args: |
-            NODE_VERSION=${{env.NODE_VERSION}}
+            NODE_VERSION=${{ env.NODE_VERSION }}
+            APP_ENV=${{ env.APP_ENV }}
 
   deploy_to_server:
     runs-on: ubuntu-latest
@@ -70,7 +72,7 @@ jobs:
     steps:
         # connect to vpn
       - name: Checkout repository 
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install OpenVPN
         run: |
             sudo apt update
@@ -81,6 +83,11 @@ jobs:
             config_file: .github/workflows/config.ovpn
             client_key: ${{ secrets.OPEN_VPN_PRIVATE_KEY }}
 
+      - name: move .env vars to pipeline
+        run: |
+          echo $(cat .env | grep '^PORT=.*$') >> $GITHUB_ENV
+        shell: bash
+
       - uses: appleboy/ssh-action@v1.2.0
         with: 
           host: ${{ vars.SSH_HOST }}
@@ -88,6 +95,10 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           debug: true
           script: |
+            chmod 777 ./${{ vars.SSH_TARGET_FOLDER }}/writeToEnvFile.sh 
+            ./${{ vars.SSH_TARGET_FOLDER }}/writeToEnvFile.sh \
+              FRONTEND_PORT='${{ env.PORT }}'
+
             docker compose -f './${{ vars.SSH_TARGET_FOLDER }}/docker-compose.yml' pull frontend
             yes | docker rm $(docker container ls --all --filter=ancestor=$(docker images -f "dangling=true" -q) --format "{{.ID}}") --force
             yes | docker image rm $(docker images -f "dangling=true" -q)

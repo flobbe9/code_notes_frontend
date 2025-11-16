@@ -7,7 +7,8 @@ import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTES_QUERY_KEY } from "../hooks/useNotes";
 import { APP_NAME_PRETTY, DEFAULT_HTML_SANTIZER_OPTIONS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
-import { assertFalsyAndLog, getRandomString, isBlank, isEmpty, logWarn, stringToHtmlElement } from "./utils";
+import { assertFalsyAndLog, getRandomString, isBlank, isEmpty, stringToHtmlElement } from "./utils";
+import { logWarn } from "./logUtils";
 
 /**
  * Meant to provide specific util methods that are not needed in any project.

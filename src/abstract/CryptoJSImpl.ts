@@ -1,6 +1,7 @@
 import CryptoJS from "crypto-js";
 import { CRYPTO_IV, CRYPTO_KEY } from "../helpers/constants";
-import { isBlank, logError } from "../helpers/utils";
+import { isBlank } from "../helpers/utils";
+import { logError } from "../helpers/logUtils";
 
 
 /**

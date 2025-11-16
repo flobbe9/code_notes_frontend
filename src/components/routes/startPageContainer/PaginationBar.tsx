@@ -1,13 +1,13 @@
 import React, { createContext, Fragment, useContext, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import "../../../assets/styles/PaginationBar.scss";
-import { isNumberFalsy, logDebug } from "../../../helpers/utils";
+import { isNumberFalsy } from "../../../helpers/utils";
 import { AppContext } from "../../App";
 import Button from "../../helpers/Button";
 import Flex from "../../helpers/Flex";
 import HelperDiv from "../../helpers/HelperDiv";
-import { useLocation } from "react-router-dom";
 
 
 interface Props extends DefaultProps {

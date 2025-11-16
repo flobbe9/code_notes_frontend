@@ -5,7 +5,7 @@ import { AppUserService } from "../../../../abstract/services/AppUserService";
 import { TagEntityService } from "../../../../abstract/services/TagEntityService";
 import "../../../../assets/styles/TagInput.scss";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../../../helpers/constants";
-import { getJsxElementIndexByKey, isBlank, logWarn, shortenString } from "../../../../helpers/utils";
+import { getJsxElementIndexByKey, isBlank, shortenString } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextProvider";
 import Button from "../../../helpers/Button";
@@ -13,6 +13,7 @@ import Flex from "../../../helpers/Flex";
 import { StartPageContainerContext } from "../StartPageContainer";
 import { NoteContext } from "./Note";
 import { NoteTagListContext } from "./NoteTagList";
+import { logWarn } from "../../../../helpers/logUtils";
 
 
 interface Props extends DefaultProps {
