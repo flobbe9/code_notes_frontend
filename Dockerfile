@@ -5,6 +5,8 @@ FROM node:${NODE_VERSION}-alpine AS build
 
 WORKDIR /app
 
+ARG APP_ENV=production
+
 COPY ./src ./src
 COPY ./public ./public
 COPY ./package.json \
@@ -13,11 +15,12 @@ COPY ./package.json \
      ./.env.loca[l] \
      ./
 
-RUN npm i
-RUN npm run build
+ENV NODE_ENV=APP_ENV
+# RUN npm i
+# RUN npm run build
 
 # UNCOMMENT FOR DEV USE: and comment out above steps and .dockerignore "build" in order to quickly use local build folder 
-# COPY ./build ./build
+COPY ./build ./build
 
 
 # NOTE: mount nginx.conf using compose

@@ -6,6 +6,7 @@ services:
       context: .
       args:
         NODE_VERSION: ${NODE_VERSION}
+        APP_ENV: development
     # NOTE: this does not override application .env vars
     environment:
       TZ: ${TZ}
