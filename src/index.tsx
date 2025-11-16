@@ -14,8 +14,7 @@ export const useQueryClientObj = new QueryClient({
         queries: {
             refetchOnReconnect: false,
             refetchOnWindowFocus: false,
-            // TODO: might fix the weird "does not save" bug?
-            // gcTime: Infinity
+            gcTime: 86400000 // 1 day
         }
     }
 });
