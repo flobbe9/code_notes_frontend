@@ -16,11 +16,11 @@ COPY ./package.json \
      ./
 
 ENV NODE_ENV=APP_ENV
-# RUN npm i
-# RUN npm run build
+RUN npm i
+RUN npm run build
 
 # UNCOMMENT FOR DEV USE: and comment out above steps and .dockerignore "build" in order to quickly use local build folder 
-COPY ./build ./build
+# COPY ./build ./build
 
 
 # NOTE: mount nginx.conf using compose
