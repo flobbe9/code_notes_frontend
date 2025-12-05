@@ -1,0 +1,106 @@
+services:
+  db:
+    image: mariadb:${DB_VERSION}
+    container_name: prod_db
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: ${TZ}
+    healthcheck:
+      test: mariadb-admin ping -u root -p${DB_ROOT_PASSWORD}
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - db:/var/lib/mysql/
+    
+  backend:
+    depends_on: 
+      db: 
+        condition: service_healthy
+    image: flobbe9/code_notes_backend
+    container_name: prod_backend
+    ports: 
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    environment:
+      GATEWAY_PROTOCOL: ${GATEWAY_PROTOCOL}
+      GATEWAY_HOST: ${GATEWAY_HOST}
+      GATEWAY_PORT: ${GATEWAY_PORT}
+      GATEWAY_BASE_URL: ${GATEWAY_BASE_URL}
+      MAIL_HOST: host.docker.internal
+      DB_HOST: host.docker.internal
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      # JAVA_RUNTIME_ARGS:
+      ENV: ${ENV}
+      TZ: ${TZ}
+    healthcheck:
+      test: wget --no-verbose --no-check-certificate --tries=1 --spider http://host.docker.internal:${BACKEND_PORT}/app-user/check-logged-in || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+  
+  frontend:
+    depends_on:
+      backend:
+        condition: service_healthy
+    image: frontend 
+    build:
+      context: ../
+      args:
+        NODE_VERSION: ${NODE_VERSION}
+        APP_ENV: ${ENV}
+    container_name: prod_frontend
+    environment:
+      REACT_APP_GATEWAY_HOST: ${GATEWAY_HOST}
+      REACT_APP_GATEWAY_PROTOCOL: ${GATEWAY_PROTOCOL}
+      REACT_APP_GATEWAY_PORT: ${GATEWAY_PORT}
+    ports: 
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    healthcheck:
+      test: wget --no-verbose --no-check-certificate --tries=1 --spider http://host.docker.internal:${FRONTEND_PORT} || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 2s
+    volumes:
+      - ./nginx.local.conf:/etc/nginx/conf.d/default.conf
+      
+  gateway:
+    depends_on:
+      frontend:
+        condition: service_healthy
+    image: flobbe9/code_notes_gateway
+    container_name: prod_gateway
+    ports:
+      - ${GATEWAY_PORT}:${GATEWAY_PORT}
+    environment:
+      PORT: ${GATEWAY_PORT}
+      HTTPS: false
+      BACKEND_HOST: host.docker.internal
+      FRONTEND_HOST: host.docker.internal
+    healthcheck:
+      test: wget --no-verbose --no-check-certificate --tries=1 --spider ${GATEWAY_PROTOCOL}://host.docker.internal:${GATEWAY_PORT} || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 2s
+
+  maildev:
+    image: maildev/maildev
+    container_name: prod_maildev
+    ports: 
+      - ${MAIL_PORT}:${MAIL_PORT}
+      - ${MAIL_UI_PORT}:${MAIL_UI_PORT}
+    environment:
+      TZ: ${TZ}
+
+volumes:
+  db:
