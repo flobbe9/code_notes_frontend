@@ -1,7 +1,6 @@
 import React, { createContext, RefObject, useRef } from "react";
 import { DefaultNoteInputProps } from "../../../../abstract/DefaultNoteInputProps";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
-import "../../../../assets/styles/DefaultCodeNoteInput.scss";
 import Flex from "../../../helpers/Flex";
 import DefaultNoteInput from "./DefaultNoteInput";
 

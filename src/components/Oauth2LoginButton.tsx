@@ -2,7 +2,6 @@ import React, { HTMLAttributeAnchorTarget } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";
 import { Oauth2ClientRegistrationId } from "../abstract/Oauth2ClientRegistrationId";
-import "../assets/styles/Oauth2LoginButton.scss";
 import { OAUTH2_AUTH_LINK_AZURE, OAUTH2_AUTH_LINK_GITHUB, OAUTH2_AUTH_LINK_GOOGLE } from "../helpers/constants";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";

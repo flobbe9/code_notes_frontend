@@ -1,7 +1,6 @@
 import React, { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
-import "../../../../assets/styles/LanguageSearchResults.scss";
 import { logWarn } from "../../../../helpers/logUtils";
 import { slideDown, slideUp, toUpperCaseFirstChar } from "../../../../helpers/utils";
 import HelperDiv from "../../../helpers/HelperDiv";

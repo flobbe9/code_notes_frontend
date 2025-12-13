@@ -2,7 +2,6 @@ import React, { MouseEvent, useContext, useEffect, useState } from "react";
 import { CustomExceptionFormat } from "../../../../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { CustomExceptionFormatService } from "../../../../abstract/services/CustomExceptionFormatService";
-import "../../../../assets/styles/Profile.scss";
 import { BACKEND_BASE_URL } from "../../../../helpers/constants";
 import { fetchAny, isResponseError } from "../../../../helpers/fetchUtils";
 import { getCurrentUrlWithoutWWW, isBlank } from "../../../../helpers/utils";

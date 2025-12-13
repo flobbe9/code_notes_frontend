@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
-import "../../../assets/styles/SaveAllNotesButton.scss";
 import { isResponseError } from "../../../helpers/fetchUtils";
 import { isNumberFalsy } from '../../../helpers/utils';
 import { AppContext } from "../../App";

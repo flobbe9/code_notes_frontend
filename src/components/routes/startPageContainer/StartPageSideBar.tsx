@@ -1,6 +1,5 @@
 import React, { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
-import "../../../assets/styles/StartPageSideBar.scss";
 import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextProvider";
 import Button from "../../helpers/Button";

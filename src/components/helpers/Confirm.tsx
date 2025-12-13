@@ -1,7 +1,6 @@
 import React, { forwardRef, Ref, useContext, useImperativeHandle, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { RememberMyChoiceKey, RememberMyChoiceValue } from "../../abstract/RememberMyChoice";
-import "../../assets/styles/Confirm.scss";
 import { isBooleanFalsy } from "../../helpers/utils";
 import { AppContext } from "../App";
 import Button from "./Button";

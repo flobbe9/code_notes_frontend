@@ -3,7 +3,6 @@ import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/Default
 import { NoteEntity } from "../../../../abstract/entites/NoteEntity";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { NoteEntityService } from "../../../../abstract/services/NoteEntityService";
-import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
 import { handleRememberMyChoice } from "../../../../helpers/projectUtils";

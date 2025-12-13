@@ -1,7 +1,6 @@
 import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import "../../assets/styles/Checkbox.scss";
 import Flex from "./Flex";
 import HiddenInput from "./HiddenInput";
 

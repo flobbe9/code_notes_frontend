@@ -1,0 +1,37 @@
+@use "@styles/global/fonts.scss";
+@use "@styles/global/functions.scss" as *;
+@use "@styles/global/helpers.scss";
+@use "@styles/global/variables.scss" as *;
+
+
+/* disable reacts error overlay */
+#webpack-dev-server-client-overlay {
+    display: none;
+}
+
+/* move use query dev tools */
+.tsqd-open-btn-container {
+    right: 150px !important;
+}
+
+.App {
+    font-family: roundFont;
+    margin: 0;
+    /* To keep scrollbar */
+    min-height: 101vh;
+    position: relative;
+
+    .content {
+        padding-bottom: calc(var(--footerHeight));
+
+        /** Meant for any page directly at <Route>*/
+        .defaultPageContent {
+            width: 70vw;
+            margin: 2em 0;
+    
+            @media only screen and (max-width: $mobileMaxWidth) {
+                width: 85vw;
+            }
+        }
+    }
+}

@@ -1,0 +1,36 @@
+@use "@styles/global/functions.scss" as *;
+
+.Confirm {   
+    max-width: 50vw;
+    min-width: 20vw;
+
+    &-footer {
+        &-rememberMyChoiceCheckbox {
+            border-color: var(--matteBlue) !important;
+            height: 20px !important;
+            width: 20px !important;
+        }
+
+        &-rememberMyChoiceLabel {
+            @include cursorHover();
+        }
+
+        &-confirmButton {
+            background-color: var(--matteBlue);
+            color: white;
+
+            @include customFocus {
+                @include outlineFocus(black);
+            }          
+        }
+        
+        &-cancelButton {
+            background-color: transparent;
+            border: 2px solid var(--matteBlue);
+        
+            @include customFocus {
+                @include outlineFocus();
+            }    
+        }
+    }
+}

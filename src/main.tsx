@@ -3,6 +3,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '@styles/style.scss';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from '@/components/App';

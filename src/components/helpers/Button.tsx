@@ -1,7 +1,6 @@
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { ButtonProps } from "../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import "../../assets/styles/Button.scss";
 import { isObjectFalsy } from "../../helpers/utils";
 
 

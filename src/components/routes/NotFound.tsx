@@ -1,5 +1,4 @@
 import React from "react";
-import "../../assets/styles/NotFound.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";

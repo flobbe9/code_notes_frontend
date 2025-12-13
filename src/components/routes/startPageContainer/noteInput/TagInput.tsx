@@ -3,7 +3,6 @@ import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/Default
 import { TagEntity } from "../../../../abstract/entites/TagEntity";
 import { AppUserService } from "../../../../abstract/services/AppUserService";
 import { TagEntityService } from "../../../../abstract/services/TagEntityService";
-import "../../../../assets/styles/TagInput.scss";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../../../helpers/constants";
 import { getJsxElementIndexByKey, isBlank, shortenString } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";

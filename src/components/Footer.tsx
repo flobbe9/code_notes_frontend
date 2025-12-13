@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
-import "../assets/styles/Footer.scss";
 import { CONTACT_PATH, PRIVACY_POLICY_PATH, VERSION } from "../helpers/constants";
 import { setCssConstant } from "../helpers/utils";
 import Flex from "./helpers/Flex";

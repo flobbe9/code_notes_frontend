@@ -1,6 +1,5 @@
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import "../../assets/styles/Hr.scss";
 import { isBlank } from "../../helpers/utils";
 import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";

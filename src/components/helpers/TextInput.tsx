@@ -2,7 +2,6 @@ import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useStat
 import { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import HelperProps from '../../abstract/HelperProps';
 import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
-import '../../assets/styles/TextInput.scss';
 import { INVALID_INPUT_CLASS_NAME } from '../../helpers/constants';
 import { addClass, isBlank, isBooleanFalsy, removeClass } from '../../helpers/utils';
 import Button from "./Button";

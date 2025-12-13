@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { NoteInputType } from "../../../../abstract/NoteInputType";
-import "../../../../assets/styles/AddNewNoteInputButtons.scss";
 import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../../../helpers/constants";
 import { sleep } from "../../../../helpers/utils";
 import { AppFetchContext } from "../../../AppFetchContextProvider";

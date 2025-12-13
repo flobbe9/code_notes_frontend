@@ -2,7 +2,6 @@ import React, { ChangeEvent, createContext, useContext, useEffect, useRef, useSt
 import { useLocation } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
-import "../../../assets/styles/StartPageContent.scss";
 import { NOTE_SEARCH_PHRASE_MIN_LENGTH, NOTE_SEARCH_PHRASE_USER_INPUT_DELAY } from "../../../helpers/constants";
 import { getRandomString, isBlank } from "../../../helpers/utils";
 import { useCsrfToken } from "../../../hooks/useCsrfToken";

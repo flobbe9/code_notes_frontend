@@ -1,7 +1,6 @@
 import React, { ReactNode, useContext, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import "../../assets/styles/Popup.scss";
 import { POPUP_FADE_DURATION } from "../../helpers/constants";
 import { fadeIn, fadeOut } from "../../helpers/utils";
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";

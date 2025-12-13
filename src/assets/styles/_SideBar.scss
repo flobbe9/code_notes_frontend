@@ -1,0 +1,51 @@
+@use "@styles/global/functions.scss" as *;
+
+:root {
+    --iconColor: rgb(179, 179, 179);
+    --sideBarPadding: 1rem;
+}
+
+.SideBar {
+    height: 100vh; 
+    position: sticky;
+    top: 0;
+    
+    &-left {
+        padding: 0.5rem;
+        
+        &-toggleButton {
+            padding: 0.5rem;
+        }
+    }
+    
+    &-right {
+        padding: var(--sideBarPadding);
+        width: 0;
+    }
+
+    &.leftAbsolute {
+        $zIndex: calc(var(--overlayZIndex));
+
+        min-height: 100%;
+        z-index: $zIndex;
+
+        .SideBar-left {
+            width: 50px; // ~ burgerButtonOffsetWidth
+
+            &-toggleButton {
+                position: absolute;
+                z-index: 1;
+            }
+        }
+
+        .SideBar-right {
+            background-color: white;
+            height: 100%;
+            position: absolute;
+            
+            &-content {
+                margin-top: 50px; // ~ bit more then burgerButtonOffsetHeight
+            }
+        }
+    }
+}

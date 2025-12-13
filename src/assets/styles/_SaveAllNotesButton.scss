@@ -1,0 +1,8 @@
+@use "@styles/global/functions.scss" as *;
+
+
+.SaveAllNotesButton {
+    background-color: var(--matteBlackLighter);
+    color: var(--saveColor);
+    transition: var(--transitionTime);
+}

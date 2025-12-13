@@ -1,0 +1,101 @@
+@use "@styles/global/functions.scss" as *;
+@use "@styles/global/variables.scss" as *;
+
+
+.Profile {
+    $disabledOpacity: .8;
+    $inputPaddingY: .3em;
+
+    position: relative;
+    min-height: 100%;
+
+    // ~ mobile landscape mode
+    @media screen and (max-height: 600px) {
+        min-height: 500px;
+    }
+
+    &-userDetail {
+        &-accountImage {
+            border: 3px solid black;
+            border-radius: 100%;
+            @include dontSelectText();
+        }
+
+        &-input.ContentEditableDiv {
+            border: 2px solid currentColor;
+            border-radius: var(--borderRadius);
+            min-width: 250px;
+            opacity: $disabledOpacity !important;
+            padding: $inputPaddingY .6em;
+            width: fit-content;
+        }
+
+        &-input.TextInput {
+            .textInput {
+                padding-top: calc($inputPaddingY - .1em);
+                padding-bottom: calc($inputPaddingY - .1em);
+                min-width: 250px;
+                width: fit-content;
+            }
+            
+            &:has(.textInput:disabled) {
+                opacity: $disabledOpacity;
+            }
+        }
+
+        &-passwordInput {
+            &:has(.textInput:disabled) {
+                opacity: 1 !important;
+                
+                .textInput {
+                    opacity: $disabledOpacity;
+                }
+            }
+            
+            .TextInput {
+                &-container {
+                    width: unset;
+                }
+
+                &-showPasswordButton {
+                    display: none !important;
+                }
+            }
+
+            &-changePasswordButton {
+                background-color: var(--matteBlueLight);
+                color: white;
+                height: fit-content;
+                padding-top: $inputPaddingY;
+                padding-bottom: $inputPaddingY;
+                width: fit-content;
+
+                .buttonContentContainer {
+                    min-height: unset;
+                }
+
+                @include buttonFocus(black);
+
+                @media only screen and (min-width: $tabletMinWidth) {
+                    margin-left: .5em;
+                }
+            }
+        }
+    }
+
+    &-deleteAccountContainer {
+        // stick to bottom
+        bottom: 0;
+        position: absolute;
+
+        &-deleteButton {
+            border: 2px solid var(--matteBlueLight);
+            color: red;
+            transition: var(--transitionTime);
+
+            @include customHover {
+                background-color: var(--matteBlueLight);
+            }
+        }
+    }
+}

@@ -1,7 +1,6 @@
 import React, { ClipboardEvent, DragEvent, forwardRef, Fragment, KeyboardEvent, MouseEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import "../../assets/styles/ContentEditableDiv.scss";
 import { getCursorIndex, getCursorLineNum } from "../../helpers/projectUtils";
 import { getClipboardText, includesIgnoreCase, isBlank, isEmpty, isEventKeyTakingUpSpace } from "../../helpers/utils";
 import { AppContext } from "../App";

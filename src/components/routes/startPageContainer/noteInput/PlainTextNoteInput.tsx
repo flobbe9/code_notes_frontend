@@ -4,7 +4,6 @@ import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../../../abstract/HelperProps";
-import "../../../../assets/styles/PlainTextNoteInput.scss";
 import { CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
 import { getContentEditableDivLineElements, isTextSelected, moveCursor } from '../../../../helpers/projectUtils';
 import { getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";

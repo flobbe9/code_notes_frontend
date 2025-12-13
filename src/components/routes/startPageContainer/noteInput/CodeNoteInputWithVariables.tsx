@@ -5,7 +5,6 @@ import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
-import "../../../../assets/styles/CodeNoteInputWithVariables.scss";
 import "../../../../assets/styles/highlightJs/vs.css";
 import { DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
 import { cleanUpSpecialChars, getContentEditableDivLineElements, getTextWidth, isTextSelected, moveCursor } from "../../../../helpers/projectUtils";

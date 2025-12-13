@@ -1,0 +1,68 @@
+@use "@styles/global/functions.scss" as *;
+
+.TagInput {
+    $containerWidth: 130px;
+    $borderRadius: var(--tagBorderRadius);
+
+    border: 2px solid var(--codeGrey);
+    border-radius: $borderRadius;
+    margin-right: 0.5em;
+    min-width: $containerWidth;
+    width: $containerWidth;
+    
+    &:has(.tagInput:focus) {
+        border: 2px solid var(--accentColor);
+        
+        .tagInputDeleteButton {
+            display: none;
+        }
+    }
+    
+    // case: has no delete button
+    &:has(.tagInputDeleteButton[hidden]) {
+        .tagInput {
+            border-top-right-radius: $borderRadius;
+            border-bottom-right-radius: $borderRadius;
+        }
+    }
+
+    &:has(.invalidInput) {
+        border-color: red !important;
+    }
+
+    .tagInput {
+        background-color: transparent;
+        border: none;
+        color: var(--codeGrey);
+        padding: 0px 7px;
+        width: 100%;
+        
+        @include placeholder {
+            @include dontSelectText();
+            color: grey;
+        }
+        
+        &:focus {
+            outline: none;
+            width: $containerWidth - 4px; // 4px = (2 * borderWidth)
+        }
+    }
+
+    .tagInputDeleteButton {
+        background-color: transparent;
+        border-radius: $borderRadius;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        color: var(--codeGrey);
+
+        padding: 0.3rem 0.3rem;
+        transition: var(--transitionTimeFast);
+        width: fit-content;
+
+        @include cursorHover();
+        
+        .fa-solid.fa-xmark {
+            width: fit-content;
+        }
+    }
+}

@@ -1,7 +1,6 @@
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import "../../assets/styles/Overlay.scss";
 import { animateAndCommit } from "../../helpers/utils";
 import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";

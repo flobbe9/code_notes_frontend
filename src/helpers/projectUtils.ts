@@ -1,6 +1,5 @@
 import parse, { Element } from "html-react-parser";
 import sanitize from "sanitize-html";
-import { useQueryClientObj } from "..";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { RememberMyChoiceKey, isRememberMyChoiceValue } from "../abstract/RememberMyChoice";
 import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
@@ -9,6 +8,7 @@ import { NOTES_QUERY_KEY } from "../hooks/useNotes";
 import { APP_NAME_PRETTY, DEFAULT_HTML_SANTIZER_OPTIONS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
 import { assertFalsyAndLog, getRandomString, isBlank, isEmpty, stringToHtmlElement } from "./utils";
 import { logWarn } from "./logUtils";
+import { useQueryClientObj } from "@/main";
 
 /**
  * Meant to provide specific util methods that are not needed in any project.

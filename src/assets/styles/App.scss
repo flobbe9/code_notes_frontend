@@ -1,7 +1,5 @@
-@import "./global/fonts.scss";
-@import "./global/functions.scss";
-@import "./global/helpers.scss";
-@import "./global/variables.scss";
+@use "@styles/global/functions.scss" as *;
+@use "@styles/global/variables.scss" as *;
 
 
 /* disable reacts error overlay */
