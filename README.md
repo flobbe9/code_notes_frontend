@@ -1,5 +1,3 @@
-# 
-
 # Code Notes frontend
 Frontend service of <a href="https://code-notes.net" target="_blank">https://code-notes.net</a>.
 

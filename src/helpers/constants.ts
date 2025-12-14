@@ -4,17 +4,17 @@ import { LogLevel } from "../abstract/LogLevel";
 import { isBlank } from "./utils";
 
 // App
-export const ENV: Env = import.meta["NODE_ENV"] as Env;
-export const PROTOCOL = import.meta["REACT_APP_GATEWAY_PROTOCOL"] as string;
-export const HOST = import.meta["REACT_APP_GATEWAY_HOST"] as string;
-export const VERSION = import.meta["REACT_APP_VERSION"] as string;
+export const ENV: Env = import.meta.env["VITE_APP_ENV"] as Env;
+export const PROTOCOL = import.meta.env["VITE_GATEWAY_PROTOCOL"] as string;
+export const HOST = import.meta.env["VITE_GATEWAY_HOST"] as string;
+export const VERSION = import.meta.env["VITE_VERSION"] as string;
 export const APP_NAME_PRETTY = "Code Notes";
-export const LOG_LEVEL = LogLevel[import.meta["REACT_APP_LOG_LEVEL"] as string];
+export const LOG_LEVEL = LogLevel[import.meta.env["VITE_LOG_LEVEL"] as string];
 
 
 // URLs
-export const BASE_URL = import.meta["REACT_APP_GATEWAY_BASE_URL"] as string;
-export const BACKEND_BASE_URL = import.meta["REACT_APP_BACKEND_BASE_URL"] as string;
+export const BASE_URL = import.meta.env["VITE_GATEWAY_BASE_URL"] as string;
+export const BACKEND_BASE_URL = import.meta.env["VITE_BACKEND_BASE_URL"] as string;
 /** Default rel attr to pass to any external link */
 export const LINK_DEFAULT_REL = "noopener noreferrer nofollow";
 
@@ -79,8 +79,8 @@ export const NUM_NOTES_PER_PAGE = 5;
 
 
 // Crypto
-export const CRYPTO_KEY = import.meta["REACT_APP_CRYPTO_KEY"] || "";
-export const CRYPTO_IV = import.meta["REACT_APP_CRYPTO_IV"] || "";
+export const CRYPTO_KEY = import.meta.env["VITE_CRYPTO_KEY"] || "";
+export const CRYPTO_IV = import.meta.env["VITE_CRYPTO_IV"] || "";
 
 /** Dont log to console if the 'message' contains one of these strings */
 export const CONSOLE_MESSAGES_TO_AVOID: (string | number)[] = [
