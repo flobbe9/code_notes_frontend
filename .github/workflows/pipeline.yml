@@ -14,12 +14,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-      - run: npm i
-      - run: npx tsc -b
+      - run: npm ci
       - run: npm run build
-        env:
-          # don't fail on build warnings
-          CI: ""
 
   push_to_DockerHub:
     # NOTE: ${{}} syntax does not work here

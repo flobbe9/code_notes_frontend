@@ -3,7 +3,6 @@ node_modules
 build
 dist
 DefaultComponent.tsx
-package-lock.json
 *.csr
 notes.md
 test.*
