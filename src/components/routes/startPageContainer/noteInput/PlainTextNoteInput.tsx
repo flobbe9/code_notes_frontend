@@ -224,7 +224,7 @@ export default function PlainTextNoteInput({
             updateNoteEdited();
         }
         
-        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed())
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]))
             updateNoteEdited();
     }
 
@@ -240,7 +240,7 @@ export default function PlainTextNoteInput({
         if (keyName === "Backspace" || keyName === "Delete")
             cleanUpEmptyInputDiv();
         
-        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed())
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]))
             updateNoteEdited();
     }
 

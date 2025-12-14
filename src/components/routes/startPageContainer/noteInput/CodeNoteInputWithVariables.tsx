@@ -518,7 +518,7 @@ export default function CodeNoteInputWithVariables({
             updateNoteEdited();
         }
 
-        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed() && !isVariableInputFocused())
+        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]) && !isVariableInputFocused())
             updateNoteEdited();
     }
     
