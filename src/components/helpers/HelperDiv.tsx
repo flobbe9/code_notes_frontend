@@ -45,7 +45,6 @@ export default forwardRef(function HelperDiv(
 
 
     function toggleIsHover(): void {
-
         const component = componentRef.current!;
 
         component.addEventListener("mouseenter", () => setIsHover(true));
@@ -54,7 +53,6 @@ export default forwardRef(function HelperDiv(
 
     
     function handleClick(event): void {
-
         if (disabled)       
             return;
 

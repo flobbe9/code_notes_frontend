@@ -378,7 +378,9 @@ export function includesIgnoreCase(arr: (string | number)[] | string, value: str
  * @returns true if value is included in array. Uses {@link equalsIgnoreCaseTrim} for comparison instead of ```includes()```.
  */
 export function includesIgnoreCaseTrim(arr: (string | number)[] | string, value: string | number): boolean {
-        
+    if (isFalsy(arr))
+        return arr === value;
+
     // case: arr is string
     if (typeof arr === "string")
         return arr.trim().toLowerCase().includes(value.toString().trim().toLowerCase());
@@ -395,7 +397,6 @@ export function includesIgnoreCaseTrim(arr: (string | number)[] | string, value:
  * @returns true if and only if all chars in given string match given pattern, else false
  */
 export function matchesAll(str: string, regexp: RegExp): boolean {
-
     // iterate chars
     for (let i = 0; i < str.length; i++) {
         const char = str[i];

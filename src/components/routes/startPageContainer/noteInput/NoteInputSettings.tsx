@@ -251,7 +251,6 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
      * @returns true if given input value either matches the languages name or at least one of the aliases
      */
     function searchInputValueMatchesLanguageSearchResult(searchInputValue: string, languageSearchResult: ProgrammingLanguage): boolean {
-
         const matchesName = includesIgnoreCaseTrim(languageSearchResult.name, searchInputValue);
         const matchesAlias = includesIgnoreCaseTrim(languageSearchResult.aliases || [], searchInputValue);
 
