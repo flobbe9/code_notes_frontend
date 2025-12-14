@@ -8,7 +8,7 @@
         // Enables imports without file extension 
         "moduleResolution": "bundler",                     /* Specify how TypeScript looks up a file from a given module specifier. */
         // make import.meta.env accessible
-        "types": ["vite/client"],                                      /* Specify type package names to be included without being referenced in a source file. */
+        "types": ["vite/client", "node"],                                      /* Specify type package names to be included without being referenced in a source file. */
         "noEmit": true,                                   /* Disable emitting files from a compilation. */
         "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
         "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
