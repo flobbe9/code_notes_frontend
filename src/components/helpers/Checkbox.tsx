@@ -32,6 +32,7 @@ export default forwardRef(function Checkbox({
         setIsChecked,
         dontHideChildren = false,
         onClick,
+        onChange,
         _hover = {},
         _disabled = {
             cursor: "default",
@@ -65,7 +66,6 @@ export default forwardRef(function Checkbox({
 
 
     function handleClick(event): void {
-
         if (disabled)
             return;
 
@@ -73,6 +73,9 @@ export default forwardRef(function Checkbox({
 
         if (onClick)
             onClick(event);
+
+        if (onChange)
+            onChange(event);
     }
 
 

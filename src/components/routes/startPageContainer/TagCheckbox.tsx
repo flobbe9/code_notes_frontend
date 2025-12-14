@@ -1,12 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";
-import { AppContext } from "../../App";
 import { AppFetchContext } from "../../AppFetchContextProvider";
 import Checkbox from "../../helpers/Checkbox";
-import { useHasComponentMounted } from './../../../hooks/useHasComponentMounted';
-import { useLocation } from "react-router-dom";
+import { StartPageContainerContext } from "./StartPageContainer";
 
 
 interface Props extends HelperProps {
@@ -20,57 +18,33 @@ interface Props extends HelperProps {
  * @since 0.0.1
  */
 export default function TagCheckbox({tagEntity, ...props}: Props) {
-
-    const [isSelected, setIsSelected] = useState(false);
-
-    const { setNoteSearchTags, getNoteSearchTags, isLoggedIn } = useContext(AppFetchContext);
+    const { setNoteSearchTags, getNoteSearchTags } = useContext(AppFetchContext);
+    const { setIsUpdateSideBarTagList } = useContext(StartPageContainerContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagCheckbox");
 
-    const hasComponentMounted = useHasComponentMounted();
-
-    const location = useLocation();
-
-
-    useEffect(() => {
-        setIsSelected(getNoteSearchTags().has(tagEntity.name))
-
-    }, [location]);
-
-
-    useEffect(() => {
-        if (hasComponentMounted && isLoggedIn)
-            handleIsSelectedChange();
-
-    }, [isSelected]);
-
 
     function handleIsSelectedChange(): void {
-
-        // case: switched from not-checked to checked
-        if (isSelected)
+        if (!getNoteSearchTags().has(tagEntity.name))
             addTagToUrlQueryParam();
-
-        // case: switched from checked to not-checked
-        else if (!isSelected)
+        else
             removeTagFromUrlQueryParam();
-    }
 
+        // update sort order
+        setIsUpdateSideBarTagList(prev => !prev);
+    }
 
     /**
      * Add if not exists in "tags=..." list.
      */
     function addTagToUrlQueryParam(): void {
-
         const noteSearchTags = getNoteSearchTags();
 
         if (!noteSearchTags.has(tagEntity.name))
             setNoteSearchTags(new Set([...noteSearchTags, tagEntity.name]));
     }
 
-
     function removeTagFromUrlQueryParam(): void {
-
         const selectedTagEntityNames = new Set(getNoteSearchTags());
         selectedTagEntityNames.delete(tagEntity.name);
 
@@ -84,8 +58,8 @@ export default function TagCheckbox({tagEntity, ...props}: Props) {
             className={className}
             style={style}
             dontHideChildren
-            isChecked={isSelected}
-            setIsChecked={setIsSelected}
+            isChecked={getNoteSearchTags().has(tagEntity.name)}
+            onChange={handleIsSelectedChange}
             _checked={{borderColor: "var(--accentColor)"}}
             {...otherProps}
         >
