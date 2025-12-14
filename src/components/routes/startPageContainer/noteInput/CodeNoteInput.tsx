@@ -451,7 +451,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
                     {/* Delete */}
                     <Button 
-                        className="deleteNoteButton defaultNoteInputButton" 
+                        className="defaultNoteInputButton" 
                         title="Delete section"
                         onClick={handleDeleteNote}
                     >

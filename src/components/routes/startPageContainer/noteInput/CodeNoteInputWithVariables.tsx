@@ -708,7 +708,7 @@ export default function CodeNoteInputWithVariables({
 
                     {/* Delete */}
                     <Button 
-                        className="deleteNoteButton defaultNoteInputButton" 
+                        className="defaultNoteInputButton" 
                         title="Delete section"
                         onClick={handleDeleteNote}
                     >

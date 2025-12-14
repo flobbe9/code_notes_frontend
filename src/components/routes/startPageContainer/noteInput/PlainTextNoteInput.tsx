@@ -416,7 +416,7 @@ export default function PlainTextNoteInput({
 
                     {/* Delete */}
                     <Button 
-                        className="deleteNoteButton defaultNoteInputButton" 
+                        className="defaultNoteInputButton" 
                         title="Delete section"
                         onClick={handleDeleteNote}
                     >
