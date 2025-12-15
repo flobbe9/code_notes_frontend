@@ -1,4 +1,4 @@
-import React, { MouseEvent, useContext } from "react";
+import React, { forwardRef, MouseEvent, Ref, useContext } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";
@@ -17,7 +17,7 @@ interface Props extends HelperProps {
 /**
  * @since 0.0.1
  */
-export default function AddNewNoteButton({onClick, ...props}: Props) {
+export default forwardRef(function AddNewNoteButton({onClick, ...props}: Props, ref: Ref<HTMLButtonElement>) {
     const { toast } = useContext(AppContext);
     const { editedNoteEntities, setEditedNoteEntities, isLoggedIn, fetchSaveNoteEntity, notesUseQueryResult } = useContext(AppFetchContext);
     const { setIsFocusFirstNote, isEditingNotes, isSearchingNotes } = useContext(StartPageContentContext);
@@ -76,7 +76,7 @@ export default function AddNewNoteButton({onClick, ...props}: Props) {
         if (isSearchingNotes())
             return `Please ${isSearchingMessage} first.`;
 
-        return 'Add a new note';
+        return 'Add a new note (Ctr + Alt + N)';
     }
 
     return (
@@ -85,6 +85,7 @@ export default function AddNewNoteButton({onClick, ...props}: Props) {
             className={className + " hover"}
             style={style}
             title={getTitle()}
+            ref={ref}
             onClickPromise={handleClick}
             {...otherProps}
         >
@@ -93,4 +94,4 @@ export default function AddNewNoteButton({onClick, ...props}: Props) {
             {children}
         </Button>
     )
-}
+})

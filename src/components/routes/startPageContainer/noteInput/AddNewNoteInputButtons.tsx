@@ -21,7 +21,6 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 export default function AddNewNoteInputButtons({...props}: Props) {
-
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInputButtons");
 
     const { isLoggedIn, notesUseQueryResult, editedNoteEntities } = useContext(AppFetchContext);

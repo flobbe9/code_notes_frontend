@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { forwardRef, Ref, useContext } from "react";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
@@ -19,7 +19,7 @@ interface Props extends ButtonProps {
 /**
  * @since 0.0.1
  */
-export default function SaveAllNotesButton({...props}: Props) {
+export default forwardRef(function SaveAllNotesButton({...props}: Props, ref: Ref<HTMLButtonElement>) {
 
     const { toast, showPopup } = useContext(AppContext);
     const { editedNoteEntities, setEditedNoteEntities, isLoggedIn, fetchSaveAllNoteEntities, notesUseQueryResult } = useContext(AppFetchContext);
@@ -76,7 +76,8 @@ export default function SaveAllNotesButton({...props}: Props) {
     return (
         <Button 
             className={`${className} hover`} 
-            title={props.disabled ? "No changes yet" : "Save all edited notes"}
+            title={props.disabled ? "No changes yet" : "Save all edited notes (Ctr + S)"}
+            ref={ref}
             onClickPromise={handleSave}
             {...otherProps}
         >
@@ -85,4 +86,4 @@ export default function SaveAllNotesButton({...props}: Props) {
             {children}
         </Button>
     )
-}
+})

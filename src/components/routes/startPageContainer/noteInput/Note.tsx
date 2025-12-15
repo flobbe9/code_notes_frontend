@@ -473,7 +473,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
                         <ButtonWithSlideLabel 
                             className="saveNoteButton ms-2" 
                             label="Save note"
-                            title="Save note"
+                            title="Save note (Ctrl + S)"
                             disabled={isSaveButtonDisabled}
                             ref={saveButtonRef}
                             onClickPromise={handleSave}
