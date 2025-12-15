@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";
@@ -70,21 +70,39 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
 
                 return 1;
             })
-            .map(tagEntity => 
-                getTagCheckboxElement(tagEntity));
+            .map((tagEntity, i) => 
+                getTagCheckboxElement(tagEntity, i));
     }
 
-
-    function getTagCheckboxElement(tagEntity: TagEntity): JSX.Element {
+    function getTagCheckboxElement(tagEntity: TagEntity, index: number): JSX.Element {
         const isDisabled = disabled || !!editedNoteEntities.length;
         return <TagCheckbox 
-            key={getRandomString()} 
-            tagEntity={tagEntity} 
-            disabled={isDisabled} 
+            disabled={isDisabled}
+            key={getRandomString()}
+            tagEntity={tagEntity}
+            tabIndex={index === 0 ? 0 : -1} // only allow tab focus for first checkbox
             title={editedNoteEntities.length ? 'Please save your pending changes first.' : tagEntity.name}
+            onKeyDown={handleTagCheckboxKeyDown}
         />;
     }
 
+    function handleTagCheckboxKeyDown(event: KeyboardEvent): void {
+        const checkboxInputClassName = "Checkbox-input";
+        let tagCheckboxToFocus: HTMLElement|null = null;
+        
+        if (event.key === "ArrowDown") {
+            event.preventDefault();
+            tagCheckboxToFocus = (event.target as HTMLElement).parentElement?.nextElementSibling as HTMLElement;
+        }
+            
+        else if (event.key === "ArrowUp") {
+            event.preventDefault();
+            tagCheckboxToFocus = (event.target as HTMLElement).parentElement?.previousElementSibling as HTMLElement;
+        }
+        
+        if (tagCheckboxToFocus)
+            (tagCheckboxToFocus.querySelector(`.${checkboxInputClassName}`) as HTMLInputElement).focus();
+    }
 
     function filterTagsBySearchValue(searchValue: string): TagEntity[] {
         const allTagEntities = appUserEntity?.tags || [];
@@ -97,7 +115,6 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
             .filter(tagEntity =>
                 matchStringsConsiderWhiteSpace(searchValue, tagEntity.name));
     }
-
 
     return (
         <HelperDiv    

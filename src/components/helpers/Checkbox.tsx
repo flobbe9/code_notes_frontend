@@ -31,6 +31,7 @@ export default forwardRef(function Checkbox({
         isChecked = false,
         setIsChecked,
         dontHideChildren = false,
+        tabIndex,
         onClick,
         onChange,
         _hover = {},
@@ -121,6 +122,7 @@ export default forwardRef(function Checkbox({
                 className="Checkbox-input"
                 checked={checked}
                 disabled={disabled}
+                tabIndex={tabIndex}
              />
                 
             <Flex 
