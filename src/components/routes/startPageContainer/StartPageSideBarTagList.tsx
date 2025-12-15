@@ -10,6 +10,7 @@ import { StartPageContainerContext } from "./StartPageContainer";
 import { StartPageSideBarContext } from "./StartPageSideBar";
 import TagCheckbox from "./TagCheckbox";
 import { logDebug } from "@/helpers/logUtils";
+import { useClickOutside } from "@/hooks/useClickOutside";
 
 
 interface Props extends HelperProps {
@@ -26,18 +27,21 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
     const [tags, setTags] = useState<JSX.Element[]>([]);
 
     const { appUserEntity, getNoteSearchTags, editedNoteEntities } = useContext(AppFetchContext);
-    const { isUpdateSideBarTagList } = useContext(StartPageContainerContext);
+    const { isUpdateSideBarTagList, setIsUpdateSideBarTagList } = useContext(StartPageContainerContext);
     const { searchValue } = useContext(StartPageSideBarContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBarTagList", true);
 
     const componentRef = useRef(null);
 
+    useClickOutside(componentRef, () => {
+        // trigger reorder tag checkboxes
+        setIsUpdateSideBarTagList(prev => !prev);
+    }, "click")
 
     useEffect(() => {
         updateTags();
     }, [appUserEntity, isUpdateSideBarTagList, editedNoteEntities]);
-
 
     useEffect(() =>  {
         handleSearch(searchValue);
@@ -56,7 +60,6 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
             return [];
 
         const selectedTagNames = getNoteSearchTags();
-        logDebug(selectedTagNames, tagEntities)
 
         return tagEntities
             .sort((t1, t2) => t1.name.localeCompare(t2.name)) // sort alphabetically asc

@@ -242,7 +242,6 @@ export default function CodeNoteInputWithVariables({
      * @returns ```true``` if given ```str``` includes a ```$[[``` followed by a ```]]```. See {@link VARIABLE_INPUT_SEQUENCE_REGEX}
      */
     function includesVariableInputSequence(str: string): boolean {
-
         return !isBlank(str) && str.replaceAll("\n", "\\n").match(VARIABLE_INPUT_SEQUENCE_REGEX) !== null;
     }
 
@@ -372,7 +371,8 @@ export default function CodeNoteInputWithVariables({
         }
 
         // select placeholder sequence
-        moveCursor(currentInputDiv || inputDivRef.current!, 
+        moveCursor(
+            currentInputDiv || inputDivRef.current!, 
             currentCursorIndex + VARIABLE_INPUT_START_SEQUENCE.length, 
             currentCursorIndex + VARIABLE_INPUT_START_SEQUENCE.length + VARIABLE_INPUT_DEFAULT_PLACEHOLDER.length
         );
@@ -625,7 +625,6 @@ export default function CodeNoteInputWithVariables({
 
 
     async function handleLanguageChange(): Promise<void> {
-
         // case: called on load
         if (!hasComponentRendered)
             return;
@@ -639,13 +638,11 @@ export default function CodeNoteInputWithVariables({
 
 
     function isAutoDetectLanguage(): boolean {
-
         return codeNoteInputWithVariablesLanguage === "_auto";
     }
 
 
     function handleAppendVariableButtonClick(): void {
-
         appendVariableInput();
         updateNoteInputEntity();
         updateNoteEdited();

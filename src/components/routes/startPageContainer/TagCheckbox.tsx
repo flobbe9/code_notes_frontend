@@ -31,9 +31,6 @@ export default function TagCheckbox({tagEntity, onKeyDown, ...props}: Props) {
             addTagToUrlQueryParam();
         else
             removeTagFromUrlQueryParam();
-
-        // update sort order
-        setIsUpdateSideBarTagList(prev => !prev);
     }
 
     /**
@@ -59,7 +56,11 @@ export default function TagCheckbox({tagEntity, onKeyDown, ...props}: Props) {
 
         if (event.key === "Enter")
             componentRef.current?.click();
-            
+
+        if (event.key === "Tab") {
+            // update sort order
+            setIsUpdateSideBarTagList(prev => !prev);
+        }
     }
 
     return (
