@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { KeyboardEvent, useContext, useRef } from "react";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";
@@ -17,11 +17,13 @@ interface Props extends HelperProps {
  * @parent ```<StartPageSideBarTagList>```
  * @since 0.0.1
  */
-export default function TagCheckbox({tagEntity, ...props}: Props) {
+export default function TagCheckbox({tagEntity, onKeyDown, ...props}: Props) {
     const { setNoteSearchTags, getNoteSearchTags } = useContext(AppFetchContext);
     const { setIsUpdateSideBarTagList } = useContext(StartPageContainerContext);
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "TagCheckbox");
+
+    const componentRef = useRef<HTMLDivElement>(null);
 
 
     function handleIsSelectedChange(): void {
@@ -51,6 +53,14 @@ export default function TagCheckbox({tagEntity, ...props}: Props) {
         setNoteSearchTags(new Set([...selectedTagEntityNames]));
     }
 
+    function handleKeyDown(event: KeyboardEvent): void {
+        if (onKeyDown)
+            onKeyDown(event);
+
+        if (event.key === "Enter")
+            componentRef.current?.click();
+            
+    }
 
     return (
         <Checkbox 
@@ -59,6 +69,8 @@ export default function TagCheckbox({tagEntity, ...props}: Props) {
             style={style}
             dontHideChildren
             isChecked={getNoteSearchTags().has(tagEntity.name)}
+            ref={componentRef}
+            onKeyDown={handleKeyDown}
             onChange={handleIsSelectedChange}
             _checked={{borderColor: "var(--accentColor)"}}
             {...otherProps}
