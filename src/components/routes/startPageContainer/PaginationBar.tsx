@@ -2,7 +2,6 @@ import React, { createContext, Fragment, useContext, useEffect, useState } from 
 import { useLocation } from "react-router-dom";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
-import "../../../assets/styles/PaginationBar.scss";
 import { isNumberFalsy } from "../../../helpers/utils";
 import { AppContext } from "../../App";
 import Button from "../../helpers/Button";

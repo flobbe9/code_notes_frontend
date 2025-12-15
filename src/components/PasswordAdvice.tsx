@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";
-import "../assets/styles/PasswordAdvice.scss";
 import { isBlank, setCssConstant } from "../helpers/utils";
 import { AppContext } from "./App";
 import Flex from "./helpers/Flex";

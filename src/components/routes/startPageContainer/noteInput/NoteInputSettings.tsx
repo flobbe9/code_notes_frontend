@@ -2,7 +2,6 @@ import React, { KeyboardEvent, useContext, useEffect, useRef, useState } from "r
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES, ProgrammingLanguage } from "../../../../abstract/ProgrammingLanguage";
-import "../../../../assets/styles/NoteInputSettings.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../../helpers/constants";
 import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
 import Button from "../../../helpers/Button";
@@ -252,7 +251,6 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
      * @returns true if given input value either matches the languages name or at least one of the aliases
      */
     function searchInputValueMatchesLanguageSearchResult(searchInputValue: string, languageSearchResult: ProgrammingLanguage): boolean {
-
         const matchesName = includesIgnoreCaseTrim(languageSearchResult.name, searchInputValue);
         const matchesAlias = includesIgnoreCaseTrim(languageSearchResult.aliases || [], searchInputValue);
 

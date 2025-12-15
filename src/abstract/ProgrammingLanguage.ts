@@ -537,11 +537,9 @@ export const CODE_BLOCK_LANGUAGES: ProgrammingLanguage[] = [
         ]
     },
     {
-        name: "scss",
         aliases: [
             "Sass",
             "sass",
-            "scss"
         ]
     },
     {
@@ -1626,9 +1624,7 @@ export const CODE_BLOCK_WITH_VARIABLES_LANGUAGES: ProgrammingLanguage[] = [
         ]
     },
     {
-        name: "SCSS",
         aliases: [
-            "scss"
         ]
     },
     {

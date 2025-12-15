@@ -1,0 +1,13 @@
+@use "@styles/global/functions.scss" as *;
+
+
+.NoteTagList {
+    border: none;
+    border-radius: var(--tagBorderRadius);
+    padding-right: 5px;
+    
+    .tagInputContainer {
+        overflow: auto;
+        @include scrollBar();
+    }
+}

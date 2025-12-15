@@ -1,7 +1,6 @@
 import React, { CSSProperties, forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import "../../assets/styles/Checkbox.scss";
 import Flex from "./Flex";
 import HiddenInput from "./HiddenInput";
 
@@ -32,7 +31,9 @@ export default forwardRef(function Checkbox({
         isChecked = false,
         setIsChecked,
         dontHideChildren = false,
+        tabIndex,
         onClick,
+        onChange,
         _hover = {},
         _disabled = {
             cursor: "default",
@@ -66,7 +67,6 @@ export default forwardRef(function Checkbox({
 
 
     function handleClick(event): void {
-
         if (disabled)
             return;
 
@@ -74,6 +74,9 @@ export default forwardRef(function Checkbox({
 
         if (onClick)
             onClick(event);
+
+        if (onChange)
+            onChange(event);
     }
 
 
@@ -119,6 +122,7 @@ export default forwardRef(function Checkbox({
                 className="Checkbox-input"
                 checked={checked}
                 disabled={disabled}
+                tabIndex={tabIndex}
              />
                 
             <Flex 

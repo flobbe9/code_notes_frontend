@@ -1,13 +1,11 @@
 name: code_notes_frontend
 
-
 run-name: ${{ github.event.head_commit.message }}
-on: 
+on:
   push:
     branches:
       - dev
   workflow_dispatch:
-
 
 jobs:
   build:
@@ -16,12 +14,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-      - run: npm i
-      - run: npx tsc -b
+      - run: npm ci
       - run: npm run build
-        env: 
-          # don't fail on build warnings
-          CI: ""
 
   push_to_DockerHub:
     # NOTE: ${{}} syntax does not work here
@@ -30,19 +24,19 @@ jobs:
     needs: build
 
     steps:
-      - name: Checkout repository 
+      - name: Checkout repository
         uses: actions/checkout@v5
-  
+
       - name: move .env vars to pipeline
         run: |
-          echo $(cat .env | grep '^REACT_APP_VERSION=.*$') >> $GITHUB_ENV
+          echo $(cat .env | grep '^VITE_VERSION=.*$') >> $GITHUB_ENV
           echo $(cat .env | grep '^NODE_VERSION=.*$') >> $GITHUB_ENV
           echo $(cat .env | grep '^APP_ENV=.*$') >> $GITHUB_ENV
         shell: bash
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -51,7 +45,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
       - name: Build and push
         uses: docker/build-push-action@v6.10.0
         with:
@@ -60,7 +54,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:${{ env.REACT_APP_VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/code_notes_frontend:${{ env.VITE_VERSION }}
           build-args: |
             NODE_VERSION=${{ env.NODE_VERSION }}
             APP_ENV=${{ env.APP_ENV }}
@@ -70,18 +64,18 @@ jobs:
     needs: push_to_DockerHub
 
     steps:
-        # connect to vpn
-      - name: Checkout repository 
+      # connect to vpn
+      - name: Checkout repository
         uses: actions/checkout@v5
       - name: Install OpenVPN
         run: |
-            sudo apt update
-            sudo apt install -y openvpn openvpn-systemd-resolved
+          sudo apt update
+          sudo apt install -y openvpn openvpn-systemd-resolved
       - name: Connect to VPN
         uses: "kota65535/github-openvpn-connect-action@v3"
         with:
-            config_file: .github/workflows/config.ovpn
-            client_key: ${{ secrets.OPEN_VPN_PRIVATE_KEY }}
+          config_file: .github/workflows/config.ovpn
+          client_key: ${{ secrets.OPEN_VPN_PRIVATE_KEY }}
 
       - name: move .env vars to pipeline
         run: |
@@ -89,7 +83,7 @@ jobs:
         shell: bash
 
       - uses: appleboy/ssh-action@v1.2.0
-        with: 
+        with:
           host: ${{ vars.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}

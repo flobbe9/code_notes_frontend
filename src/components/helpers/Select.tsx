@@ -2,7 +2,6 @@ import React, { createContext, forwardRef, KeyboardEvent, Ref, useContext, useEf
 import { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import HelperProps from '../../abstract/HelperProps';
 import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
-import '../../assets/styles/Select.scss';
 import { addClass, getRandomString, slideDown, slideUp } from "../../helpers/utils";
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
 import { AppContext } from '../App';

@@ -1,0 +1,43 @@
+@use "@styles/global/functions.scss" as *;
+
+.Note {
+    background-color: var(--matteBlack);
+    border-radius: var(--borderRadius);
+    margin-bottom: 65px;
+    padding: 15px;
+
+    &-showAllButton {
+        $buttonTransitionTime: 300ms; // same duration as slide button animation
+
+        background-color: var(--matteBlackLighter);
+        border-radius: var(--borderRadius);
+        color: white;
+            padding: 2px;
+        transition: background-color $buttonTransitionTime;
+        width: 170px;
+
+        &-arrowIcon {
+            transition: $buttonTransitionTime;
+        }
+    }
+
+    .deleteNoteButton, .saveNoteButton {
+        background-color: var(--matteBlackLighter);
+    }
+
+    .deleteNoteButton {
+        color: rgba(255, 0, 0, 0.7);
+
+        @include customHover {
+            color: rgba(255, 0, 0, 1);
+        }
+    }
+
+    .saveNoteButton {
+        color: rgb(0, 255, 0, 0.7);
+
+        @include customHover {
+            color: var(--saveColor);
+        }
+    }
+}

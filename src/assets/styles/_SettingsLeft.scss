@@ -1,0 +1,33 @@
+@use "@styles/global/functions.scss" as *;
+
+.SettingsLeft {
+    font-size: 1.2em;
+
+    &-notMobile {
+        width: 100%;
+        
+        &-button {
+            color: var(--matteBlueLight);
+            margin-bottom: .2em;
+            transition: var(--transitionTime);
+            width: 100%;
+            
+            .buttonContentContainer {
+                justify-content: left;
+            }
+            
+            &.active {
+                background-color: var(--matteBlueLight);
+                color: var(--accentColor);
+            }
+        }
+    }
+
+    &-mobile {
+        &-button {
+            &.active {
+                color: var(--accentColor);
+            }
+        }
+    }
+}

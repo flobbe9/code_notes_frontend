@@ -1,14 +1,14 @@
+import { useQueryClientObj } from "@/main";
 import parse, { Element } from "html-react-parser";
 import sanitize from "sanitize-html";
-import { useQueryClientObj } from "..";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { RememberMyChoiceKey, isRememberMyChoiceValue } from "../abstract/RememberMyChoice";
 import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTES_QUERY_KEY } from "../hooks/useNotes";
 import { APP_NAME_PRETTY, DEFAULT_HTML_SANTIZER_OPTIONS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
+import { logDebug, logWarn } from "./logUtils";
 import { assertFalsyAndLog, getRandomString, isBlank, isEmpty, stringToHtmlElement } from "./utils";
-import { logWarn } from "./logUtils";
 
 /**
  * Meant to provide specific util methods that are not needed in any project.
@@ -135,31 +135,42 @@ export function getCursorLineNum(inputElement: HTMLTextAreaElement | HTMLDivElem
 
     if (inputElement instanceof HTMLDivElement) {
         const documentSelection = document.getSelection();
+        // the selection start index
         const initialAnchorOffset = documentSelection?.anchorOffset!;
+        // the selection end index, negative if selected backwards
         const initialFocusOffset = documentSelection?.focusOffset!;
         const initiallySelectedText = isTextSelected();
 
         if (assertFalsyAndLog(documentSelection, initialAnchorOffset, initialFocusOffset))
             return -1;
         
+        let lineCount = 1; // 1-based
+        
         // move to start of line (pos (0, y))
         documentSelection?.modify("move", "left", "lineboundary")
-
-        let lineCount = 1; // 1-based
+        documentSelection?.modify("extend", "backward", "line")
+        
         // move up to pos (0, 0)
-        while (documentSelection?.anchorOffset! > 0) {
+        while (!documentSelection?.isCollapsed) {
             lineCount++;
-            documentSelection?.modify("move", "backward", "line")
+            documentSelection?.modify("move", "left", "lineboundary")
+            documentSelection?.modify("extend", "backward", "line")
         }
 
-        // move back
+        logDebug("lineCount", lineCount)
+
+        // move back to initial line num
+        for (let i = 1; i < lineCount; i++)
+            documentSelection?.modify("move", "forward", "line");
+
+        // move back to initial cursor index
         moveCursor(inputElement, initialAnchorOffset);
 
         // select initially selected text
-        if (initiallySelectedText)
-            for (let i = documentSelection?.anchorOffset!; i < initialFocusOffset; i++)
-                documentSelection?.modify("extend", "forward", "character")
-
+        if (initiallySelectedText) {
+            for (let i = 0; i < Math.abs(initialAnchorOffset - initialFocusOffset); i++)
+                documentSelection?.modify("extend", initialAnchorOffset < initialFocusOffset ? "forward" : 'backward', "character");
+        }
         return lineCount;
     }
 
@@ -362,4 +373,13 @@ export function isTextSelected(): boolean {
         return false;
 
     return currentSelection.anchorOffset !== currentSelection.focusOffset;
+}
+
+// TODO: does this make sense?
+function getDocumentSelectionRangeSize(): number {
+    const documentSelection = document.getSelection();
+    if (!documentSelection)
+        return 0;
+    
+    return documentSelection!.anchorOffset - documentSelection!.focusOffset;
 }

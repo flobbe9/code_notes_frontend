@@ -1,0 +1,113 @@
+@use "@styles/global/functions.scss" as *;
+
+:root {
+    --noteInputPaddingX: 4px;
+    --noteInputDefaultBorder: 2px solid;
+}
+
+.DefaultNoteInput {
+    position: relative;
+    transition: opacity var(--transitionTime);
+    
+    &-dragged {
+        opacity: .5;
+    }
+
+    &-dragArea {
+        border-top-left-radius: var(--borderRadius);
+        border-bottom-left-radius: var(--borderRadius);
+        transition: background-color var(--transitionTime);
+        @include customHover {
+            background-color: var(--matteBlackLighter);
+            cursor: grab;
+        }
+
+        &-dragIcon {
+            font-size: 1.4em;
+        }
+    }
+    
+    &:has(.CodeNoteInputWithVariables) {
+        .DefaultNoteInput-dragArea-dragIcon {
+            color: var(--codeNoteInputWithVariablesColor);
+        }
+    }
+    
+    &:has(.CodeNoteInput) {
+        .DefaultNoteInput-dragArea-dragIcon {
+            color: var(--codeNoteInputColor);
+        }
+    }
+
+    &:has(.PlainTextNoteInput) {
+        .DefaultNoteInput-dragArea-dragIcon {
+            color: var(--plainTextNoteInputColor);
+        }
+    }
+
+    &-dropZoneHr {
+        background-color: transparent;
+        border-radius: var(--borderRadius);
+        height: .3em;
+        margin: 3px 0;
+        transition: background-color var(--transitionTime);
+        width: 100%;
+
+        hr {
+            color: transparent;
+        }
+
+        &-active {
+            background-color: rgb(0, 110, 255);
+        }
+    }
+
+    &-content {
+        border-radius: var(--borderRadius);
+
+        .defaultNoteInputButton {
+            background-color: var(--matteBlack);
+            color: var(--codeGrey);
+            margin: .3em .7rem 0;
+            padding: 0 .2em;
+            transition: var(--transitionTime);
+
+            @include customHover {
+                color: white;
+            }
+        }
+
+        .deleteNoteInputButton {
+            height: unset;
+        }
+
+        .copyButton {
+            .buttonContentContainer {
+                min-width: 15px;
+                
+                .fa-copy {
+                    position: absolute;
+                }
+            }
+        }
+    }
+
+    pre {
+        position: relative;
+    }
+
+    .noteInputOverlay {
+        .overlayBackground {
+            border-radius: var(--borderRadius);
+        }
+
+        .overlayChildrenContainer {
+            @include flexCenter();
+
+            .fa-circle-notch {
+                color: white;
+                font-size: 1.1em;
+            }
+        }
+    }
+}

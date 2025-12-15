@@ -1,7 +1,6 @@
 import React, { CSSProperties, forwardRef, Ref, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import "../../assets/styles/SearchBar.scss";
 import { isObjectFalsy } from "../../helpers/utils";
 import Button from "./Button";
 import Flex from "./Flex";

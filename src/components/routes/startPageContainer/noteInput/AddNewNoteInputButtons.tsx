@@ -2,8 +2,7 @@ import React, { useContext } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { NoteInputType } from "../../../../abstract/NoteInputType";
-import "../../../../assets/styles/AddNewNoteInputButtons.scss";
-import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, getDefaultVariableInput } from "../../../../helpers/constants";
+import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, CODE_SNIPPET_SEQUENCE_SINGLELINE, getDefaultVariableInput } from "../../../../helpers/constants";
 import { sleep } from "../../../../helpers/utils";
 import { AppFetchContext } from "../../../AppFetchContextProvider";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
@@ -22,7 +21,6 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 export default function AddNewNoteInputButtons({...props}: Props) {
-
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInputButtons");
 
     const { isLoggedIn, notesUseQueryResult, editedNoteEntities } = useContext(AppFetchContext);
@@ -36,7 +34,6 @@ export default function AddNewNoteInputButtons({...props}: Props) {
 
 
     function handleAddCodeNoteInput(): void {
-         
         // case: not noteInputs yet
         if (!noteEntity.noteInputs)
             noteEntity.noteInputs = [];
@@ -46,7 +43,6 @@ export default function AddNewNoteInputButtons({...props}: Props) {
 
 
     function handleAddPlainTextNoteInput(): void {
-         
         // case: not noteInputs yet
         if (!noteEntity.noteInputs)
             noteEntity.noteInputs = [];
@@ -66,14 +62,13 @@ export default function AddNewNoteInputButtons({...props}: Props) {
 
     
     function getNewNoteInputEntityPlainText(): NoteInputEntity {
-
         let value = "";
         const noteEntities = isLoggedIn ? notesUseQueryResult.data.results : editedNoteEntities;
 
         // case: is first note and first noteInput
         if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("PLAIN_TEXT"))
             // add tutorial text
-            value = "Plain text and some <code>code...</code>";
+            value = `Plain text and some ${CODE_SNIPPET_SEQUENCE_SINGLELINE}code...${CODE_SNIPPET_SEQUENCE_SINGLELINE}`;
 
         return {
             value: value,
@@ -81,9 +76,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
         }
     }
 
-
     function getNewNoteInputEntityWithVariables(): NoteInputEntity {
-
         let value = "";
         const noteEntities = isLoggedIn ? notesUseQueryResult.data.results : editedNoteEntities;
 
@@ -134,7 +127,6 @@ export default function AddNewNoteInputButtons({...props}: Props) {
      * @param noteInputEntity to add
      */
     async function appendNoteInputEntity(noteInputEntity: NoteInputEntity): Promise<void> {
-
         if (!noteEntity || !noteEntity.noteInputs)
             return;
 

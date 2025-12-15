@@ -2,7 +2,6 @@ import React, { ChangeEvent, createContext, useContext, useEffect, useRef, useSt
 import { useLocation } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
-import "../../../assets/styles/StartPageContent.scss";
 import { NOTE_SEARCH_PHRASE_MIN_LENGTH, NOTE_SEARCH_PHRASE_USER_INPUT_DELAY } from "../../../helpers/constants";
 import { getRandomString, isBlank } from "../../../helpers/utils";
 import { useCsrfToken } from "../../../hooks/useCsrfToken";
@@ -60,6 +59,8 @@ export default function StartPageContent({...props}: Props) {
     
     const componentRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const saveAllNotesButtonRef = useRef<HTMLButtonElement>(null);
+    const newNoteButtonRef = useRef<HTMLButtonElement>(null);
 
     const context = {
         notes,
@@ -129,6 +130,18 @@ export default function StartPageContent({...props}: Props) {
             event.preventDefault();
             searchInputRef.current!.focus();
         } 
+
+        // save all
+        if (isKeyPressed("Control") && event.key === "s") {
+            event.preventDefault();
+            saveAllNotesButtonRef.current!.click();
+        }
+
+        // save all
+        if (isKeyPressed("Control") && isKeyPressed("Alt") && event.key === "n") {
+            event.preventDefault();
+            newNoteButtonRef.current!.click();
+        }
     }
 
     function mapNoteEntitiesToJsx(noteEntities: NoteEntity[]): JSX.Element[] {
@@ -282,8 +295,17 @@ export default function StartPageContent({...props}: Props) {
                 </Flex>
 
                 <Flex className="mb-4" horizontalAlign="right">
-                    <SaveAllNotesButton className="mt-2" disabled={!editedNoteEntities.length && isLoggedIn} rendered={notesUseQueryResult.data.results.length > 1} />
-                    <AddNewNoteButton className={(notes.length ? "" : "hover") + ` ms-2 mt-2`} disabled={isAddNewNoteButtonDisabled} />
+                    <SaveAllNotesButton 
+                        className="mt-2" 
+                        ref={saveAllNotesButtonRef}
+                        disabled={!editedNoteEntities.length && isLoggedIn} 
+                        rendered={notesUseQueryResult.data.results.length > 1} 
+                    />
+                    <AddNewNoteButton 
+                        className={(notes.length ? "" : "hover") + ` ms-2 mt-2`} 
+                        ref={newNoteButtonRef}
+                        disabled={isAddNewNoteButtonDisabled} 
+                    />
                 </Flex>
 
                 {notes}

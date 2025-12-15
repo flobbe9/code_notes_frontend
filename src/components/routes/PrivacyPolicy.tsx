@@ -1,5 +1,4 @@
 import React from "react";
-import "../../assets/styles/PrivacyPolicy.scss";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { BASE_URL, HELP_EMAIL, LINK_DEFAULT_REL } from "../../helpers/constants";
 import Flex from "../helpers/Flex";

@@ -1,0 +1,82 @@
+@use "@styles/global/functions.scss" as *;
+
+.Register {
+    $paddingX: 10px;
+
+    &-contentContainer {
+        padding: 0 20px;
+        width: 400px;
+
+        &-heading {
+            color: var(--matteBlue);
+        }
+
+        &-formContainer {
+            &-password {
+                .PasswordAdvice {
+                    font-size: .8em;
+                    // position on the left of password input
+                    left: calc(-1 * var(--passwordAdviceWidth) - calc(var(--passwordAdviceArrowBoxSize) / 2) - 10px);
+                    top: -51px;
+
+                    &-nonDesktopWidth {
+                        margin: 15px 0;
+                    }
+                }
+            }
+
+            &-submitButton {
+                padding: $paddingX 20px;
+                @include buttonContained();
+            }
+            
+            .TextInput {
+                width: 100%;
+
+                .textInput {
+                    width: 100%;
+
+                    @include customFocus {
+                        border-color: var(--accentColor);
+                    }
+                }
+            }
+
+            &-linkContainer {
+                font-size: .9em;
+
+                &-linkButton {
+                    padding: 2px;
+                    text-decoration: underline;
+                }
+            }
+                
+            &-loginButton {
+                padding: 0;
+                width: 100%;
+                
+                @include buttonFocus(var(--accentColor));
+                @include buttonOutline(var(--matteBlueLight));
+                
+                &-link {
+                    color: currentColor;
+                    padding: $paddingX 20px;
+                    width: 100%;
+                }
+            }
+        }
+        
+        &-oauth2Container {
+            .Oauth2LoginButton {
+                @include hover();
+            }
+        }
+    }
+
+    @media only screen and (max-width: 575) {
+        .Login-contentContainer {
+            min-width: 250px;
+            width: unset;
+        }
+    }
+}

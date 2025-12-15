@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../../abstract/InputValidationWrapper";
-import "../../assets/styles/Register.scss";
 import { BACKEND_BASE_URL, EMAIL_REGEX, LOGIN_PATH, PASSWORD_REGEX } from "../../helpers/constants";
 import { fetchAny, isResponseError } from "../../helpers/fetchUtils";
 import { getHeadTitleText } from "../../helpers/projectUtils";

@@ -1,0 +1,10 @@
+@use "@styles/global/functions.scss" as *;
+
+.DefaultCodeNoteInput {
+    border-radius: var(--borderRadius);
+    transition: box-shadow var(--transitionTime);
+
+    &:has(.fullScreen) {
+        box-shadow: 2px 2px 15px 2px var(--codeGrey);
+    }
+}

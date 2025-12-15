@@ -3,7 +3,6 @@ import { editor } from "monaco-editor";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
-import "../../../../assets/styles/CodeNoteInput.scss";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../../helpers/constants";
 import { logWarn } from "../../../../helpers/logUtils";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, getRandomString, isNumberFalsy, setClipboardText, setCssConstant } from "../../../../helpers/utils";
@@ -452,7 +451,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
                     {/* Delete */}
                     <Button 
-                        className="deleteNoteButton defaultNoteInputButton" 
+                        className="defaultNoteInputButton" 
                         title="Delete section"
                         onClick={handleDeleteNote}
                     >

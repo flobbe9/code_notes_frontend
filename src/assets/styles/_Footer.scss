@@ -1,0 +1,28 @@
+@use "../styles/global/functions.scss" as *;
+
+:root {
+    // set on footer render
+    --footerHeight: 0;
+}
+
+
+.Footer {
+    background-color: white;
+    border-top: 2px solid var(--matteBlue);
+    bottom: 0;
+    color: var(--matteBlue);
+    padding: 20px;
+    position: absolute;
+    width: 100%;
+
+    .simpleLink {
+        @include dontSelectText();
+    }
+
+    &-rightContainer {
+        &-version {
+            color: grey;
+            font-size: .8em;
+        }
+    }
+}

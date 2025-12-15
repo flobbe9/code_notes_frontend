@@ -1,7 +1,6 @@
 import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
-import "../../assets/styles/ButtonWithSlideLabel.scss";
 import { animateAndCommit } from "../../helpers/utils";
 import Button from "./Button";
 import { getTextWidth } from "../../helpers/projectUtils";

@@ -1,0 +1,25 @@
+@use "@styles/global/functions.scss" as *;
+
+.NoteTitle {
+    .titleInput {
+        background-color: transparent;
+        border: none;
+        border-bottom: 2px solid var(--codeGrey);
+        color: var(--codeGrey);
+        font-size: 1.6em;
+        width: 100%;
+
+        @include placeholder {
+            @include dontSelectText();
+        }
+
+        &:focus {
+            border-color: var(--accentColor);
+            outline: none;
+        }
+    
+        &.invalidInput {
+            border-color: red;
+        }
+    }
+}

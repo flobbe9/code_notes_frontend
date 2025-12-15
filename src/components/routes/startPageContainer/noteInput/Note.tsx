@@ -3,7 +3,6 @@ import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/Default
 import { NoteEntity } from "../../../../abstract/entites/NoteEntity";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { NoteEntityService } from "../../../../abstract/services/NoteEntityService";
-import "../../../../assets/styles/Note.scss";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
 import { handleRememberMyChoice } from "../../../../helpers/projectUtils";
@@ -474,7 +473,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
                         <ButtonWithSlideLabel 
                             className="saveNoteButton ms-2" 
                             label="Save note"
-                            title="Save note"
+                            title="Save note (Ctrl + S)"
                             disabled={isSaveButtonDisabled}
                             ref={saveButtonRef}
                             onClickPromise={handleSave}

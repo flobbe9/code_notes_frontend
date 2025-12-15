@@ -1,0 +1,27 @@
+@use "@styles/global/functions.scss" as *;
+
+.NoteInputSwitch {
+    .switchButton {
+        background-color: white;
+        border-radius: var(--borderRadius);
+        margin-left: 5px;
+        min-width: 40px;
+        padding: 4px 0;
+        @include dontSelectText();
+
+        // case: not checked
+        &:has(.radioButtonInput:not(:checked)):hover {
+            @include hover();
+        }
+
+        &:has(.radioButtonInput:focus) {
+            @include outlineFocus(black);
+        }
+
+    }
+
+    .curlyBraces {
+        margin-left: 1px;
+        font-weight: bold;
+    }
+}

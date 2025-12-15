@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import '../../assets/styles/SelectOption.scss';
 import DefaultProps, { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import { SelectContext } from './Select';
 import Flex from './Flex';

@@ -1,7 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
-import "../../../assets/styles/SettingsLeft.scss";
 import { PROFILE_PATH } from "../../../helpers/constants";
 import { AppContext } from "../../App";
 import Button from "../../helpers/Button";

@@ -1,7 +1,6 @@
 import React, { createContext, DragEvent, RefObject, useContext, useEffect, useRef, useState } from "react";
 import { DefaultNoteInputProps } from "../../../../abstract/DefaultNoteInputProps";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
-import "../../../../assets/styles/DefaultNoteInput.scss";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../../../helpers/constants";
 import { addClass, animateAndCommit, getJsxElementIndexByKey, isNumberFalsy, removeClass, shortenString } from "../../../../helpers/utils";
 import { AppContext } from "../../../App";

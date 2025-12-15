@@ -1,5 +1,4 @@
 import React from "react";
-import "./../assets/styles/NavBar.scss";
 import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
 import Flex from "./helpers/Flex";
 import NavBarProfileSection from "./NavBarProfileSection";

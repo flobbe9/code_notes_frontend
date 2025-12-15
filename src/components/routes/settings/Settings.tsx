@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
-import "../../../assets/styles/Settings.scss";
 import Flex from "../../helpers/Flex";
 import SettingsLeft from "./SettingsLeft";
 import { AppContext } from "../../App";

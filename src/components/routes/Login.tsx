@@ -2,7 +2,6 @@ import React, { ChangeEvent, MouseEvent, useContext, useEffect, useRef } from "r
 import { Link, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../../abstract/InputValidationWrapper";
-import "../../assets/styles/Login.scss";
 import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, OAUTH2_AUTH_LINK_GOOGLE, OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
 import { getHeadTitleText, setCsrfToken } from "../../helpers/projectUtils";

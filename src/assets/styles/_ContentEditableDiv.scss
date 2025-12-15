@@ -1,0 +1,24 @@
+@use "@styles/global/functions.scss" as *;
+
+.ContentEditableDiv {
+
+    .placeholderInput {
+        background-color: transparent;
+        border: none;
+        height: 0.8em;
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+        resize: none;
+        width: 100%;
+        line-height: 1em; // should equal font size of input
+
+        @include placeholder {
+            @include dontSelectText();
+        }
+
+        &:focus {
+            outline: none;
+        }
+    }
+}
