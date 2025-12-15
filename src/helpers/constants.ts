@@ -118,7 +118,6 @@ export const CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END = "</code>";
  * @returns ```<input>``` tag as string with a few attributes
  */
 export function getDefaultVariableInput(placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER, inputWidth = 120): string {
-
     // case: invalid placeholder
     if (isBlank(placeholder))
         placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER;

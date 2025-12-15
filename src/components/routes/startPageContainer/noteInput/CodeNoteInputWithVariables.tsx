@@ -7,6 +7,7 @@ import HelperProps from "../../../../abstract/HelperProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/highlightJs/vs.css";
 import { DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
+import { logDebug, logWarn } from "../../../../helpers/logUtils";
 import { cleanUpSpecialChars, getContentEditableDivLineElements, getTextWidth, isTextSelected, moveCursor } from "../../../../helpers/projectUtils";
 import { getClipboardText, getCssConstant, getCSSValueAsNumber, insertString, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
@@ -19,7 +20,6 @@ import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from "./Note";
 import NoteInputSettings from "./NoteInputSettings";
-import { logDebug, logWarn } from "../../../../helpers/logUtils";
 
 
 interface Props extends HelperProps {
@@ -342,6 +342,7 @@ export default function CodeNoteInputWithVariables({
         const isFirstLineADiv = inputDivRef.current!.innerHTML.startsWith("<div>")
         const currentInputDiv = inputInnerDivs[currentCursorLineNum - 1 - (isFirstLineADiv ? 0 : 1)] as HTMLDivElement; // - 2 for item() beeing 0-based and the first line not beeing a div
         const numInutLines = inputInnerDivs.length + (isFirstLineADiv ? 0 : 1); 
+        logDebug("line num", currentCursorLineNum, "cursor index", currentCursorIndex)
 
         if (currentCursorIndex === -1 || currentCursorLineNum === -1) {
             logWarn("Failed to get cursor index or cursor line num");
@@ -349,7 +350,8 @@ export default function CodeNoteInputWithVariables({
             currentCursorIndex = inputDivRef.current!.innerText.length - 1;
             currentCursorLineNum = numInutLines;
         }
-
+        
+        logDebug("line num", currentCursorLineNum, "cursor index", currentCursorIndex)
         // case: is first line, not a div
         if (!currentInputDiv) {
             inputDivRef.current!.innerHTML = insertString(
@@ -584,20 +586,6 @@ export default function CodeNoteInputWithVariables({
         defaultCodeNoteInput.style.top = "10vh";
         inputDivContainer.style.height = "80vh";
         inputDiv.style.maxHeight = "80vh";
-
-        // animateAndCommit(
-        //     defaultCodeNoteInput,
-        //     [{ top: window.getComputedStyle(defaultCodeNoteInput).getPropertyValue("top") }, { top: "10vh" }], 
-        //     { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION }
-        // );
-
-        // animateAndCommit(
-        //     inputDivContainer, 
-        //     [{ height: window.getComputedStyle(defaultCodeNoteInput).getPropertyValue("height") }, { height: "80vh" }], 
-        //     { duration: CODE_INPUT_FULLSCREEN_ANIMATION_DURATION}
-        // );
-
-        // animateAndCommit(inputDiv, { maxHeight: "80vh" });
     }
 
 
@@ -641,13 +629,11 @@ export default function CodeNoteInputWithVariables({
         return codeNoteInputWithVariablesLanguage === "_auto";
     }
 
-
     function handleAppendVariableButtonClick(): void {
         appendVariableInput();
         updateNoteInputEntity();
         updateNoteEdited();
     }
-
 
     return (
         <Flex 

@@ -6,6 +6,7 @@ import { getClipboardText, includesIgnoreCase, isBlank, isEmpty, isEventKeyTakin
 import { AppContext } from "../App";
 import HelperDiv from "./HelperDiv";
 import HiddenInput from "./HiddenInput";
+import { logDebug } from "@/helpers/logUtils";
 
 
 interface Props extends HelperProps {
@@ -181,7 +182,9 @@ export default forwardRef(function ContentEditableDiv(
         if (onMouseDown)
             onMouseDown(event);
 
-        updateCursorPosState();
+        setTimeout(() => {
+            updateCursorPosState();
+        }, 100); // wait for cursor to update
     }
 
     
@@ -273,6 +276,8 @@ export default forwardRef(function ContentEditableDiv(
         if (cursorLineNum === -1)
             cursorLineNum = cursorPos[1];
 
+        logDebug(documentSelection)
+
         // dont update state if no changes, for efficiency
         if (cursorIndex === cursorPos[0] && cursorLineNum === cursorPos[1])
             return;
@@ -295,6 +300,7 @@ export default forwardRef(function ContentEditableDiv(
                 ref={componentRef}
                 contentEditable
                 disabled={disabled}
+                suppressContentEditableWarning
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 onKeyDownCapture={handleKeyDownCapture}
