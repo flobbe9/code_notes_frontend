@@ -374,12 +374,3 @@ export function isTextSelected(): boolean {
 
     return currentSelection.anchorOffset !== currentSelection.focusOffset;
 }
-
-// TODO: does this make sense?
-function getDocumentSelectionRangeSize(): number {
-    const documentSelection = document.getSelection();
-    if (!documentSelection)
-        return 0;
-    
-    return documentSelection!.anchorOffset - documentSelection!.focusOffset;
-}

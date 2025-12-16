@@ -1,3 +1,4 @@
+import { REQUIRED_PASSWORD_SYMBOLS } from "@/helpers/constants";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";
@@ -24,7 +25,6 @@ interface Props extends HelperProps {
  * @since 0.0.1
  */
 export default function PasswordAdvice({password, useMobileView = false, ...props}: Props) {
-
     const [hasUpperCaseLetter, setHasUpperCaseLetter] = useState(false);
     const [hasLowerCaseLetter, setHasLowerCaseLetter] = useState(false);
     const [hasNumber, setHasNumber] = useState(false);
@@ -49,9 +49,7 @@ export default function PasswordAdvice({password, useMobileView = false, ...prop
 
     }, [password]);
 
-
     function validateAllCriteria(): void {
-
         updateHasUpperCaseLetter();
         updateHasLowerCaseLetter();
         updateHasNumber();
@@ -59,37 +57,28 @@ export default function PasswordAdvice({password, useMobileView = false, ...prop
         updateIsValidLength();
     }
 
-
     function updateHasUpperCaseLetter(): void {
-
         const regex = /[A-Z]/;
         setHasUpperCaseLetter(!isBlank(password) && password.match(regex) !== null);
     }
     
-
     function updateHasLowerCaseLetter(): void {
-
         const regex = /[a-z]/;
         setHasLowerCaseLetter(!isBlank(password) && password.match(regex) !== null);
     }
     
-
     function updateHasNumber(): void {
-
         const regex = /[0-9]/;
         setHasNumber(!isBlank(password) && password.match(regex) !== null);
     }
     
-
     function updateHasSymbol(): void {
 
         const regex = /[.,;_!#$%&@€*+=?´`"'\\/{|}()~^\-\])(]/;
         setHasSymbol(!isBlank(password) && password.match(regex) !== null);
     }
-    
 
     function updateIsValidLength(): void {
-
         const regex = /^.{8,72}$/;
         setIsValidLength(!isBlank(password) && password.match(regex) !== null);
     }
@@ -135,7 +124,7 @@ export default function PasswordAdvice({password, useMobileView = false, ...prop
                             1 number
                         </li>
                         <li className={`PasswordAdvice-regexList-item ${hasSymbol ? "validRegex" : "invalidRegex"}`}>
-                            1 symbol
+                            1 symbol of: {REQUIRED_PASSWORD_SYMBOLS}
                         </li>
                         <li className={`PasswordAdvice-regexList-item ${isValidLength ? "validRegex" : "invalidRegex"}`}>
                             length of 8 - 72 characters
@@ -160,7 +149,7 @@ export default function PasswordAdvice({password, useMobileView = false, ...prop
                         1 number
                     </li>
                     <li className={`PasswordAdvice-regexList-item ${hasSymbol ? "validRegex" : "invalidRegex"}`}>
-                        1 symbol
+                        1 symbol of: {REQUIRED_PASSWORD_SYMBOLS}
                     </li>
                     <li className={`PasswordAdvice-regexList-item ${isValidLength ? "validRegex" : "invalidRegex"}`}>
                         length of 8 - 72 characters

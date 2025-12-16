@@ -409,6 +409,24 @@ export function matchesAll(str: string, regexp: RegExp): boolean {
 }
 
 
+/**
+ * @param str to check 
+ * @param regexp pattern to use for checking
+ * @returns true if any char in given string match given pattern, else false
+ */
+export function matchesAny(str: string, regexp: RegExp): boolean {
+    // iterate chars
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        
+        if (char.match(regexp) !== null)
+            return true;
+    }
+
+    return false;
+}
+
+
 export function isStringAlphaNumeric(str: string): boolean {
 
     // alpha numeric regex

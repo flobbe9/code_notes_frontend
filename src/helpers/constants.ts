@@ -67,7 +67,8 @@ export const MAX_NOTE_TITLE_VALUE_LENGTH = 255;
 export const MAX_NOTE_INPUT_VALUE_LENGTH = 65_535;
 export const CSRF_TOKEN_HEADER_NAME = "X-CSRF-TOKEN";
 export const DEFAULT_ERROR_MESSAGE = "An unexpected error occurred. Please copy your unsaved contents and refresh the page.";
-export const PASSWORD_REGEX = new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[.,;_!#$%&@€*+=?´`"'\\/{|}()~^-])(.{8,72})$/, "g");
+export const REQUIRED_PASSWORD_SYMBOLS = ".,;_!#§$%&@€*+=?´\"'/()~-";
+export const PASSWORD_REGEX = new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[.,;_!#§$%&@€*+=?´"'/()~-])(.{8,72})$/, "g");
 export const EMAIL_REGEX = new RegExp(/^[\w\-.]+@([\w-]+.)+[\w-]{2,4}$/, "g");
 /** Also hard coded in "ConfirmationToken.java" */
 export const HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES = 12;

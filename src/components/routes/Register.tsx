@@ -81,12 +81,12 @@ export default function Register({isPopupContent = false, ...props}: Props) {
         password: [
             {
                 predicate: (password) => !isBlank(password),
-                errorMessage: "Please set a password",
+                errorMessage: "Please choose a password",
                 validateOnChange: true
             },
             {
                 predicate: (password) => password.match(PASSWORD_REGEX) !== null,
-                errorMessage: "Please set a password that complies with the requirements (*)",
+                errorMessage: "Please choose a password that meets the requirements.",
                 validateOnChange: false
             }
         ],
@@ -103,7 +103,6 @@ export default function Register({isPopupContent = false, ...props}: Props) {
             }
         ]
     }
-    
 
     function handleEmailInputChange(event: FormEvent<any>): void {
 
