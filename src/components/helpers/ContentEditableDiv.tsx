@@ -70,7 +70,6 @@ export default forwardRef(function ContentEditableDiv(
 
 
     function handleFocus(event): void {
-
         if (disabled) {
             preventFocus();
             return;
@@ -85,9 +84,7 @@ export default forwardRef(function ContentEditableDiv(
             componentRef.current!.focus();
     }
 
-
     function handleBlur(event): void {
-
         if (disabled) 
             return;
 
@@ -97,12 +94,9 @@ export default forwardRef(function ContentEditableDiv(
             onBlur(event);
     }
 
-
     function preventFocus(): void {
-
         hiddencomponentRef.current!.focus()
     }
-
 
     /**
      * @param withPlaceholder if ```true``` the placeholerInput must be present for the div input to be considered "empty". 
@@ -111,7 +105,6 @@ export default forwardRef(function ContentEditableDiv(
      * @returns ```true``` if input div has no text (or white space) and no html (except possibly the placeholder ```<input>```)
      */
     function isInputDivEmpty(withPlaceholder = true): boolean {
-
         const inputDiv = componentRef.current!;
         const innerText = inputDiv.innerText;
         const inputDivChildren = inputDiv.children;
@@ -127,9 +120,7 @@ export default forwardRef(function ContentEditableDiv(
         return isEmpty(innerText) || innerText === "\n";
     }
 
-
     function handleKeyDownCapture(event: KeyboardEvent): void {
-
         if (disabled)
             return;
 
@@ -142,7 +133,6 @@ export default forwardRef(function ContentEditableDiv(
         if (isEventKeyTakingUpSpace(keyName) && isInputDivEmpty())
            removePlaceholderInput();
     }
-
 
     function handleKeyUp(event: KeyboardEvent): void {
         if (disabled)
@@ -186,10 +176,8 @@ export default forwardRef(function ContentEditableDiv(
             updateCursorPosState();
         }, 100); // wait for cursor to update
     }
-
     
     function handleMouseUp(event: MouseEvent): void {
-
         if (disabled)
             return;
 
@@ -199,9 +187,7 @@ export default forwardRef(function ContentEditableDiv(
         updateCursorPosState(true);
     }
 
-
     function handleDrop(event: DragEvent): void {
-
         if (disabled) {
             event.preventDefault();
             return;
@@ -211,12 +197,10 @@ export default forwardRef(function ContentEditableDiv(
             onDrop(event);
     }
 
-
     /**
      * Append a text input to input div with ```placeholder``` as placeholder. 
      */
     function appendPlaceholderInputToInputDiv(): void {
-
         // case: no placeholder
         if (isBlank(placeholder))
             return;
@@ -229,18 +213,14 @@ export default forwardRef(function ContentEditableDiv(
         componentRef.current!.append(placeholderInput);
     }
 
-
     function removePlaceholderInput(): void {
-
         componentRef.current!.innerHTML = "";
     }
-
 
     /**
      * Works only if reading clipboard data is permitted.
      */
     async function handleCut(): Promise<void> {
-
         if (disabled)
             return;
 

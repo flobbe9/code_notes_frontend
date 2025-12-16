@@ -31,7 +31,6 @@ export default forwardRef(function SaveAllNotesButton({...props}: Props, ref: Re
      * Fetch method will validate and toast. Refetch after success
      */
     async function handleSave(): Promise<void> {
-        
         if (!isLoggedIn) {
             showPopup(<Login isPopupContent />);
             return;

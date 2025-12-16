@@ -132,12 +132,17 @@ export default function StartPageContent({...props}: Props) {
         } 
 
         // save all
-        if (isKeyPressed("Control") && event.key === "s") {
-            event.preventDefault();
-            saveAllNotesButtonRef.current!.click();
-        }
+        // if (isKeyPressed("Control") && event.key === "s") {
+        //     event.preventDefault();
+        //     const eventTarget = (event.target as HTMLElement);
+        //     eventTarget.blur();
+        //     setTimeout(() => {
+        //         saveAllNotesButtonRef.current!.click();
+        //         eventTarget.focus();
+        //     }, 100);
+        // }
 
-        // save all
+        // new note
         if (isKeyPressed("Control") && isKeyPressed("Alt") && event.key === "n") {
             event.preventDefault();
             newNoteButtonRef.current!.click();
