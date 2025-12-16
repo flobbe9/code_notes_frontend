@@ -522,6 +522,21 @@ export default function CodeNoteInputWithVariables({
 
         if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]) && !isVariableInputFocused())
             updateNoteEdited();
+
+        // if (isKeyPressed("Control") && event.key === "s") {
+        //     event.preventDefault();
+
+        //     // TODO: continue here
+        //         // save should highlight, save all, then unhighlight, then move the cursor back
+        //             // startpagecontent keyeventhandler should not do that if a noteinput that's a contenteditable div is focused
+        //     if (!inputHighlighted) {
+        //         // init cursor pos
+        //         await highlightInputDivContent();
+        //         // save
+        //         await unHighlightInputDivContent();
+        //         // move cursor back
+        //     }
+        // }
     }
     
     async function handleCut(): Promise<void> {
