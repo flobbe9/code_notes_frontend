@@ -2,7 +2,7 @@ import React, { ChangeEvent, MouseEvent, useContext, useEffect, useRef } from "r
 import { Link, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../../abstract/InputValidationWrapper";
-import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, OAUTH2_AUTH_LINK_GOOGLE, OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
+import { CONFIRM_ACCOUNT_STATUS_URL_QUERY_PARAM, HOURS_BEFORE_CONFIRMATION_TOKEN_EXPIRES, OAUTH2_LOGIN_ERROR_STATUS_URL_QUERY_PARAM, REGISTER_PATH, SEND_RESET_PASSWORD_MAIL_STATUS_PARAM } from "../../helpers/constants";
 import { isResponseError } from "../../helpers/fetchUtils";
 import { getHeadTitleText, setCsrfToken } from "../../helpers/projectUtils";
 import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, stringToNumber } from "../../helpers/utils";
@@ -71,7 +71,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
         password: [
             {
                 predicate: (password) => !isBlank(password),
-                errorMessage: "Please set a password",
+                errorMessage: "Please choose a password",
                 validateOnChange: true
             }
         ]
@@ -92,13 +92,12 @@ export default function Login({isPopupContent = false, ...props}: Props) {
      * Validate form, fetch login and cache csrf token (encrypted) or toast error.
      */
     async function handleFormSubmit(): Promise<void> {
-
         triggerFormValidation();
 
         if (!isFormValid())
             return;
 
-        const loginResponse = await fetchLogin(email, password);
+        const loginResponse = await fetchLogin(email, encodeURIComponent(password));
 
         if (isResponseError(loginResponse)) {
             handleFormFailure(loginResponse.status);
@@ -146,19 +145,16 @@ export default function Login({isPopupContent = false, ...props}: Props) {
 
 
     function handleEmailInputChange(event: ChangeEvent): void {
-
         setEmail((event.target as HTMLInputElement).value);
     }
 
     
     function handlePasswordInputChange(event: ChangeEvent): void {
-
         setPassword((event.target as HTMLInputElement).value);
     }
 
 
     function handleTextInputKeyDown(event: any): void {
-
         if (event.key === "Enter") {
             event.preventDefault();
             submitButtonRef.current!.click();
@@ -169,20 +165,17 @@ export default function Login({isPopupContent = false, ...props}: Props) {
      * Make all inputs validate their current value and possibly display an error message.
      */
     function triggerFormValidation(): void {
-
         setTriggerEmailValidation(!triggerEmailValidation);
         setTriggerPasswordValidation(!triggerPasswordValidation);
     }
 
 
     function isFormValid(): boolean {
-
         return isInputValidationWrapperRecordValid(inputValidationWrappers, [email, password]);
     }
 
 
     function handleRegisterClick(event: MouseEvent): void {
-
         if (isPopupContent) {
             // dont navigate
             event.preventDefault();
