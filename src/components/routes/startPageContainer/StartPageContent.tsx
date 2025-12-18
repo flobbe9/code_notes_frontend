@@ -16,11 +16,9 @@ import Note from "./noteInput/Note";
 import PaginationBar from "./PaginationBar";
 import SaveAllNotesButton from "./SaveAllNotesButton";
 
-
 interface Props extends DefaultProps {
 
 }
-
 
 /**
  * Container for all content on start page that is not the side bar.
@@ -42,7 +40,7 @@ export default function StartPageContent({...props}: Props) {
 
     const [noteSearchUserInputTimeout, setNoteSearchUserInputTimeout] = useState<NodeJS.Timeout>();
 
-    const { isKeyPressed, showPopup } = useContext(AppContext);
+    const { isKeyPressed, showPopup, toast } = useContext(AppContext);
     const { 
         editedNoteEntities,
         setEditedNoteEntities,
@@ -131,16 +129,16 @@ export default function StartPageContent({...props}: Props) {
             searchInputRef.current!.focus();
         } 
 
-        // save all
-        // if (isKeyPressed("Control") && event.key === "s") {
-        //     event.preventDefault();
-        //     const eventTarget = (event.target as HTMLElement);
-        //     eventTarget.blur();
-        //     setTimeout(() => {
-        //         saveAllNotesButtonRef.current!.click();
-        //         eventTarget.focus();
-        //     }, 100);
-        // }
+        // save all notes
+        if (isKeyPressed("Control") && isKeyPressed("Shift") && event.key === "S" && getComputedStyle(componentRef.current?.querySelector("#ButtonSaveAllNotesButton")!).getPropertyValue("display") !== "none") {
+            // case: no noteinput focused
+            if (!document.activeElement?.matches(".DefaultNoteInput .ContentEditableDiv") && !document.activeElement?.matches(".DefaultNoteInput textarea.inputarea")) {
+                event.preventDefault();
+                saveAllNotesButtonRef.current!.click();
+
+            } else
+                toast("Save all", "Remove the focus from this input first.", "info", 7000);
+        }
 
         // new note
         if (isKeyPressed("Control") && isKeyPressed("Alt") && event.key === "n") {

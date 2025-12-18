@@ -3,6 +3,7 @@ import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/Default
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES, ProgrammingLanguage } from "../../../../abstract/ProgrammingLanguage";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../../helpers/constants";
+import { moveCursor } from "../../../../helpers/projectUtils";
 import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
@@ -10,7 +11,6 @@ import SearchBar from "../../../helpers/SearchBar";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import LanguageSearchResults from "./LanguageSearchResults";
 import { NoteContext } from "./Note";
-import { moveCursor } from "../../../../helpers/projectUtils";
 
 
 interface Props extends DefaultProps {
@@ -49,12 +49,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "NoteInputSettings");
 
     const componentRef = useRef<HTMLDivElement>(null);
-    // const noteInputSwitchRef = useRef(null);
     const languageSearchBarRef = useRef<HTMLInputElement>(null);
-
-    // IDEA: make custom colors and pass them to buttons as border color
-
-
 
     useEffect(() => {
         const allLanguageSearchResults = getAllLanguagesByNoteInputType();
@@ -63,36 +58,6 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
         setLanguageSearchResults(mapLanguageNames(allLanguageSearchResults));
 
     }, []);
-
-
-    // /**
-    //  * Slide toggle the noteInput switch.
-    //  * 
-    //  * @param hide whether to hide the noteInput switch regardles of it's current state
-    //  */
-    // function toggleNoteInputSwitch(hide = isShowNoteInputSettings): void {
-
-    //     const noteInputSwitch = $(noteInputSwitchRef.current!);
-
-    //     // case: show noteInput settings
-    //     if (!hide)
-    //         // radio buttons back to static
-    //         noteInputSwitch.children(".RadioButton").css("position", "static");
-
-    //     // fake "toggle slide"
-    //     noteInputSwitch.animate(
-    //         {
-    //             width: hide ? 0 : getCssConstant("noteInputSwitchWidth"),
-    //             opacity: hide ? 0 : 1,
-    //             zIndex: hide ? -1 : 0
-    //         }, 
-    //         BLOCK_SETTINGS_ANIMATION_DURATION,
-    //         "swing",
-    //         // radio buttons to absolute so they dont widen the container width
-    //         () => noteInputSwitch.children(".RadioButton").css("position", (hide ? "absolute" : "static"))
-    //     )
-    // }
-
 
     /**
      * Slide toggle the language searchbar.
@@ -119,12 +84,18 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
                 languageSearchBar.style.zIndex = hide ? "-1" : "1";
                 if (!hide) {
                     languageSearchBarRef.current!.focus();
-                    moveCursor((languageSearchBarRef.current!), 0, -1);
+                    moveCursor(
+                        languageSearchBarRef.current!, 
+                        {
+                            x: 0,
+                            y: 0,
+                            selectedChars: 100 // select text
+                        }
+                    );
                 }
             }
         )
     }
-
 
     /**
      * Slide toggle this component except the toggle button.
@@ -132,16 +103,13 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
      * @param hide whether to hide the noteInput settings regardles of their current state
      */
     function toggleNoteInputSettings(hide = isShowNoteInputSettings): void {
-
         setIsShowNoteInputSettings(!hide);
 
         // toggleNoteInputSwitch(hide);
         toggleLanguageSearchBar(hide);
     }
 
-
     function handleLanguageSearchKeyDown(event): void {
-
         const keyName = event.key;
 
         if (keyName === "ArrowDown") {
@@ -224,7 +192,6 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
 
         setLanguageSearchResults(newLanguageSearchResults);
     }
-
 
     /**
      * @returns the complete list of available programming languages for current noteInput type

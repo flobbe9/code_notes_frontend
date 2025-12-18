@@ -35,7 +35,7 @@ export function isFalsy(obj: any): boolean {
 }
 
 export function isNumberFalsy(num: any): boolean {
-    return num === undefined || num === null || isNaN(num);
+    return isFalsy(num) || isNaN(num);
 }
 
 
@@ -1203,7 +1203,6 @@ export function scrollTop(): void {
  * @returns the parsed object or ```null``` if error
  */
 export function jsonParseDontThrow<ReturnType>(value: string | null | undefined): ReturnType | null {
-
     if (isBlank(value))
         return null;
 
@@ -1405,4 +1404,25 @@ function prepend0ToNumber(num: number, totalDigits = 2): string {
         str = "0" + str;        
 
     return str;
+}
+
+export function parentSelector(childElement: HTMLElement | null, parentSelector: string): HTMLElement | null {
+    if (!childElement || !parentSelector)
+        return null;
+
+    // case: child is the highest parent
+    if (!childElement.parentElement)
+        return null;
+
+    let parentElement: HTMLElement | null = childElement.parentElement;
+
+    while (!parentElement!.matches(parentSelector)) {
+        parentElement = parentElement!.parentElement;
+
+        // case: reached highest parent
+        if (!parentElement)
+            return null;
+    }
+
+    return parentElement;
 }

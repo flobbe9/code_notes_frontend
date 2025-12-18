@@ -1,3 +1,4 @@
+import { useClickOutside } from "@/hooks/useClickOutside";
 import React, { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { TagEntity } from "../../../abstract/entites/TagEntity";
@@ -9,8 +10,6 @@ import HelperDiv from "../../helpers/HelperDiv";
 import { StartPageContainerContext } from "./StartPageContainer";
 import { StartPageSideBarContext } from "./StartPageSideBar";
 import TagCheckbox from "./TagCheckbox";
-import { logDebug } from "@/helpers/logUtils";
-import { useClickOutside } from "@/hooks/useClickOutside";
 
 
 interface Props extends HelperProps {

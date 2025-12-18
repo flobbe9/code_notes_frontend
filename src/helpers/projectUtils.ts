@@ -1,3 +1,5 @@
+import { CursorPosition } from "@/abstract/CursorPosition";
+import { MovableCursorElement } from "@/abstract/MovableCursorElement";
 import { useQueryClientObj } from "@/main";
 import parse, { Element } from "html-react-parser";
 import sanitize from "sanitize-html";
@@ -7,8 +9,8 @@ import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTES_QUERY_KEY } from "../hooks/useNotes";
 import { APP_NAME_PRETTY, DEFAULT_HTML_SANTIZER_OPTIONS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
-import { logDebug, logWarn } from "./logUtils";
-import { assertFalsyAndLog, getRandomString, isBlank, isEmpty, stringToHtmlElement } from "./utils";
+import { logError, logWarn } from "./logUtils";
+import { assertFalsyAndLog, getRandomString, isBlank, isEmpty, isNumberFalsy, stringToHtmlElement } from "./utils";
 
 /**
  * Meant to provide specific util methods that are not needed in any project.
@@ -35,79 +37,106 @@ export function getContentEditableDivLineElements(contentEditableDiv: HTMLDivEle
 
 
 export function isContentEditableDiv(element: HTMLElement): boolean {
-
     return element && element instanceof HTMLDivElement && (element as HTMLDivElement).isContentEditable
 }
 
-
 /**
- * Move the cursor once sothat the current selection (if any) is removed.
- * 
- * @param inputElement to unselect text for
- * @param direction to move the cursor to when unselecting. Default is 'left'
- */
-export function unselectContentEditableDivText(inputElement: HTMLDivElement, direction: "left" | "right" = "left"): void {
-    if (!isContentEditableDiv(inputElement))
-        return;
-
-    if (!isTextSelected())
-        return;
-    
-    document.getSelection()!.modify("move", direction, "character");
-}
-
-/**
- * Move cursor of a text input element or a content editable div. If ```start === end``` the cursor will be shifted normally to given position.
- * If ```start !== end``` the text between the indices will be marked.
+ * Move cursor to `to.x` and possibly to `to.y` (only for contenteditable divs), then extend the selection to `to.selectedChars`, either "backward" or "forward".
  * 
  * @param inputElement  to move the cursor in
- * @param start index of selection start, default is 0
- * @param end index of selection end, default is ```start``` param
+ * @param to the directions
  */
-export function moveCursor(inputElement: HTMLInputElement | HTMLDivElement, start = 0, end = start): void {
-    if (!inputElement)
+export function moveCursor(inputElement: MovableCursorElement, to: CursorPosition | null): void { // start, linenum, num charse selected (may be negative), 
+    if (!inputElement || !to || !isCursorPositionValid(to)) {
+        logWarn("Failed to move cursor. Invalid args", inputElement, to);
         return;
+    }
 
-    if (inputElement instanceof HTMLInputElement) {
-        inputElement.selectionStart = start;
-        inputElement.selectionEnd = end;
-
-    } else if (isContentEditableDiv(inputElement)) {
-        unselectContentEditableDivText(inputElement);
-        
-        const currentCursorIndex = getCursorIndex(inputElement);
-        if (currentCursorIndex === -1)
+    if (inputElement instanceof HTMLInputElement || inputElement instanceof HTMLTextAreaElement) {
+        // case: did not want to move at all
+        if (to.x < 0)
             return;
 
-        // move cursor to 'start'
-        for (let i = 0; i < Math.abs(currentCursorIndex - start); i++) {
-            const direction = currentCursorIndex - start < 0 ? "forward" : "backward";
-            document.getSelection()?.modify("move", direction, "character");
+        // move to x
+        if (to.selectedChars >= 0)
+            inputElement.selectionStart = to.x;
+
+        // case: extend forward
+        if (to.selectedChars > 0)
+            inputElement.selectionEnd = to.x + to.selectedChars;
+
+        // case: extend backward
+        else if (to.selectedChars < 0) {
+            inputElement.selectionStart = Math.max(to.x + to.selectedChars, 0);
+            inputElement.selectionEnd = to.x;
+
+        } else
+            inputElement.selectionEnd = to.x;
+
+    } else if (isContentEditableDiv(inputElement)) {
+        const documentSelection = document.getSelection();
+        if (!documentSelection)
+            return;
+
+        const currentPos = getCursorPos(inputElement);
+        if (!currentPos)
+            return;
+
+        // move y
+        if (to.y > 0 && currentPos.y !== to.y) {
+            const numLinesToMove = to.y - currentPos.y;
+            const direction = to.y - currentPos.y < 0 ? "backward" : "forward";
+
+            for (let i = 0; i < Math.abs(numLinesToMove); i++)
+                documentSelection.modify("move", direction, "line");
+
+            // case: don't want to change x, move back to initial x
+            if (to.x < 0)
+                for (let i = 0; i < currentPos.x; i++)
+                    documentSelection.modify("move", "forward", "character");
         }
 
-        // extend cursor to 'end'
-        if (start !== end) {
-            for (let i = 0; i < Math.abs(end - start); i++) {
-                const direction = start - end < 0 ? "forward" : "backward";
-                document.getSelection()?.modify("extend", direction, "character");            
-            }
+        // move x
+        if (to.x >= 0) {
+            // move to x = 0
+            documentSelection.modify("move", "backward", "lineboundary");
+
+            // move to desired x
+            for (let i = 0; i < to.x; i++)
+                documentSelection.modify("move", "forward", "character");
+
+            // extend
+            const selectionDirection = to.selectedChars < 0 ? "backward" : "forward";
+            for (let i = 0; i < Math.abs(to.selectedChars); i++)
+                documentSelection.modify("extend", selectionDirection, "character"); // will start at last cursor x
         }
 
     } else 
         logWarn("Invalid 'inputElement' type");
 }
 
+/**
+ * @param cursorPosition 
+ * @returns `false` if any prop is not a number or is outside it's boundaries (see Cursorposition)
+ */
+function isCursorPositionValid(cursorPosition: CursorPosition | null): boolean {
+    return !!cursorPosition && 
+        !isNumberFalsy(cursorPosition.x) && cursorPosition.x >= -1 && 
+        !isNumberFalsy(cursorPosition.y) && cursorPosition.y >= 0 && 
+        !isNumberFalsy(cursorPosition.selectedChars)
+}
 
 /**
- * Works for both text input and contenteditable div
+ * Value will be relative to line for contenteditable divs. For any other input the value will be relative to the whole input's value.
+ * 
  * @param inputElement to get the cursor for
- * @returns the current index of the cursor of given text input element or -1. If text is marked, the index of selection start is returned
+ * @returns 0-based the current index of the cursor of given text input element or -1. If text is marked, the index of selection start is returned
  */
-export function getCursorIndex(inputElement: HTMLInputElement | HTMLDivElement): number {
+export function getCursorIndex(inputElement: MovableCursorElement): number {
     if (!inputElement)
         return -1;
 
-    if (inputElement instanceof HTMLInputElement)
+    if (inputElement instanceof HTMLInputElement || inputElement instanceof HTMLTextAreaElement)
         return inputElement.selectionStart ?? -1;
 
     if (isContentEditableDiv(inputElement))
@@ -117,14 +146,16 @@ export function getCursorIndex(inputElement: HTMLInputElement | HTMLDivElement):
     return -1;
 }
 
-
 /**
  * @param inputElement to get the line number for
  * @returns the 1-based line number of the current selection start in given ```inputElement``` or -1 if falsy params
  */
-export function getCursorLineNum(inputElement: HTMLTextAreaElement | HTMLDivElement): number {
+export function getCursorLineNum(inputElement: MovableCursorElement): number {
     if (!inputElement)
         return -1;
+
+    if (inputElement instanceof HTMLInputElement)
+        return 1;
 
     if (inputElement instanceof HTMLTextAreaElement) {
         const cursorIndex = inputElement.selectionStart;
@@ -139,7 +170,7 @@ export function getCursorLineNum(inputElement: HTMLTextAreaElement | HTMLDivElem
         const initialAnchorOffset = documentSelection?.anchorOffset!;
         // the selection end index, negative if selected backwards
         const initialFocusOffset = documentSelection?.focusOffset!;
-        const initiallySelectedText = isTextSelected();
+        const didInitiallySelectedText = getNumCharsSelected(inputElement) > 0;
 
         if (assertFalsyAndLog(documentSelection, initialAnchorOffset, initialFocusOffset))
             return -1;
@@ -147,27 +178,28 @@ export function getCursorLineNum(inputElement: HTMLTextAreaElement | HTMLDivElem
         let lineCount = 1; // 1-based
         
         // move to start of line (pos (0, y))
-        documentSelection?.modify("move", "left", "lineboundary")
-        documentSelection?.modify("extend", "backward", "line")
+        documentSelection?.modify("move", "left", "lineboundary");
+        documentSelection?.modify("extend", "backward", "line");
         
         // move up to pos (0, 0)
         while (!documentSelection?.isCollapsed) {
             lineCount++;
-            documentSelection?.modify("move", "left", "lineboundary")
-            documentSelection?.modify("extend", "backward", "line")
+            documentSelection?.modify("move", "left", "lineboundary");
+            documentSelection?.modify("extend", "backward", "line");
         }
-
-        logDebug("lineCount", lineCount)
 
         // move back to initial line num
         for (let i = 1; i < lineCount; i++)
             documentSelection?.modify("move", "forward", "line");
 
-        // move back to initial cursor index
-        moveCursor(inputElement, initialAnchorOffset);
+        // move to x = 0
+        documentSelection.modify("move", "backward", "lineboundary");
+        // move back to initial x
+        for (let i = 0; i < initialAnchorOffset; i++)
+            documentSelection.modify("move", "forward", "character");
 
         // select initially selected text
-        if (initiallySelectedText) {
+        if (didInitiallySelectedText) {
             for (let i = 0; i < Math.abs(initialAnchorOffset - initialFocusOffset); i++)
                 documentSelection?.modify("extend", initialAnchorOffset < initialFocusOffset ? "forward" : 'backward', "character");
         }
@@ -178,6 +210,21 @@ export function getCursorLineNum(inputElement: HTMLTextAreaElement | HTMLDivElem
     return -1;
 }
 
+/**
+ * @param element 
+ * @returns `null` if no document selection yet
+ */
+export function getCursorPos(element: MovableCursorElement): CursorPosition | null {
+    const documentSelection = document.getSelection();
+    if (!documentSelection)
+        return null;
+
+    return {
+        x: getCursorIndex(element),
+        y: getCursorLineNum(element),
+        selectedChars: getNumCharsSelected(element)
+    }
+}
 
 /**
  * @param text to measure
@@ -187,7 +234,6 @@ export function getCursorLineNum(inputElement: HTMLTextAreaElement | HTMLDivElem
  * @returns width of text in px
  */
 export function getTextWidth(text: string, fontSize: string, fontFamily: string, fontWeight = "400"): number {
-
     if (isEmpty(text))
         return 0;
 
@@ -257,7 +303,6 @@ export function getHTMLStringAttribs(dirtyHtml: string): {className: string, id:
  * @returns same text string but with some special chars replaced
 */
 export function cleanUpSpecialChars(text: string): string {
-
     let cleanHtml = text;
     cleanHtml = cleanHtml.replaceAll("&amp;", "&");
     cleanHtml = cleanHtml.replaceAll("&lt;", "<");
@@ -267,24 +312,20 @@ export function cleanUpSpecialChars(text: string): string {
     return cleanHtml;
 }
 
-
 /**
  * Removes sensitive data from use query cache.
  */
 export function clearSensitiveCache(): void {
-    
     if (useQueryClientObj && useQueryClientObj.getQueryData<AppUserEntity>(APP_USER_QUERY_KEY))
         useQueryClientObj.removeQueries({queryKey: APP_USER_QUERY_KEY});
 
     localStorage.removeItem(CSRF_TOKEN_QUERY_KEY);
 }
 
-
 /**
  * Removes use query cache data related to app user (not ```isLoggedIn``` though). May be used on logout.
  */
 export function clearUserCache(): void {
-
     if (!useQueryClientObj)
         return;
     
@@ -294,14 +335,12 @@ export function clearUserCache(): void {
         useQueryClientObj.removeQueries({queryKey: NOTES_QUERY_KEY});
 }
 
-
 /**
  * Attempts to retrieve the csrf token from cache. 
  * 
  * @returns the csrf token or a blank string
  */
 export function getCsrfToken(): string {
-
     const csrfToken = localStorage.getItem(CSRF_TOKEN_QUERY_KEY);
 
     if (isBlank(csrfToken))
@@ -310,17 +349,14 @@ export function getCsrfToken(): string {
     return csrfToken!;
 }
 
-
 /**
  * Will store given ```csrfToken``` in localStorage (regardless of the token beeing blank or not).
  * 
  * @param csrfToken to encrypt and cache
  */
 export function setCsrfToken(csrfToken: string): void {
-    
     localStorage.setItem(CSRF_TOKEN_QUERY_KEY, csrfToken);
 }
-
 
 /**
  * Find choice in localStorage and possibly call callback.
@@ -332,7 +368,6 @@ export function setCsrfToken(csrfToken: string): void {
  * @returns ```true``` if a valid choice was cached (no matter if "confirm" or "cancel")
  */
 export function handleRememberMyChoice(key: RememberMyChoiceKey, confirmCallback?: () => void): boolean {
-
     const choice = localStorage.getItem(REMEMBER_MY_CHOICE_KEY_PREFIX + key);
 
     if (!choice) 
@@ -351,7 +386,6 @@ export function handleRememberMyChoice(key: RememberMyChoiceKey, confirmCallback
     return true;
 }
 
-
 /**
  * Get the text for the ```<title>```.
  * 
@@ -359,18 +393,41 @@ export function handleRememberMyChoice(key: RememberMyChoiceKey, confirmCallback
  * @returns ```pageTitle | ${companyName}``` or just ```companyName``` if no ```pageTitle```
  */
 export function getHeadTitleText(pageTitle?: string): string {
-
     return isBlank(pageTitle) ? `${APP_NAME_PRETTY}` : `${pageTitle} | ${APP_NAME_PRETTY}`; 
 }
 
+
 /**
- * @returns `true` if some text somewhere in the document is user selected
+ * For contenteditable divs this is only returns the correct result for selections within the same line. 
+ * 
+ * Will include line breaks as "selected char".
+ * 
+ * @param element 
+ * @returns absolute number of selected chars. -1 if unable to evaluate
  */
-export function isTextSelected(): boolean {
-    const currentSelection = document.getSelection();
+export function getNumCharsSelected(element: MovableCursorElement): number {
+    if (!element)
+        return -1;
 
-    if (!currentSelection)
-        return false;
+    if (isContentEditableDiv(element)) {
+        const documentSelection = document.getSelection();
+        if (!documentSelection) {
+            logError("Failed to get num chars. No document selection");
+            return -1;
+        }
 
-    return currentSelection.anchorOffset !== currentSelection.focusOffset;
+        if (documentSelection.isCollapsed)
+            return 0;
+
+        return Math.abs(documentSelection.focusOffset - documentSelection.anchorOffset);
+    }
+
+    const inputElement = element as HTMLInputElement;
+
+    // case: nothing selected
+    if (inputElement.selectionEnd === null)
+        return 0;
+
+    // assume that selectionStart must be truthy if selectionEnd is
+    return inputElement.selectionEnd - inputElement.selectionStart!;
 }

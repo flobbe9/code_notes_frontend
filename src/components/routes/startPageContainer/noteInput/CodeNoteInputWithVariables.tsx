@@ -1,3 +1,4 @@
+import { CursorPosition } from "@/abstract/CursorPosition";
 import hljs from "highlight.js";
 import parse from 'html-react-parser';
 import React, { FocusEvent, KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
@@ -7,8 +8,8 @@ import HelperProps from "../../../../abstract/HelperProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/highlightJs/vs.css";
 import { DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
-import { logDebug, logWarn } from "../../../../helpers/logUtils";
-import { cleanUpSpecialChars, getContentEditableDivLineElements, getTextWidth, isTextSelected, moveCursor } from "../../../../helpers/projectUtils";
+import { logWarn } from "../../../../helpers/logUtils";
+import { cleanUpSpecialChars, getContentEditableDivLineElements, getCursorPos, getNumCharsSelected, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
 import { getClipboardText, getCssConstant, getCSSValueAsNumber, insertString, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from "../../../App";
@@ -23,7 +24,6 @@ import NoteInputSettings from "./NoteInputSettings";
 
 
 interface Props extends HelperProps {
-
     noteInputEntity: NoteInputEntity
 }
 
@@ -40,10 +40,8 @@ export default function CodeNoteInputWithVariables({
     onBlur, 
     ...props
 }: Props) {
-
     const [inputDivValue, setInputDivValue] = useState<any>()
-    /** ```[cursorIndex, cursorLineNumber]``` inside this input. ```cursorIndex``` is 0-based, ```cursorLineNumber``` is 1-based */
-    const [cursorPos, setCursorPos] = useState([0, 1]);
+    const [cursorPos, setCursorPos] = useState<CursorPosition>({x: 0, y: 1, selectedChars: 0});
     
     const [hasComponentRendered, sethasComponentRendered] = useState(false);
 
@@ -56,7 +54,7 @@ export default function CodeNoteInputWithVariables({
     const inputDivRef = useRef<HTMLDivElement>(null);
 
     const { isKeyPressed, isControlKeyPressed } = useContext(AppContext);
-    const { updateNoteEdited } = useContext(NoteContext);
+    const { updateNoteEdited, isSaveButtonDisabled, clickSaveButton } = useContext(NoteContext);
     const { 
         codeNoteInputWithVariablesLanguage, 
         isNoteInputOverlayVisible,
@@ -143,8 +141,6 @@ export default function CodeNoteInputWithVariables({
                 if (!isBlank(firstLine))
                     highlightedHtmlString += "</div>";
 
-                logDebug("first line", firstLine)
-
                 // iterate lines after first line
                 Array.from(inputChildren).forEach(inputChild => {
                     const child = inputChild as HTMLElement;
@@ -191,7 +187,6 @@ export default function CodeNoteInputWithVariables({
      * Remove highlighting of inputDiv content and parse ```<input>```s to inputVariableSequences.
      */
     async function unHighlightInputDivContent(): Promise<string> {
-
         const unHighlightedContent = await new Promise<string>((res, rej) => {
             const inputDiv = inputDivRef.current!;
             const inputHtml = inputDiv.innerHTML;
@@ -217,7 +212,6 @@ export default function CodeNoteInputWithVariables({
      * @returns plain text of the very first line of the content editable which is not wrapped inside a ```<div>```
      */
     function getFirstInputDivContentLine(): string {
-
         const inputDiv = inputDivRef.current!;
         let inputHtml = inputDiv.innerHTML;
 
@@ -334,15 +328,14 @@ export default function CodeNoteInputWithVariables({
     function insertVariableInputSequence(): void {
         const variableInputSequence = VARIABLE_INPUT_START_SEQUENCE + VARIABLE_INPUT_DEFAULT_PLACEHOLDER + VARIABLE_INPUT_END_SEQUENCE;
         
-        let currentCursorIndex = cursorPos[0];
-        let currentCursorLineNum = cursorPos[1];
+        let currentCursorIndex = cursorPos.x;
+        let currentCursorLineNum = cursorPos.y;
         
         // all inner divs that represent a line
         const inputInnerDivs = getContentEditableDivLineElements(inputDivRef.current!);
         const isFirstLineADiv = inputDivRef.current!.innerHTML.startsWith("<div>")
         const currentInputDiv = inputInnerDivs[currentCursorLineNum - 1 - (isFirstLineADiv ? 0 : 1)] as HTMLDivElement; // - 2 for item() beeing 0-based and the first line not beeing a div
         const numInutLines = inputInnerDivs.length + (isFirstLineADiv ? 0 : 1); 
-        logDebug("line num", currentCursorLineNum, "cursor index", currentCursorIndex)
 
         if (currentCursorIndex === -1 || currentCursorLineNum === -1) {
             logWarn("Failed to get cursor index or cursor line num");
@@ -351,7 +344,6 @@ export default function CodeNoteInputWithVariables({
             currentCursorLineNum = numInutLines;
         }
         
-        logDebug("line num", currentCursorLineNum, "cursor index", currentCursorIndex)
         // case: is first line, not a div
         if (!currentInputDiv) {
             inputDivRef.current!.innerHTML = insertString(
@@ -375,8 +367,11 @@ export default function CodeNoteInputWithVariables({
         // select placeholder sequence
         moveCursor(
             currentInputDiv || inputDivRef.current!, 
-            currentCursorIndex + VARIABLE_INPUT_START_SEQUENCE.length, 
-            currentCursorIndex + VARIABLE_INPUT_START_SEQUENCE.length + VARIABLE_INPUT_DEFAULT_PLACEHOLDER.length
+            {
+                x: currentCursorIndex + VARIABLE_INPUT_START_SEQUENCE.length, 
+                y: 0,
+                selectedChars: VARIABLE_INPUT_DEFAULT_PLACEHOLDER.length
+            }
         );
     }
 
@@ -523,27 +518,31 @@ export default function CodeNoteInputWithVariables({
         if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]) && !isVariableInputFocused())
             updateNoteEdited();
 
-        // if (isKeyPressed("Control") && event.key === "s") {
-        //     event.preventDefault();
+        // save this note
+        if (isKeyPressed("Control") && event.key === "s" && !isSaveButtonDisabled) {
+            event.preventDefault();
 
-        //     // TODO: continue here
-        //         // save should highlight, save all, then unhighlight, then move the cursor back
-        //             // startpagecontent keyeventhandler should not do that if a noteinput that's a contenteditable div is focused
-        //     if (!inputHighlighted) {
-        //         // init cursor pos
-        //         await highlightInputDivContent();
-        //         // save
-        //         await unHighlightInputDivContent();
-        //         // move cursor back
-        //     }
-        // }
+            // highlight to properly save
+            if (!inputHighlighted)
+                await highlightInputDivContent();
+
+            // click note save button
+            clickSaveButton();
+
+            // unhighlight
+            if (!inputHighlighted)
+                await unHighlightInputDivContent();
+
+            // move cursor back
+            const cursorPosition = getCursorPos(inputDivRef.current!);
+            moveCursor(inputDivRef.current!, cursorPosition);
+        }
     }
     
     async function handleCut(): Promise<void> {
-        if (isTextSelected())
+        if (getNumCharsSelected(inputDivRef.current!) > 0)
             updateNoteEdited();
     }
-
 
     async function handlePaste(): Promise<void> {
         if (!isVariableInputFocused())
