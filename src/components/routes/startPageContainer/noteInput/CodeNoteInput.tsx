@@ -1,5 +1,5 @@
 import { Editor, Monaco } from "@monaco-editor/react";
-import { editor } from "monaco-editor";
+import { editor, IKeyboardEvent } from "monaco-editor";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
@@ -50,7 +50,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     const [editorKey, setEditorKey] = useState("initialKey");
 
     const { isStartPageSideBarVisible, getStartPageSideBarWidth } = useContext(StartPageContainerContext);
-    const { updateNoteEdited } = useContext(NoteContext);
+    const { updateNoteEdited, clickSaveButton } = useContext(NoteContext);
     const { 
         isShowNoteInputSettings, 
         areNoteInputSettingsDisabled, 
@@ -79,7 +79,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         updateFullScreenSetterStates();
         
         setEditorHeight(getInitialEditorHeight());
-        
     }, []);
 
     useEffect(() => {
@@ -334,6 +333,8 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         (editorRef.current as any) = editor;
 
         setIsEditorMounted(true);
+
+        editor.onKeyDown(handleKeyDown);
     }
 
     /**
@@ -409,6 +410,13 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
      */
     function rerenderEditor(): void {
         setEditorKey(getRandomString());
+    }
+
+    function handleKeyDown(e: IKeyboardEvent): void {
+        if (e.ctrlKey && e.keyCode === 49) { // === "s"
+            e.preventDefault();
+            clickSaveButton();
+        }
     }
 
     return (

@@ -1,3 +1,4 @@
+import { CursorPosition } from '@/abstract/CursorPosition';
 import parse from 'html-react-parser';
 import React, { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
@@ -5,7 +6,8 @@ import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../../../abstract/HelperProps";
 import { CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
-import { getContentEditableDivLineElements, isTextSelected, moveCursor } from '../../../../helpers/projectUtils';
+import { logWarn } from '../../../../helpers/logUtils';
+import { getContentEditableDivLineElements, getCursorPos, getNumCharsSelected, moveCursor } from '../../../../helpers/projectUtils';
 import { getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from '../../../App';
@@ -15,7 +17,6 @@ import Flex from "../../../helpers/Flex";
 import Overlay from '../../../helpers/Overlay';
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from './Note';
-import { logWarn } from '../../../../helpers/logUtils';
 
 
 interface Props extends HelperProps {
@@ -36,11 +37,11 @@ export default function PlainTextNoteInput({
     
     const [inputDivValue, setInputDivValue] = useState<any>();
     /** ```[cursorIndex, cursorLineNumber]``` inside this input. ```cursorIndex``` is 0-based, ```cursorLineNumber``` is 1-based */
-    const [cursorPos, setCursorPos] = useState([0, 1]);
+    const [cursorPos, setCursorPos] = useState<CursorPosition>({x: 0, y: 1, selectedChars: 0});
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
     const { isKeyPressed, isControlKeyPressed } = useContext(AppContext);
-    const { updateNoteEdited } = useContext(NoteContext);
+    const { updateNoteEdited, isSaveButtonDisabled, clickSaveButton } = useContext(NoteContext);
     const { 
         isNoteInputOverlayVisible,
         setIsNoteInputOverlayVisible, 
@@ -56,9 +57,7 @@ export default function PlainTextNoteInput({
     const componentRef = useRef<HTMLDivElement>(null);
     const inputDivRef = useRef<HTMLDivElement>(null);
 
-    
     useInitialStyles(inputDivRef.current, [["max-width", "width"]], 100);
-
 
     useEffect(() => {
         setInputDivValue(parse(sanitize(noteInputEntity.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
@@ -212,7 +211,7 @@ export default function PlainTextNoteInput({
         return cleanHtml;
     }
 
-    function handleKeyDownCapture(event: KeyboardEvent): void {
+    async function handleKeyDownCapture(event: KeyboardEvent): Promise<void> {
         const keyName = event.key;
 
         if (keyName === "Control")
@@ -226,6 +225,21 @@ export default function PlainTextNoteInput({
         
         if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]))
             updateNoteEdited();
+        
+        if (isKeyPressed("Control") && event.key === "s" && !isSaveButtonDisabled) {
+            event.preventDefault();
+            await parseCodeTextToCodeHtml();
+
+            // click note save button
+            clickSaveButton();
+
+            // unhighlight
+            parseCodeHtmlToCodeText();
+
+            // move cursor back
+            const cursorPosition = getCursorPos(inputDivRef.current!);
+            moveCursor(inputDivRef.current!, cursorPosition);
+        }
     }
 
     function handleKeyUp(event: KeyboardEvent): void {
@@ -245,7 +259,7 @@ export default function PlainTextNoteInput({
     }
 
     function handleCut(): void {
-        if (isTextSelected())
+        if (getNumCharsSelected(inputDivRef.current!) > 0)
             updateNoteEdited();
     }
 
@@ -320,8 +334,8 @@ export default function PlainTextNoteInput({
     function insertCodeSnippetSequence(): void {
         const variableInputSequence = CODE_SNIPPET_SEQUENCE_SINGLELINE + CODE_SNIPPET_SEQUENCE_SINGLELINE;
         
-        let currentCursorIndex = cursorPos[0];
-        let currentCursorLineNum = cursorPos[1];
+        let currentCursorIndex = cursorPos.x;
+        let currentCursorLineNum = cursorPos.y;
         
         // all inner divs that represent a line
         const inputInnerDivs = getContentEditableDivLineElements(inputDivRef.current!);
@@ -355,8 +369,15 @@ export default function PlainTextNoteInput({
                 currentCursorIndex
             );
 
-        // select placeholder sequence
-        moveCursor(currentInputDiv || inputDivRef.current!, currentCursorIndex + CODE_SNIPPET_SEQUENCE_SINGLELINE.length);
+        // move cursor into sequence
+        moveCursor(
+            currentInputDiv || inputDivRef.current!, 
+            {
+                x: currentCursorIndex + CODE_SNIPPET_SEQUENCE_SINGLELINE.length,
+                y: 0,
+                selectedChars: 0
+            }
+        );
     }
 
     function handleAppendCodeSnippet(): void {

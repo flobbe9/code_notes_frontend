@@ -75,7 +75,7 @@ export default forwardRef(function SaveAllNotesButton({...props}: Props, ref: Re
     return (
         <Button 
             className={`${className} hover`} 
-            title={props.disabled ? "No changes yet" : "Save all edited notes (Ctr + S)"}
+            title={props.disabled ? "No changes yet" : "Save all edited notes (Ctr + Shift + S)"}
             ref={ref}
             onClickPromise={handleSave}
             {...otherProps}

@@ -6,7 +6,7 @@ import { NoteEntityService } from "../../../../abstract/services/NoteEntityServi
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
 import { handleRememberMyChoice } from "../../../../helpers/projectUtils";
-import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, shortenString } from '../../../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, parentSelector, shortenString } from '../../../../helpers/utils';
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextProvider";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
@@ -102,6 +102,9 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         setGotNewNoteInputs,
 
         setAreNoteInputsExpanded,
+
+        isSaveButtonDisabled,
+        clickSaveButton
     }
     
 
@@ -317,26 +320,29 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         }
     }
 
-
     /**
      * @returns ```true``` if note is considered not "edited"
      */
     function getIsSaveButtonDisabled(): boolean {
-
         return isLoggedIn && !NoteEntityService.includesById(editedNoteEntities, noteEntity.id!);
     }
-
 
     /**
      * Update ```noteEntity``` object retrieving it from ```notesUseQueryResult.data``` using the jsx element index of this note
      */
     function updateNoteEntity(): void {
-
         const noteEntity = getNoteEntityFromState();
         if (noteEntity)
             setNoteEntity(noteEntity);
     }
 
+    function clickSaveButton(): void {
+        const saveButton = componentRef.current!.querySelector(".saveNoteButton");
+        if (!saveButton)
+            logWarn("Failed to click save button. No '.saveNoteButton' element found in '.Note'");
+        else
+            (saveButton as HTMLButtonElement).click();
+    }
 
     /**
      * @returns the noteEntity from either ```notesUseQueryResult.data``` or ```editedNoteEntities``` state using this note's current index in ```notes```
@@ -513,4 +519,7 @@ export const NoteContext = createContext({
     setGotNewNoteInputs: (newNoteInputs: boolean) => {},
 
     setAreNoteInputsExpanded: (expanded: boolean) => {},
+
+    isSaveButtonDisabled: true as boolean,
+    clickSaveButton: (() => {}) as () => void
 })

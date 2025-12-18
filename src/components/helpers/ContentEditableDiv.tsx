@@ -1,3 +1,4 @@
+import { CursorPosition } from "@/abstract/CursorPosition";
 import React, { ClipboardEvent, DragEvent, forwardRef, Fragment, KeyboardEvent, MouseEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
@@ -6,7 +7,6 @@ import { getClipboardText, includesIgnoreCase, isBlank, isEmpty, isEventKeyTakin
 import { AppContext } from "../App";
 import HelperDiv from "./HelperDiv";
 import HiddenInput from "./HiddenInput";
-import { logDebug } from "@/helpers/logUtils";
 
 
 interface Props extends HelperProps {
@@ -16,8 +16,8 @@ interface Props extends HelperProps {
      */
     placeholder?: string
 
-    /** Setter for the current cursor position state that is maintained by this component. ```[cursorIndexOfCurrentLine, lineNumber]```, 0-based and 1-based */
-    setCursorPos?: (cursorPos: [number, number]) => void
+    /** Setter for the current cursor position state that is maintained by this component */
+    setCursorPos?: (cursorPos: CursorPosition) => void
 }
 
 
@@ -51,7 +51,7 @@ export default forwardRef(function ContentEditableDiv(
 ) {
 
     const [isFocus, setIsFocus] = useState(false);
-    const [cursorPos, setCursorPos] = useState([0, 1]);
+    const [cursorPos, setCursorPos] = useState<CursorPosition>({x: -1, y: 0, selectedChars: 0});
     
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "ContentEditableDiv");
 
@@ -251,20 +251,23 @@ export default forwardRef(function ContentEditableDiv(
         let cursorLineNum = dontUpdateLineNum ? cursorPos[1] : getCursorLineNum(componentRef.current!);
 
         if (cursorIndex === -1)
-            cursorIndex = cursorPos[0];
+            cursorIndex = cursorPos.x;
 
         if (cursorLineNum === -1)
-            cursorLineNum = cursorPos[1];
-
-        logDebug(documentSelection)
+            cursorLineNum = cursorPos.y;
 
         // dont update state if no changes, for efficiency
-        if (cursorIndex === cursorPos[0] && cursorLineNum === cursorPos[1])
+        if (cursorIndex === cursorPos.x && cursorLineNum === cursorPos.y)
             return;
 
-        setCursorPos([cursorIndex, cursorLineNum]);
+        const updatedCursorPos = {
+            x: cursorIndex, 
+            y: cursorLineNum,
+            selectedChars: 0
+        };
+        setCursorPos(updatedCursorPos);
         if (setCursorPosProps)
-            setCursorPosProps([cursorIndex, cursorLineNum]);
+            setCursorPosProps(updatedCursorPos);
     }
 
     return (
