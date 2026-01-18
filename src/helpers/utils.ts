@@ -1052,13 +1052,11 @@ export function stopAnimations(element: HTMLElement): void {
         .forEach(animation => animation.cancel());
 }
 
-
 /**
  * @param strNode to parse to element. Should be one node but may have any number of children
  * @returns the html element or an empty ```<div>``` element if arg is falsy
  */
 export function stringToHtmlElement(strNode: string): HTMLElement {
-
     const parser = new DOMParser();
 
     if (isBlank(strNode))
@@ -1068,7 +1066,6 @@ export function stringToHtmlElement(strNode: string): HTMLElement {
 
     return parsedDocument.head.firstChild as HTMLElement || parsedDocument.body.firstChild as HTMLElement;
 }
-
 
 /**
  * @param element to add class from

@@ -1,18 +1,17 @@
 import { CursorPosition } from "@/abstract/CursorPosition";
 import { CODE_BLOCK_WITH_VARIABLES_AUTO_DETECT_LANGUAGE } from "@/abstract/ProgrammingLanguage";
-import TextareaDiv from "@/components/helpers/TextareaDiv";
+import TextareaDiv, { TextareaDivMode } from "@/components/helpers/TextareaDiv";
 import hljs from "highlight.js";
-import parse from 'html-react-parser';
-import React, { KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { FormEvent, KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/highlightJs/vs.css";
 import { DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_CLASS, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
-import { logWarn } from "../../../../helpers/logUtils";
+import { logDebug, logWarn } from "../../../../helpers/logUtils";
 import { getCursorIndex, getCursorPos, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
-import { getCssConstant, getCSSValueAsNumber, insertString, isBlank, setClipboardText } from "../../../../helpers/utils";
+import { getCssConstant, getCSSValueAsNumber, insertString, isBlank, setClipboardText, stringToHtmlElement } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from "../../../App";
 import Button from "../../../helpers/Button";
@@ -21,6 +20,7 @@ import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from "./Note";
 import NoteInputSettings from "./NoteInputSettings";
+import HiddenInput from "@/components/helpers/HiddenInput";
 
 
 interface Props extends HelperProps {
@@ -35,26 +35,34 @@ interface Props extends HelperProps {
  * 
  */
 // TODO
-    // dont turn example html code into & unicode on parseTextarea?
-    // update noteEdited state on change?
-    // can't tab focus input because i'ts a div
-        // put a hidden input in front
+    // fullscreen div does not maintain it's height
+    // font
+        // use code and pre?
+    // consider migration function for input values
+    // styles
+        // maybe differentiate between highlighted and unhighlighted more clearly?
+        // try making input height fit-content, align all control buttons
+            // textarea rows?
+    // window resize with langauge settings open wont resize properly
 export default function CodeNoteInputWithVariables({
     noteInputEntity,
     disabled,
     onBlur, 
     ...props
 }: Props) {
-    const [inputDivValue, setInputDivValue] = useState<any>()
+    const [inputDefaultValue, setInputDefaultValue] = useState<any>()
     /** The last known cursor position. This state is only updated on blur, not on change. Use `getCursorPos()` instead */
     const [lastCursorPos, setLastCursorPos] = useState<CursorPosition>({x: 0, y: 1, selectedChars: 0});
     
     const [hasComponentRendered, sethasComponentRendered] = useState(false);
+    const [inputMode, setInputMode] = useState<TextareaDivMode>("div");
     
     const componentName = "CodeNoteInputWithVariables";
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName);
     
     const componentRef = useRef<HTMLDivElement>(null);
+    const inputContainerRef = useRef<HTMLDivElement>(null);
+    /** Use `getTextarea()` or `getInputDiv()` instead */
     const inputDivRef = useRef<HTMLDivElement | HTMLTextAreaElement>(null);
 
     const { isKeyPressed } = useContext(AppContext);
@@ -74,13 +82,10 @@ export default function CodeNoteInputWithVariables({
     } = useContext(DefaultNoteInputContext);
     const { componentRef: defaultCodeNoteInputRef } = useContext(DefaultCodeNoteInputContext);
 
-
     useInitialStyles(inputDivRef.current, [["max-width", "width"]], 100);
-
     
     useEffect(() => {
-
-        setInputDivValue(parse(sanitize(noteInputEntity.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
+        updateInputDefaultValue();
 
         sethasComponentRendered(true);
 
@@ -92,11 +97,17 @@ export default function CodeNoteInputWithVariables({
                 inputDivRef.current?.focus(), 10); // default text will be removed otherwise
     }, []);
 
+    useEffect(() => {
+        logDebug(inputMode)
+    }, [inputMode])
 
     useEffect(() => {
         handleLanguageChange();
     }, [codeNoteInputWithVariablesLanguage]);
-    
+
+    async function updateInputDefaultValue(): Promise<void> {
+        setInputDefaultValue(await parseDivInnerHtml(noteInputEntity?.value));
+    }
     
     /**
      * @param text plain non-html text
@@ -147,6 +158,9 @@ export default function CodeNoteInputWithVariables({
         divInnerHtml = divInnerHtml.replaceAll("<input ", VARIABLE_INPUT_START_SEQUENCE);
         divInnerHtml = divInnerHtml.replaceAll("placeholder=\"", "");
         divInnerHtml = divInnerHtml.replaceAll("\" />", VARIABLE_INPUT_END_SEQUENCE);
+
+        // decode html unicodes
+        divInnerHtml = stringToHtmlElement(divInnerHtml).textContent;
 
         return divInnerHtml;
     }
@@ -226,9 +240,6 @@ export default function CodeNoteInputWithVariables({
      * 
      * @param position the cursorIndex to insert the sequence at. Will try to get the current cursor pos if not specified
      */
-    // TODO: 
-        // edge case 
-            // is text selected
     function insertVariableInputSequence(position?: number): void {
         const textarea = getTextarea()!;
         const variableInputSequence = VARIABLE_INPUT_START_SEQUENCE + VARIABLE_INPUT_DEFAULT_PLACEHOLDER + VARIABLE_INPUT_END_SEQUENCE;
@@ -240,6 +251,7 @@ export default function CodeNoteInputWithVariables({
         }
         
         textarea.value = insertString(textarea.value, variableInputSequence, cursorIndex);
+        handleChange();
 
         // select placeholder sequence
         moveCursor(
@@ -283,47 +295,19 @@ export default function CodeNoteInputWithVariables({
             .map((element) => (element as HTMLInputElement).value);
     }
 
-    /**
-     * Set all noteInputEntity fields for this noteInput.
-     */
-    function updateNoteInputEntity(): void {
-        // value
-        noteInputEntity.value = inputDivRef.current!.innerHTML;
-
-        // programmingLanguage
-        noteInputEntity.programmingLanguage = codeNoteInputWithVariablesLanguage;
-    }
-    
     async function handleKeyDownCapture(event: KeyboardEvent): Promise<void> {
         const keyName = event.key;
 
         if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
             event.preventDefault();
             insertVariableInputSequence();
-            // updateNoteEdited();
         }
-
-        // if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]) && !isVariableInputFocused())
-        //     updateNoteEdited();
 
         // save this note
         if (isKeyPressed("Control") && event.key === "s" && !isSaveButtonDisabled) {
             event.preventDefault();
 
-            // TODO: reconsider timing and whether to highlight
-            // highlight to properly save
-            // if (!isInputHighlighted)
-            //     await highlightInputDivContent();
-
-            // clickSaveButton();
-
-            // // unhighlight
-            // if (!isInputHighlighted)
-            //     await unHighlightInputDivContent();
-
-            // // move cursor back
-            // const cursorPosition = getCursorPos(getTextarea()!);
-            // moveCursor(getTextarea()!, cursorPosition);
+            clickSaveButton();
         }
     }
 
@@ -333,11 +317,10 @@ export default function CodeNoteInputWithVariables({
         await copyInputDivContentToClipboard();
     }
 
-    // TODO
     function activateFullScreenStyles(): void {
-        const inputDiv = inputDivRef.current!;
+        const inputDiv = getInputDiv()!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
-        const inputDivContainer = componentRef.current!.querySelector(".inputDivContainer") as HTMLElement;
+        const inputDivContainer = inputContainerRef.current!;
 
         const appOverlayZIndex = getCssConstant("overlayZIndex");
 
@@ -351,16 +334,11 @@ export default function CodeNoteInputWithVariables({
         inputDiv.style.maxHeight = "80vh";
     }
 
-    // TODO
     function deactivateFullScreenStyles(): void {
-        const inputDiv = inputDivRef.current!;
+        const inputDiv = getInputDiv()!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
-        const inputDivContainer = componentRef.current!.querySelector(".inputDivContainer") as HTMLElement;
+        const inputDivContainer = inputContainerRef.current!;
 
-        // move up just a little bit
-        defaultCodeNoteInput.style.position = "relative";
-        defaultCodeNoteInput.style.top = "30px";
-        
         // resize quickly
         defaultCodeNoteInput.style.width = "100%";
         
@@ -386,7 +364,7 @@ export default function CodeNoteInputWithVariables({
 
         inputDiv.innerHTML = highlighted;
 
-        updateNoteInputEntity();
+        noteInputEntity.programmingLanguage = codeNoteInputWithVariablesLanguage;
         updateNoteEdited();
     }
 
@@ -401,9 +379,6 @@ export default function CodeNoteInputWithVariables({
         await focusInput();
 
         insertVariableInputSequence(lastCursorPos.x);
-        
-        updateNoteInputEntity();
-        updateNoteEdited();
     }
 
     /**
@@ -454,6 +429,12 @@ export default function CodeNoteInputWithVariables({
         await parseTextareaValue(inputDiv.innerHTML);
     }
 
+    function handleChange(_event?: FormEvent<HTMLTextAreaElement>): void {
+        noteInputEntity.value = getTextarea()!.value;
+
+        updateNoteEdited();
+    }
+
     return (
         <Flex 
             id={id} 
@@ -463,17 +444,28 @@ export default function CodeNoteInputWithVariables({
             ref={componentRef}
             {...otherProps}
         >
-            <TextareaDiv 
-                parseDiv={parseDivInnerHtml}
-                parseTextarea={parseTextareaValue}
-                defaultValue={inputDivValue}
-                ref={inputDivRef}
-                onBlurCapture={(e) => setLastCursorPos(getCursorPos(e.target))}
-                onKeyDownCapture={handleKeyDownCapture}
-                onMouseDown={handleInputMouseEvent}
-                onClick={handleInputMouseEvent}
+            {/* For focusing the input */}
+            <HiddenInput 
+                onFocus={focusInput} 
+                tabIndex={inputMode === "textarea" ? -1 : 0} // make that "tab back" will not refocus the input
             />
+            {/* Input */}
+            <div className="inputContainer" ref={inputContainerRef}>
+                <TextareaDiv 
+                    parseDiv={parseDivInnerHtml}
+                    parseTextarea={parseTextareaValue}
+                    defaultValue={inputDefaultValue}
+                    ref={inputDivRef}
+                    setMode={setInputMode}
+                    onChange={handleChange}
+                    onBlurCapture={(e) => setLastCursorPos(getCursorPos(e.target))}
+                    onKeyDownCapture={handleKeyDownCapture}
+                    onMouseDown={handleInputMouseEvent}
+                    onClick={handleInputMouseEvent}
+                />
+            </div>
 
+            {/* Controls */}
             <div className={`${componentName}-buttonContainer`}>
                 <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
                     {/* Copy */}

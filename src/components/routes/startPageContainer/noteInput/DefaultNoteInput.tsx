@@ -192,7 +192,6 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
 
 
     function deactivateFullScreen() {
-
         deactivateFullScreenStyles();
 
         setIsFullScreen(false);
@@ -216,13 +215,10 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
         if (isFullScreen)
             deactivateFullScreen();
     }
-
     
     function handleDragEnter(): void {
-
         setDragOverNoteInputIndex(getJsxElementIndexByKey(noteInputs, propsKey));
     }
-
 
     /**
      * Sets the ```draggedNoteInputIndex```, uses the whole ```<DefaultNoteInput>``` as dragImage and styles the dragged noteInput.
@@ -230,7 +226,6 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
      * @param event 
      */
     function handleDragStart(event: DragEvent): void {
-        
         setDraggedNoteInputIndex(getJsxElementIndexByKey(noteInputs, propsKey));
 
         event.dataTransfer.dropEffect = "move";
@@ -244,24 +239,20 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
         addClass(componentRef.current!, `${componentName}-dragged`);
     }
 
-
     /**
      * Remove styles of dragged noteInput and reset drag index states.
      */
     function handleDragEnd(): void {
-
         removeClass(componentRef.current!, `${componentName}-dragged`);
         setDraggedNoteInputIndex(NaN);
         setDragOverNoteInputIndex(NaN);
     }
-    
 
     /**
      * Activate or deactivate styles of ```<hr>``` elements during drag over. Make sure to not activate them if the noteInput position
      * would not change on drop
      */
     function handleDragOverNoteInputIndexChange(): void {
-
         // case: is drag end
         if (isNumberFalsy(draggedNoteInputIndex)) {
             deactivateDragOverStyles();
@@ -290,7 +281,6 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
 
 
     function deactivateDragOverStyles(): void {
-
         removeClass(dropZoneHrRef.current!, `${componentName}-dropZoneHr-active`);
         removeClass(topMostDropZoneHrHrRef.current!, `${componentName}-dropZoneHr-active`);
     }

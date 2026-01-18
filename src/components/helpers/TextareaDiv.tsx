@@ -1,9 +1,9 @@
 import DefaultProps, { getCleanDefaultProps } from "@/abstract/DefaultProps";
 import { logDebug, logError } from "@/helpers/logUtils";
-import React, { FocusEvent, forwardRef, Fragment, MouseEvent, Ref, RefObject, useImperativeHandle, useRef, useState } from "react";
+import React, { FocusEvent, forwardRef, Fragment, MouseEvent, Ref, RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
 import Sanitized from "./Sanitized";
 
-type Mode = "textarea" | "div";
+export type TextareaDivMode = "textarea" | "div";
 
 interface Props extends Omit<DefaultProps, "children"> {
     /**
@@ -27,7 +27,7 @@ interface Props extends Omit<DefaultProps, "children"> {
      * 
      * Default is "div".
      */
-    defaultMode?: Mode,
+    defaultMode?: TextareaDivMode,
 
     /**
      * Initial content of the div / textarea. Should match `defaultMode`.
@@ -39,7 +39,12 @@ interface Props extends Omit<DefaultProps, "children"> {
     /**
      * State setter for keeping track of the current content. Will either set the div's innerHTML or the textarea's value.
      */
-    setValue?: (value: string) => void
+    setValue?: (value: string) => void,
+
+    /**
+     * State setter for keeping track of the current mode. 
+     */
+    setMode?: (mode: TextareaDivMode) => void
 }
 
 /**
@@ -59,11 +64,12 @@ export default forwardRef(function TextareaDiv(
         defaultValue = "",
         defaultMode = "div",
         setValue,
+        setMode,
         ...props
     }: Props, 
     ref: Ref<HTMLDivElement | HTMLTextAreaElement>
 ) {
-    const [currentMode, setCurrentMode] = useState<Mode>(defaultMode);
+    const [currentMode, setCurrentMode] = useState<TextareaDivMode>(defaultMode);
     const [currentContent, setCurrentContent] = useState<string>(defaultValue);
     
     const componentRef = useRef<HTMLDivElement | HTMLTextAreaElement>(null);
@@ -75,6 +81,14 @@ export default forwardRef(function TextareaDiv(
     const componentName = `TextareaDiv`;
     const { className, onBlur, onMouseDown, onClick, ...otherProps } = getCleanDefaultProps(props, componentName);
 
+    useEffect(() => {
+        updateContentState(defaultValue);
+    }, [defaultValue]);
+
+    useEffect(() => {
+        updateModeState(defaultMode);
+    }, [defaultMode]);
+
     async function divToTextarea(): Promise<void> {
         if (currentMode === "textarea")
             return;
@@ -82,10 +96,8 @@ export default forwardRef(function TextareaDiv(
         try {
             const textareaValue = await parseTextarea(divRef.current!.innerHTML, divRef.current!);
 
-            setCurrentMode("textarea");
-            setCurrentContent(textareaValue);
-            if (setValue)
-                setValue(textareaValue)
+            updateModeState("textarea");
+            updateContentState(textareaValue);
 
         } catch (e) {
             // TODO
@@ -100,10 +112,8 @@ export default forwardRef(function TextareaDiv(
         try {
             const divInnerHtml = await parseDiv(textareaRef.current!.value, textareaRef.current!);
 
-            setCurrentMode("div");
-            setCurrentContent(divInnerHtml);
-            if (setValue)
-                setValue(divInnerHtml)
+            updateModeState("div");
+            updateContentState(divInnerHtml);
 
         } catch (e) {
             // TODO
@@ -146,6 +156,20 @@ export default forwardRef(function TextareaDiv(
         
         await divToTextarea();
         setTimeout(() => textareaRef.current!.focus(), 10);
+    }
+
+    function updateContentState(content: string): void {
+        setCurrentContent(content);
+
+        if (setValue)
+            setValue(content);
+    }
+
+    function updateModeState(mode: TextareaDivMode): void {
+        setCurrentMode(mode);
+
+        if (setMode)
+            setMode(mode);
     }
 
     return (
