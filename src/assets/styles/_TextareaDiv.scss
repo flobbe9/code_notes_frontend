@@ -1,0 +1,16 @@
+.TextareaDiv {
+    width: 100%;
+
+    &:hover {
+        cursor: text;
+    }
+}
+
+textarea.TextareaDiv {
+    // height: 1.9em;
+    height: fit-content;
+    height: 100%;
+    resize: none;
+
+    // TODO: hide the scrollbar?
+}

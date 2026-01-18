@@ -20,16 +20,13 @@ interface Props extends DefaultProps {
  */
 export default forwardRef(function Toast({summary, message = "", sevirity = "info", ...props}: Props, ref: LegacyRef<HTMLDivElement> | undefined) {
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "Toast", true);
+    const { children, ...otherProps } = getCleanDefaultProps(props, "Toast", true);
 
     const { moveToast } = useContext(AppContext);
 
     return (
         <div 
-            id={id} 
             ref={ref}
-            className={className}
-            style={style}
             {...otherProps}
         >
             <div className={"textContainer " + sevirity}>
@@ -37,7 +34,7 @@ export default forwardRef(function Toast({summary, message = "", sevirity = "inf
                     <Flex flexWrap="nowrap">
                         <div className="fullWidth"><strong>{summary}</strong></div>
                         <span className="ms-3 textRight hover" onClick={() => moveToast(true)}>
-                            <i className="fa-solid fa-xmark fa-xl "></i>
+                            <i className="fa-solid fa-xmark fa-xl"></i>
                         </span>
                     </Flex>
                 </div>

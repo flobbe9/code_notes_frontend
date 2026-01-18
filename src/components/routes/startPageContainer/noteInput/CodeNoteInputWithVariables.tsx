@@ -1,22 +1,22 @@
 import { CursorPosition } from "@/abstract/CursorPosition";
+import { CODE_BLOCK_WITH_VARIABLES_AUTO_DETECT_LANGUAGE } from "@/abstract/ProgrammingLanguage";
+import TextareaDiv from "@/components/helpers/TextareaDiv";
 import hljs from "highlight.js";
 import parse from 'html-react-parser';
-import React, { FocusEvent, KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/highlightJs/vs.css";
-import { DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
+import { DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_CLASS, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
 import { logWarn } from "../../../../helpers/logUtils";
-import { cleanUpSpecialChars, getContentEditableDivLineElements, getCursorPos, getNumCharsSelected, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
-import { getClipboardText, getCssConstant, getCSSValueAsNumber, insertString, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
+import { getCursorIndex, getCursorPos, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
+import { getCssConstant, getCSSValueAsNumber, insertString, isBlank, setClipboardText } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from "../../../App";
 import Button from "../../../helpers/Button";
-import ContentEditableDiv from "../../../helpers/ContentEditableDiv";
 import Flex from "../../../helpers/Flex";
-import Overlay from "../../../helpers/Overlay";
 import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from "./Note";
@@ -34,6 +34,11 @@ interface Props extends HelperProps {
  * @since 0.0.1
  * 
  */
+// TODO
+    // dont turn example html code into & unicode on parseTextarea?
+    // update noteEdited state on change?
+    // can't tab focus input because i'ts a div
+        // put a hidden input in front
 export default function CodeNoteInputWithVariables({
     noteInputEntity,
     disabled,
@@ -41,19 +46,18 @@ export default function CodeNoteInputWithVariables({
     ...props
 }: Props) {
     const [inputDivValue, setInputDivValue] = useState<any>()
-    const [cursorPos, setCursorPos] = useState<CursorPosition>({x: 0, y: 1, selectedChars: 0});
+    /** The last known cursor position. This state is only updated on blur, not on change. Use `getCursorPos()` instead */
+    const [lastCursorPos, setLastCursorPos] = useState<CursorPosition>({x: 0, y: 1, selectedChars: 0});
     
     const [hasComponentRendered, sethasComponentRendered] = useState(false);
-
-    const [inputHighlighted, setInputHighlighted] = useState(true);
     
     const componentName = "CodeNoteInputWithVariables";
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName);
     
     const componentRef = useRef<HTMLDivElement>(null);
-    const inputDivRef = useRef<HTMLDivElement>(null);
+    const inputDivRef = useRef<HTMLDivElement | HTMLTextAreaElement>(null);
 
-    const { isKeyPressed, isControlKeyPressed } = useContext(AppContext);
+    const { isKeyPressed } = useContext(AppContext);
     const { updateNoteEdited, isSaveButtonDisabled, clickSaveButton } = useContext(NoteContext);
     const { 
         codeNoteInputWithVariablesLanguage, 
@@ -91,387 +95,192 @@ export default function CodeNoteInputWithVariables({
 
     useEffect(() => {
         handleLanguageChange();
-
     }, [codeNoteInputWithVariablesLanguage]);
     
     
     /**
-     * @param text any text
+     * @param text plain non-html text
      * @returns highlighted and then sanitized html string (using {@link DEFAULT_HTML_SANTIZER_OPTIONS})
      */
-    function highlightAndSanitizeDefault(text: string): string {
+    function highlightPlainText(text: string): string {
         let highlightedText = text;
         if (isAutoDetectLanguage())
-            highlightedText= hljs.highlightAuto(text).value;
+            highlightedText = hljs.highlightAuto(text).value;
 
         else
-            highlightedText= hljs.highlight(text, { language: codeNoteInputWithVariablesLanguage }).value;
+            highlightedText = hljs.highlight(text, { language: codeNoteInputWithVariablesLanguage }).value;
 
-        return sanitize(highlightedText, DEFAULT_HTML_SANTIZER_OPTIONS);
+        return highlightedText;
     }
 
-
     /**
-     * Highlight inner content of input. Also add ```<input>```s if necessary. 
-     * 
-     * Will update input divs html.
-     * 
-     * @return the highlighted inner html
+     * @param textareaValue 
+     * @param textarea 
+     * @returns highlighted input value (div innerHtml) replacing `<input />`s with input sequences
      */
-    async function highlightInputDivContent(): Promise<string> {
-        setIsNoteInputOverlayVisible(true);
+    async function parseDivInnerHtml(textareaValue: string, _textarea?: HTMLTextAreaElement): Promise<string> {
+        if (isBlank(textareaValue))
+            return "";
 
-        const highlightPromise = await new Promise<string>((res, rej) => {
-            setTimeout(() => {
-                const inputDiv = inputDivRef.current!;
-                const inputChildren = inputDiv.children;
+        textareaValue = await highlightAndReplaceVariableInputSequences(textareaValue);
+        // replace line breaks that are inside a sequence
+        textareaValue = textareaValue.replaceAll("\n", "<br>");
 
-                // case: first line is not a node
-                const firstLine = getFirstInputDivContentLine();
-                let highlightedHtmlString = "";
-
-                // case: first line with inputs
-                if (includesVariableInputSequence(firstLine))
-                    highlightedHtmlString += "<div>" + highlightAndSanitizeWithVariableInputs(firstLine);
-
-                // case: first line with text only
-                else if (!isBlank(firstLine))
-                    highlightedHtmlString += "<div>" + highlightAndSanitizeDefault(getFirstInputDivContentLine());
-
-                if (!isBlank(firstLine))
-                    highlightedHtmlString += "</div>";
-
-                // iterate lines after first line
-                Array.from(inputChildren).forEach(inputChild => {
-                    const child = inputChild as HTMLElement;
-                    let innerText = child.innerText;
-                    const innerHtml = child.innerHTML;
-
-                    // clean up special chars
-                    innerText = cleanUpSpecialChars(innerText);
-                    
-                    highlightedHtmlString += "<div>";
-
-                    // case: line with inputs
-                    if (includesVariableInputSequence(innerText)) 
-                        highlightedHtmlString += highlightAndSanitizeWithVariableInputs(innerText);
-                        
-                    // case: empty line
-                    else if (innerHtml === "<br>")
-                        highlightedHtmlString += "<br>";
-
-                    // case: line with text only
-                    else if (!isBlank(innerText))
-                        highlightedHtmlString += highlightAndSanitizeDefault(innerText);
-
-                    highlightedHtmlString += "</div>";
-                });
-
-                inputDiv.innerHTML = highlightedHtmlString;
-
-                res(highlightedHtmlString); 
-            }, 0); // somehow necessary for states to update properly, 0 milliseconds is fine
-        });
-        
-        setInputHighlighted(true);
-
-        setIsNoteInputOverlayVisible(false);
-
-        updateNoteInputEntity();
-
-        return highlightPromise;
+        return textareaValue;
     }
 
-
     /**
-     * Remove highlighting of inputDiv content and parse ```<input>```s to inputVariableSequences.
+     * @param divInnerHtml 
+     * @param _div 
+     * @returns unhighlighted input value (textarea value) replacing input sequences with `<inputs>`. Blank string if falsy args
      */
-    async function unHighlightInputDivContent(): Promise<string> {
-        const unHighlightedContent = await new Promise<string>((res, rej) => {
-            const inputDiv = inputDivRef.current!;
-            const inputHtml = inputDiv.innerHTML;
+    async function parseTextareaValue(divInnerHtml: string, _div?: HTMLDivElement): Promise<string> {
+        if (isBlank(divInnerHtml))
+            return "";
 
-            // remove highlights
-            let sanitizedInputHtml = sanitizeForInputDiv(inputHtml);
+        divInnerHtml = divInnerHtml.replaceAll("<br>", "\n");
+        // only leave <input> elements and their "placeholder" attribute behind
+        divInnerHtml = sanitize(divInnerHtml, {
+            allowedTags: ["input"],
+            allowedAttributes: {"input": ["placeholder"]}
+        }); 
+        divInnerHtml = divInnerHtml.replaceAll("<input ", VARIABLE_INPUT_START_SEQUENCE);
+        divInnerHtml = divInnerHtml.replaceAll("placeholder=\"", "");
+        divInnerHtml = divInnerHtml.replaceAll("\" />", VARIABLE_INPUT_END_SEQUENCE);
 
-            // convert inputs
-            sanitizedInputHtml = parseVariableInputToVariableInputSequence(sanitizedInputHtml);
-
-            inputDiv.innerHTML = sanitizedInputHtml;
-
-            setInputHighlighted(false);
-            
-            res(sanitizedInputHtml);
-        });
-
-        return unHighlightedContent;
+        return divInnerHtml;
     }
 
-
     /**
-     * @returns plain text of the very first line of the content editable which is not wrapped inside a ```<div>```
-     */
-    function getFirstInputDivContentLine(): string {
-        const inputDiv = inputDivRef.current!;
-        let inputHtml = inputDiv.innerHTML;
-
-        // case: no html tags inside inputDiv
-        if (!inputHtml.includes("<"))
-            inputHtml = inputDiv.innerText;
-        
-        else {
-            // get text until first tag
-            inputHtml = inputHtml.substring(0, inputHtml.indexOf("<"));
-            inputHtml = cleanUpSpecialChars(inputHtml);
-        }
-
-        return inputHtml;
-    }
-
-
-    /**
-     * Indicates whether given ```str``` includes variable input sequence that is to be replaced with a variable ```<input>```.
+     * Indicates whether given `str` includes variable input sequence that is to be replaced with a variable `<input>`.
      * 
      * @param str to check
-     * @returns ```true``` if given ```str``` includes a ```$[[``` followed by a ```]]```. See {@link VARIABLE_INPUT_SEQUENCE_REGEX}
+     * @returns `true` if given `str` includes a `$[[` followed by a `]]`. See {@link VARIABLE_INPUT_SEQUENCE_REGEX}
      */
     function includesVariableInputSequence(str: string): boolean {
         return !isBlank(str) && str.replaceAll("\n", "\\n").match(VARIABLE_INPUT_SEQUENCE_REGEX) !== null;
     }
 
     /**
-     * Calls {@link highlightAndSanitizeWithVariableInput()} until all ```$[[]]``` sequences are replaced.
+     * Calls {@link highlightAndReplaceVariableInputSequence()} until all `$[[]]` sequences are replaced.
      * 
-     * @param text plain text string to adjust. Wont be altered
-     * @returns the highlighted and sanitized html string possibly with ```<input>```s
+     * @param text plain, non-html text
+     * @returns the highlighted html string possibly with `<input>`s
      */
-    function highlightAndSanitizeWithVariableInputs(text: string): string {
-        // dont alter param
-        let alteredText = text;
-
+    async function highlightAndReplaceVariableInputSequences(text: string): Promise<string> {
         // result string
         let highlightedText = "";
 
-        while (alteredText.includes(VARIABLE_INPUT_START_SEQUENCE) && alteredText.includes(VARIABLE_INPUT_END_SEQUENCE)) {
-            // highlight until first sequence start
-            highlightedText += highlightAndSanitizeWithVariableInput(alteredText);
+        while (text.includes(VARIABLE_INPUT_START_SEQUENCE) && text.includes(VARIABLE_INPUT_END_SEQUENCE)) {
+            // highlight string before sequence
+            const textBeforeSequence = text.substring(0, text.indexOf(VARIABLE_INPUT_START_SEQUENCE));
+            highlightedText += highlightPlainText(textBeforeSequence);
 
-            // highlight anything after sequence
-            alteredText = alteredText.substring(alteredText.indexOf(VARIABLE_INPUT_END_SEQUENCE) + 2);
+            // replace first sequence with variable input
+            highlightedText += parseVariableInput(text);
+
+            // ignore "]]", continue after sequence
+            text = text.substring(text.indexOf(VARIABLE_INPUT_END_SEQUENCE) + VARIABLE_INPUT_END_SEQUENCE.length);
         }
 
-        // consider text after last "]]"
-        return highlightedText + highlightAndSanitizeDefault(alteredText);
+        // highlight text after last "]]"
+        return Promise.resolve(highlightedText + highlightPlainText(text));
     }
 
     /**
-     * Highlight and sanitize given string until the first occurence of a ```$[[``` string (not considering if it's closed).
-     * Any html after the ```]]``` will be ignored. 
+     * Find first occurrence of variableInputSequence and parse that to a variableInput. 
      * 
-     * If there's no ```]]``` an ```<input>``` with an empty placeholder attribute will be appended* ignoring any text after the ```$[[```.
-     * 
-     * @param innerHtml html string to adjust. Wont be altered
-     * @returns highlighted html and possibly an ```<input>``` replacement
+     * @param text possibly with a value inside the brackets
+     * @returns only the `<input>` passing the value of the `$[[]]` sequence as placeholder (or "" if `$[[]]` not found)
      */
-    function highlightAndSanitizeWithVariableInput(innerHtml: string): string {
-        const openingSequenceStartIndex = innerHtml.indexOf(VARIABLE_INPUT_START_SEQUENCE);
-        const textBeforeSequence = innerHtml.substring(0, openingSequenceStartIndex);
+    function parseVariableInput(text: string): string {
+        const openingSequenceStartIndex = text.indexOf(VARIABLE_INPUT_START_SEQUENCE);
+        const openingSequenceEndIndex = text.indexOf(VARIABLE_INPUT_END_SEQUENCE);
 
-        return highlightAndSanitizeDefault(textBeforeSequence) + parseVariableInputSequenceToVariableInput(innerHtml)
-    }
-
-    /**
-     * Get the ```<input>``` tag that will replace the ```$[[]]``` sequence.
-     * 
-     * @param innerHtml containing the ```$[[]]``` sequence
-     * @returns an ```<input>``` passing the value of the ```$[[]]``` sequence as placeholder (or "" if ```$[[]]``` not found)
-     */
-    function parseVariableInputSequenceToVariableInput(innerHtml: string): string {
-        const openingSequenceStartIndex = innerHtml.indexOf(VARIABLE_INPUT_START_SEQUENCE);
-        const openingSequenceEndIndex = innerHtml.indexOf(VARIABLE_INPUT_END_SEQUENCE);
-
-        let placeholder = innerHtml.substring(openingSequenceStartIndex + 3, openingSequenceEndIndex);
+        let placeholder = text.substring(openingSequenceStartIndex + VARIABLE_INPUT_START_SEQUENCE.length, openingSequenceEndIndex);
     
         // case: invalid variable sequence
         if (openingSequenceStartIndex === -1 || openingSequenceEndIndex === -1)
             placeholder = "";
 
-        return getDefaultVariableInput(placeholder, getDefaultVariableInputWidth(placeholder));
+        placeholder = placeholder.replaceAll("\n", "");
+        placeholder = placeholder.trim();
+
+        return getDefaultVariableInput(placeholder, getVariableInputWidth(placeholder));
     }
 
     /**
      * @param placeholder of input. Default is {@link VARIABLE_INPUT_DEFAULT_PLACEHOLDER}
-     * @returns the width of a variableInput as if the ```placeholder``` was it's value and the width was 'fit-content'
+     * @returns the width of a variableInput as if the `placeholder` was it's value and the width was 'fit-content'
      */
-    function getDefaultVariableInputWidth(placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER): number {
+    function getVariableInputWidth(placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER): number {
         const placeholderWidth = getTextWidth(placeholder, getCssConstant("variableInputFontSize"), getCssConstant("variableInputFontFamily"));
         const variableInputPadding = getCSSValueAsNumber(getCssConstant("variableInputPaddingLeftRight"), 2) * 2;
         const variableInputBorderWidth = getCSSValueAsNumber(getCssConstant("variableInputBorderWidth"), 2) * 2;
 
         return placeholderWidth + variableInputPadding + variableInputBorderWidth;
     }
-    
-    /**
-     * Appends a default ```<input>``` to the end of the inputDiv.
-     */
-    function appendVariableInput(): void {
-        const inputDiv = inputDivRef.current!;
-        const inputDivChildDivs = inputDiv.querySelectorAll("div");
-        const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.item(inputDivChildDivs.length - 1) : inputDiv;
-
-        lastChildDiv.innerHTML = (lastChildDiv.innerHTML + getDefaultVariableInput(VARIABLE_INPUT_DEFAULT_PLACEHOLDER, getDefaultVariableInputWidth()));
-    }
         
     /**
-     * Inserts a default ```$[[VARIABL_NAME]]``` sequence at current cursor pos.
+     * Inserts a default `$[[VARIABL_NAME]]` sequence at current cursor pos.
+     * 
+     * @param position the cursorIndex to insert the sequence at. Will try to get the current cursor pos if not specified
      */
-    function insertVariableInputSequence(): void {
+    // TODO: 
+        // edge case 
+            // is text selected
+    function insertVariableInputSequence(position?: number): void {
+        const textarea = getTextarea()!;
         const variableInputSequence = VARIABLE_INPUT_START_SEQUENCE + VARIABLE_INPUT_DEFAULT_PLACEHOLDER + VARIABLE_INPUT_END_SEQUENCE;
         
-        let currentCursorIndex = cursorPos.x;
-        let currentCursorLineNum = cursorPos.y;
-        
-        // all inner divs that represent a line
-        const inputInnerDivs = getContentEditableDivLineElements(inputDivRef.current!);
-        const isFirstLineADiv = inputDivRef.current!.innerHTML.startsWith("<div>")
-        const currentInputDiv = inputInnerDivs[currentCursorLineNum - 1 - (isFirstLineADiv ? 0 : 1)] as HTMLDivElement; // - 2 for item() beeing 0-based and the first line not beeing a div
-        const numInutLines = inputInnerDivs.length + (isFirstLineADiv ? 0 : 1); 
-
-        if (currentCursorIndex === -1 || currentCursorLineNum === -1) {
-            logWarn("Failed to get cursor index or cursor line num");
-            // assume cursor at end of input value
-            currentCursorIndex = inputDivRef.current!.innerText.length - 1;
-            currentCursorLineNum = numInutLines;
+        let cursorIndex = position ?? getCursorIndex(textarea);
+        if (cursorIndex === -1) {
+            cursorIndex = textarea.value.length;
+            logWarn("Failed to get cursor index. Inserting variableInputSequence at the end of the input");
         }
         
-        // case: is first line, not a div
-        if (!currentInputDiv) {
-            inputDivRef.current!.innerHTML = insertString(
-                inputDivRef.current!.innerHTML,
-                variableInputSequence, 
-                currentCursorIndex
-            );
-
-        // case: is empty line
-        } else if (!!currentInputDiv.querySelector("br")) 
-            currentInputDiv.innerHTML = variableInputSequence;
-
-        else {
-            currentInputDiv.innerText = insertString(
-                currentInputDiv.innerText,
-                variableInputSequence, 
-                currentCursorIndex
-            );
-        }
+        textarea.value = insertString(textarea.value, variableInputSequence, cursorIndex);
 
         // select placeholder sequence
         moveCursor(
-            currentInputDiv || inputDivRef.current!, 
+            textarea,
             {
-                x: currentCursorIndex + VARIABLE_INPUT_START_SEQUENCE.length, 
-                y: 0,
+                x: cursorIndex + VARIABLE_INPUT_START_SEQUENCE.length, 
+                y: 0, // not used for textareas
                 selectedChars: VARIABLE_INPUT_DEFAULT_PLACEHOLDER.length
             }
         );
     }
 
     /**
-     * Replace all ```<input>``` with "$[[]]" sequence and placeholder attribute key with "". Assuming that all other attributes have been 
-     * removed already.
-     * 
-     * @param html html string to adjust. Wont be altered
-     * @returns given ```html``` with replacments
-     */
-    function parseVariableInputToVariableInputSequence(html: string): string {
-        let alteredHtml = html;
-
-        alteredHtml = alteredHtml.replaceAll("<input ", VARIABLE_INPUT_START_SEQUENCE);
-        alteredHtml = alteredHtml.replaceAll("placeholder=\"", "");
-        alteredHtml = alteredHtml.replaceAll("\" />", VARIABLE_INPUT_END_SEQUENCE);
-        
-        return alteredHtml;
-    }
-
-    /**
-     * @param dirtyHtml html string to sanitize
-     * @returns html string with only ```div```, ```br``` and ```input``` tags and only ```placeholder``` attributes
-     */
-    function sanitizeForInputDiv(dirtyHtml: string): string {
-        return sanitize(dirtyHtml, {
-            allowedTags: ["div", "br", "input"],
-            allowedAttributes: {"input": ["placeholder"]}
-        }); 
-    }
-    
-    /**
-     * Sanitize and update clipboard text (if allowed) in order to paste plain text into inputs instead of styled html.
-     */
-    async function sanitizeAndUpdateClipboardText(): Promise<void> {
-        // get clipboard text
-        let clipboardText = await getClipboardText();
-
-        // case: nothing copied or permission denied by browser
-        if (isBlank(clipboardText))
-            return;
-
-        // remove styles
-        clipboardText = sanitizeForInputDiv(clipboardText);
-        // remove special chars
-        clipboardText = cleanUpSpecialChars(clipboardText);
-
-        setClipboardText(clipboardText);
-    }
-
-    /**
-     * Copy content of inputDiv to clipboard considering the variableInput values, line breaks as well as spaces.
-     * 
-     * Appending a hidden div is necessary to keep line breaks when pasting. For some reason using ```innerText``` on an element
-     * inside a ```<pre>``` tag will keep the line breaks and spaces.
+     * Copy content of inputDiv to clipboard replacing `<input>`s with their value.
      */
     async function copyInputDivContentToClipboard(): Promise<void> {
-        const inputDiv = inputDivRef.current!;
-        let inputDivHtml = inputDiv.innerHTML;
+        let inputDivHtml = getInputDiv()?.innerHTML;
+        if (isBlank(inputDivHtml))
+            return;
 
-        // get varialbeInput values
-        const variableInputValues = getVariableInputValues();
-
-        // remove highlights and clean up <input>s
+        inputDivHtml = inputDivHtml!.replaceAll("<br>", "\n");
+        // only leave <input> elements
         inputDivHtml = sanitize(inputDivHtml, {
-            allowedTags: ["div", "br", "input"],
+            allowedTags: ["input"],
             allowedAttributes: {}
         });
-
-        // replace <input>s with their values
+        
+        // replace each <input> with their value
+        const variableInputValues = getVariableInputValues();
         const inputDivHtmlArray = inputDivHtml.split("<input />");
         inputDivHtml = inputDivHtmlArray.reduce((prev, curr, i) => prev + variableInputValues[i - 1] + curr);
 
-        // create hidden div inside inputDiv
-        const hiddenDiv = document.createElement("div");
-        hiddenDiv.style.display = "none";
-        // add sanitized content
-        hiddenDiv.innerHTML = inputDivHtml;
-
-        // use inner text for keeping line breaks and spaces
-        await setClipboardText(hiddenDiv.innerText);
-
-        // remove hidden div
-        hiddenDiv.remove();
+        await setClipboardText(inputDivHtml);
     }
 
     /**
      * @returns list of values of variableInputs inside inputDiv
      */
     function getVariableInputValues(): string[] {
-        let values: string[] = [];
-
-        inputDivRef.current!.querySelectorAll("input")
-            .forEach((element) => {
-                const input = element as HTMLInputElement;
-                if (input.type === "text")
-                    values.push(input.value)
-            });
-
-        return values;
+        return Array.from(getInputDiv()!.querySelectorAll(`input.${VARIABLE_INPUT_CLASS}`))
+            .map((element) => (element as HTMLInputElement).value);
     }
 
     /**
@@ -484,99 +293,38 @@ export default function CodeNoteInputWithVariables({
         // programmingLanguage
         noteInputEntity.programmingLanguage = codeNoteInputWithVariablesLanguage;
     }
-
-    async function handleFocus(event: FocusEvent): Promise<void> {
-        if (event.target.className !== "variableInput")
-            await unHighlightInputDivContent();
-    }
-
-    async function handleBlurCapture(event): Promise<void> {
-        if (disabled)
-            return;
-
-        if (onBlur)
-            onBlur(event);
-
-        // case: focus was not on a variable input or the placeholder textarea
-        if (!inputHighlighted)
-            await highlightInputDivContent();
-    }
     
-
     async function handleKeyDownCapture(event: KeyboardEvent): Promise<void> {
         const keyName = event.key;
 
-        if (isKeyPressed("Control"))
-            sanitizeAndUpdateClipboardText();
-        
         if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
             event.preventDefault();
             insertVariableInputSequence();
-            updateNoteEdited();
+            // updateNoteEdited();
         }
 
-        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]) && !isVariableInputFocused())
-            updateNoteEdited();
+        // if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]) && !isVariableInputFocused())
+        //     updateNoteEdited();
 
         // save this note
         if (isKeyPressed("Control") && event.key === "s" && !isSaveButtonDisabled) {
             event.preventDefault();
 
+            // TODO: reconsider timing and whether to highlight
             // highlight to properly save
-            if (!inputHighlighted)
-                await highlightInputDivContent();
+            // if (!isInputHighlighted)
+            //     await highlightInputDivContent();
 
-            // click note save button
-            clickSaveButton();
+            // clickSaveButton();
 
-            // unhighlight
-            if (!inputHighlighted)
-                await unHighlightInputDivContent();
+            // // unhighlight
+            // if (!isInputHighlighted)
+            //     await unHighlightInputDivContent();
 
-            // move cursor back
-            const cursorPosition = getCursorPos(inputDivRef.current!);
-            moveCursor(inputDivRef.current!, cursorPosition);
+            // // move cursor back
+            // const cursorPosition = getCursorPos(getTextarea()!);
+            // moveCursor(getTextarea()!, cursorPosition);
         }
-    }
-    
-    async function handleCut(): Promise<void> {
-        if (getNumCharsSelected(inputDivRef.current!) > 0)
-            updateNoteEdited();
-    }
-
-    async function handlePaste(): Promise<void> {
-        if (!isVariableInputFocused())
-            updateNoteEdited();
-    }
- 
-    function handleKeyUp(event: KeyboardEvent): void {
-        const keyName = event.key;
-
-        if (keyName === "Backspace" || keyName === "Delete")
-            cleanUpEmptyInputDiv();
-    }
-
-    function isVariableInputFocused(): boolean {
-        return !!document.activeElement && document.activeElement.classList.contains("variableInput");
-    }
-
-    function cleanUpEmptyInputDiv(): void {
-        const inputDiv = inputDivRef.current!;
-        const inputBreaks = inputDiv.querySelectorAll("br");
-        
-        // case: no content left
-        if (isBlank(inputDiv.innerText) && inputBreaks.length <= 1)
-            // clean up empty tags
-            inputDiv.innerHTML = "";
-    }
-
-    function handleInputDivContainerClick(event: MouseEvent): void {
-        const inputDiv = inputDivRef.current!;
-
-        // case: not focuesd yet and not clicking a variableInput
-        if (!inputDiv.matches(":focus") && (event.target as HTMLElement).className !== "variableInput")
-            // focus input div
-            inputDiv.focus();
     }
 
     async function handleCopyClick(): Promise<void> {
@@ -585,6 +333,7 @@ export default function CodeNoteInputWithVariables({
         await copyInputDivContentToClipboard();
     }
 
+    // TODO
     function activateFullScreenStyles(): void {
         const inputDiv = inputDivRef.current!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
@@ -602,7 +351,7 @@ export default function CodeNoteInputWithVariables({
         inputDiv.style.maxHeight = "80vh";
     }
 
-
+    // TODO
     function deactivateFullScreenStyles(): void {
         const inputDiv = inputDivRef.current!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
@@ -625,28 +374,84 @@ export default function CodeNoteInputWithVariables({
         inputDiv.focus();
     }
 
-
     async function handleLanguageChange(): Promise<void> {
         // case: called on load
         if (!hasComponentRendered)
             return;
 
-        await unHighlightInputDivContent();
+        // "rehighlight"
+        const inputDiv = getInputDiv()!;
+        const unhighlighted = await parseTextareaValue(inputDiv.innerHTML);
+        const highlighted = await parseDivInnerHtml(unhighlighted);
 
-        highlightInputDivContent();
+        inputDiv.innerHTML = highlighted;
 
-        updateNoteInputEntity();
-    }
-
-
-    function isAutoDetectLanguage(): boolean {
-        return codeNoteInputWithVariablesLanguage === "_auto";
-    }
-
-    function handleAppendVariableButtonClick(): void {
-        appendVariableInput();
         updateNoteInputEntity();
         updateNoteEdited();
+    }
+
+    function isAutoDetectLanguage(): boolean {
+        return codeNoteInputWithVariablesLanguage === CODE_BLOCK_WITH_VARIABLES_AUTO_DETECT_LANGUAGE;
+    }
+
+    /**
+     * Insert a variableInput sequence at the last known cursor pos or at the end. Use {@link insertVariableInputSequence}
+     */
+    async function handleInsertVariableButtonClick(): Promise<void> {
+        await focusInput();
+
+        insertVariableInputSequence(lastCursorPos.x);
+        
+        updateNoteInputEntity();
+        updateNoteEdited();
+    }
+
+    /**
+     * @returns the textareaDiv element assuming that it's currently rendered as textarea. `null` if it is not
+     */
+    function getTextarea(): HTMLTextAreaElement | null {
+        const textareaDiv = componentRef.current!.querySelector(".TextareaDiv");
+        if (!textareaDiv || !(textareaDiv instanceof HTMLTextAreaElement)) {
+            logWarn(`Invalid access of textareaDiv ref. Not a textarea element right now: ${textareaDiv}`);
+            return null;
+        }
+
+        return textareaDiv;
+    }
+
+    /**
+     * @returns the inputDiv element assuming that it's currently rendered as div. `null` if it is not
+     */
+    function getInputDiv(): HTMLDivElement | null {
+        const inputDiv = componentRef.current!.querySelector(".TextareaDiv");
+        if (!inputDiv || !(inputDiv instanceof HTMLDivElement)) {
+            logWarn(`Invalid access of inputDiv ref. Not a textarea element right now: ${inputDiv}`);
+            return null;
+        }
+
+        return inputDiv;
+    }
+
+    function handleInputMouseEvent(event: MouseEvent): void {
+        // make sure not to convert to textarea on click on variable input
+        if (event.target instanceof HTMLInputElement && (event.target as HTMLInputElement).classList.contains(VARIABLE_INPUT_CLASS))
+            throw new Error("Dont convert to textarea");
+    }
+
+    /**
+     * Await this in order to make sure that the textarea is rendered:
+     * 
+     * ```
+     * await focusInput();
+     * const textarea = getTextarea()!; // not null
+     * ```
+     */
+    async function focusInput(): Promise<void> {
+        const inputDiv = getInputDiv()!;
+        inputDiv.click();
+        
+        // this is how long it should take for the textarea to be rendered
+        await parseTextareaValue(inputDiv.innerHTML);
     }
 
     return (
@@ -658,38 +463,16 @@ export default function CodeNoteInputWithVariables({
             ref={componentRef}
             {...otherProps}
         >
-            <pre 
-                className="inputDivContainer fullWidth"
-                onClick={handleInputDivContainerClick}
-            >
-                <code>
-                    {/* dont use a placeholder because of conflicts with vairableInputs */}
-                    <ContentEditableDiv 
-                        className="inputDiv fullWidth" 
-                        ref={inputDivRef} 
-                        spellCheck={false}
-                        setCursorPos={setCursorPos}
-                        onKeyDownCapture={handleKeyDownCapture}
-                        onKeyUp={handleKeyUp}
-                        onFocus={handleFocus}
-                        onBlurCapture={handleBlurCapture}
-                        onCut={handleCut}
-                        onPaste={handlePaste}
-                    >
-                        {inputDivValue}
-                    </ContentEditableDiv> 
-                </code>
-                
-                <Overlay 
-                    className="noteInputOverlay flexCenter" 
-                    hideOnClick={false}
-                    fadeInDuration={0}
-                    isOverlayVisible={isNoteInputOverlayVisible} 
-                    setIsOverlayVisible={setIsNoteInputOverlayVisible}
-                >
-                    <i className={"fa-solid fa-circle-notch rotating"}></i>
-                </Overlay>
-            </pre>
+            <TextareaDiv 
+                parseDiv={parseDivInnerHtml}
+                parseTextarea={parseTextareaValue}
+                defaultValue={inputDivValue}
+                ref={inputDivRef}
+                onBlurCapture={(e) => setLastCursorPos(getCursorPos(e.target))}
+                onKeyDownCapture={handleKeyDownCapture}
+                onMouseDown={handleInputMouseEvent}
+                onClick={handleInputMouseEvent}
+            />
 
             <div className={`${componentName}-buttonContainer`}>
                 <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
@@ -730,7 +513,7 @@ export default function CodeNoteInputWithVariables({
                     <Button 
                         className={`${componentName}-buttonContainer-appendVariableButton defaultNoteInputButton`}
                         title="Variable (Ctrl + Shift + V)"
-                        onClick={handleAppendVariableButtonClick}
+                        onClick={handleInsertVariableButtonClick}
                     >
                         <i className="fa-solid fa-dollar-sign"></i>
                     </Button>

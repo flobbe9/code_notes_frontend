@@ -212,12 +212,16 @@ export function getCursorLineNum(inputElement: MovableCursorElement): number {
 
 /**
  * @param element 
- * @returns `null` if no document selection yet
+ * @returns `{ x: -1, y: -1: selectedChars: 0 }` if no document selection yet
  */
-export function getCursorPos(element: MovableCursorElement): CursorPosition | null {
+export function getCursorPos(element: MovableCursorElement): CursorPosition {
     const documentSelection = document.getSelection();
     if (!documentSelection)
-        return null;
+        return {
+            x: -1,
+            y: -1,
+            selectedChars: 0
+        };
 
     return {
         x: getCursorIndex(element),
@@ -243,10 +247,13 @@ export function getTextWidth(text: string, fontSize: string, fontFamily: string,
             id="${elementId}"
             style='
                 border: none; 
-                width: fit-content;
                 font-size: ${fontSize};
                 font-family:  ${fontFamily};
                 font-weight: ${fontWeight};
+                opacity: 0;
+                position: fixed;
+                width: fit-content;
+                z-index: -1;
             ' 
             contenteditable
         >
@@ -257,7 +264,7 @@ export function getTextWidth(text: string, fontSize: string, fontFamily: string,
     
     const hiddenInputDivWidth2 = hiddenInputDiv2?.offsetWidth;
 
-    hiddenInputDiv2?.remove();
+    // hiddenInputDiv2?.remove();
 
     return hiddenInputDivWidth2 || 0;
 }

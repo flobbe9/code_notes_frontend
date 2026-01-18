@@ -24,14 +24,15 @@ interface Props extends DefaultProps {
  * 
  * @since 0.0.1
  */
-export default function Sanitized({
-    dirtyHTML,
-    mainTagNames = ["div"],
-    parseOptions,
-    sanitizeOptions,
-    rendered = true,
-    ...props}: Props) {
-
+export default function Sanitized(
+    {
+        dirtyHTML,
+        mainTagNames = ["div"],
+        parseOptions,
+        sanitizeOptions,
+        rendered = true,
+        ...props
+    }: Props) {
     const { id, className, style, children } = getCleanDefaultProps(props);
 
     // add component props to parsed html
@@ -41,14 +42,12 @@ export default function Sanitized({
         }
     }
 
-
     /**
      * @param node to convert to jsx element
      * @param childIndex -1 if this is the top level node, else the index of this node child amongst it's siblings
      * @returns jsx element of given ```node``` or ```null``` if given ```node``` is falsy
      */
     function nodeToJSXElement(node: Element, childIndex: number): JSX.Element | null {
-
         // case: invalid node
         if (!node || !node.attribs) 
             return null;
@@ -76,7 +75,6 @@ export default function Sanitized({
      * @returns combined props of ```node``` props and this component's props
      */
     function combineProps(node: Element, childIndex: number): object {
-
         // case: invalid node
         if (!node || !node.attribs) 
             return {};

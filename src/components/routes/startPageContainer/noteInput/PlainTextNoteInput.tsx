@@ -396,7 +396,7 @@ export default function PlainTextNoteInput({
             ref={componentRef}
             {...otherProps}
         >
-            <pre className="inputDivContainer fullWidth">
+            {/* <pre className="inputDivContainer fullWidth">
                 <ContentEditableDiv 
                     className="plainTextInput fullWidth" 
                     spellCheck={false} 
@@ -421,7 +421,7 @@ export default function PlainTextNoteInput({
                 >
                     <i className={"fa-solid fa-circle-notch rotating"}></i>
                 </Overlay>
-            </pre>
+            </pre> */}
                     
             <div className="CodeNoteInputWithVariables-buttonContainer">
                 <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">

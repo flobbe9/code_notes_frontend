@@ -418,7 +418,7 @@ export default function App() {
                                             </Settings>
                                         </LoggedInComponent>
                                     } />
-                                    <Route path="*" element={<NotFound></NotFound>} />
+                                    <Route path="*" element={<NotFound />} />
                                 </Routes>
                             </div>
 

@@ -111,6 +111,7 @@ export const CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START = "<code>";
 export const CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END = "</code>";
 
 
+export const VARIABLE_INPUT_CLASS = "variableInput";
 /**
  * Input will always be as wide as given ```placeholder``` text. Uses the default placeholder if given ```placeholder``` is blank.
  * 
@@ -123,7 +124,7 @@ export function getDefaultVariableInput(placeholder = VARIABLE_INPUT_DEFAULT_PLA
     if (isBlank(placeholder))
         placeholder = VARIABLE_INPUT_DEFAULT_PLACEHOLDER;
 
-    return `<input type="text" style="width: ${inputWidth}px" class="variableInput" placeholder="${placeholder}" />`;
+    return `<input type="text" style="width: ${inputWidth}px" class="${VARIABLE_INPUT_CLASS}" placeholder="${placeholder}" />`;
 }
 
 

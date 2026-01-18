@@ -3,7 +3,7 @@
 
 :root {
     --variableInputFontFamily: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --variableInputFontSize: 1em;
+    --variableInputFontSize: 1rem;
     --variableInputPaddingLeftRight: 0px;
     --variableInputBorderWidth: 2px;
 }
@@ -45,7 +45,7 @@
         }
     }
 
-    .inputDivContainer {
+    .TextareaDiv {
         margin: 0;
         
         code {
@@ -53,7 +53,7 @@
             display: block;
         }
         
-        .inputDiv {
+        &-div {
             border-left: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
             border-right: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
             line-height: 1.6em;
