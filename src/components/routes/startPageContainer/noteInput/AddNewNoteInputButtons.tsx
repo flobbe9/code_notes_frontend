@@ -170,7 +170,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
                     onClick={handleAddCodeNoteInput}
                 >
                     <i className="fa-solid fa-plus me-2"></i>
-                    <img src="/img/vsStudio_purple.png" className="vsStudioIcon" alt="vscode" height={20} />
+                    <img src="/img/vsCode.png" className="vsCodeIcon" alt="vsCode" height={20} />
                 </ButtonWithSlideLabel> 
             </div>
 
