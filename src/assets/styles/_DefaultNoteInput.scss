@@ -54,7 +54,7 @@
         width: 100%;
 
         hr {
-            color: transparent;
+            z-index: -1; // hide actual hr element
         }
 
         &-active {
@@ -69,6 +69,7 @@
             background-color: var(--matteBlack);
             color: var(--codeGrey);
             margin: .3em .7rem 0;
+            margin: 0 .7rem;
             padding: 0 .2em;
             transition: var(--transitionTime);
 

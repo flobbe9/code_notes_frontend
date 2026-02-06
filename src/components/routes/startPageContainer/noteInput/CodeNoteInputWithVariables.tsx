@@ -1,5 +1,6 @@
 import { CursorPosition } from "@/abstract/CursorPosition";
 import { CODE_BLOCK_WITH_VARIABLES_AUTO_DETECT_LANGUAGE } from "@/abstract/ProgrammingLanguage";
+import HiddenInput from "@/components/helpers/HiddenInput";
 import TextareaDiv, { TextareaDivMode } from "@/components/helpers/TextareaDiv";
 import hljs from "highlight.js";
 import React, { FormEvent, KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
@@ -20,7 +21,6 @@ import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from "./Note";
 import NoteInputSettings from "./NoteInputSettings";
-import HiddenInput from "@/components/helpers/HiddenInput";
 
 
 interface Props extends HelperProps {
@@ -35,16 +35,11 @@ interface Props extends HelperProps {
  * 
  */
 // TODO
-    // fullscreen div does not maintain it's height
-    // font
-        // use code and pre?
-    // consider migration function for input values
-    // styles
-        // maybe differentiate between highlighted and unhighlighted more clearly?
-        // try making input height fit-content, align all control buttons
-            // textarea rows?
-    // window resize with langauge settings open wont resize properly
-export default function CodeNoteInputWithVariables({
+    // migration function for input values
+    // window resize with langauge settings open wont resize properly 
+        // make settings search bar position absolute somehow, avoid width shift
+            // clean up those width corrections
+export default function CodeNoteInputWithVariables({ 
     noteInputEntity,
     disabled,
     onBlur, 
@@ -98,10 +93,6 @@ export default function CodeNoteInputWithVariables({
     }, []);
 
     useEffect(() => {
-        logDebug(inputMode)
-    }, [inputMode])
-
-    useEffect(() => {
         handleLanguageChange();
     }, [codeNoteInputWithVariablesLanguage]);
 
@@ -131,11 +122,13 @@ export default function CodeNoteInputWithVariables({
      */
     async function parseDivInnerHtml(textareaValue: string, _textarea?: HTMLTextAreaElement): Promise<string> {
         if (isBlank(textareaValue))
-            return "";
+            // empty divs have slightly less height, so put a whitespace inside
+            return "<span> </span>";
 
         textareaValue = await highlightAndReplaceVariableInputSequences(textareaValue);
-        // replace line breaks that are inside a sequence
-        textareaValue = textareaValue.replaceAll("\n", "<br>");
+        // replace line breaks that are inside a sequence. 
+        // append the weird span with a whitespace because a div ending with a <br> element will only render it if there's content after 
+        textareaValue = textareaValue.replaceAll("\n", "<br><span> </span>");
 
         return textareaValue;
     }
@@ -318,7 +311,6 @@ export default function CodeNoteInputWithVariables({
     }
 
     function activateFullScreenStyles(): void {
-        const inputDiv = getInputDiv()!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
         const inputDivContainer = inputContainerRef.current!;
 
@@ -331,24 +323,24 @@ export default function CodeNoteInputWithVariables({
         defaultCodeNoteInput.style.left = "5vw";
         defaultCodeNoteInput.style.top = "10vh";
         inputDivContainer.style.height = "80vh";
-        inputDiv.style.maxHeight = "80vh";
+        inputDivContainer.style.maxHeight = "80vh";
     }
 
     function deactivateFullScreenStyles(): void {
-        const inputDiv = getInputDiv()!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
         const inputDivContainer = inputContainerRef.current!;
-
+        
         // resize quickly
         defaultCodeNoteInput.style.width = "100%";
         
         defaultCodeNoteInput.style.left = "auto";
         inputDivContainer.style.height = "100%";
-        inputDiv.style.maxHeight = "var(--noteInputMaxHeight)";
+        inputDivContainer.style.maxHeight = "var(--noteInputMaxHeight)";
         defaultCodeNoteInput.style.position = "static";
         defaultCodeNoteInput.style.top = "auto";
         defaultCodeNoteInput.style.zIndex = "0";
-
+        
+        const inputDiv = getInputDiv()!;
         inputDiv.focus();
     }
 
@@ -430,7 +422,8 @@ export default function CodeNoteInputWithVariables({
     }
 
     function handleChange(_event?: FormEvent<HTMLTextAreaElement>): void {
-        noteInputEntity.value = getTextarea()!.value;
+        const textarea = getTextarea()!;
+        noteInputEntity.value = textarea.value;
 
         updateNoteEdited();
     }
@@ -450,7 +443,7 @@ export default function CodeNoteInputWithVariables({
                 tabIndex={inputMode === "textarea" ? -1 : 0} // make that "tab back" will not refocus the input
             />
             {/* Input */}
-            <div className="inputContainer" ref={inputContainerRef}>
+            <code className="inputContainer" ref={inputContainerRef}>
                 <TextareaDiv 
                     parseDiv={parseDivInnerHtml}
                     parseTextarea={parseTextareaValue}
@@ -463,7 +456,7 @@ export default function CodeNoteInputWithVariables({
                     onMouseDown={handleInputMouseEvent}
                     onClick={handleInputMouseEvent}
                 />
-            </div>
+            </code>
 
             {/* Controls */}
             <div className={`${componentName}-buttonContainer`}>
@@ -498,9 +491,7 @@ export default function CodeNoteInputWithVariables({
                             <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
                         }
                     </Button>
-                </Flex>
 
-                <Flex horizontalAlign="right" flexWrap="nowrap">
                     {/* Add variable */}
                     <Button 
                         className={`${componentName}-buttonContainer-appendVariableButton defaultNoteInputButton`}

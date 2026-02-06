@@ -1,6 +1,7 @@
 import DefaultProps, { getCleanDefaultProps } from "@/abstract/DefaultProps";
 import { logDebug, logError } from "@/helpers/logUtils";
-import React, { FocusEvent, forwardRef, Fragment, MouseEvent, Ref, RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { countTextareaLines } from "@/helpers/projectUtils";
+import React, { ChangeEvent, FocusEvent, forwardRef, Fragment, MouseEvent, Ref, RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
 import Sanitized from "./Sanitized";
 
 export type TextareaDivMode = "textarea" | "div";
@@ -71,7 +72,9 @@ export default forwardRef(function TextareaDiv(
 ) {
     const [currentMode, setCurrentMode] = useState<TextareaDivMode>(defaultMode);
     const [currentContent, setCurrentContent] = useState<string>(defaultValue);
-    
+    // the number of lines in the textarea value
+    const [textareaRows, setTextareaRows] = useState(-1);
+
     const componentRef = useRef<HTMLDivElement | HTMLTextAreaElement>(null);
     useImperativeHandle(ref, () => componentRef.current! , []);
 
@@ -79,7 +82,7 @@ export default forwardRef(function TextareaDiv(
     const divRef = componentRef as RefObject<HTMLDivElement>;
 
     const componentName = `TextareaDiv`;
-    const { className, onBlur, onMouseDown, onClick, ...otherProps } = getCleanDefaultProps(props, componentName);
+    const { className, onBlur, onMouseDown, onClick, onChange, ...otherProps } = getCleanDefaultProps(props, componentName);
 
     useEffect(() => {
         updateContentState(defaultValue);
@@ -89,20 +92,19 @@ export default forwardRef(function TextareaDiv(
         updateModeState(defaultMode);
     }, [defaultMode]);
 
-    async function divToTextarea(): Promise<void> {
+    async function divToTextarea(): Promise<string | null> {
         if (currentMode === "textarea")
-            return;
+            return null;
         
-        try {
-            const textareaValue = await parseTextarea(divRef.current!.innerHTML, divRef.current!);
+        const textareaValue = await parseTextarea(divRef.current!.innerHTML, divRef.current!);
 
-            updateModeState("textarea");
-            updateContentState(textareaValue);
+        // case: num lines not initialized yet
+        if (textareaRows < 1)
+            setTextareaRows(countTextareaLines(textareaValue));
 
-        } catch (e) {
-            // TODO
-            logError(e);
-        }
+        updateModeState("textarea");
+        updateContentState(textareaValue);
+        return textareaValue;
     }
 
     async function textareaToDiv(): Promise<void> {
@@ -133,7 +135,9 @@ export default forwardRef(function TextareaDiv(
     
         // TODO: improove focus behaviour
         await divToTextarea();
-        setTimeout(() => textareaRef.current!.focus(), 10);
+        setTimeout(() => {
+            textareaRef.current!.focus();
+        }, 10);
     }
     
     function handleTextareaBlur(event: FocusEvent): void {
@@ -156,6 +160,13 @@ export default forwardRef(function TextareaDiv(
         
         await divToTextarea();
         setTimeout(() => textareaRef.current!.focus(), 10);
+    }
+
+    function handleTextareaChange(event: ChangeEvent<HTMLTextAreaElement>): void {
+        if (onChange)
+            onChange(event);
+
+        setTextareaRows(countTextareaLines(textareaRef.current!));
     }
 
     function updateContentState(content: string): void {
@@ -192,6 +203,8 @@ export default forwardRef(function TextareaDiv(
                     className={`${className} ${componentName}-textarea`} 
                     defaultValue={currentContent} 
                     ref={textareaRef}
+                    rows={textareaRows}
+                    onChange={handleTextareaChange}
                     onBlur={handleTextareaBlur}
                     onMouseDown={onMouseDown}
                     onClick={onClick}

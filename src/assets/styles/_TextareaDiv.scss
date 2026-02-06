@@ -2,12 +2,13 @@
     width: 100%;
 
     &-textarea {
-        // height: 1.9em;
+        display: block; // make sure height behaves normally
         height: fit-content;
-        // height: 100%;
         resize: none;
-        // TODO: hide the scrollbar?
     }
+
+    // &-div {
+    // }
 
     &:hover {
         cursor: text;

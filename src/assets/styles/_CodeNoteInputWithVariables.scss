@@ -24,55 +24,64 @@
     &.fullScreen {
         border-radius: var(--borderRadius); // for full screen mode
         padding: 15px;
-        
-        .inputDiv {
-            max-height: unset;
-        }
     }
 
     &:not(.fullScreen) {
-        .inputDiv {
-            transition: background-color var(--transitionTime);
-
-            @include customHover {
-                &:not(:focus) {
-                    background-color: var(--matteBlackLight);
+        .TextareaDiv {
+            &-div, &-textarea {
+                transition: background-color var(--transitionTime);
+            }
+            
+            &-div {
+                @include customHover {
+                    &:not(:focus) {
+                        background-color: var(--matteBlackLight);
+                    }
                 }
             }
-            @include customFocus {
-                background-color: var(--matteBlackLighter);
+
+            &-textarea {
+                @include customFocus {
+                    background-color: var(--matteBlackLighter);
+                }
             }
         }
     }
 
     .inputContainer {
+        border-left: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
+        border-right: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
+        color: white;
+        display: block;
+        height: 100%;
+        max-height: var(--noteInputMaxHeight);
+        overflow: hidden;
         width: 100%;
 
         .TextareaDiv {
-            margin: 0;
+            $lineHeight: 1.6em;
 
+            height: inherit;
+            margin: 0;
+            
             &-textarea {
                 background-color: transparent;
                 border: none;
                 color: white;
+                line-height: $lineHeight;
                 outline: none;
+                padding: 0;
+                padding-left: var(--codeNoteInputPaddingLeft);
                 // padding: 10px var(--noteInputPaddingX);
-            }
-            
-            code {
-                height: 100%;
-                display: block;
+
+                @include scrollBar();
             }
             
             &-div {
-                border-left: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
-                border-right: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
-                line-height: 1.6em;
-                height: 100%;
+                line-height: $lineHeight;
                 margin: 0;
-                max-height: var(--noteInputMaxHeight);
-                // min-height: 41px;
                 overflow: auto;
+                padding-left: var(--codeNoteInputPaddingLeft);
                 // padding: 10px var(--noteInputPaddingX);
                 white-space: pre-wrap;
 

@@ -438,6 +438,12 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
                     language={codeNoteInputLanguage.toLowerCase()}
                     theme="vs-dark"
                     defaultValue={noteInputEntity.value}
+                    options={{
+                        lineNumbers: 'off',
+                        minimap: {
+                            enabled: false
+                        }
+                    }}
                     onChange={handleChange}
                     onMount={handleEditorMount}
                 />

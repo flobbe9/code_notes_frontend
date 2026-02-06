@@ -9,7 +9,7 @@
 
     .AddNewNoteButton {
         background-color: var(--matteBlackLighter);
-        color: rgb(52, 116, 255);
+        color: var(--accentColor);
         height: fit-content;
         text-wrap: nowrap;
     }

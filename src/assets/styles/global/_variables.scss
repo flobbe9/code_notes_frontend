@@ -14,6 +14,9 @@ $desktopMinWidth: 992px;
     --tagBorderRadius: 1px;
     --codeGrey: rgb(212, 212, 212);
     --codeGreyLight: rgb(231, 231, 231);
+    --matteBlack: #1d1e1f;
+    --matteBlackLight: #292929;
+    --matteBlackLighter: #3a3a3a;
     --matteBlue: rgb(21, 1, 70);
     --matteBlueLight: rgb(31, 4, 94);
     --overlayZIndex: 10;
@@ -22,13 +25,12 @@ $desktopMinWidth: 992px;
     --testBorder: 1px solid black;
     --transitionTime: 0.2s;
     --transitionTimeFast: 0.1s;
-    --matteBlack: #1d1e1f;
-    --matteBlackLight: #292929;
-    --matteBlackLighter: #3a3a3a;
 
     // input specific
     /** The max height of a note input when collapsed */
     --noteInputMaxHeight: 20vh;
+    // distance from left border to input start, vscode displays it like that, can't change it
+    --codeNoteInputPaddingLeft: 26px;
 
     --mobileMaxWidth: #{$mobileMaxWidth};
     --tabletMinWidth: #{$tabletMinWidth};

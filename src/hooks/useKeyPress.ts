@@ -102,7 +102,7 @@ export default function useKeyPress(checkAllKeys = false) {
      * @returns ```true``` if the list of pressed keys contains at least one "control" kind of key (that is a key that
      *          doesn't take up or removes any space, e.g. "Shift" or "Control")
      */
-    function isControlKeyPressed(nonControlKeys = []): boolean {
+    function isControlKeyPressed(nonControlKeys: string[] = []): boolean {
 
         const keysToIgnore = new Set(["Space", "Enter", "Backspace", "Delete", ...nonControlKeys]);
 

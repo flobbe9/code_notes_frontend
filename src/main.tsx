@@ -1,12 +1,12 @@
+import App from '@/components/App';
+import '@styles/style.scss';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '@styles/style.scss';
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from '@/components/App';
+import { createRoot } from 'react-dom/client';
 
 
 // useQuery config
@@ -25,8 +25,7 @@ const persister = createSyncStoragePersister({
 })
 
 // render root
-const root = ReactDOM.createRoot(document.getElementById('root')!);
-root.render(
+createRoot(document.getElementById('root')!).render(
     <PersistQueryClientProvider
         client={useQueryClientObj}
         persistOptions={{persister: persister}}

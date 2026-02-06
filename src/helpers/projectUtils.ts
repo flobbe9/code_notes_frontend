@@ -10,7 +10,7 @@ import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTES_QUERY_KEY } from "../hooks/useNotes";
 import { APP_NAME_PRETTY, DEFAULT_HTML_SANTIZER_OPTIONS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
 import { logError, logWarn } from "./logUtils";
-import { assertFalsyAndLog, getRandomString, isBlank, isEmpty, isNumberFalsy, stringToHtmlElement } from "./utils";
+import { assertFalsyAndLog, assertFalsyAndThrow, getRandomString, isBlank, isEmpty, isNumberFalsy, stringToHtmlElement } from "./utils";
 
 /**
  * Meant to provide specific util methods that are not needed in any project.
@@ -437,4 +437,15 @@ export function getNumCharsSelected(element: MovableCursorElement): number {
 
     // assume that selectionStart must be truthy if selectionEnd is
     return inputElement.selectionEnd - inputElement.selectionStart!;
+}
+
+/**
+ * @param textarea element or element.value
+ * @returns number of actual lines written in textarea value. Will be 1 if value is empty
+ */
+export function countTextareaLines(textarea: HTMLTextAreaElement | string): number {
+    assertFalsyAndThrow(textarea);
+
+    let textareaValue = typeof textarea === "string" ? textarea : textarea.value;
+    return textareaValue.split("\n").length;
 }

@@ -50,11 +50,6 @@
                     border-right: var(--noteInputDefaultBorder) var(--codeNoteInputColor);
                     transition: background-color var(--transitionTime), width var(--transitionTime);
                     
-                    /** line number container */
-                    .margin {
-                        left: 0;
-                    }
-                    
                     /** text container */
                     .monaco-scrollable-element {
                         .decorationsOverviewRuler {
@@ -82,10 +77,6 @@
                                 // }
                             }
                         }
-                    }
-                        
-                    .minimap {
-                        display: none;
                     }
                 }
             }

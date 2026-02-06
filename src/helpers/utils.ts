@@ -274,7 +274,6 @@ export async function flashClass(element: HTMLElement, classToAdd: string, class
  * @returns a Promise which resolves once styles are reset
  */
 export async function flashCss(element: HTMLElement, flashCss: CSSProperties, holdTime = 1000): Promise<void> {
-    
     return new Promise((res, rej) => {
         if (!element) {
             rej("'elementId' falsy");
@@ -284,12 +283,13 @@ export async function flashCss(element: HTMLElement, flashCss: CSSProperties, ho
         const initCss: CSSProperties = {};
 
         // set flash styles
-        Object.entries(flashCss).forEach(([cssProp, cssVal]) => {
+        Object.entries(flashCss).forEach(([key, val]) => {
+            const cssProp = key as keyof CSSProperties;
             // save init css entry
             initCss[cssProp] = element.style[cssProp];
 
             // set flash css value
-            element.style[cssProp] = cssVal;
+            element.style[cssProp] = val;
         })
 
         // reset flash styles
