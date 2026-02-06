@@ -9,8 +9,8 @@ import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/highlightJs/vs.css";
-import { DEFAULT_HTML_SANTIZER_OPTIONS, getDefaultVariableInput, VARIABLE_INPUT_CLASS, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
-import { logDebug, logWarn } from "../../../../helpers/logUtils";
+import { getDefaultVariableInput, VARIABLE_INPUT_CLASS, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
+import { logWarn } from "../../../../helpers/logUtils";
 import { getCursorIndex, getCursorPos, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
 import { getCssConstant, getCSSValueAsNumber, insertString, isBlank, setClipboardText, stringToHtmlElement } from "../../../../helpers/utils";
 import { useInitialStyles } from "../../../../hooks/useInitialStyles";
@@ -36,9 +36,7 @@ interface Props extends HelperProps {
  */
 // TODO
     // migration function for input values
-    // window resize with langauge settings open wont resize properly 
-        // make settings search bar position absolute somehow, avoid width shift
-            // clean up those width corrections
+    // white space in span will appear as character
 export default function CodeNoteInputWithVariables({ 
     noteInputEntity,
     disabled,
@@ -59,6 +57,8 @@ export default function CodeNoteInputWithVariables({
     const inputContainerRef = useRef<HTMLDivElement>(null);
     /** Use `getTextarea()` or `getInputDiv()` instead */
     const inputDivRef = useRef<HTMLDivElement | HTMLTextAreaElement>(null);
+
+    const divWhitespace = "<span> </span>";
 
     const { isKeyPressed } = useContext(AppContext);
     const { updateNoteEdited, isSaveButtonDisabled, clickSaveButton } = useContext(NoteContext);
@@ -123,12 +123,15 @@ export default function CodeNoteInputWithVariables({
     async function parseDivInnerHtml(textareaValue: string, _textarea?: HTMLTextAreaElement): Promise<string> {
         if (isBlank(textareaValue))
             // empty divs have slightly less height, so put a whitespace inside
-            return "<span> </span>";
+            return divWhitespace;
 
         textareaValue = await highlightAndReplaceVariableInputSequences(textareaValue);
         // replace line breaks that are inside a sequence. 
+        textareaValue = textareaValue.replaceAll("\n", "<br>");
+
         // append the weird span with a whitespace because a div ending with a <br> element will only render it if there's content after 
-        textareaValue = textareaValue.replaceAll("\n", "<br><span> </span>");
+        if (textareaValue.endsWith("<br>"))
+            textareaValue += divWhitespace;
 
         return textareaValue;
     }
@@ -142,6 +145,8 @@ export default function CodeNoteInputWithVariables({
         if (isBlank(divInnerHtml))
             return "";
 
+        // remove hacky whitespace
+        divInnerHtml = divInnerHtml.replaceAll(divWhitespace, "");
         divInnerHtml = divInnerHtml.replaceAll("<br>", "\n");
         // only leave <input> elements and their "placeholder" attribute behind
         divInnerHtml = sanitize(divInnerHtml, {
