@@ -1,14 +1,12 @@
 import { CursorPosition } from "@/abstract/CursorPosition";
 import { MovableCursorElement } from "@/abstract/MovableCursorElement";
 import { useQueryClientObj } from "@/main";
-import parse, { Element } from "html-react-parser";
-import sanitize from "sanitize-html";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { RememberMyChoiceKey, isRememberMyChoiceValue } from "../abstract/RememberMyChoice";
 import { APP_USER_QUERY_KEY } from "../hooks/useAppUser";
 import { CSRF_TOKEN_QUERY_KEY } from "../hooks/useCsrfToken";
 import { NOTES_QUERY_KEY } from "../hooks/useNotes";
-import { APP_NAME_PRETTY, DEFAULT_HTML_SANTIZER_OPTIONS, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
+import { APP_NAME_PRETTY, REMEMBER_MY_CHOICE_KEY_PREFIX } from "./constants";
 import { logError, logWarn } from "./logUtils";
 import { assertFalsyAndLog, assertFalsyAndThrow, getRandomString, isBlank, isEmpty, isNumberFalsy, stringToHtmlElement } from "./utils";
 
@@ -23,6 +21,7 @@ import { assertFalsyAndLog, assertFalsyAndThrow, getRandomString, isBlank, isEmp
  * Get line elements (inner divs) of given ```contentEditableDiv```. Notice that this does NOT include the very first line as that is never
  * a div element.
  * 
+ * @deprecated
  * @param contentEditableDiv 
  * @returns all first level inner divs of ```contentEditableDiv``` that represent a line (this excludes divs without inner html or inner text). 
  *          Empty array if invalid param
@@ -46,7 +45,7 @@ export function isContentEditableDiv(element: HTMLElement): boolean {
  * @param inputElement  to move the cursor in
  * @param to the directions
  */
-export function moveCursor(inputElement: MovableCursorElement, to: CursorPosition | null): void { // start, linenum, num charse selected (may be negative), 
+export function moveCursor(inputElement: MovableCursorElement | null, to: CursorPosition | null): void { // start, linenum, num charse selected (may be negative), 
     if (!inputElement || !to || !isCursorPositionValid(to)) {
         logWarn("Failed to move cursor. Invalid args", inputElement, to);
         return;
@@ -269,42 +268,6 @@ export function getTextWidth(text: string, fontSize: string, fontFamily: string,
     return hiddenInputDivWidth2 || 0;
 }
     
-
-/**
- * Parse given html string and retrieve some attribs.
- * 
- * @param dirtyHtml unsafe html to parse
- * @returns some attributes of the innerHtml of the core/columns noteInput
- */
-export function getHTMLStringAttribs(dirtyHtml: string): {className: string, id: string, style: string} {
-
-    let className = "";
-    let id = "";
-    let style = "";
-
-    // parse html
-    parse(sanitize(dirtyHtml, DEFAULT_HTML_SANTIZER_OPTIONS), {
-        replace(domNode: Element) {
-
-            // get attributes
-            const attribs = domNode.attribs;
-            if (!attribs)
-                return;
-
-            className = attribs.class;
-            id = attribs.id;
-            style = attribs.style
-        }
-    })
-
-    return {
-        className,
-        id,
-        style
-    }
-}
-
-
 /**
  * @param text string to clean up. Wont be altered
  * @returns same text string but with some special chars replaced

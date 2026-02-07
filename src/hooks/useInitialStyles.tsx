@@ -39,7 +39,6 @@ export function useInitialStyles(
      * Set value of ```cssAttributeToChange``` to value of ```cssAttributeToUse```
      */
     function setInitialStyle(): void {
-
         if (!element)
             return;
 

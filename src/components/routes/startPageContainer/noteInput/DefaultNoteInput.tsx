@@ -34,8 +34,6 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
     const [codeNoteInputLanguage, setCodeNoteInputLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_DEFAULT_LANGUAGE);
     const [codeNoteInputWithVariablesLanguage, setCodeNoteInputWithVariablesLanguage] = useState(noteInputEntity.programmingLanguage || CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE);
 
-    const [isNoteInputOverlayVisible, setIsNoteInputOverlayVisible] = useState(false);
-
     const componentName = "DefaultNoteInput";
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName);
 
@@ -68,9 +66,6 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
 
         codeNoteInputWithVariablesLanguage, 
         setCodeNoteInputWithVariablesLanguage,
-
-        isNoteInputOverlayVisible,
-        setIsNoteInputOverlayVisible,
 
         animateCopyIcon,
 
@@ -154,7 +149,6 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
      * Animate the icon of the "copy" button.
      */
     function animateCopyIcon(): void {
-
         const copyIcon = componentRef.current!.querySelector(".copyButton .fa-copy") as HTMLElement;
 
         animateAndCommit(
@@ -341,9 +335,6 @@ export const DefaultNoteInputContext = createContext({
 
     codeNoteInputWithVariablesLanguage: "", 
     setCodeNoteInputWithVariablesLanguage: (language: string) => {},
-
-    isNoteInputOverlayVisible: false,
-    setIsNoteInputOverlayVisible: (isVisible: boolean) => {},
 
     animateCopyIcon: () => {},
 

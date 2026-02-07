@@ -1,20 +1,16 @@
-import { CursorPosition } from '@/abstract/CursorPosition';
-import parse from 'html-react-parser';
-import React, { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
-import sanitize from "sanitize-html";
+import HiddenInput from '@/components/helpers/HiddenInput';
+import TextareaDiv, { getTextareaDivDivElement, getTextareaDivTextareaElement, TextareaDivMode } from '@/components/helpers/TextareaDiv';
+import React, { FormEvent, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../../../abstract/HelperProps";
-import { CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, DEFAULT_HTML_SANTIZER_OPTIONS } from "../../../../helpers/constants";
-import { logWarn } from '../../../../helpers/logUtils';
-import { getContentEditableDivLineElements, getCursorPos, getNumCharsSelected, moveCursor } from '../../../../helpers/projectUtils';
-import { getClipboardText, getCssConstant, insertString, isBlank, isEventKeyTakingUpSpace, setClipboardText } from "../../../../helpers/utils";
-import { useInitialStyles } from "../../../../hooks/useInitialStyles";
+import { CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, TEXTAREA_DIV_WHITESPACE_HTML } from "../../../../helpers/constants";
+import { logError, logWarn } from '../../../../helpers/logUtils';
+import { getCursorIndex, moveCursor } from '../../../../helpers/projectUtils';
+import { getCssConstant, insertString, isBlank, setClipboardText, stringToHtmlElement } from "../../../../helpers/utils";
 import { AppContext } from '../../../App';
 import Button from "../../../helpers/Button";
-import ContentEditableDiv from "../../../helpers/ContentEditableDiv";
 import Flex from "../../../helpers/Flex";
-import Overlay from '../../../helpers/Overlay';
 import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from './Note';
 
@@ -22,7 +18,6 @@ import { NoteContext } from './Note';
 interface Props extends HelperProps {
     noteInputEntity: NoteInputEntity,
 }
-
 
 /**
  * @since 0.0.1
@@ -33,83 +28,82 @@ export default function PlainTextNoteInput({
     onFocus,
     onBlur,
     onKeyUp,
-    ...props}: Props) {
-    
-    const [inputDivValue, setInputDivValue] = useState<any>();
-    /** ```[cursorIndex, cursorLineNumber]``` inside this input. ```cursorIndex``` is 0-based, ```cursorLineNumber``` is 1-based */
-    const [cursorPos, setCursorPos] = useState<CursorPosition>({x: 0, y: 1, selectedChars: 0});
+    ...props
+}: Props) {
+    const [inputDefaultValue, setInputDefaultValue] = useState<string>()
+    const [inputMode, setInputMode] = useState<TextareaDivMode>("div");
 
-    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "PlainTextNoteInput");
-    const { isKeyPressed, isControlKeyPressed } = useContext(AppContext);
+    const componentName = "PlainTextNoteInput";
+    const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName);
+    const { isKeyPressed } = useContext(AppContext);
     const { updateNoteEdited, isSaveButtonDisabled, clickSaveButton } = useContext(NoteContext);
     const { 
-        isNoteInputOverlayVisible,
-        setIsNoteInputOverlayVisible, 
         animateCopyIcon,
         setActivateFullScreenStyles,
         setDeactivateFullScreenStyles,
         toggleFullScreen,
         isFullScreen,
         handleDeleteNote,
-        focusOnRender
+        focusOnRender,
     } = useContext(DefaultNoteInputContext);
 
     const componentRef = useRef<HTMLDivElement>(null);
-    const inputDivRef = useRef<HTMLDivElement>(null);
-
-    useInitialStyles(inputDivRef.current, [["max-width", "width"]], 100);
+    const inputContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        setInputDivValue(parse(sanitize(noteInputEntity.value, DEFAULT_HTML_SANTIZER_OPTIONS)));
-
+        updateInputDefaultValueState();
+    
         setActivateFullScreenStyles(() => {return activateFullScreenStyles});
         setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
-
-        if (focusOnRender)
-            inputDivRef.current?.focus();
-
     }, []);
 
+    async function updateInputDefaultValueState(): Promise<void> {
+        let defaultValue = noteInputEntity?.value;
 
-    function handleFocus(event): void {
-        
-        if (onFocus)
-            onFocus(event);
+        // only parse if not converting back to textarea anyway 
+        if (!focusOnRender) 
+            defaultValue = await parseDivInnerHtml(noteInputEntity?.value);
 
-        // convert <code> sequences to ```
-        inputDivRef.current!.innerHTML = parseCodeHtmlToCodeText();
-    }
+        setInputDefaultValue(defaultValue);
 
-
-    async function handleBlur(event): Promise<void> {
-
-        if (onBlur)
-            onBlur(event);
-
-        const parsedText = await parseCodeTextToCodeHtml();
-
-        inputDivRef.current!.innerHTML = parsedText;
-
-        updateNoteInputEntity(parsedText);
-    }
-
-
-    async function updateNoteInputEntity(parsedText?: string): Promise<void> {
-
-        noteInputEntity.value = parsedText ?? await parseCodeTextToCodeHtml();
+        if (focusOnRender)
+            setTimeout(() => {
+                focusInput();
+            }, 10); // default text would disappear otherwise
     }
 
     /**
-     * Parses inner html of inputDiv replacing text code sequences with html code sequences. Will consider
+     * @param textareaValue 
+     * @param textarea 
+     * @returns highlighted input value (div innerHtml) replacing html 'code' sequences
+     */
+    async function parseDivInnerHtml(textareaValue: string, _textarea?: HTMLTextAreaElement): Promise<string> {
+        if (isBlank(textareaValue))
+            // empty divs have slightly less height, so put a whitespace inside
+            return TEXTAREA_DIV_WHITESPACE_HTML;
+
+        let divInnerHtml = textareaValue;
+        divInnerHtml = await replacePlainTextCodeSequences(divInnerHtml);
+        // replace line breaks that are inside a sequence. 
+        divInnerHtml = divInnerHtml.replaceAll("\n", "<br>");
+
+        // append the weird span with a whitespace because a div ending with a <br> element will only render it if there's content after 
+        if (divInnerHtml.endsWith("<br>"))
+            divInnerHtml += TEXTAREA_DIV_WHITESPACE_HTML;
+
+        return divInnerHtml;
+    }
+
+    /**
+     * Parses `textareaValue` replacing plain text 'code' sequences with html 'code' sequences. Will consider
      * unclosed code sequences.
      * 
      * Wont actually update the inputDiv's inner html.
      * 
+     * @param textareaValue to parse
      * @returns parsed inner html of inputDiv
      */
-    async function parseCodeTextToCodeHtml(): Promise<string> {
-        setIsNoteInputOverlayVisible(true);
-
+    async function replacePlainTextCodeSequences(textareaValue: string): Promise<string> {
         const parseCallback = (codeText: string, snippetSequence: string, htmlStartSequence: string, htmlEndSequence: string): string => {
             const snippetContents = codeText.split(snippetSequence);
         
@@ -133,35 +127,26 @@ export default function PlainTextNoteInput({
 
             return codeHtml;
         }
-
-        const codeHtml = await new Promise<string>((res, rej) => {
-            setTimeout(() => {
-                let parsed = parseCallback(inputDivRef.current!.innerHTML, CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END);
-                parsed = parseCallback(parsed, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END);
-
-                res(parsed);
-            }, 0); // somehow necessary for states to update properly, 0 milliseconds is fine
-        });
-
-        const sanitizedCodeHtml = sanitize(codeHtml, DEFAULT_HTML_SANTIZER_OPTIONS);
         
-        setIsNoteInputOverlayVisible(false);
-
-        return sanitizedCodeHtml;
+        let parsed = parseCallback(textareaValue, CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END);
+        parsed = parseCallback(parsed, CODE_SNIPPET_SEQUENCE_SINGLELINE, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END);
+        return Promise.resolve(parsed);
     }
 
     /**
-     * Parses inner html of inputDiv replacing html code sequences with text code sequences.
+     * Parses `divInnerHtml` to plain text replacing html code sequences with plain text code sequences.
      * 
      * Wont actually update the inputDiv's inner text.
      * 
+     * @param divInnerHtml to parse
      * @returns parsed inner text of inputDiv
      */
-    function parseCodeHtmlToCodeText(): string {
-        const inputDiv = inputDivRef.current!;
-        let inputHtml = inputDiv.innerHTML;
+    async function parseTextareaValue(divInnerHtml: string): Promise<string> {
+        let newInputText = divInnerHtml;
 
-        let newInputText = inputHtml;
+        // remove hacky whitespace
+        newInputText = newInputText.replaceAll(TEXTAREA_DIV_WHITESPACE_HTML, "");
+
         // multiline
         newInputText = newInputText.replaceAll(CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_START, CODE_SNIPPET_SEQUENCE_MULTILINE);
         newInputText = newInputText.replaceAll(CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_END, CODE_SNIPPET_SEQUENCE_MULTILINE);
@@ -170,219 +155,159 @@ export default function PlainTextNoteInput({
         newInputText = newInputText.replaceAll(CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_START, CODE_SNIPPET_SEQUENCE_SINGLELINE);
         newInputText = newInputText.replaceAll(CODE_SNIPPET_SEQUENCE_SINGLELINE_HTML_END, CODE_SNIPPET_SEQUENCE_SINGLELINE);
 
-        return newInputText;
-    }
-        
-    /**
-     * Sanitize clipboard text (if allowed) in order to paste plain text in inputs instead of styled html.
-     */
-    async function sanitizeClipboardText(): Promise<void> {
+        // line breaks
+        newInputText = newInputText.replaceAll("<br>", "\n");
 
-        // get clipboard text
-        let clipboardText = await getClipboardText();
+        // parse html unicodes
+        newInputText = stringToHtmlElement(newInputText).textContent;
 
-        // case: nothing copied or permission denied by browser
-        if (isBlank(clipboardText))
-            return;
-
-        // remove styles
-        clipboardText = sanitize(clipboardText, {
-            allowedTags: ["div", "br"],
-            allowedAttributes: {}
-        });
-        // remove special chars
-        clipboardText = cleanUpHtml(clipboardText);
-
-        await setClipboardText(clipboardText);
-    }
-    
-
-    /**
-     * @param html html string
-     * @returns same html string but with some special chars replaced. Does not alter given string
-     */
-    function cleanUpHtml(html: string): string {
-        let cleanHtml = html;
-        cleanHtml = cleanHtml.replaceAll("&amp;", "&");
-        cleanHtml = cleanHtml.replaceAll("&lt;", "<");
-        cleanHtml = cleanHtml.replaceAll("&gt;", ">");
-        cleanHtml = cleanHtml.replaceAll("&nbsp;", " ");
-
-        return cleanHtml;
+        return Promise.resolve(newInputText);
     }
 
     async function handleKeyDownCapture(event: KeyboardEvent): Promise<void> {
         const keyName = event.key;
 
-        if (keyName === "Control")
-            sanitizeClipboardText();
-                
         if (isKeyPressed("Control") && isKeyPressed("Shift") && keyName === "V") {
             event.preventDefault();
             insertCodeSnippetSequence();
-            updateNoteEdited();
         }
-        
-        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]))
-            updateNoteEdited();
         
         if (isKeyPressed("Control") && event.key === "s" && !isSaveButtonDisabled) {
             event.preventDefault();
-            await parseCodeTextToCodeHtml();
-
-            // click note save button
             clickSaveButton();
-
-            // unhighlight
-            parseCodeHtmlToCodeText();
-
-            // move cursor back
-            const cursorPosition = getCursorPos(inputDivRef.current!);
-            moveCursor(inputDivRef.current!, cursorPosition);
         }
     }
 
-    function handleKeyUp(event: KeyboardEvent): void {
-        if (disabled)
-            return;
-
-        if (onKeyUp)
-            onKeyUp(event);
-
-        const keyName = event.key;
-
-        if (keyName === "Backspace" || keyName === "Delete")
-            cleanUpEmptyInputDiv();
-        
-        if (isEventKeyTakingUpSpace(keyName, true, true) && !isControlKeyPressed(["Shift"]))
-            updateNoteEdited();
-    }
-
-    function handleCut(): void {
-        if (getNumCharsSelected(inputDivRef.current!) > 0)
-            updateNoteEdited();
-    }
-
-    function handlePaste(): void {
-        updateNoteEdited();
-    }
-
-    function cleanUpEmptyInputDiv(): void {
-        const inputDiv = inputDivRef.current!;
-        const inputBreaks = inputDiv.querySelectorAll("br");
-        
-        // case: no content left
-        if (isBlank(inputDiv.innerText) && inputBreaks.length <= 1)
-            // clean up empty tags
-            inputDiv.innerHTML = "";
-    }
-
+    /**
+     * Update clipboard text (if allowed) with textarea value.
+     */
     async function handleCopyClick(): Promise<void> {
         animateCopyIcon();
 
-        setClipboardText(inputDivRef.current!.textContent || "");
+        let plainTextInputValue = "";
+
+        // get textarea value
+        let inputElement: HTMLDivElement | HTMLTextAreaElement | null = null;
+        if ((inputElement = getTextarea()))
+            plainTextInputValue = inputElement.value;
+
+        else if ((inputElement = getInputDiv()))
+            plainTextInputValue = await parseTextareaValue(inputElement.innerHTML);
+
+        else {
+            logError("Failed to copy input value to clipboard. Neither input is neither div nor textarea");
+            return;
+        }
+        
+        await setClipboardText(plainTextInputValue);
     }
 
     function activateFullScreenStyles(): void {
         const plainTextNoteInput = componentRef.current!;
+        // const defaultCodeNoteInput = defaultCodeNoteInputRef.current!;
+        const inputDivContainer = inputContainerRef.current!;
 
         const appOverlayZIndex = getCssConstant("overlayZIndex");
 
         plainTextNoteInput.style.position = "fixed";
+        plainTextNoteInput.style.zIndex = appOverlayZIndex + 1;
         plainTextNoteInput.style.width = "90vw";
+        plainTextNoteInput.style.height = "80vh";
+        inputDivContainer.style.maxHeight = "80vh";
         // center
         plainTextNoteInput.style.left = "5vw";
-        plainTextNoteInput.style.zIndex = appOverlayZIndex + 1;
-        plainTextNoteInput.style.height = "80vh";
         plainTextNoteInput.style.top = "10vh";
 
-        inputDivRef.current!.focus();
+        focusInput();
     }
-
 
     function deactivateFullScreenStyles(): void {
         const plainTextNoteInput = componentRef.current!;
+        const inputDivContainer = inputContainerRef.current!;
         
-        // move up just a little bit
-        plainTextNoteInput.style.height = "100%";
-        plainTextNoteInput.style.position = "relative";
-        plainTextNoteInput.style.top = "30px";
+        // resize quickly
         plainTextNoteInput.style.width = "100%";
-        
         plainTextNoteInput.style.left = "auto";
         plainTextNoteInput.style.position = "static";
         plainTextNoteInput.style.top = "auto";
         plainTextNoteInput.style.zIndex = "0";
+        plainTextNoteInput.style.height = "100%";
 
-        inputDivRef.current!.focus();
+        inputDivContainer.style.maxHeight = "var(--noteInputMaxHeight)";
+
+        focusInput();
     }
     
     /**
-     * Appends a default ```<input>``` to the end of the inputDiv.
-     */
-    function appendVariableInput(): void {
-        const inputDiv = inputDivRef.current!;
-        const inputDivChildDivs = inputDiv.querySelectorAll("div");
-        const lastChildDiv = inputDivChildDivs.length ? inputDivChildDivs.item(inputDivChildDivs.length - 1) : inputDiv;
-
-        lastChildDiv.innerHTML = (lastChildDiv.innerHTML + "<code>code</code>");
-    }
-    
-    /**
-     * Inserts a `\`` sequence at current cursor pos.
+     * Inserts a plain text 'code' sequence at current cursor pos.
      */
     function insertCodeSnippetSequence(): void {
+        const textarea = getTextarea()!;
         const variableInputSequence = CODE_SNIPPET_SEQUENCE_SINGLELINE + CODE_SNIPPET_SEQUENCE_SINGLELINE;
         
-        let currentCursorIndex = cursorPos.x;
-        let currentCursorLineNum = cursorPos.y;
-        
-        // all inner divs that represent a line
-        const inputInnerDivs = getContentEditableDivLineElements(inputDivRef.current!);
-        const isFirstLineADiv = inputDivRef.current!.innerHTML.startsWith("<div>")
-        const currentInputDiv = inputInnerDivs[currentCursorLineNum - 1 - (isFirstLineADiv ? 0 : 1)] as HTMLDivElement; // - 2 for item() beeing 0-based and the first line not beeing a div
-        const numInutLines = inputInnerDivs.length + (isFirstLineADiv ? 0 : 1); 
-
-        if (currentCursorIndex === -1 || currentCursorLineNum === -1) {
-            logWarn("Failed to get cursor index or cursor line num");
-            // assume cursor at end of input value
-            currentCursorIndex = inputDivRef.current!.innerText.length - 1;
-            currentCursorLineNum = numInutLines;
+        let cursorIndex = getCursorIndex(textarea);
+        if (cursorIndex === -1) {
+            cursorIndex = textarea.value.length;
+            logWarn("Failed to get cursor index. Inserting variableInputSequence at the end of the input");
         }
+        
+        textarea.value = insertString(textarea.value, variableInputSequence, cursorIndex);
+        handleChange();
 
-        // case: is first line, not a div
-        if (!currentInputDiv)
-            inputDivRef.current!.innerHTML = insertString(
-                inputDivRef.current!.innerHTML,
-                variableInputSequence, 
-                currentCursorIndex
-            );
-
-        // case: is empty line
-        else if (!!currentInputDiv.querySelector("br"))
-            currentInputDiv.innerHTML = variableInputSequence;
-
-        else
-            currentInputDiv.innerText = insertString(
-                currentInputDiv.innerText,
-                variableInputSequence, 
-                currentCursorIndex
-            );
-
-        // move cursor into sequence
+        // select placeholder sequence
         moveCursor(
-            currentInputDiv || inputDivRef.current!, 
+            textarea,
             {
-                x: currentCursorIndex + CODE_SNIPPET_SEQUENCE_SINGLELINE.length,
-                y: 0,
+                x: cursorIndex + CODE_SNIPPET_SEQUENCE_SINGLELINE.length, 
+                y: 0, // not used for textareas
                 selectedChars: 0
             }
         );
     }
 
-    function handleAppendCodeSnippet(): void {
-        appendVariableInput();
-        updateNoteInputEntity();
+    /**
+     * @see {@link insertCodeSnippetSequence}
+     */
+    async function handleInsertPlainTextCodeSequence(): Promise<void> {
+        await focusInput();
+
+        insertCodeSnippetSequence();
+    }
+    
+    /**
+     * @see {@link getTextareaDivDivElement}
+     */
+    function getInputDiv(): HTMLDivElement | null {
+        return getTextareaDivDivElement(componentRef.current);
+    }
+
+    /**
+     * @see {@link getTextareaDivTextareaElement}
+     */
+    function getTextarea(): HTMLTextAreaElement | null {
+        return getTextareaDivTextareaElement(componentRef.current);
+    }
+    
+    /**
+     * Await this in order to make sure that the textarea is rendered:
+     * 
+     * ```
+     * await focusInput();
+     * const textarea = getTextarea()!; // not null
+     * ```
+     */
+    async function focusInput(): Promise<void> {
+        const inputDiv = getInputDiv()!;
+        inputDiv.click();
+        
+        // this is how long it should take for the textarea to be rendered
+        await parseTextareaValue(inputDiv.innerHTML);
+    }
+
+    function handleChange(_event?: FormEvent<HTMLTextAreaElement>): void {
+        const textarea = getTextarea()!;
+        noteInputEntity.value = textarea.value;
+
         updateNoteEdited();
     }
 
@@ -396,32 +321,24 @@ export default function PlainTextNoteInput({
             ref={componentRef}
             {...otherProps}
         >
-            {/* <pre className="inputDivContainer fullWidth">
-                <ContentEditableDiv 
-                    className="plainTextInput fullWidth" 
-                    spellCheck={false} 
-                    setCursorPos={setCursorPos}
-                    ref={inputDivRef}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
+            {/* For focusing the input */}
+            <HiddenInput 
+                onFocus={focusInput} 
+                tabIndex={inputMode === "textarea" ? -1 : 0} // make that "tab back" will not refocus the input
+            />
+            
+            {/* Input */}
+            <div className="inputContainer" ref={inputContainerRef}>
+                <TextareaDiv 
+                    parseDiv={parseDivInnerHtml}
+                    parseTextarea={parseTextareaValue}
+                    defaultValue={inputDefaultValue}
+                    // ref={inputDivRef}
+                    setMode={setInputMode}
+                    onChange={handleChange}
                     onKeyDownCapture={handleKeyDownCapture}
-                    onKeyUp={handleKeyUp}
-                    onCut={handleCut}
-                    onPaste={handlePaste}
-                >
-                    {inputDivValue}
-                </ContentEditableDiv>
-                                
-                <Overlay 
-                    className="noteInputOverlay flexCenter" 
-                    hideOnClick={false}
-                    fadeInDuration={0}
-                    isOverlayVisible={isNoteInputOverlayVisible} 
-                    setIsOverlayVisible={setIsNoteInputOverlayVisible}
-                >
-                    <i className={"fa-solid fa-circle-notch rotating"}></i>
-                </Overlay>
-            </pre> */}
+                />
+            </div>
                     
             <div className="CodeNoteInputWithVariables-buttonContainer">
                 <Flex horizontalAlign="right" flexWrap="nowrap" verticalAlign="start">
@@ -455,14 +372,12 @@ export default function PlainTextNoteInput({
                             <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
                         }
                     </Button>
-                </Flex>
 
-                <Flex horizontalAlign="right" flexWrap="nowrap">
                     {/* Add code highlighted text */}
                     <Button 
-                        className="mt-2 defaultNoteInputButton" 
+                        className="me-1 defaultNoteInputButton" 
                         title="Code snippet (Ctrl + Shift + V)"
-                        onClick={handleAppendCodeSnippet}
+                        onClick={handleInsertPlainTextCodeSequence}
                     >
                         <i className="fa-solid fa-code dontSelectText"></i>
                     </Button>

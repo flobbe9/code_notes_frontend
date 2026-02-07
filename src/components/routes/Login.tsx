@@ -333,7 +333,7 @@ export default function Login({isPopupContent = false, ...props}: Props) {
     function handleOauth2ButtonClick(): void {
 
         localStorage.setItem(EDITED_NOTES_KEY, JSON.stringify(editedNoteEntities));
-        // TODO: continue here
+        // TODO: 
         // window.open(OAUTH2_AUTH_LINK_GOOGLE, "test", "popup=true,width=500,height=700")
         // open
         // authenticate

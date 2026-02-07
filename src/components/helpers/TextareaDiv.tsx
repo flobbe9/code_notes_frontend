@@ -3,12 +3,15 @@ import { logDebug, logError } from "@/helpers/logUtils";
 import { countTextareaLines } from "@/helpers/projectUtils";
 import React, { ChangeEvent, FocusEvent, forwardRef, Fragment, MouseEvent, Ref, RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
 import Sanitized from "./Sanitized";
+import Overlay from "./Overlay";
+import SpinnerIcon from "./icons/SpinnerIcon";
 
 export type TextareaDivMode = "textarea" | "div";
 
 interface Props extends Omit<DefaultProps, "children"> {
     /**
-     * Called upon switching from textarea to div.
+     * Called upon switching from textarea to div. Throwing an error will log to console and
+     * not switch the mode.
      * 
      * @param textareaValue `value` of the textarea element
      * @returns the innerHtml for the div
@@ -16,7 +19,8 @@ interface Props extends Omit<DefaultProps, "children"> {
     parseDiv: (textareaValue: string, textarea: HTMLTextAreaElement) => Promise<string>,
 
     /**
-     * Called upon switching from div to textarea.
+     * Called upon switching from div to textarea. Throwing an error will log to console and
+     * not switch the mode.
      * 
      * @param divInnerHtml innerHtml of the div element
      * @returns the `value` for the textarea
@@ -49,15 +53,14 @@ interface Props extends Omit<DefaultProps, "children"> {
 }
 
 /**
- * Will render a `<textarea>` element while focused and a `<div>` element while unfocused.
+ * Will render a `<textarea>` element while focused and a `<div>` element while unfocused. Will display a pending indicator if parsing
+ * takes longer than 500ms.
+ * NOTE: wrap this component into a 'relative' positioned container for pending overlay to cover only the textareaDiv.
+ * 
+ * Use {@link getTextareaDivDivElement} and {@link getTextareaDivTextareaElement} to retrieve the element.
  * 
  * @since latest
  */
-// TODO: 
-    // comment example on how to retrieve value with dom
-    // MouseDowning on the div while another input is focused will not focus the textarea
-    // selecting the div's text is not possible without converting to textarea
-        // consider double click to focus
 export default forwardRef(function TextareaDiv(
     {
         parseDiv,
@@ -74,6 +77,10 @@ export default forwardRef(function TextareaDiv(
     const [currentContent, setCurrentContent] = useState<string>(defaultValue);
     // the number of lines in the textarea value
     const [textareaRows, setTextareaRows] = useState(-1);
+
+    const [isParsing, setParsing] = useState(false);
+    /** Duration (in ms) a parsing function may take before a pending indicator is beeing displayed */
+    const parsingTakesLongerDuration = 500;
 
     const componentRef = useRef<HTMLDivElement | HTMLTextAreaElement>(null);
     useImperativeHandle(ref, () => componentRef.current! , []);
@@ -92,19 +99,31 @@ export default forwardRef(function TextareaDiv(
         updateModeState(defaultMode);
     }, [defaultMode]);
 
-    async function divToTextarea(): Promise<string | null> {
+    async function divToTextarea(): Promise<void> {
         if (currentMode === "textarea")
-            return null;
+            return;
         
-        const textareaValue = await parseTextarea(divRef.current!.innerHTML, divRef.current!);
+        // prepare pending indicator
+        const parsingTimeout = setTimeout(() => {
+            setParsing(true);
+        }, parsingTakesLongerDuration);
 
-        // case: num lines not initialized yet
-        if (textareaRows < 1)
-            setTextareaRows(countTextareaLines(textareaValue));
+        try {
+            const textareaValue = await parseTextarea(divRef.current!.innerHTML, divRef.current!);
 
-        updateModeState("textarea");
-        updateContentState(textareaValue);
-        return textareaValue;
+            clearTimeout(parsingTimeout);
+            setParsing(false);
+
+            // case: num lines not initialized yet
+            if (textareaRows < 1)
+                setTextareaRows(countTextareaLines(textareaValue));
+            
+            updateModeState("textarea");
+            updateContentState(textareaValue);
+
+        } catch (e) {
+            logError(e);
+        }
     }
 
     async function textareaToDiv(): Promise<void> {
@@ -112,13 +131,20 @@ export default forwardRef(function TextareaDiv(
             return;
         
         try {
+            // prepare pending indicator
+            const parsingTimeout = setTimeout(() => {
+                setParsing(true);
+            }, parsingTakesLongerDuration);
+
             const divInnerHtml = await parseDiv(textareaRef.current!.value, textareaRef.current!);
+            
+            clearTimeout(parsingTimeout);
+            setParsing(false);
 
             updateModeState("div");
             updateContentState(divInnerHtml);
 
         } catch (e) {
-            // TODO
             logError(e);
         }
     }
@@ -133,7 +159,6 @@ export default forwardRef(function TextareaDiv(
             return;
         }
     
-        // TODO: improove focus behaviour
         await divToTextarea();
         setTimeout(() => {
             textareaRef.current!.focus();
@@ -211,6 +236,41 @@ export default forwardRef(function TextareaDiv(
                     {...otherProps} 
                 />
             }
+
+            <Overlay 
+                isOverlayVisible={isParsing} 
+                setIsOverlayVisible={setParsing} 
+            >
+                <SpinnerIcon />
+            </Overlay>
         </Fragment>
     );
-})
+})    
+
+/**
+ * @param parentElement parent container that should have a `<TextareaDiv>` element
+ * @returns the `<div>` element of the first TextareaDiv in `parentElement` or `null`
+ */
+export function getTextareaDivDivElement(parentElement: HTMLElement | null): HTMLDivElement | null {
+    const textareaDiv = parentElement?.querySelector(".TextareaDiv");
+    if (!textareaDiv || !(textareaDiv instanceof HTMLDivElement)) {
+        logDebug(`Failed to get <TextareaDiv> div element. Not a div element right now: ${textareaDiv}`);
+        return null;
+    }
+
+    return textareaDiv;
+}
+
+/**
+ * @param parentElement parent container that should have a `<TextareaDiv>` element
+ * @returns the `<textarea>` element of the first TextareaDiv in `parentElement` or `null`
+ */
+export function getTextareaDivTextareaElement(parentElement: HTMLElement | null): HTMLTextAreaElement | null {
+    const textareaDiv = parentElement?.querySelector(".TextareaDiv");
+    if (!textareaDiv || !(textareaDiv instanceof HTMLTextAreaElement)) {
+        logDebug(`Failed to get <TextareaDiv> textarea element. Not a textarea element right now: ${textareaDiv}`);
+        return null;
+    }
+
+    return textareaDiv;
+}

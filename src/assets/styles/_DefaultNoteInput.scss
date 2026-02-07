@@ -23,7 +23,7 @@
         }
 
         &-dragIcon {
-            font-size: 1.4em;
+            padding-top: 2px;
         }
     }
     
@@ -91,24 +91,84 @@
                 }
             }
         }
+
+        .CodeNoteInputWithVariables, .PlainTextNoteInput {
+            background-color: var(--matteBlack);
+            border-radius: var(--borderRadius);
+            border-bottom-right-radius: 0;
+
+            &.fullScreen {
+                border-radius: var(--borderRadius); // for full screen mode
+                padding: 15px;
+            }
+
+            &:not(.fullScreen) {
+                .TextareaDiv {
+                    &-div, &-textarea {
+                        transition: background-color var(--transitionTime);
+                    }
+                    
+                    &-div {
+                        @include customHover {
+                            &:not(:focus) {
+                                background-color: var(--matteBlackLight);
+                            }
+                        }
+                    }
+        
+                    &-textarea {
+                        @include customFocus {
+                            background-color: var(--matteBlackLighter);
+                        }
+                    }
+                }
+            }
+
+            .inputContainer {
+                color: white;
+                display: block;
+                height: 100%;
+                max-height: var(--noteInputMaxHeight);
+                overflow: hidden;
+                padding-left: var(--codeNoteInputPaddingLeft);
+                width: 100%;
+        
+                .TextareaDiv {            
+                    $lineHeight: 1.6em;
+        
+                    color: white;
+                    height: inherit;
+                    margin: 0;
+        
+                    &-textarea {
+                        background-color: transparent;
+                        border: none;
+                        color: white;
+                        line-height: $lineHeight;
+                        outline: none;
+                        padding: 0;
+        
+                        @include scrollBar();
+                    }
+                    
+                    &-div {
+                        line-height: $lineHeight;
+                        margin: 0;
+                        overflow: auto;
+                        white-space: pre-wrap;
+        
+                        @include scrollBar();
+        
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     pre {
         position: relative;
-    }
-
-    .noteInputOverlay {
-        .overlayBackground {
-            border-radius: var(--borderRadius);
-        }
-
-        .overlayChildrenContainer {
-            @include flexCenter();
-
-            .fa-circle-notch {
-                color: white;
-                font-size: 1.1em;
-            }
-        }
     }
 }

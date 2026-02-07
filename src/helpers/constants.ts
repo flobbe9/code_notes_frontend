@@ -89,6 +89,7 @@ export const CONSOLE_MESSAGES_TO_AVOID: (string | number)[] = [
     "Warning: A component is `contentEditable` and contains `children` managed by React",
 ];
 
+export const TEXTAREA_DIV_WHITESPACE_HTML = "<span> </span>";
 
 // CodeNoteInputWithVariables
 export const VARIABLE_INPUT_SEQUENCE_REGEX = /^.*\$\[\[.*\]\].*$/;

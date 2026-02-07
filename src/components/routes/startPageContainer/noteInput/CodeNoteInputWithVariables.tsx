@@ -1,7 +1,8 @@
 import { CursorPosition } from "@/abstract/CursorPosition";
 import { CODE_BLOCK_WITH_VARIABLES_AUTO_DETECT_LANGUAGE } from "@/abstract/ProgrammingLanguage";
 import HiddenInput from "@/components/helpers/HiddenInput";
-import TextareaDiv, { TextareaDivMode } from "@/components/helpers/TextareaDiv";
+import TextareaDiv, { getTextareaDivDivElement, getTextareaDivTextareaElement, TextareaDivMode } from "@/components/helpers/TextareaDiv";
+import { useHasComponentMounted } from "@/hooks/useHasComponentMounted";
 import hljs from "highlight.js";
 import React, { FormEvent, KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
@@ -9,11 +10,10 @@ import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import "../../../../assets/styles/highlightJs/vs.css";
-import { getDefaultVariableInput, VARIABLE_INPUT_CLASS, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_SEQUENCE_REGEX, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
-import { logWarn } from "../../../../helpers/logUtils";
+import { getDefaultVariableInput, TEXTAREA_DIV_WHITESPACE_HTML, VARIABLE_INPUT_CLASS, VARIABLE_INPUT_DEFAULT_PLACEHOLDER, VARIABLE_INPUT_END_SEQUENCE, VARIABLE_INPUT_START_SEQUENCE } from "../../../../helpers/constants";
+import { logError, logWarn } from "../../../../helpers/logUtils";
 import { getCursorIndex, getCursorPos, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
 import { getCssConstant, getCSSValueAsNumber, insertString, isBlank, setClipboardText, stringToHtmlElement } from "../../../../helpers/utils";
-import { useInitialStyles } from "../../../../hooks/useInitialStyles";
 import { AppContext } from "../../../App";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
@@ -22,11 +22,9 @@ import { DefaultNoteInputContext } from "./DefaultNoteInput";
 import { NoteContext } from "./Note";
 import NoteInputSettings from "./NoteInputSettings";
 
-
 interface Props extends HelperProps {
     noteInputEntity: NoteInputEntity
 }
-
 
 /**
  * Component containing noteInput with the less complex code editor but including variable inputs that are considered by the copy button.
@@ -36,36 +34,30 @@ interface Props extends HelperProps {
  */
 // TODO
     // migration function for input values
-    // white space in span will appear as character
 export default function CodeNoteInputWithVariables({ 
     noteInputEntity,
     disabled,
     onBlur, 
     ...props
 }: Props) {
-    const [inputDefaultValue, setInputDefaultValue] = useState<any>()
+    const [inputDefaultValue, setInputDefaultValue] = useState<string>()
     /** The last known cursor position. This state is only updated on blur, not on change. Use `getCursorPos()` instead */
     const [lastCursorPos, setLastCursorPos] = useState<CursorPosition>({x: 0, y: 1, selectedChars: 0});
     
-    const [hasComponentRendered, sethasComponentRendered] = useState(false);
     const [inputMode, setInputMode] = useState<TextareaDivMode>("div");
+
+    const hasMounted = useHasComponentMounted();
     
     const componentName = "CodeNoteInputWithVariables";
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, componentName);
     
     const componentRef = useRef<HTMLDivElement>(null);
     const inputContainerRef = useRef<HTMLDivElement>(null);
-    /** Use `getTextarea()` or `getInputDiv()` instead */
-    const inputDivRef = useRef<HTMLDivElement | HTMLTextAreaElement>(null);
-
-    const divWhitespace = "<span> </span>";
 
     const { isKeyPressed } = useContext(AppContext);
     const { updateNoteEdited, isSaveButtonDisabled, clickSaveButton } = useContext(NoteContext);
     const { 
         codeNoteInputWithVariablesLanguage, 
-        isNoteInputOverlayVisible,
-        setIsNoteInputOverlayVisible, 
         areNoteInputSettingsDisabled, 
         animateCopyIcon,
         setActivateFullScreenStyles,
@@ -77,27 +69,30 @@ export default function CodeNoteInputWithVariables({
     } = useContext(DefaultNoteInputContext);
     const { componentRef: defaultCodeNoteInputRef } = useContext(DefaultCodeNoteInputContext);
 
-    useInitialStyles(inputDivRef.current, [["max-width", "width"]], 100);
-    
     useEffect(() => {
-        updateInputDefaultValue();
-
-        sethasComponentRendered(true);
+        updateInputDefaultValueState();
 
         setActivateFullScreenStyles(() => {return activateFullScreenStyles});
         setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
-
-        if (focusOnRender)
-            setTimeout(() => 
-                inputDivRef.current?.focus(), 10); // default text will be removed otherwise
     }, []);
 
     useEffect(() => {
         handleLanguageChange();
     }, [codeNoteInputWithVariablesLanguage]);
 
-    async function updateInputDefaultValue(): Promise<void> {
-        setInputDefaultValue(await parseDivInnerHtml(noteInputEntity?.value));
+    async function updateInputDefaultValueState(): Promise<void> {
+        let defaultValue = noteInputEntity?.value;
+
+        // only parse if not converting back to textarea anyway 
+        if (!focusOnRender) 
+            defaultValue = await parseDivInnerHtml(noteInputEntity?.value);
+
+        setInputDefaultValue(defaultValue);
+
+        if (focusOnRender)
+            setTimeout(() => {
+                focusInput();
+            }, 10); // default text would disappear otherwise
     }
     
     /**
@@ -123,17 +118,18 @@ export default function CodeNoteInputWithVariables({
     async function parseDivInnerHtml(textareaValue: string, _textarea?: HTMLTextAreaElement): Promise<string> {
         if (isBlank(textareaValue))
             // empty divs have slightly less height, so put a whitespace inside
-            return divWhitespace;
+            return TEXTAREA_DIV_WHITESPACE_HTML;
 
-        textareaValue = await highlightAndReplaceVariableInputSequences(textareaValue);
+        let divInnerHtml = textareaValue;
+        divInnerHtml = await highlightAndReplaceVariableInputSequences(divInnerHtml);
         // replace line breaks that are inside a sequence. 
-        textareaValue = textareaValue.replaceAll("\n", "<br>");
+        divInnerHtml = divInnerHtml.replaceAll("\n", "<br>");
 
         // append the weird span with a whitespace because a div ending with a <br> element will only render it if there's content after 
-        if (textareaValue.endsWith("<br>"))
-            textareaValue += divWhitespace;
+        if (divInnerHtml.endsWith("<br>"))
+            divInnerHtml += TEXTAREA_DIV_WHITESPACE_HTML;
 
-        return textareaValue;
+        return divInnerHtml;
     }
 
     /**
@@ -146,7 +142,7 @@ export default function CodeNoteInputWithVariables({
             return "";
 
         // remove hacky whitespace
-        divInnerHtml = divInnerHtml.replaceAll(divWhitespace, "");
+        divInnerHtml = divInnerHtml.replaceAll(TEXTAREA_DIV_WHITESPACE_HTML, "");
         divInnerHtml = divInnerHtml.replaceAll("<br>", "\n");
         // only leave <input> elements and their "placeholder" attribute behind
         divInnerHtml = sanitize(divInnerHtml, {
@@ -161,16 +157,6 @@ export default function CodeNoteInputWithVariables({
         divInnerHtml = stringToHtmlElement(divInnerHtml).textContent;
 
         return divInnerHtml;
-    }
-
-    /**
-     * Indicates whether given `str` includes variable input sequence that is to be replaced with a variable `<input>`.
-     * 
-     * @param str to check
-     * @returns `true` if given `str` includes a `$[[` followed by a `]]`. See {@link VARIABLE_INPUT_SEQUENCE_REGEX}
-     */
-    function includesVariableInputSequence(str: string): boolean {
-        return !isBlank(str) && str.replaceAll("\n", "\\n").match(VARIABLE_INPUT_SEQUENCE_REGEX) !== null;
     }
 
     /**
@@ -266,7 +252,21 @@ export default function CodeNoteInputWithVariables({
      * Copy content of inputDiv to clipboard replacing `<input>`s with their value.
      */
     async function copyInputDivContentToClipboard(): Promise<void> {
-        let inputDivHtml = getInputDiv()?.innerHTML;
+        let inputDivHtml = "";
+
+        // get the div input value
+        let inputElement: HTMLDivElement | HTMLTextAreaElement | null = null;
+        if ((inputElement = getTextarea()))
+            inputDivHtml = await parseDivInnerHtml(inputElement.value);
+
+        else if ((inputElement = getInputDiv()))
+            inputDivHtml = inputElement.innerHTML;
+
+        else {
+            logError("Failed to copy input value to clipboard. Neither input is neither div nor textarea");
+            return;
+        }
+        
         if (isBlank(inputDivHtml))
             return;
 
@@ -329,6 +329,8 @@ export default function CodeNoteInputWithVariables({
         defaultCodeNoteInput.style.top = "10vh";
         inputDivContainer.style.height = "80vh";
         inputDivContainer.style.maxHeight = "80vh";
+
+        focusInput();
     }
 
     function deactivateFullScreenStyles(): void {
@@ -345,13 +347,12 @@ export default function CodeNoteInputWithVariables({
         defaultCodeNoteInput.style.top = "auto";
         defaultCodeNoteInput.style.zIndex = "0";
         
-        const inputDiv = getInputDiv()!;
-        inputDiv.focus();
+        focusInput();
     }
 
     async function handleLanguageChange(): Promise<void> {
         // case: called on load
-        if (!hasComponentRendered)
+        if (!hasMounted)
             return;
 
         // "rehighlight"
@@ -379,29 +380,17 @@ export default function CodeNoteInputWithVariables({
     }
 
     /**
-     * @returns the textareaDiv element assuming that it's currently rendered as textarea. `null` if it is not
+     * @see {@link getTextareaDivDivElement}
      */
-    function getTextarea(): HTMLTextAreaElement | null {
-        const textareaDiv = componentRef.current!.querySelector(".TextareaDiv");
-        if (!textareaDiv || !(textareaDiv instanceof HTMLTextAreaElement)) {
-            logWarn(`Invalid access of textareaDiv ref. Not a textarea element right now: ${textareaDiv}`);
-            return null;
-        }
-
-        return textareaDiv;
+    function getInputDiv(): HTMLDivElement | null {
+        return getTextareaDivDivElement(componentRef.current);
     }
 
     /**
-     * @returns the inputDiv element assuming that it's currently rendered as div. `null` if it is not
+     * @see {@link getTextareaDivTextareaElement}
      */
-    function getInputDiv(): HTMLDivElement | null {
-        const inputDiv = componentRef.current!.querySelector(".TextareaDiv");
-        if (!inputDiv || !(inputDiv instanceof HTMLDivElement)) {
-            logWarn(`Invalid access of inputDiv ref. Not a textarea element right now: ${inputDiv}`);
-            return null;
-        }
-
-        return inputDiv;
+    function getTextarea(): HTMLTextAreaElement | null {
+        return getTextareaDivTextareaElement(componentRef.current);
     }
 
     function handleInputMouseEvent(event: MouseEvent): void {
@@ -447,13 +436,13 @@ export default function CodeNoteInputWithVariables({
                 onFocus={focusInput} 
                 tabIndex={inputMode === "textarea" ? -1 : 0} // make that "tab back" will not refocus the input
             />
+
             {/* Input */}
-            <code className="inputContainer" ref={inputContainerRef}>
+            <div className="inputContainer" ref={inputContainerRef}>
                 <TextareaDiv 
                     parseDiv={parseDivInnerHtml}
                     parseTextarea={parseTextareaValue}
                     defaultValue={inputDefaultValue}
-                    ref={inputDivRef}
                     setMode={setInputMode}
                     onChange={handleChange}
                     onBlurCapture={(e) => setLastCursorPos(getCursorPos(e.target))}
@@ -461,7 +450,7 @@ export default function CodeNoteInputWithVariables({
                     onMouseDown={handleInputMouseEvent}
                     onClick={handleInputMouseEvent}
                 />
-            </code>
+            </div>
 
             {/* Controls */}
             <div className={`${componentName}-buttonContainer`}>

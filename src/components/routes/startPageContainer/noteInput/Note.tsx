@@ -144,7 +144,7 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
     useEffect(() => {
         setIsSaveButtonDisabled(getIsSaveButtonDisabled());
 
-    }, [isLoggedIn, editedNoteEntities, noteEntity]); // TODO: remove isLoggedIn?
+    }, [isLoggedIn, editedNoteEntities, noteEntity]);
 
 
     function mapNoteInputsToJsx(): JSX.Element[] {

@@ -754,7 +754,6 @@ export async function getClipboardText(): Promise<string> {
  * @param text to copy to clipboard
  */
 export async function setClipboardText(text: string): Promise<void> {
-
     navigator.clipboard.writeText(text);
 }
 
@@ -1207,8 +1206,8 @@ export function jsonParseDontThrow<ReturnType>(value: string | null | undefined)
         return JSON.parse(value!);
 
     } catch (e) {
-        logDebug(e.message);
-        return null;
+        logDebug((e as Error).message);
+        return null ;
     }
 }
 

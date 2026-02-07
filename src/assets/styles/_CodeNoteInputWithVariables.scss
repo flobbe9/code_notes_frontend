@@ -9,9 +9,6 @@
 }
 
 .CodeNoteInputWithVariables {
-    background-color: var(--matteBlack);
-    border-radius: var(--borderRadius);
-    border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
     color: white;
 
@@ -21,76 +18,12 @@
         }
     }
     
-    &.fullScreen {
-        border-radius: var(--borderRadius); // for full screen mode
-        padding: 15px;
-    }
-
-    &:not(.fullScreen) {
-        .TextareaDiv {
-            &-div, &-textarea {
-                transition: background-color var(--transitionTime);
-            }
-            
-            &-div {
-                @include customHover {
-                    &:not(:focus) {
-                        background-color: var(--matteBlackLight);
-                    }
-                }
-            }
-
-            &-textarea {
-                @include customFocus {
-                    background-color: var(--matteBlackLighter);
-                }
-            }
-        }
-    }
-
     .inputContainer {
         border-left: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
         border-right: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
-        color: white;
-        display: block;
-        height: 100%;
-        max-height: var(--noteInputMaxHeight);
-        overflow: hidden;
-        width: 100%;
 
         .TextareaDiv {
-            $lineHeight: 1.6em;
-
-            height: inherit;
-            margin: 0;
-            
-            &-textarea {
-                background-color: transparent;
-                border: none;
-                color: white;
-                line-height: $lineHeight;
-                outline: none;
-                padding: 0;
-                padding-left: var(--codeNoteInputPaddingLeft);
-                // padding: 10px var(--noteInputPaddingX);
-
-                @include scrollBar();
-            }
-            
             &-div {
-                line-height: $lineHeight;
-                margin: 0;
-                overflow: auto;
-                padding-left: var(--codeNoteInputPaddingLeft);
-                // padding: 10px var(--noteInputPaddingX);
-                white-space: pre-wrap;
-
-                @include scrollBar();
-
-                &:focus {
-                    outline: none;
-                }
-
                 .variableInput {
                     background-color: var(--codeGreyLight);
                     border: var(--variableInputBorderWidth) solid transparent;
