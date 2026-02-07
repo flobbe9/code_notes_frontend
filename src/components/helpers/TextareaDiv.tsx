@@ -59,7 +59,7 @@ interface Props extends Omit<DefaultProps, "children"> {
  * 
  * Use {@link getTextareaDivDivElement} and {@link getTextareaDivTextareaElement} to retrieve the element.
  * 
- * @since latest
+ * @since 1.1.0
  */
 export default forwardRef(function TextareaDiv(
     {
