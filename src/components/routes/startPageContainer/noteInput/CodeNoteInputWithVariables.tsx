@@ -32,8 +32,6 @@ interface Props extends HelperProps {
  * @since 0.0.1
  * 
  */
-// TODO
-    // migration function for input values
 export default function CodeNoteInputWithVariables({ 
     noteInputEntity,
     disabled,
