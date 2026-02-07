@@ -274,7 +274,6 @@ export async function flashClass(element: HTMLElement, classToAdd: string, class
  * @returns a Promise which resolves once styles are reset
  */
 export async function flashCss(element: HTMLElement, flashCss: CSSProperties, holdTime = 1000): Promise<void> {
-    
     return new Promise((res, rej) => {
         if (!element) {
             rej("'elementId' falsy");
@@ -284,12 +283,13 @@ export async function flashCss(element: HTMLElement, flashCss: CSSProperties, ho
         const initCss: CSSProperties = {};
 
         // set flash styles
-        Object.entries(flashCss).forEach(([cssProp, cssVal]) => {
+        Object.entries(flashCss).forEach(([key, val]) => {
+            const cssProp = key as keyof CSSProperties;
             // save init css entry
             initCss[cssProp] = element.style[cssProp];
 
             // set flash css value
-            element.style[cssProp] = cssVal;
+            element.style[cssProp] = val;
         })
 
         // reset flash styles
@@ -754,7 +754,6 @@ export async function getClipboardText(): Promise<string> {
  * @param text to copy to clipboard
  */
 export async function setClipboardText(text: string): Promise<void> {
-
     navigator.clipboard.writeText(text);
 }
 
@@ -1052,13 +1051,11 @@ export function stopAnimations(element: HTMLElement): void {
         .forEach(animation => animation.cancel());
 }
 
-
 /**
  * @param strNode to parse to element. Should be one node but may have any number of children
  * @returns the html element or an empty ```<div>``` element if arg is falsy
  */
 export function stringToHtmlElement(strNode: string): HTMLElement {
-
     const parser = new DOMParser();
 
     if (isBlank(strNode))
@@ -1068,7 +1065,6 @@ export function stringToHtmlElement(strNode: string): HTMLElement {
 
     return parsedDocument.head.firstChild as HTMLElement || parsedDocument.body.firstChild as HTMLElement;
 }
-
 
 /**
  * @param element to add class from
@@ -1210,8 +1206,8 @@ export function jsonParseDontThrow<ReturnType>(value: string | null | undefined)
         return JSON.parse(value!);
 
     } catch (e) {
-        logDebug(e.message);
-        return null;
+        logDebug((e as Error).message);
+        return null ;
     }
 }
 

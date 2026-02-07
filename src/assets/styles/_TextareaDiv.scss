@@ -1,0 +1,16 @@
+.TextareaDiv {
+    width: 100%;
+
+    &-textarea {
+        display: block; // make sure height behaves normally
+        height: fit-content;
+        resize: none;
+    }
+
+    // &-div {
+    // }
+
+    &:hover {
+        cursor: text;
+    }
+}

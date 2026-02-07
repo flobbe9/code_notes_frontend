@@ -537,6 +537,7 @@ export const CODE_BLOCK_LANGUAGES: ProgrammingLanguage[] = [
         ]
     },
     {
+        name: "sass",
         aliases: [
             "Sass",
             "sass",
@@ -677,10 +678,13 @@ export const CODE_BLOCK_LANGUAGES: ProgrammingLanguage[] = [
     }
 ]
 
-
+export const CODE_BLOCK_WITH_VARIABLES_AUTO_DETECT_LANGUAGE = "_auto";
 export const CODE_BLOCK_WITH_VARIABLES_LANGUAGES: ProgrammingLanguage[] = [
     {
-        name: "_auto"
+        name: CODE_BLOCK_WITH_VARIABLES_AUTO_DETECT_LANGUAGE,
+        aliases: [
+            "auto"
+        ]
     },
     {
         name: "1C",
@@ -1621,10 +1625,6 @@ export const CODE_BLOCK_WITH_VARIABLES_LANGUAGES: ProgrammingLanguage[] = [
         aliases: [
             "SAS",
             "sas"
-        ]
-    },
-    {
-        aliases: [
         ]
     },
     {

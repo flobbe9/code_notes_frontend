@@ -3,15 +3,12 @@
 
 :root {
     --variableInputFontFamily: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --variableInputFontSize: 1em;
+    --variableInputFontSize: 1rem;
     --variableInputPaddingLeftRight: 0px;
     --variableInputBorderWidth: 2px;
 }
 
 .CodeNoteInputWithVariables {
-    background-color: var(--matteBlack);
-    border-radius: var(--borderRadius);
-    border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
     color: white;
 
@@ -21,74 +18,31 @@
         }
     }
     
-    &.fullScreen {
-        border-radius: var(--borderRadius); // for full screen mode
-        padding: 15px;
-        
-        .inputDiv {
-            max-height: unset;
-        }
-    }
+    .inputContainer {
+        border-left: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
+        border-right: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
 
-    &:not(.fullScreen) {
-        .inputDiv {
-            transition: background-color var(--transitionTime);
+        .TextareaDiv {
+            &-div {
+                .variableInput {
+                    background-color: var(--codeGreyLight);
+                    border: var(--variableInputBorderWidth) solid transparent;
+                    border-radius: var(--borderRadius);
+                    font-family: var(--variableInputFontFamily);
+                    font-size: var(--variableInputFontSize);
+                    line-height: 1em;
+                    margin: 0 2px;
+                    min-width: 50px;
+                    padding: 0px var(--variableInputPaddingLeftRight);
 
-            @include customHover {
-                &:not(:focus) {
-                    background-color: var(--matteBlackLight);
-                }
-            }
-            @include customFocus {
-                background-color: var(--matteBlackLighter);
-            }
-        }
-    }
-
-    .inputDivContainer {
-        margin: 0;
-        
-        code {
-            height: 100%;
-            display: block;
-        }
-        
-        .inputDiv {
-            border-left: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
-            border-right: var(--noteInputDefaultBorder) var(--codeNoteInputWithVariablesColor);
-            line-height: 1.6em;
-            height: 100%;
-            margin: 0;
-            max-height: var(--noteInputMaxHeight);
-            min-height: 41px;
-            overflow: auto;
-            padding: 10px var(--noteInputPaddingX);
-            white-space: pre-wrap;
-
-            @include scrollBar();
-
-            &:focus {
-                outline: none;
-            }
-
-            .variableInput {
-                background-color: var(--codeGreyLight);
-                border: var(--variableInputBorderWidth) solid transparent;
-                border-radius: var(--borderRadius);
-                font-family: var(--variableInputFontFamily);
-                font-size: var(--variableInputFontSize);
-                line-height: 1em;
-                margin: 0 2px;
-                min-width: 50px;
-                padding: 0px var(--variableInputPaddingLeftRight);
-
-                &:focus {
-                    border-color: var(--accentColor);
-                    outline: none;
-                }
-                
-                &:not(:focus) {
-                    @include hover();
+                    &:focus {
+                        border-color: var(--accentColor);
+                        outline: none;
+                    }
+                    
+                    &:not(:focus) {
+                        @include hover();
+                    }
                 }
             }
         }

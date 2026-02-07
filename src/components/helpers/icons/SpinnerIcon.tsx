@@ -4,7 +4,6 @@ import { IconProps } from "../../../abstract/IconProps";
 
 
 interface Props extends IconProps {
-
     /** Default is ```true``` */
     rotating?: boolean,
 }

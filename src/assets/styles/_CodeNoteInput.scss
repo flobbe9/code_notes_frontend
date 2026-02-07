@@ -22,19 +22,23 @@
         // not focused, not disabled, hover
         &:has(textarea:not(:focus)) {
             &:has(.overflow-guard:not([disabled]):hover) {
-                .overflow-guard, .lines-content { 
+                .inputContainer, .lines-content { 
                     background-color: var(--matteBlackLight);
                 }
             }
         }
         &:has(textarea:not([disabled]):focus) {
-            .overflow-guard, .lines-content {
+            .inputContainer, .lines-content {
                 background-color: var(--matteBlackLighter) !important;
             }
         }
     }
     
-    .editorContainer {
+    .inputContainer {    
+        background-color: var(--matteBlack);               
+        border-left: var(--noteInputDefaultBorder) var(--codeNoteInputColor);
+        border-right: var(--noteInputDefaultBorder) var(--codeNoteInputColor);
+        
         // = <Editor /> tag
         section {
             background-color: var(--matteBlack);
@@ -46,14 +50,7 @@
                 
                 .overflow-guard {
                     background-color: var(--matteBlack);
-                    border-left: var(--noteInputDefaultBorder) var(--codeNoteInputColor);
-                    border-right: var(--noteInputDefaultBorder) var(--codeNoteInputColor);
                     transition: background-color var(--transitionTime), width var(--transitionTime);
-                    
-                    /** line number container */
-                    .margin {
-                        left: 0;
-                    }
                     
                     /** text container */
                     .monaco-scrollable-element {
@@ -82,10 +79,6 @@
                                 // }
                             }
                         }
-                    }
-                        
-                    .minimap {
-                        display: none;
                     }
                 }
             }

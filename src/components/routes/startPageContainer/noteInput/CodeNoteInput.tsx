@@ -32,12 +32,9 @@ interface Props extends DefaultProps {
  * @since 0.0.1
  */
 export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
-    /** Height of one line of the monaco vscode editor in px */
-    const editorLineHeight = 19; // px
-
+    const editorLineHeight = 26;
     /** Min number of lines visible on render */
     const minNumInitialLines = 3;
-
     const maxNumLines = 15;
 
     const [isEditorMounted, setIsEditorMounted] = useState(false);
@@ -45,7 +42,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     const [fullEditorWidth, setFullEditorWidth] = useState<number>(NaN);
     const [editorWidth, setEditorWidth] = useState("100%");
     const [editorTransition, setEditorTransition] = useState(0);
-    const [numEditorLines, setNumEditorLines] = useState(1);
+    // const [numEditorLines, setNumEditorLines] = useState(1);
     const [editorHeight, setEditorHeight] = useState(0);
     const [editorKey, setEditorKey] = useState("initialKey");
 
@@ -69,6 +66,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "CodeNoteInput");
 
     const componentRef = useRef<HTMLDivElement>(null);
+    const inputContainerRef = useRef<HTMLDivElement>(null);
     // assigned in editor mount function
     const editorRef = useRef<editor.IStandaloneCodeEditor>(null);
     const copyButtonRef = useRef(null);
@@ -76,8 +74,10 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     
     useEffect(() => {
         setAreNoteInputSettingsDisabled(true);
-        updateFullScreenSetterStates();
-        
+
+        setActivateFullScreenStyles(() => {return activateFullScreenStyles});
+        setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
+
         setEditorHeight(getInitialEditorHeight());
     }, []);
 
@@ -87,14 +87,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     }, [isEditorMounted, editorRef.current]);
     
-    useEffect(() => {
-        if (isEditorMounted)
-            updateActualEditorHeight();
-
-        updateFullScreenSetterStates();
-
-    }, [editorHeight, numEditorLines]);
-
     useEffect(() => {
         if (isEditorMounted)
             updateActualEditorWidth(); 
@@ -135,11 +127,10 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
     useWindowResizeCallback(handleWindowResize);
 
-    function handleChange(value: string): void {
-        if (!isFullScreen)
-            setTimeout(() => setNumEditorLines(getNumEditorValueLines(value)), 5);
+    function handleChange(value: string | undefined, _ev: editor.IModelContentChangedEvent): void {
+        updateActualEditorHeight();
 
-        updateNoteEntity(value);
+        updateNoteEntity(value ?? null);
 
         updateNoteEdited();
     }
@@ -155,11 +146,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         noteInputEntity.programmingLanguage = codeNoteInputLanguage;
     }
 
-    function updateFullScreenSetterStates(): void {
-        setActivateFullScreenStyles(() => {return activateFullScreenStyles});
-        setDeactivateFullScreenStyles(() => {return deactivateFullScreenStyles});
-    }
-
     /**
      * @param value complete content of the editor
      * @returns the current number of lines of the editor value
@@ -172,52 +158,35 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
      * Check if editor height still fits number of rendered lines and adjust if not.
      */
     function updateActualEditorHeight(): void {
-        const editorLinesHeightComparison = compareEditorHeightToLinesHeight();
+        // make sure there's always additional space of 2 lines for readability 
+        const targetHeight = (getNumEditorValueLines(editorRef.current!.getValue()) * editorLineHeight) + (2 * editorLineHeight);
+        const heightDiff = targetHeight - editorHeight;
+        const lineDiff = Math.ceil(heightDiff / editorLineHeight);
 
-        // increase editor height if possible
-        if (editorLinesHeightComparison === -1 && !isMaxEditorHeight())
-            handleAddLine();
-        
-        // decrease editor height if possible
-        else if (editorLinesHeightComparison === 1 && !isMinEditorHeight())
-            handleRemoveLine();
+        // case: editor height needs at least one more line
+        if (lineDiff > 0) {
+            for (let i = 0; i < lineDiff; i++)
+                handleAddLine();
+
+        // case: editor height is at least one line too  high
+        } else if (lineDiff < 0) {
+            for (let i = 0; i < Math.abs(lineDiff); i++)
+                handleRemoveLine();
+        }
     }
 
-    /**
-     * Describes the height of the editor in comparison to the height of all rendered editor lines.
-     * 
-     * Ideally the editor is always 2 lines higher than the current number of lines rendered.
-     * 
-     * @returns -1 if the editor is too small, 0 if it's the right height and 1 if it's too big
-     */
-    function compareEditorHeightToLinesHeight(): number {
-        const totalEditorLinesHeight = getTotalEditorLinesHeight();
-        const heightDifference = editorHeight - totalEditorLinesHeight - (1 * editorLineHeight);
-
-        // dont devide by 0
-        if (heightDifference === 0)
-            return 0;
-        
-        return heightDifference / Math.abs(heightDifference);
-    }
-
-    /**
-     * @returns the total height of all lines inside the editor
-     */
-    function getTotalEditorLinesHeight(): number {
-        return numEditorLines * editorLineHeight;
-    }
-    
     function handleAddLine(): void {
-        // case: reached max editor height
         if (isMaxEditorHeight())
             return;
 
-        setEditorHeight(editorHeight + 19);
+        setEditorHeight((prev) => prev + editorLineHeight);
     }
 
     function handleRemoveLine(): void {
-        setEditorHeight(editorHeight - 19);
+        if (isMinEditorHeight())
+            return;
+
+        setEditorHeight((prev) => prev - editorLineHeight);
     }
 
     /**
@@ -229,8 +198,6 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
 
         if (numEditorValueLines < minNumInitialLines)
             numEditorValueLines = minNumInitialLines;
-
-        numEditorValueLines++;
 
         return numEditorValueLines * editorLineHeight;
     }
@@ -322,7 +289,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         return componentRef.current!.querySelector("section") as HTMLElement;
     }
 
-    async function handleCopyClick(event): Promise<void> {
+    async function handleCopyClick(): Promise<void> {
         animateCopyIcon();
 
         setClipboardText((editorRef.current as any).getValue())
@@ -351,8 +318,8 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
     
 
     function activateFullScreenStyles(): void {
-        const editor = getOuterEditorContainer()!;
         const defaultCodeNoteInput = defaultCodeNoteInputRef!.current!
+        const editorContainer = inputContainerRef.current!;
 
         const appOverlayZIndex = getCssConstant("overlayZIndex");
 
@@ -361,18 +328,19 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         defaultCodeNoteInput.style.width = "90vw";
         // center
         defaultCodeNoteInput.style.left = "5vw";
-        editor.style.width = "100%";
-        editor.style.maxHeight = "unset";
+        editorContainer.style.width = "100%";
+        editorContainer.style.maxHeight = "unset";
         updateFullEditorWidth();
 
         defaultCodeNoteInput.style.top = "10vh";
-        editor.style.height = "80vh";
+        editorContainer.style.height = "80vh";
 
         editorRef.current!.focus();
     }
 
     function deactivateFullScreenStyles(): void {
-        const defaultCodeNoteInput = defaultCodeNoteInputRef!.current!
+        const defaultCodeNoteInput = defaultCodeNoteInputRef!.current!;
+        const editorContainer = inputContainerRef.current!;
         
         // move up just a little bit
         defaultCodeNoteInput.style.position = "relative";
@@ -382,7 +350,9 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         defaultCodeNoteInput.style.width = "100%";
         updateFullEditorWidth();
         updateActualEditorWidth();
-        
+
+        editorContainer.style.height = "unset";
+
         defaultCodeNoteInput.style.left = "auto";
         defaultCodeNoteInput.style.position = "static";
         defaultCodeNoteInput.style.top = "auto";
@@ -430,7 +400,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
             {...otherProps}
         >
             {/* Editor */}
-            <div className="fullWidth editorContainer">
+            <div className="fullWidth inputContainer" ref={inputContainerRef} onClick={() => editorRef.current!.focus()}>
                 <Editor 
                     key={editorKey}
                     className="vsCodeEditor" 
@@ -438,6 +408,12 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
                     language={codeNoteInputLanguage.toLowerCase()}
                     theme="vs-dark"
                     defaultValue={noteInputEntity.value}
+                    options={{
+                        lineNumbers: 'off',
+                        minimap: {
+                            enabled: false
+                        }
+                    }}
                     onChange={handleChange}
                     onMount={handleEditorMount}
                 />
@@ -472,17 +448,15 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
                         title={isFullScreen ? "Normal screen" : "Fullscreen"}
                         disabled={areNoteInputSettingsDisabled}
                         ref={fullScreenButtonRef}
-                        onClick={toggleFullScreen}
+                        onClick={(e) => {toggleFullScreen(e); updateActualEditorHeight();}}
                     >
                         {isFullScreen ?
                             <i className="fa-solid fa-down-left-and-up-right-to-center"></i> :
                             <i className="fa-solid fa-up-right-and-down-left-from-center"></i>
                         }
                     </Button>
-                </Flex>
 
-                <Flex className="fullWidth" horizontalAlign="right">
-                    <NoteInputSettings noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
+                    <NoteInputSettings className="me-1" noteInputEntity={noteInputEntity} areNoteInputSettingsDisabled={areNoteInputSettingsDisabled} />
                 </Flex>
             </div>
                 

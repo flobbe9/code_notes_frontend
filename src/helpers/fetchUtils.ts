@@ -95,7 +95,6 @@ export async function fetchAny(url: string, method = "get", body?: any, headers?
  *          {@link CustomExceptionFormat} object
  */
 export async function fetchAnyReturnBlobUrl(url: string, method = "get", body?: object, headers?: HeadersInit): Promise<string | CustomExceptionFormat> {
-
     const response = await fetchAny(url, method, body, headers);
 
     // case: request failed

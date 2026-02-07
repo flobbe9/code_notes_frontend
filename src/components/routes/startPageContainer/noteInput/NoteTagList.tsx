@@ -98,7 +98,6 @@ export default function NoteTagList({...props}: Props) {
      * @param index of the tag to remove
      */
     function removeTagEntity(index: number): void {
-
         const tagToRemove = noteEntity.tags!.splice(index, 1)[0];
 
         if (!tagToRemove || !appUserEntity.tags)

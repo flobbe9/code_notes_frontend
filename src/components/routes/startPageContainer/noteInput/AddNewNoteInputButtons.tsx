@@ -23,7 +23,7 @@ interface Props extends DefaultProps {
 export default function AddNewNoteInputButtons({...props}: Props) {
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "AddNewNoteInputButtons");
 
-    const { isLoggedIn, notesUseQueryResult, editedNoteEntities } = useContext(AppFetchContext);
+    const { isLoggedIn, editedNoteEntities } = useContext(AppFetchContext);
     const { 
         noteEntity, 
         updateNoteEdited, 
@@ -31,7 +31,6 @@ export default function AddNewNoteInputButtons({...props}: Props) {
         gotNewNoteInputs,
         setGotNewNoteInputs
     } = useContext(NoteContext);
-
 
     function handleAddCodeNoteInput(): void {
         // case: not noteInputs yet
@@ -41,7 +40,6 @@ export default function AddNewNoteInputButtons({...props}: Props) {
         appendNoteInputEntity(getNewNoteInputEntityCode());
     }
 
-
     function handleAddPlainTextNoteInput(): void {
         // case: not noteInputs yet
         if (!noteEntity.noteInputs)
@@ -50,23 +48,19 @@ export default function AddNewNoteInputButtons({...props}: Props) {
         appendNoteInputEntity(getNewNoteInputEntityPlainText());
     }
 
-
     function handleAddCodeNoteInputWithVariables(): void {
-
         // case: not noteInputs yet
         if (!noteEntity.noteInputs)
             noteEntity.noteInputs = [];
  
         appendNoteInputEntity(getNewNoteInputEntityWithVariables());
     }
-
     
     function getNewNoteInputEntityPlainText(): NoteInputEntity {
         let value = "";
-        const noteEntities = isLoggedIn ? notesUseQueryResult.data.results : editedNoteEntities;
 
         // case: is first note and first noteInput
-        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("PLAIN_TEXT"))
+        if (!isLoggedIn && editedNoteEntities.length === 1 && !hasNoteEntityNoteInputOfType("PLAIN_TEXT"))
             // add tutorial text
             value = `Plain text and some ${CODE_SNIPPET_SEQUENCE_SINGLELINE}code...${CODE_SNIPPET_SEQUENCE_SINGLELINE}`;
 
@@ -78,10 +72,9 @@ export default function AddNewNoteInputButtons({...props}: Props) {
 
     function getNewNoteInputEntityWithVariables(): NoteInputEntity {
         let value = "";
-        const noteEntities = isLoggedIn ? notesUseQueryResult.data.results : editedNoteEntities;
 
         // case: is first note and first noteInput
-        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE_WITH_VARIABLES"))
+        if (!isLoggedIn && editedNoteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE_WITH_VARIABLES"))
             // add tutorial text
             value = `x = ${getDefaultVariableInput()} can be copied to the clipboard. Change the programming language on the right.`;
 
@@ -92,14 +85,11 @@ export default function AddNewNoteInputButtons({...props}: Props) {
         }
     }
 
-    
     function getNewNoteInputEntityCode(): NoteInputEntity {
-
         let value = "";
-        const noteEntities = isLoggedIn ? notesUseQueryResult.data.results : editedNoteEntities;
 
         // case: is first note and first noteInput
-        if (noteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE"))
+        if (!isLoggedIn && editedNoteEntities.length === 1 && !hasNoteEntityNoteInputOfType("CODE"))
             // add tutorial text
             value = "VSCode Editor. Change the programming language on the right.";
 
@@ -109,17 +99,14 @@ export default function AddNewNoteInputButtons({...props}: Props) {
         }
     }
 
-
     /**
      * @param noteInputType note input type to look for
      * @returns ```true``` if this ```noteEntity``` has at least one noteInput with given type
      */
     function hasNoteEntityNoteInputOfType(noteInputType: NoteInputType): boolean {
-        
         return !!noteEntity.noteInputs?.find(noteInputEntity => 
             noteInputEntity.type === noteInputType);
     }
-
 
     /**
      * Appends given ```noteInputEntity```. A new noteInput will be appended in ```<Note>```.
@@ -141,7 +128,6 @@ export default function AddNewNoteInputButtons({...props}: Props) {
         updateNoteEdited();
     }
  
-
     return (
         <Flex 
             id={id} 
@@ -170,7 +156,7 @@ export default function AddNewNoteInputButtons({...props}: Props) {
                     onClick={handleAddCodeNoteInput}
                 >
                     <i className="fa-solid fa-plus me-2"></i>
-                    <img src="/img/vsStudio_purple.png" className="vsStudioIcon" alt="vscode" height={20} />
+                    <img src="/img/vsCode.png" className="vsCodeIcon" alt="vsCode" height={20} />
                 </ButtonWithSlideLabel> 
             </div>
 
