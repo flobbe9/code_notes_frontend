@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
-import Flex from "../../helpers/Flex";
-import SettingsLeft from "./SettingsLeft";
 import { AppContext } from "../../App";
+import Flex from "../../helpers/Flex";
 import HelperDiv from "../../helpers/HelperDiv";
 import Overlay from "../../helpers/Overlay";
+import SettingsLeft from "./SettingsLeft";
 
 
 interface Props extends DefaultProps {
@@ -45,7 +45,7 @@ export default function Settings({...props}: Props) {
                     <SettingsLeft className="col-md-3" />
 
                     {/* hr */}
-                    <HelperDiv className={`${componentName}-container-pseudoHr col-md-1 mx-5`} rendered={!isMobileWidth}></HelperDiv>
+                    <HelperDiv className={`${componentName}-container-pseudoHr mx-5`} rendered={!isMobileWidth}>&nbsp;</HelperDiv>
 
                     {/* Right */}
                     <div className={`${componentName}-container-right col-md-8`}>
