@@ -4,10 +4,10 @@ import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { NoteInputType } from "../../../../abstract/NoteInputType";
 import { CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE, CODE_SNIPPET_SEQUENCE_SINGLELINE, getDefaultVariableInput } from "../../../../helpers/constants";
 import { sleep } from "../../../../helpers/utils";
-import { AppFetchContext } from "../../../AppFetchContextProvider";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
 import Flex from "../../../helpers/Flex";
-import { NoteContext } from "./Note";
+import { NoteContext } from "@/context/NoteContext";
 
 
 interface Props extends DefaultProps {

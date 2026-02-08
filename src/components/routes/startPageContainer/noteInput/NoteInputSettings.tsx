@@ -8,9 +8,9 @@ import { animateAndCommit, getCssConstant, includesIgnoreCaseTrim, isEventKeyTak
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
 import SearchBar from "../../../helpers/SearchBar";
-import { DefaultNoteInputContext } from "./DefaultNoteInput";
+import { DefaultNoteInputContext } from "@/context/DefaultNoteInputContext";
 import LanguageSearchResults from "./LanguageSearchResults";
-import { NoteContext } from "./Note";
+import { NoteContext } from "@/context/NoteContext";
 
 
 interface Props extends DefaultProps {

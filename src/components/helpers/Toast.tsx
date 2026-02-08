@@ -1,7 +1,7 @@
 import { forwardRef, LegacyRef, useContext } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { isBlank } from "../../helpers/utils";
-import { AppContext } from "../App";
+import { AppContext } from "@/context/AppContext";
 import Flex from "./Flex";
 
 

@@ -1,4 +1,5 @@
-import { createContext, RefObject, useRef } from "react";
+import { DefaultCodeNoteInputContext } from "@/context/DefaultCodeNoteInputContext";
+import { useRef } from "react";
 import { DefaultNoteInputProps } from "../../../../abstract/DefaultNoteInputProps";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import Flex from "../../../helpers/Flex";
@@ -42,8 +43,3 @@ export default function DefaultCodeNoteInput({noteInputEntity, propsKey, focusOn
         </DefaultCodeNoteInputContext.Provider>
     )
 }
-
-
-export const DefaultCodeNoteInputContext = createContext({
-    componentRef: {} as RefObject<HTMLDivElement | null>
-});

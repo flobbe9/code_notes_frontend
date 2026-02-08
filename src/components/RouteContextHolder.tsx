@@ -1,8 +1,9 @@
-import { createContext, Fragment, useContext, useEffect } from "react";
+import { AppContext } from "@/context/AppContext";
+import { RouteContext } from "@/context/RouteContext";
+import { Fragment, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PROTOCOL } from "../helpers/constants";
 import { replaceCurrentBrowserHistoryEntry, scrollTop } from "../helpers/utils";
-import { AppContext } from "./App";
 
 
 
@@ -60,13 +61,7 @@ export default function RouteContextHolder({children}) {
 
     return (
         <RouteContext.Provider value={context}>
-
             <Fragment>{children}</Fragment>
         </RouteContext.Provider>
     );
 }
-
-
-export const RouteContext = createContext({
-    clearUrlQueryParams:(_removeFromHistory = true) => {}
-})

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { AppContext } from "../components/App";
+import { AppContext } from "@/context/AppContext";
 
 
 /**

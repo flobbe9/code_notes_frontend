@@ -5,11 +5,11 @@ import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";
 import { matchStringsConsiderWhiteSpace } from "../../../helpers/searchUtils";
 import { getRandomString, isBlank } from "../../../helpers/utils";
-import { AppFetchContext } from "../../AppFetchContextProvider";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import HelperDiv from "../../helpers/HelperDiv";
-import { StartPageContainerContext } from "./StartPageContainer";
-import { StartPageSideBarContext } from "./StartPageSideBar";
+import { StartPageContainerContext } from "@/context/StartPageContainerContext";
 import TagCheckbox from "./TagCheckbox";
+import { StartPageSideBarContext } from "@/context/StartPageSideBarContext";
 
 
 interface Props extends HelperProps {

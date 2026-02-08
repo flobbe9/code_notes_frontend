@@ -4,7 +4,7 @@ import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps"
 import { POPUP_FADE_DURATION } from "../../helpers/constants";
 import { fadeIn, fadeOut } from "../../helpers/utils";
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
-import { AppContext } from "../App";
+import { AppContext } from "@/context/AppContext";
 import Button from "./Button";
 import Flex from "./Flex";
 import HelperDiv from "./HelperDiv";

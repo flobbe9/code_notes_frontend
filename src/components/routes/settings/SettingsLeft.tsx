@@ -2,12 +2,12 @@ import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { PROFILE_PATH } from "../../../helpers/constants";
-import { AppContext } from "../../App";
+import { AppContext } from "@/context/AppContext";
 import Button from "../../helpers/Button";
 import Flex from "../../helpers/Flex";
 import HelperDiv from "../../helpers/HelperDiv";
 import SideBar from "../../helpers/SideBar";
-import { SettingsContext } from "./Settings";
+import { SettingsContext } from "@/context/SettingsContext";
 
 
 interface Props extends DefaultProps {

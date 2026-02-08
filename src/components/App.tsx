@@ -1,9 +1,10 @@
-import { createContext, JSX, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
+import { AppContext } from '@/context/AppContext';
+import { JSX, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, pauseAnimations, playAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
-import AppFetchContextProvider from "./AppFetchContextProvider";
+import AppFetchContextProvider from './AppFetchContextProvider';
 import Footer from "./Footer";
 import ConditionalComponent from './helpers/ConditionalComponent';
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
@@ -454,32 +455,3 @@ export default function App() {
         </AppContext.Provider>
     );
 }
-
-
-export const AppContext = createContext({
-    toast: (_summary: string, _message = "", _sevirity: ToastSevirity = "info", _screenTime?: number) => {},
-    forceToastTimeout: (_screentTime?: number) => {},
-    moveToast: (_hideToast = false, _screenTime?: number) => {},
-
-    windowSize: [0, 0],
-    isMobileWidth: false as boolean,
-    isTableWidth: false as boolean,
-    isDesktopWidth: false as boolean,
-
-    isKeyPressed: (_keyName: string): boolean => {return false},
-    isControlKeyPressed: (_nonControlKeys?: string[]) => {return false as boolean},
-    pressedKeys: new Set() as Set<string>,
-
-    isAppOverlayVisible: false,
-    setIsAppOverlayVisible: (_isVisible: boolean) => {},
-    isAppOverlayHideOnClick: true,
-    setIsAppOverlayHideOnClick: (_isHideOnClick: boolean) => {},
-    setIsAppOverlayHideOnEscape: (_isHideOnEscape: boolean) => {},
-    setAppOverlayContent: (_overlayContent: JSX.Element | JSX.Element[]) => {},
-    showPendingOverlay: (_overlayContent?: ReactNode) => {},
-    hidePendingOverlay: () => {},
-
-    showPopup: (_popupContent?: ReactNode | undefined) => {},
-    hidePopup: () => {},
-    replacePopupContent: (_content: ReactNode | undefined) => {},
-});

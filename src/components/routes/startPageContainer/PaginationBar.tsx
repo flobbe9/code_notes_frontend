@@ -1,9 +1,10 @@
-import { createContext, Fragment, JSX, useContext, useEffect, useState } from "react";
+import { AppContext } from "@/context/AppContext";
+import { PaginationBarContext } from "@/context/PaginationBarContext";
+import { Fragment, JSX, useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { isNumberFalsy } from "../../../helpers/utils";
-import { AppContext } from "../../App";
 import Button from "../../helpers/Button";
 import Flex from "../../helpers/Flex";
 import HelperDiv from "../../helpers/HelperDiv";
@@ -274,12 +275,6 @@ export default function PaginationBar({
     )
 }
 
-
-const PaginationBarContext = createContext({
-    getCurrentPage: () => 1 as number,
-    setCurrentPage: (_page: number) => {}
-})
-        
 
 /**
  * Renders exactly one page number with a click event updating the ```currentPage```.

@@ -1,10 +1,11 @@
-import { createContext, forwardRef, JSX, KeyboardEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { AppContext } from '@/context/AppContext';
+import { SelectContext } from "@/context/SelectContext";
+import { forwardRef, JSX, KeyboardEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import HelperProps from '../../abstract/HelperProps';
 import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
 import { addClass, getRandomString, slideDown, slideUp } from "../../helpers/utils";
 import { useHasComponentMounted } from "../../hooks/useHasComponentMounted";
-import { AppContext } from '../App';
 import Flex from './Flex';
 import HelperDiv from './HelperDiv';
 import SelectOption from './SelectOption';
@@ -316,8 +317,4 @@ export default forwardRef(function Select(
             </HelperDiv>
         </SelectContext.Provider>
     );
-});
-
-export const SelectContext = createContext({
-    selectedOptions: new Set<string>()
 });

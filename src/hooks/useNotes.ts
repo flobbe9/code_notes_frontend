@@ -7,7 +7,7 @@ import { NoteEntity } from '../abstract/entites/NoteEntity';
 import { createSearchNoteResultDtoInstance, SearchNoteResultDto } from "../abstract/SearchNoteResultDto";
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { NoteEntityService } from "../abstract/services/NoteEntityService";
-import { AppContext } from "../components/App";
+import { AppContext } from "@/context/AppContext";
 import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NOTE_PAGE_URL_QUERY_PARAM, NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, NOTE_SEARCH_TAGS_URL_QUERY_PARAM, NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR, NUM_NOTES_PER_PAGE, START_PAGE_PATH } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { logWarn } from "../helpers/logUtils";

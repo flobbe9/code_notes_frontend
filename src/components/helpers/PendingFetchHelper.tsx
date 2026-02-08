@@ -1,6 +1,6 @@
 import { DefinedUseQueryResult } from "@tanstack/react-query";
 import { Fragment, ReactNode, useContext, useEffect } from "react";
-import { AppContext } from "../App";
+import { AppContext } from "@/context/AppContext";
 
 
 interface Props {

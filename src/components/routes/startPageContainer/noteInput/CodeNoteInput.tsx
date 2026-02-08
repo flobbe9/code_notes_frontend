@@ -9,10 +9,10 @@ import { animateAndCommit, getCssConstant, getCSSValueAsNumber, getRandomString,
 import useWindowResizeCallback from "../../../../hooks/useWindowResizeCallback";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
-import { StartPageContainerContext } from "../StartPageContainer";
-import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
-import { DefaultNoteInputContext } from "./DefaultNoteInput";
-import { NoteContext } from "./Note";
+import { StartPageContainerContext } from "@/context/StartPageContainerContext";
+import { DefaultCodeNoteInputContext } from "@/context/DefaultCodeNoteInputContext";
+import { DefaultNoteInputContext } from "@/context/DefaultNoteInputContext";
+import { NoteContext } from "@/context/NoteContext";
 import NoteInputSettings from "./NoteInputSettings";
 
 

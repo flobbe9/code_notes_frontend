@@ -14,12 +14,12 @@ import { getDefaultVariableInput, TEXTAREA_DIV_WHITESPACE_HTML, VARIABLE_INPUT_C
 import { logError, logWarn } from "../../../../helpers/logUtils";
 import { getCursorIndex, getCursorPos, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
 import { getCssConstant, getCSSValueAsNumber, insertString, isBlank, setClipboardText, stringToHtmlElement } from "../../../../helpers/utils";
-import { AppContext } from "../../../App";
+import { AppContext } from "@/context/AppContext";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
-import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
-import { DefaultNoteInputContext } from "./DefaultNoteInput";
-import { NoteContext } from "./Note";
+import { DefaultCodeNoteInputContext } from "@/context/DefaultCodeNoteInputContext";
+import { DefaultNoteInputContext } from "@/context/DefaultNoteInputContext";
+import { NoteContext } from "@/context/NoteContext";
 import NoteInputSettings from "./NoteInputSettings";
 
 interface Props extends HelperProps {

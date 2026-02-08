@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { AppFetchContext } from "../components/AppFetchContextProvider";
-import { RouteContext } from "../components/RouteContextHolder";
+import { AppFetchContext } from "@/context/AppFetchContext";
+import { RouteContext } from "@/context/RouteContext";
 import { CSRF_TOKEN_URL_QUERY_PARAM } from "../helpers/constants";
 import { getCsrfToken, setCsrfToken } from "../helpers/projectUtils";
 

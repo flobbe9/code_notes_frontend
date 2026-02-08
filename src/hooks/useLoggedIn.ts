@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect } from "react";
-import { AppContext } from "../components/App";
+import { AppContext } from "@/context/AppContext";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { useLocation } from "react-router-dom";

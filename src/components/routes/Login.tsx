@@ -8,9 +8,8 @@ import { getHeadTitleText, setCsrfToken } from "../../helpers/projectUtils";
 import { getCurrentUrlWithoutWWW, isBlank, isNumberFalsy, stringToNumber } from "../../helpers/utils";
 import { useFormInput } from "../../hooks/useFormInput";
 import { EDITED_NOTES_KEY } from "../../hooks/useNotes";
-import { RouteContext } from "../RouteContextHolder";
-import { AppContext } from "./../App";
-import { AppFetchContext } from "./../AppFetchContextProvider";
+import { RouteContext } from "@/context/RouteContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import Button from "./../helpers/Button";
 import Flex from "./../helpers/Flex";
 import Head from "./../helpers/Head";
@@ -20,6 +19,7 @@ import Oauth2LoginButton from "./../Oauth2LoginButton";
 import ResendConfirmationMail from "./../ResendConfirmationMail";
 import SendPasswordResetMail from "./../SendPasswordResetMail";
 import Register from "./Register";
+import { AppContext } from "@/context/AppContext";
 
 
 interface Props extends DefaultProps {

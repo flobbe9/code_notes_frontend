@@ -5,8 +5,8 @@ import { CustomExceptionFormatService } from "../../../../abstract/services/Cust
 import { BACKEND_BASE_URL } from "../../../../helpers/constants";
 import { fetchAny, isResponseError } from "../../../../helpers/fetchUtils";
 import { getCurrentUrlWithoutWWW, isBlank } from "../../../../helpers/utils";
-import { AppContext } from "../../../App";
-import { AppFetchContext } from "../../../AppFetchContextProvider";
+import { AppContext } from "@/context/AppContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import ResetPassword from "../../../ResetPassword";
 import Button from "../../../helpers/Button";
 import Confirm from "../../../helpers/Confirm";

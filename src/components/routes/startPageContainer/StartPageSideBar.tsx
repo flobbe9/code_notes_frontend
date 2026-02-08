@@ -1,13 +1,14 @@
-import { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from "react";
+import { AppContext } from "@/context/AppContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
+import { StartPageSideBarContext } from "@/context/StartPageSideBarContext";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
-import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextProvider";
+import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../helpers/constants";
 import Button from "../../helpers/Button";
 import SearchBar from "../../helpers/SearchBar";
 import SideBar from "../../helpers/SideBar";
-import { StartPageContainerContext } from "./StartPageContainer";
+import { StartPageContainerContext } from "@/context/StartPageContainerContext";
 import StartPageSideBarTagList from "./StartPageSideBarTagList";
-import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../helpers/constants";
 
 
 interface Props extends DefaultProps {
@@ -135,8 +136,3 @@ export default function StartPageSideBar({...props}: Props) {
         </StartPageSideBarContext.Provider>
     )
 }
-
-
-export const StartPageSideBarContext = createContext({
-    searchValue: ""
-})

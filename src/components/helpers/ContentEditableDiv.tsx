@@ -4,7 +4,7 @@ import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import { getCursorIndex, getCursorLineNum } from "../../helpers/projectUtils";
 import { getClipboardText, includesIgnoreCase, isBlank, isEmpty, isEventKeyTakingUpSpace } from "../../helpers/utils";
-import { AppContext } from "../App";
+import { AppContext } from "@/context/AppContext";
 import HelperDiv from "./HelperDiv";
 import HiddenInput from "./HiddenInput";
 

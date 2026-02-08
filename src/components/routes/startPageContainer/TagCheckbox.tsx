@@ -2,9 +2,9 @@ import { KeyboardEvent, useContext, useRef } from "react";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";
-import { AppFetchContext } from "../../AppFetchContextProvider";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import Checkbox from "../../helpers/Checkbox";
-import { StartPageContainerContext } from "./StartPageContainer";
+import { StartPageContainerContext } from "@/context/StartPageContainerContext";
 
 
 interface Props extends HelperProps {

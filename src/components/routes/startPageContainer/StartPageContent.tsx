@@ -1,4 +1,7 @@
-import { ChangeEvent, createContext, JSX, useContext, useEffect, useRef, useState } from "react";
+import { AppContext } from "@/context/AppContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
+import { StartPageContentContext } from "@/context/StartPageContentContext";
+import { ChangeEvent, JSX, useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
@@ -6,8 +9,6 @@ import { NOTE_SEARCH_PHRASE_MIN_LENGTH, NOTE_SEARCH_PHRASE_USER_INPUT_DELAY } fr
 import { getRandomString, isBlank } from "../../../helpers/utils";
 import { useCsrfToken } from "../../../hooks/useCsrfToken";
 import AddNewNoteButton from "../../AddNewNoteButton";
-import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextProvider";
 import Confirm from "../../helpers/Confirm";
 import Flex from "../../helpers/Flex";
 import PendingFetchHelper from "../../helpers/PendingFetchHelper";
@@ -333,16 +334,3 @@ export default function StartPageContent({...props}: Props) {
         </StartPageContentContext.Provider>
     )
 }
-
-
-export const StartPageContentContext = createContext({
-    notes: [<></>],
-    setNotes: (_notes: JSX.Element[]) => {},
-    mapNoteEntitiesToJsx: (_noteEntities: NoteEntity[]): JSX.Element[] => [],
-
-    setIsFocusFirstNote: (_focus: boolean) => {},
-
-    createNoteByNoteEntity: (_noteEntity: NoteEntity, _focusOnRender = false) => {return <></>},
-    isSearchingNotes: () => false as boolean,
-    isEditingNotes: () => false as boolean
-})

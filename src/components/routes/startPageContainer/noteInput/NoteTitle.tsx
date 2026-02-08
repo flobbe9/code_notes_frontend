@@ -2,8 +2,8 @@ import { forwardRef, KeyboardEvent, Ref, useContext, useEffect, useImperativeHan
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { INVALID_INPUT_CLASS_NAME, MAX_NOTE_TITLE_VALUE_LENGTH } from "../../../../helpers/constants";
 import { flashClass, isEventKeyTakingUpSpace } from "../../../../helpers/utils";
-import { AppContext } from "../../../App";
-import { NoteContext } from "./Note";
+import { AppContext } from "@/context/AppContext";
+import { NoteContext } from "@/context/NoteContext";
 
 
 interface Props extends DefaultProps {

@@ -8,7 +8,7 @@ import { fetchAny, isResponseError } from "../../helpers/fetchUtils";
 import { getHeadTitleText } from "../../helpers/projectUtils";
 import { getCurrentUrlWithoutWWW, isBlank } from "../../helpers/utils";
 import { useFormInput } from "../../hooks/useFormInput";
-import { AppContext } from "../App";
+import { AppContext } from "@/context/AppContext";
 import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
 import Head from "../helpers/Head";

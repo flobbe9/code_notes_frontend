@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";
 import { isBlank, setCssConstant } from "../helpers/utils";
-import { AppContext } from "./App";
+import { AppContext } from "@/context/AppContext";
 import Flex from "./helpers/Flex";
 import HelperDiv from "./helpers/HelperDiv";
 

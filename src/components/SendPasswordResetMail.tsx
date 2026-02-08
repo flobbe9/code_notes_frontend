@@ -7,7 +7,7 @@ import { BACKEND_BASE_URL, EMAIL_REGEX, LOGIN_PATH, POPUP_FADE_DURATION } from "
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { isBlank } from "../helpers/utils";
 import { useFormInput } from "../hooks/useFormInput";
-import { AppContext } from "./App";
+import { AppContext } from "@/context/AppContext";
 import Button from "./helpers/Button";
 import TextInput from "./helpers/TextInput";
 import Login from "./routes/Login";

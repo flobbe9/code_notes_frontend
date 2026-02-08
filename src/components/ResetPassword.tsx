@@ -6,8 +6,8 @@ import { BACKEND_BASE_URL, LOGIN_PATH, PASSWORD_REGEX, RESET_PASSWORD_BY_TOKEN_P
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { getCurrentUrlWithoutWWW, isBlank, replaceCurrentBrowserHistoryEntry } from "../helpers/utils";
 import { useFormInput } from "../hooks/useFormInput";
-import { AppContext } from "./App";
-import { AppFetchContext } from "./AppFetchContextProvider";
+import { AppContext } from "@/context/AppContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import Button from "./helpers/Button";
 import Flex from "./helpers/Flex";
 import Head from "./helpers/Head";

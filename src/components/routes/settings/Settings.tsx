@@ -1,6 +1,7 @@
-import { createContext, useContext, useState } from "react";
+import { AppContext } from "@/context/AppContext";
+import { SettingsContext } from "@/context/SettingsContext";
+import { useContext, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
-import { AppContext } from "../../App";
 import Flex from "../../helpers/Flex";
 import HelperDiv from "../../helpers/HelperDiv";
 import Overlay from "../../helpers/Overlay";
@@ -56,11 +57,3 @@ export default function Settings({...props}: Props) {
         </SettingsContext.Provider>
     )
 }
-
-
-export const SettingsContext = createContext({
-    isSettingsOverlayVisible: false as boolean, 
-    setIsSettingsOverlayVisible: (_isVisible: boolean) => {},
-    isSettingsSideBarVisible: false as boolean, 
-    setIsSettingsSideBarVisible: (_isVisible: boolean) => {}
-})

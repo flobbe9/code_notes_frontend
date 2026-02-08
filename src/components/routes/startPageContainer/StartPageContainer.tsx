@@ -1,9 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { AppContext } from "@/context/AppContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
+import { StartPageContainerContext } from "@/context/StartPageContainerContext";
+import { useCallback, useContext, useEffect, useState } from "react";
 import DefaultProps from "../../../abstract/DefaultProps";
 import { getHeadTitleText } from "../../../helpers/projectUtils";
 import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, removeConfirmPageUnload } from "../../../helpers/utils";
-import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextProvider";
 import Flex from "../../helpers/Flex";
 import Head from "../../helpers/Head";
 import StartPageContent from "./StartPageContent";
@@ -106,15 +107,3 @@ export default function StartPageContainer({children, ...props}: Props) {
         </StartPageContainerContext.Provider>
     )
 }
-
-
-export const StartPageContainerContext = createContext({
-    isStartPageSideBarVisible: false, 
-    setIsStartPageSideBarVisible: (_isShow: boolean) => {},
-
-    isUpdateSideBarTagList: true as (boolean | undefined), 
-    setIsUpdateSideBarTagList: ((_update: boolean | undefined) => {}) as React.Dispatch<React.SetStateAction<boolean | undefined>>,
-    updateStartPageSideBarTagList: () => {},
-
-    getStartPageSideBarWidth: () => {return 0 as number},
-});

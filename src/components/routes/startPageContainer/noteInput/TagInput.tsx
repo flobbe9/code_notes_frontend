@@ -5,13 +5,13 @@ import { AppUserService } from "../../../../abstract/services/AppUserService";
 import { TagEntityService } from "../../../../abstract/services/TagEntityService";
 import { MAX_TAG_INPUT_VALUE_LENGTH } from "../../../../helpers/constants";
 import { getJsxElementIndexByKey, isBlank, shortenString } from "../../../../helpers/utils";
-import { AppContext } from "../../../App";
-import { AppFetchContext } from "../../../AppFetchContextProvider";
+import { AppContext } from "@/context/AppContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
-import { StartPageContainerContext } from "../StartPageContainer";
-import { NoteContext } from "./Note";
-import { NoteTagListContext } from "./NoteTagList";
+import { StartPageContainerContext } from "@/context/StartPageContainerContext";
+import { NoteContext } from "@/context/NoteContext";
+import { NoteTagListContext } from "@/context/NoteTagListContext";
 import { logWarn } from "../../../../helpers/logUtils";
 
 

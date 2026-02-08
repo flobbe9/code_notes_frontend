@@ -1,13 +1,13 @@
+import { AppContext } from "@/context/AppContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import { forwardRef, MouseEvent, Ref, useContext } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";
 import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { isResponseError } from "../helpers/fetchUtils";
-import { AppContext } from "./App";
-import { AppFetchContext } from "./AppFetchContextProvider";
 import Button from "./helpers/Button";
-import { StartPageContentContext } from "./routes/startPageContainer/StartPageContent";
+import { StartPageContentContext } from "@/context/StartPageContentContext";
 
 
 interface Props extends HelperProps {

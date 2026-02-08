@@ -1,13 +1,14 @@
-import { createContext, JSX, useContext, useEffect, useRef, useState } from "react";
+import { AppFetchContext } from "@/context/AppFetchContext";
+import { NoteContext } from "@/context/NoteContext";
+import { NoteTagListContext } from "@/context/NoteTagListContext";
+import { JSX, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { TagEntity } from "../../../../abstract/entites/TagEntity";
 import { AppUserService } from "../../../../abstract/services/AppUserService";
 import { TagEntityService } from "../../../../abstract/services/TagEntityService";
 import { getRandomString, isBlank } from '../../../../helpers/utils';
-import { AppFetchContext } from "../../../AppFetchContextProvider";
 import Flex from "../../../helpers/Flex";
 import HelperDiv from "../../../helpers/HelperDiv";
-import { NoteContext } from "./Note";
 import TagInput from "./TagInput";
 
 
@@ -196,15 +197,3 @@ export default function NoteTagList({...props}: Props) {
         </NoteTagListContext.Provider>
     )
 }
-
-
-export const NoteTagListContext = createContext({
-    getTagElementIndex: (_key: string | number) => {return -1 as number},
-    addTag: () => {},
-    addTagEntity: (_tag: TagEntity) => {},
-    removeTag: (_index: number) => {},
-    removeTagEntity: (_index: number) => {},
-    getNumBlankTags: () => {return 1 as number},
-    tags: [<></>],
-    noteTagEntities: [{}] as (TagEntity[] | null)
-})
