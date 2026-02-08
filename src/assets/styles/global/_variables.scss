@@ -16,16 +16,19 @@ $desktopMinWidth: 992px;
     --codeGreyLight: rgb(231, 231, 231);
     --matteBlack: #1d1e1f;
     --matteBlackLight: #292929;
-    --matteBlackLighter: #3a3a3a;
+    --matteBlackLighter: #020202;
+    --matteBlue: rgb(21, 1, 70);
+    --matteBlueLight: rgb(31, 4, 94);
 
     // TODO: idea for new colors
     // --matteBlack: rgb(21, 1, 70);
     // --matteBlackLight: rgb(21, 1, 70);
     // --matteBlackLighter: rgb(31, 4, 94);
-    // --matteBlue: #000;
 
-    --matteBlue: rgb(21, 1, 70);
-    --matteBlueLight: rgb(31, 4, 94);
+    // --matteBlue: #1d1e1f;
+    // --matteBlue: #fff;
+    // --matteBlueLight: #292929;
+
     --overlayZIndex: 10;
     --saveColor: rgb(0, 255, 0, 1);
     --toastZindex: calc(var(--overlayZIndex) + 1);

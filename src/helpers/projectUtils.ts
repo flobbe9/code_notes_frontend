@@ -34,7 +34,12 @@ export function getContentEditableDivLineElements(contentEditableDiv: HTMLDivEle
     return Array.from(contentEditableDiv.querySelectorAll("div:not(:empty)"));
 }
 
-
+/**
+ * 
+ * @deprecated
+ * @param element 
+ * @returns 
+ */
 export function isContentEditableDiv(element: HTMLElement): boolean {
     return element && element instanceof HTMLDivElement && (element as HTMLDivElement).isContentEditable
 }
@@ -163,7 +168,7 @@ export function getCursorLineNum(inputElement: MovableCursorElement): number {
         return value.substring(0, cursorIndex).split("\n").length;
     }
 
-    if (inputElement instanceof HTMLDivElement) {
+    if (isContentEditableDiv(inputElement)) {
         const documentSelection = document.getSelection();
         // the selection start index
         const initialAnchorOffset = documentSelection?.anchorOffset!;
@@ -269,6 +274,7 @@ export function getTextWidth(text: string, fontSize: string, fontFamily: string,
 }
     
 /**
+ * @deprecated
  * @param text string to clean up. Wont be altered
  * @returns same text string but with some special chars replaced
 */
