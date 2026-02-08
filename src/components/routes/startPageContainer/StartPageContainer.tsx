@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import DefaultProps from "../../../abstract/DefaultProps";
 import { getHeadTitleText } from "../../../helpers/projectUtils";
 import { confirmPageUnload, getCssConstant, getCSSValueAsNumber, getCurrentUrlWithoutWWW, removeConfirmPageUnload } from "../../../helpers/utils";
@@ -110,10 +110,10 @@ export default function StartPageContainer({children, ...props}: Props) {
 
 export const StartPageContainerContext = createContext({
     isStartPageSideBarVisible: false, 
-    setIsStartPageSideBarVisible: (isShow: boolean) => {},
+    setIsStartPageSideBarVisible: (_isShow: boolean) => {},
 
     isUpdateSideBarTagList: true as (boolean | undefined), 
-    setIsUpdateSideBarTagList: ((update: boolean | undefined) => {}) as React.Dispatch<React.SetStateAction<boolean | undefined>>,
+    setIsUpdateSideBarTagList: ((_update: boolean | undefined) => {}) as React.Dispatch<React.SetStateAction<boolean | undefined>>,
     updateStartPageSideBarTagList: () => {},
 
     getStartPageSideBarWidth: () => {return 0 as number},

@@ -1,4 +1,4 @@
-import React, { createContext, Fragment, useContext, useEffect, useState } from "react";
+import { createContext, Fragment, useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
@@ -277,7 +277,7 @@ export default function PaginationBar({
 
 const PaginationBarContext = createContext({
     getCurrentPage: () => 1 as number,
-    setCurrentPage: (page: number) => {}
+    setCurrentPage: (_page: number) => {}
 })
         
 

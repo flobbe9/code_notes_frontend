@@ -1,4 +1,4 @@
-import React, { HTMLAttributeAnchorTarget } from "react";
+import { HTMLAttributeAnchorTarget } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";
 import { Oauth2ClientRegistrationId } from "../abstract/Oauth2ClientRegistrationId";

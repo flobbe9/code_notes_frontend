@@ -1,4 +1,4 @@
-import React, { createContext, Fragment, useContext, useEffect } from "react";
+import { createContext, Fragment, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PROTOCOL } from "../helpers/constants";
 import { replaceCurrentBrowserHistoryEntry, scrollTop } from "../helpers/utils";
@@ -38,7 +38,7 @@ export default function RouteContextHolder({children}) {
      * 
      * @param removeFromHistory indicates whether to remove the browser history entry with the url query params. Default is ```true```
      */
-    function clearUrlQueryParams(removeFromHistory = true): void {
+    function clearUrlQueryParams(_removeFromHistory = true): void {
 
         replaceCurrentBrowserHistoryEntry();
 
@@ -68,5 +68,5 @@ export default function RouteContextHolder({children}) {
 
 
 export const RouteContext = createContext({
-    clearUrlQueryParams:(removeFromHistory = true) => {}
+    clearUrlQueryParams:(_removeFromHistory = true) => {}
 })

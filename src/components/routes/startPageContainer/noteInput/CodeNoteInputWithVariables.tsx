@@ -4,7 +4,7 @@ import HiddenInput from "@/components/helpers/HiddenInput";
 import TextareaDiv, { getTextareaDivDivElement, getTextareaDivTextareaElement, TextareaDivMode } from "@/components/helpers/TextareaDiv";
 import { useHasComponentMounted } from "@/hooks/useHasComponentMounted";
 import hljs from "highlight.js";
-import React, { FormEvent, KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";

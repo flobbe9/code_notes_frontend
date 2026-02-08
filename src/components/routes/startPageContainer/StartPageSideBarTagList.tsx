@@ -1,5 +1,5 @@
 import { useClickOutside } from "@/hooks/useClickOutside";
-import React, { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";

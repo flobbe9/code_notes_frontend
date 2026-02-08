@@ -1,6 +1,6 @@
 import HiddenInput from '@/components/helpers/HiddenInput';
 import TextareaDiv, { getTextareaDivDivElement, getTextareaDivTextareaElement, TextareaDivMode } from '@/components/helpers/TextareaDiv';
-import React, { FormEvent, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../../../abstract/HelperProps";

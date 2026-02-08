@@ -5,16 +5,20 @@ import { NoteEntity } from "./entites/NoteEntity";
  * 
  * @since 1.0.0
  */
-export class SearchNoteResultDto {
+export interface SearchNoteResultDto {
     /** The paginated search results */
     results: NoteEntity[];
     /** The total number of search results */
     totalResults: number
 
-    static emptyInstance(): SearchNoteResultDto {
-        return {
-            results: [],
-            totalResults: 0
-        }
+}
+
+/**
+ * @returns new  object with default values
+ */
+export function createSearchNoteResultDtoInstance(): SearchNoteResultDto {
+    return {
+        results: [],
+        totalResults: 0
     }
 }

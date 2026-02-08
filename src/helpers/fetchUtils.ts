@@ -68,7 +68,7 @@ export async function fetchAny(url: string, method = "get", body?: any, headers?
             response = await fetch(url, fetchConfig);
 
         } catch (e) {
-            return handleFetchError(e, url);
+            return handleFetchError(e as Error, url);
         }
 
     } finally {

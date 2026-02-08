@@ -1,4 +1,4 @@
-import React, { forwardRef, MouseEvent, Ref, useContext } from "react";
+import { forwardRef, MouseEvent, Ref, useContext } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
 import HelperProps from "../abstract/HelperProps";

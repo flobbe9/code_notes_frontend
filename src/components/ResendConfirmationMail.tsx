@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
@@ -61,7 +61,7 @@ export default function ResendConfirmationMail({isParentPopupContent, ...props}:
     }, []);
 
 
-    async function handleFormSubmit(event: React.MouseEvent): Promise<void> {
+    async function handleFormSubmit(_event: React.MouseEvent): Promise<void> {
 
         triggerFormValidation();
 

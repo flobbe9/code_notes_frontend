@@ -1,9 +1,9 @@
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
+import { getTextWidth } from "../../helpers/projectUtils";
 import { animateAndCommit } from "../../helpers/utils";
 import Button from "./Button";
-import { getTextWidth } from "../../helpers/projectUtils";
 
 
 interface Props extends HelperProps {
@@ -100,7 +100,6 @@ export default forwardRef(function ButtonWithSlideLabel(
             return "0";
 
         const labelWidth = getTextWidth(label, labelRef.current!.style.fontSize, labelRef.current!.style.fontFamily, labelRef.current!.style.fontWeight);
-
         return (labelWidth + 25) + "px"; // 25 is a guess and should technically be the labels margin-left, but needs 10px in addition for some reason
     }
     

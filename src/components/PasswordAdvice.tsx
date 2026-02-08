@@ -1,5 +1,5 @@
 import { REQUIRED_PASSWORD_SYMBOLS } from "@/helpers/constants";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../abstract/DefaultProps";
 import HelperProps from "../abstract/HelperProps";
 import { isBlank, setCssConstant } from "../helpers/utils";

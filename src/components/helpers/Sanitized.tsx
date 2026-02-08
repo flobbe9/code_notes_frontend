@@ -1,9 +1,10 @@
 import parse, { attributesToProps, Element, HTMLReactParserOptions } from "html-react-parser";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import sanitize from "sanitize-html";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
 import { includesIgnoreCaseTrim } from "../../helpers/utils";
+import React from "react";
 
 
 interface Props extends DefaultProps {

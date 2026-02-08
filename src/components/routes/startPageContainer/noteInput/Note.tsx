@@ -1,12 +1,13 @@
-import React, { createContext, DragEvent, useContext, useEffect, useRef, useState } from "react";
+import { createContext, DragEvent, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../../abstract/entites/NoteEntity";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { NoteEntityService } from "../../../../abstract/services/NoteEntityService";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
+import { logError, logWarn } from "../../../../helpers/logUtils";
 import { handleRememberMyChoice } from "../../../../helpers/projectUtils";
-import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, parentSelector, shortenString } from '../../../../helpers/utils';
+import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, shortenString } from '../../../../helpers/utils';
 import { AppContext } from "../../../App";
 import { AppFetchContext } from "../../../AppFetchContextProvider";
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
@@ -23,7 +24,6 @@ import DefaultNoteInput from "./DefaultNoteInput";
 import NoteTagList from "./NoteTagList";
 import NoteTitle from "./NoteTitle";
 import PlainTextNoteInput from "./PlainTextNoteInput";
-import { logWarn, logError } from "../../../../helpers/logUtils";
 
 
 interface Props extends DefaultProps {
@@ -498,27 +498,27 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
 
 export const NoteContext = createContext({
     noteEntity: {} as NoteEntity,
-    setNoteEntity: (noteEntity: NoteEntity) => {},
+    setNoteEntity: (_noteEntity: NoteEntity) => {},
 
     noteInputs: [<></>],
-    setNoteInputs: (noteInputs: JSX.Element[]) => {},
+    setNoteInputs: (_noteInputs: JSX.Element[]) => {},
 
     draggedNoteInputIndex: NaN as number, 
-    setDraggedNoteInputIndex: (index: number) => {},
+    setDraggedNoteInputIndex: (_index: number) => {},
     dragOverNoteInputIndex: NaN as number, 
-    setDragOverNoteInputIndex: (index: number) => {},
+    setDragOverNoteInputIndex: (_index: number) => {},
 
-    createNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity, focusOnRender = false) => {return <></>},
+    createNoteInputByNoteInputType: (_noteInputEntity: NoteInputEntity, _focusOnRender = false) => {return <></>},
 
     /**
      * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```
      */
-    updateNoteEdited: (edited = true) => {},
+    updateNoteEdited: (_edited = true) => {},
 
     gotNewNoteInputs: false as boolean,
-    setGotNewNoteInputs: (newNoteInputs: boolean) => {},
+    setGotNewNoteInputs: (_newNoteInputs: boolean) => {},
 
-    setAreNoteInputsExpanded: (expanded: boolean) => {},
+    setAreNoteInputsExpanded: (_expanded: boolean) => {},
 
     isSaveButtonDisabled: true as boolean,
     clickSaveButton: (() => {}) as () => void

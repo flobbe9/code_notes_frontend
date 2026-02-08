@@ -1,5 +1,5 @@
 import { CursorPosition } from "@/abstract/CursorPosition";
-import React, { ClipboardEvent, DragEvent, forwardRef, Fragment, KeyboardEvent, MouseEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { ClipboardEvent, DragEvent, forwardRef, Fragment, KeyboardEvent, MouseEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import { getCursorIndex, getCursorLineNum } from "../../helpers/projectUtils";

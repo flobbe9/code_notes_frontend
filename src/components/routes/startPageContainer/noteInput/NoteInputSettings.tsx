@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { CODE_BLOCK_LANGUAGES, CODE_BLOCK_WITH_VARIABLES_LANGUAGES, ProgrammingLanguage } from "../../../../abstract/ProgrammingLanguage";
@@ -105,7 +105,6 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
     function toggleNoteInputSettings(hide = isShowNoteInputSettings): void {
         setIsShowNoteInputSettings(!hide);
 
-        // toggleNoteInputSwitch(hide);
         toggleLanguageSearchBar(hide);
     }
 
@@ -129,7 +128,7 @@ export default function NoteInputSettings({noteInputEntity, areNoteInputSettings
     }
     
     
-    function handleLanguageSearchFocus(event): void {
+    function handleLanguageSearchFocus(_event): void {
         
         setShowLanguageSearchResults(true);
     }

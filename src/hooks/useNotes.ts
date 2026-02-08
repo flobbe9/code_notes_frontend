@@ -4,15 +4,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from '../abstract/entites/AppUserEntity';
 import { NoteEntity } from '../abstract/entites/NoteEntity';
-import { SearchNoteResultDto } from "../abstract/SearchNoteResultDto";
+import { createSearchNoteResultDtoInstance, SearchNoteResultDto } from "../abstract/SearchNoteResultDto";
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
 import { NoteEntityService } from "../abstract/services/NoteEntityService";
 import { AppContext } from "../components/App";
 import { BACKEND_BASE_URL, DEFAULT_ERROR_MESSAGE, NOTE_PAGE_URL_QUERY_PARAM, NOTE_SEARCH_PHRASE_URL_QUERY_PARAM, NOTE_SEARCH_TAGS_URL_QUERY_PARAM, NOTE_SEARCH_TAGS_URL_QUERY_PARAM_SEPARATOR, NUM_NOTES_PER_PAGE, START_PAGE_PATH } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
+import { logWarn } from "../helpers/logUtils";
 import { getUrlQueryParam, isBlank, isNumberFalsy, isStringFalsy, jsonParseDontThrow, setUrlQueryParam, stringToNumber } from "../helpers/utils";
 import { useIsFetchTakingLong } from "./useIsFetchTakingLong";
-import { logWarn } from "../helpers/logUtils";
 
 
 /**
@@ -34,7 +34,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
     const notesUseQueryResult = useQuery<SearchNoteResultDto>({
         queryKey: NOTES_QUERY_KEY,
         queryFn: fetchNotes,
-        initialData: queryClient.getQueryData(NOTES_QUERY_KEY) ?? SearchNoteResultDto.emptyInstance()
+        initialData: queryClient.getQueryData(NOTES_QUERY_KEY) ?? createSearchNoteResultDtoInstance()
     });
 
 
@@ -63,7 +63,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
      */
     async function fetchNotes(): Promise<SearchNoteResultDto> {
         if (!isLoggedInUseQueryResult.data || !appUserEntity || window.location.pathname !== START_PAGE_PATH)
-            return SearchNoteResultDto.emptyInstance();
+            return createSearchNoteResultDtoInstance();
 
         const url = `${BACKEND_BASE_URL}/note/get-by-app_user-pageable?pageNumber=${getCurrentPage() - 1
             }&pageSize=${NUM_NOTES_PER_PAGE
@@ -73,7 +73,7 @@ export function useNotes(isLoggedInUseQueryResult: DefinedUseQueryResult, appUse
         const jsonResponse = await fetchJson(url);
         if (isResponseError(jsonResponse)) {
             toast("Failed to load notes", DEFAULT_ERROR_MESSAGE, "error");
-            return SearchNoteResultDto.emptyInstance();
+            return createSearchNoteResultDtoInstance();
         }
 
         return jsonResponse;

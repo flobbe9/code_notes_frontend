@@ -1,4 +1,4 @@
-import React, { forwardRef, KeyboardEvent, Ref, useContext, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, KeyboardEvent, Ref, useContext, useEffect, useImperativeHandle, useRef } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { INVALID_INPUT_CLASS_NAME, MAX_NOTE_TITLE_VALUE_LENGTH } from "../../../../helpers/constants";
 import { flashClass, isEventKeyTakingUpSpace } from "../../../../helpers/utils";

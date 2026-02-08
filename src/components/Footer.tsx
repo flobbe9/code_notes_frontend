@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { CONTACT_PATH, PRIVACY_POLICY_PATH, VERSION } from "../helpers/constants";

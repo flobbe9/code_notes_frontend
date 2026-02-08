@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { PROFILE_PATH } from "../helpers/constants";
 import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";

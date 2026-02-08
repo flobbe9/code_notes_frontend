@@ -1,4 +1,4 @@
-import React, { CSSProperties, forwardRef, Ref, useImperativeHandle, useRef, useState } from "react";
+import { CSSProperties, forwardRef, Ref, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import { isObjectFalsy } from "../../helpers/utils";

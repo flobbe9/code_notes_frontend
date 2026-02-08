@@ -1,4 +1,3 @@
-import React from "react";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { IconProps } from "../../../abstract/IconProps";
 

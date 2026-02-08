@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, useContext } from "react";
+import { forwardRef, Ref, useContext } from "react";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";

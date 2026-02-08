@@ -19,19 +19,14 @@ export default class CryptoJSImpl {
 
 
     /**
-     * NOTE: don't use encryption with keys, it's not safe in frontend.
-     * 
      * @param key secret string used by alogrithm. Needs to be either 16 or 32 chars long. Default is {@link CRYPTO_KEY}.
      * @param iv secret string used by alogrithm. Necessary for encryption to always return the same value. Default is {@link CRYPTO_IV}
      *           Needs to be 16 chars long
      */
     constructor(key = CRYPTO_KEY, iv = CRYPTO_IV) {
-
         // case: falsy params
-        if (!this.areConstructorParamsValid(key, iv)) {
-            logError("Failed to instantiate CryptoJsImpl. Invalid constructor params.");
-            return;
-        }
+        if (!this.areConstructorParamsValid(key, iv))
+            throw new Error(`Failed to instantiate CryptoJsImpl. Invalid constructor params.`);
 
         this.key = CryptoJS.lib.WordArray.create(new TextEncoder().encode(key))
         this.iv = CryptoJS.lib.WordArray.create(new TextEncoder().encode(iv))

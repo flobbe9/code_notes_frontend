@@ -1,5 +1,5 @@
 import { DefinedUseQueryResult } from "@tanstack/react-query";
-import React, { createContext, useEffect } from "react";
+import { createContext, useEffect } from "react";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { NoteEntity } from "../abstract/entites/NoteEntity";
@@ -111,25 +111,25 @@ export default function AppFetchContextProvider({ children }) {
 
 export const AppFetchContext = createContext({
     appUserEntity: AppUserService.getDefaultInstance() as AppUserEntity,
-    setAppUserEntity: (appUserEntity: AppUserEntity) => {},
+    setAppUserEntity: (_appUserEntity: AppUserEntity) => {},
     appUserEntityUseQueryResult: {} as DefinedUseQueryResult<AppUserEntity>,
-    fetchSaveAppUserEntity: async (appUserToSave?: AppUserEntity, decrypt = true) => {return {} as Promise<AppUserEntity | CustomExceptionFormat> },
-    fetchLogin: async (email: string, password: string) => {return {} as Promise<CustomExceptionFormat | Response>},
+    fetchSaveAppUserEntity: async (_appUserToSave?: AppUserEntity, _decrypt = true) => {return {} as Promise<AppUserEntity | CustomExceptionFormat> },
+    fetchLogin: async (_email: string, _password: string) => {return {} as Promise<CustomExceptionFormat | Response>},
 
     editedNoteEntities: [] as NoteEntity[],
-    setEditedNoteEntities: (editedNoteEntities: NoteEntity[]) => {},
+    setEditedNoteEntities: (_editedNoteEntities: NoteEntity[]) => {},
     getNoteSearchPhrase: () => "" as string,
-    setNoteSearchPhrase: (phrase: string) => {},
+    setNoteSearchPhrase: (_phrase: string) => {},
     getNoteSearchTags: () => new Set<string>(),
-    setNoteSearchTags: (tags: Set<string>) => {},
-    fetchSaveNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<NoteEntity | CustomExceptionFormat>},
-    fetchSaveAllNoteEntities: async (editedNoteEntities: NoteEntity[]) => {return {} as Promise<NoteEntity[] | CustomExceptionFormat>},
-    fetchDeleteNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<Response | CustomExceptionFormat>},
+    setNoteSearchTags: (_tags: Set<string>) => {},
+    fetchSaveNoteEntity: async (_noteEntity: NoteEntity) => {return {} as Promise<NoteEntity | CustomExceptionFormat>},
+    fetchSaveAllNoteEntities: async (_editedNoteEntities: NoteEntity[]) => {return {} as Promise<NoteEntity[] | CustomExceptionFormat>},
+    fetchDeleteNoteEntity: async (_noteEntity: NoteEntity) => {return {} as Promise<Response | CustomExceptionFormat>},
     isFetchNoteEntitiesTakingLonger: false as boolean,
     notesUseQueryResult: {} as DefinedUseQueryResult<SearchNoteResultDto>,
     /** 1-based */
     getCurrentNotesPage: () => 1 as number,
-    setCurrentNotesPage: (page: number) => {},
+    setCurrentNotesPage: (_page: number) => {},
     totalNotePages: 0 as number,
 
     isLoggedIn: false,

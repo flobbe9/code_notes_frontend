@@ -5,7 +5,6 @@ import { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 

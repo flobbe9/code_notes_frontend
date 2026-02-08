@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import DefaultProps, { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import { SelectContext } from './Select';
 import Flex from './Flex';

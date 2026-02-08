@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { PROFILE_PATH } from "../../../helpers/constants";

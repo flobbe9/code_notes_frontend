@@ -1,7 +1,6 @@
-import React from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
-import Flex from "../helpers/Flex";
 import Button from "../helpers/Button";
+import Flex from "../helpers/Flex";
 
 
 interface Props extends DefaultProps {

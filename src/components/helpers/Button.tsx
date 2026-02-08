@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, MouseEvent, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { ButtonProps } from "../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { isObjectFalsy } from "../../helpers/utils";
@@ -54,7 +54,7 @@ export default forwardRef(function Button({
     }, [disabled]);
 
 
-    function handleMouseEnter(event): void {
+    function handleMouseEnter(_event: MouseEvent): void {
 
         if (isDisabled)
             return;
@@ -63,7 +63,7 @@ export default forwardRef(function Button({
     }
 
 
-    function handleMouseLeave(event): void {
+    function handleMouseLeave(_event: MouseEvent): void {
 
         if (isDisabled)
             return;
@@ -72,8 +72,7 @@ export default forwardRef(function Button({
     }
 
 
-    function handleMouseDown(event): void {
-
+    function handleMouseDown(event: MouseEvent): void {
         if (disabled)
             return;
 
@@ -84,8 +83,7 @@ export default forwardRef(function Button({
     }
 
 
-    function handleMouseUp(event): void {
-
+    function handleMouseUp(_event: MouseEvent): void {
         if (disabled)
             return;
 
@@ -98,8 +96,7 @@ export default forwardRef(function Button({
      * 
      * @param event 
      */
-    function handleClick(event): void {
-
+    function handleClick(event: MouseEvent): void {
         if (disabled)
             return;
 
@@ -111,7 +108,7 @@ export default forwardRef(function Button({
     }
 
 
-    async function handleClickPromise(event): Promise<any> {
+    async function handleClickPromise(event: MouseEvent): Promise<any> {
         if (disabled)
             return;
 

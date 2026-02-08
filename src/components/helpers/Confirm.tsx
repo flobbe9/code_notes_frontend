@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, useContext, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, Ref, useContext, useImperativeHandle, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { RememberMyChoiceKey, RememberMyChoiceValue } from "../../abstract/RememberMyChoice";
 import { isBooleanFalsy } from "../../helpers/utils";

@@ -1,6 +1,6 @@
 import { Editor, Monaco } from "@monaco-editor/react";
 import { editor, IKeyboardEvent } from "monaco-editor";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../../../helpers/constants";
@@ -295,7 +295,7 @@ export default function CodeNoteInput({noteInputEntity, ...props}: Props) {
         setClipboardText((editorRef.current as any).getValue())
     }
 
-    function handleEditorMount(editor: editor.IStandaloneCodeEditor, monaco: Monaco): void {
+    function handleEditorMount(editor: editor.IStandaloneCodeEditor, _monaco: Monaco): void {
         // assign ref
         (editorRef.current as any) = editor;
 

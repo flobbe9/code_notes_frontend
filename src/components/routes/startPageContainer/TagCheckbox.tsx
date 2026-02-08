@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, useContext, useRef } from "react";
+import { KeyboardEvent, useContext, useRef } from "react";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";

@@ -1,4 +1,4 @@
-import React, { MouseEvent, useContext, useEffect, useState } from "react";
+import { MouseEvent, useContext, useEffect, useState } from "react";
 import { CustomExceptionFormat } from "../../../../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { CustomExceptionFormatService } from "../../../../abstract/services/CustomExceptionFormatService";
@@ -41,8 +41,7 @@ export default function Profile({...props}: Props) {
     const { children, ...otherProps } = getCleanDefaultProps(props, "Profile", true);
 
 
-    function handleChangePassword(event: MouseEvent): void {
-
+    function handleChangePassword(_event: MouseEvent): void {
         showPopup(<ResetPassword isPopupContent />);
     }
 
@@ -52,8 +51,7 @@ export default function Profile({...props}: Props) {
      * 
      * @param event 
      */
-    function handleDeleteAccount(event: MouseEvent): void {
-
+    function handleDeleteAccount(_event: MouseEvent): void {
         showPopup(
             <Confirm 
                 heading={<h3 style={{color: "red"}}>Delete your account?</h3>}

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from "react";
+import { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
@@ -337,12 +337,12 @@ export default function StartPageContent({...props}: Props) {
 
 export const StartPageContentContext = createContext({
     notes: [<></>],
-    setNotes: (notes: JSX.Element[]) => {},
-    mapNoteEntitiesToJsx: (noteEntities: NoteEntity[]): JSX.Element[] => [],
+    setNotes: (_notes: JSX.Element[]) => {},
+    mapNoteEntitiesToJsx: (_noteEntities: NoteEntity[]): JSX.Element[] => [],
 
-    setIsFocusFirstNote: (focus: boolean) => {},
+    setIsFocusFirstNote: (_focus: boolean) => {},
 
-    createNoteByNoteEntity: (noteEntity: NoteEntity, focusOnRender = false) => {return <></>},
+    createNoteByNoteEntity: (_noteEntity: NoteEntity, _focusOnRender = false) => {return <></>},
     isSearchingNotes: () => false as boolean,
     isEditingNotes: () => false as boolean
 })

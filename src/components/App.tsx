@@ -1,4 +1,4 @@
-import React, { createContext, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
+import { createContext, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, pauseAnimations, playAnimations } from '../helpers/utils';
@@ -180,7 +180,7 @@ export default function App() {
      * 
      * @param event 
      */
-    function handleToastMouseLeave(event: MouseEvent): void {
+    function handleToastMouseLeave(_event: MouseEvent): void {
         playAnimations(toastRef.current!)
 
         // case: toast does hide automatically
@@ -188,7 +188,7 @@ export default function App() {
             setToastScreenTimeTimeout(setTimeout(() => moveToast(true), toastScreenTime));
     }
 
-    function handleWindowResize(event): void {
+    function handleWindowResize(_event: UIEvent): void {
         setWindowSize([window.innerWidth, window.innerHeight]);
     }
 
@@ -237,7 +237,7 @@ export default function App() {
     }
 
 
-    function handleWindowKeyUp(event): void {
+    function handleWindowKeyUp(event: KeyboardEvent): void {
         handleKeyUpUseKeyPress(event);
     }
 
@@ -457,29 +457,29 @@ export default function App() {
 
 
 export const AppContext = createContext({
-    toast: (summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number) => {},
-    forceToastTimeout: (screentTime?: number) => {},
-    moveToast: (hideToast = false, screenTime?: number) => {},
+    toast: (_summary: string, _message = "", _sevirity: ToastSevirity = "info", _screenTime?: number) => {},
+    forceToastTimeout: (_screentTime?: number) => {},
+    moveToast: (_hideToast = false, _screenTime?: number) => {},
 
     windowSize: [0, 0],
     isMobileWidth: false as boolean,
     isTableWidth: false as boolean,
     isDesktopWidth: false as boolean,
 
-    isKeyPressed: (keyName: string): boolean => {return false},
-    isControlKeyPressed: (nonControlKeys?: string[]) => {return false as boolean},
+    isKeyPressed: (_keyName: string): boolean => {return false},
+    isControlKeyPressed: (_nonControlKeys?: string[]) => {return false as boolean},
     pressedKeys: new Set() as Set<string>,
 
     isAppOverlayVisible: false,
-    setIsAppOverlayVisible: (isVisible: boolean) => {},
+    setIsAppOverlayVisible: (_isVisible: boolean) => {},
     isAppOverlayHideOnClick: true,
-    setIsAppOverlayHideOnClick: (isHideOnClick: boolean) => {},
-    setIsAppOverlayHideOnEscape: (isHideOnEscape: boolean) => {},
-    setAppOverlayContent: (overlayContent: JSX.Element | JSX.Element[]) => {},
-    showPendingOverlay: (overlayContent?: ReactNode) => {},
+    setIsAppOverlayHideOnClick: (_isHideOnClick: boolean) => {},
+    setIsAppOverlayHideOnEscape: (_isHideOnEscape: boolean) => {},
+    setAppOverlayContent: (_overlayContent: JSX.Element | JSX.Element[]) => {},
+    showPendingOverlay: (_overlayContent?: ReactNode) => {},
     hidePendingOverlay: () => {},
 
-    showPopup: (popupContent?: ReactNode | undefined) => {},
+    showPopup: (_popupContent?: ReactNode | undefined) => {},
     hidePopup: () => {},
-    replacePopupContent: (content: ReactNode | undefined) => {},
+    replacePopupContent: (_content: ReactNode | undefined) => {},
 });

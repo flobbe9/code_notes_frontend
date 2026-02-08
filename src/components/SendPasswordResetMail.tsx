@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import { MouseEvent, useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
@@ -61,8 +61,7 @@ export default function SendPasswordResetMail({isParentPopupContent, ...props}: 
     }, []);
 
 
-    async function handleFormSubmit(event: React.MouseEvent): Promise<void> {
-
+    async function handleFormSubmit(_event: MouseEvent): Promise<void> {
         triggerFormValidation();
 
         if (!isFormValid())
@@ -111,8 +110,7 @@ export default function SendPasswordResetMail({isParentPopupContent, ...props}: 
     }
 
 
-    function handleFormSubmitSuccess(jsonResponse: Response): void {
-
+    function handleFormSubmitSuccess(_jsonResponse: Response): void {
         toast("Mail sent", "We've sent you an E-Mail to reset your password. Please check the junk folder as well.", "success", 8000);
 
         hidePopup();

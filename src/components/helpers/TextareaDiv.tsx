@@ -1,7 +1,7 @@
 import DefaultProps, { getCleanDefaultProps } from "@/abstract/DefaultProps";
 import { logDebug, logError } from "@/helpers/logUtils";
 import { countTextareaLines } from "@/helpers/projectUtils";
-import React, { ChangeEvent, FocusEvent, forwardRef, Fragment, MouseEvent, Ref, RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { ChangeEvent, FocusEvent, forwardRef, Fragment, MouseEvent, Ref, RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
 import Sanitized from "./Sanitized";
 import Overlay from "./Overlay";
 import SpinnerIcon from "./icons/SpinnerIcon";

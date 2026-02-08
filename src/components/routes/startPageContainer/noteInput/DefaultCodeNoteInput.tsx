@@ -1,4 +1,4 @@
-import React, { createContext, RefObject, useRef } from "react";
+import { createContext, RefObject, useRef } from "react";
 import { DefaultNoteInputProps } from "../../../../abstract/DefaultNoteInputProps";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import Flex from "../../../helpers/Flex";

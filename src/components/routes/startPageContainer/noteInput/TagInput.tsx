@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { TagEntity } from "../../../../abstract/entites/TagEntity";
 import { AppUserService } from "../../../../abstract/services/AppUserService";

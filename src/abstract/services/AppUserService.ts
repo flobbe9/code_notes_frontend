@@ -12,15 +12,10 @@ import { TagEntityService } from './TagEntityService';
  */
 export class AppUserService {
     
-    /** List of app user fields that need to be encrypted before caching the app user. Non-string fields will be ignored */
-    private static SENSITIVE_FIELDS: (keyof AppUserEntity)[] = ["email", "password", "oauth2Id"];
-    
-
     /**
      * @returns instance with default values (mostly ```null```)
      */
     public static getDefaultInstance(): AppUserEntity {
-
         return {
             id: null, 
             created: "", 
@@ -32,10 +27,8 @@ export class AppUserService {
             tags: null, 
         };
     }
-    
 
     public static clone(appUserEntity: AppUserEntity): AppUserEntity {
-
         return {
             id: appUserEntity.id,
             created: appUserEntity.created,

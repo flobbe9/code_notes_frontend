@@ -1,4 +1,4 @@
-import React, { forwardRef, ReactNode, Ref, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, ReactNode, Ref, useEffect, useImperativeHandle, useRef } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import { BLOCK_SETTINGS_ANIMATION_DURATION } from "../../helpers/constants";

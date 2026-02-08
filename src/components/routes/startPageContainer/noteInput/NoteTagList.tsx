@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { TagEntity } from "../../../../abstract/entites/TagEntity";
 import { AppUserService } from "../../../../abstract/services/AppUserService";
@@ -199,11 +199,11 @@ export default function NoteTagList({...props}: Props) {
 
 
 export const NoteTagListContext = createContext({
-    getTagElementIndex: (key: string | number) => {return -1 as number},
+    getTagElementIndex: (_key: string | number) => {return -1 as number},
     addTag: () => {},
-    addTagEntity: (tag: TagEntity) => {},
-    removeTag: (index: number) => {},
-    removeTagEntity: (index: number) => {},
+    addTagEntity: (_tag: TagEntity) => {},
+    removeTag: (_index: number) => {},
+    removeTagEntity: (_index: number) => {},
     getNumBlankTags: () => {return 1 as number},
     tags: [<></>],
     noteTagEntities: [{}] as (TagEntity[] | null)

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
 import { InputValidationWrapper, isInputValidationWrapperRecordValid } from "../abstract/InputValidationWrapper";
@@ -55,12 +55,12 @@ export default function ResetPassword({isPopupContent = false, ...props}: Props)
     
     const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-    const [isResetByToken, setIsResetByToken] = useState(window.location.pathname === RESET_PASSWORD_BY_TOKEN_PATH);
+    const [isResetByToken, ] = useState(window.location.pathname === RESET_PASSWORD_BY_TOKEN_PATH);
     
     const { toast, hidePopup } = useContext(AppContext);
     const { isLoggedIn } = useContext(AppFetchContext);
     
-    const [urlQueryParams, setUrlSearchParams] = useSearchParams();
+    const [urlQueryParams, ] = useSearchParams();
     const navigate = useNavigate();
     
     type InputName = "oldPassword" | "newPassword" | "repeatNewPassword";
