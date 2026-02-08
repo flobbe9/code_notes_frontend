@@ -345,5 +345,5 @@ export const DefaultNoteInputContext = createContext({
 
     focusOnRender: false as boolean,
 
-    componentRef: {} as RefObject<HTMLDivElement>
+    componentRef: {} as RefObject<HTMLDivElement | null>
 });

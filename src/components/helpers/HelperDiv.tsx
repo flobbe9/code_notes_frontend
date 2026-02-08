@@ -24,7 +24,6 @@ export default forwardRef(function HelperDiv(
     }: Props,
     ref: Ref<HTMLDivElement>
 ) {
-
     const [isHover, setIsHover] = useState(false);
     
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props);

@@ -1,4 +1,4 @@
-import { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from "react";
+import { ChangeEvent, createContext, JSX, useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import DefaultProps, { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";

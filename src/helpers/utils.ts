@@ -1,4 +1,4 @@
-import { CSSProperties } from "react";
+import { CSSProperties, JSX } from "react";
 import { AnimationEasing } from "../abstract/CSSTypes";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { BASE_URL, ENV, HOST } from "./constants";

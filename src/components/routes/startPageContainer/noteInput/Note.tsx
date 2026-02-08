@@ -1,4 +1,4 @@
-import { createContext, DragEvent, useContext, useEffect, useRef, useState } from "react";
+import { createContext, DragEvent, JSX, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../../abstract/entites/NoteEntity";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";

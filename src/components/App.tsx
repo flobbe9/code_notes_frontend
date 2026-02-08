@@ -1,4 +1,4 @@
-import { createContext, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
+import { createContext, JSX, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, pauseAnimations, playAnimations } from '../helpers/utils';
@@ -380,7 +380,7 @@ export default function App() {
 
     return (
         <AppContext.Provider value={context}>
-            <BrowserRouter future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
+            <BrowserRouter>
                 <RouteContextHolder>
                     <AppFetchContextProvider>
                         <div id="App" className="App">

@@ -44,7 +44,6 @@ export default forwardRef(function SideBar(
 
     useImperativeHandle(ref, () => componentRef.current!, []);
 
-
     useEffect(() => {
         if (props.onRender)
             props.onRender();
@@ -56,7 +55,6 @@ export default forwardRef(function SideBar(
         }
     }, []);
 
-
     useEffect(() => {
         if (isVisible) 
             slideOpen();
@@ -65,12 +63,10 @@ export default forwardRef(function SideBar(
 
     }, [isVisible]);
 
-
     /**
      * Update the ```isVisible``` state to open, only use this in use effect
      */
     function slideOpen(): void {
-
         const tagFilterContainer = rightRef.current!;
 
         tagFilterContainer.style.display = "block";
@@ -87,7 +83,6 @@ export default forwardRef(function SideBar(
             }
         );
     }
-
 
     /**
      * Update the ```isVisible``` state to close, only use this in use effect

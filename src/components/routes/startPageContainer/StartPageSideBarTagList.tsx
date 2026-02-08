@@ -1,5 +1,5 @@
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
+import { JSX, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";
@@ -31,7 +31,7 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBarTagList", true);
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
 
     useClickOutside(componentRef, () => {
         // trigger reorder tag checkboxes

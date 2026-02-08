@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { JSX, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
 import { logWarn } from "../../../../helpers/logUtils";

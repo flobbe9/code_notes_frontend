@@ -9,7 +9,7 @@ import { useEffect, type RefObject } from "react";
  * @since 0.0.1
  */
 export function useClickOutside<T extends HTMLElement = HTMLElement>(
-    ref: RefObject<T>,
+    ref: RefObject<T | null>,
     callback: (eventTrigger: Event) => void,
     eventTrigger: "click" | "mousedown" | "mouseup" | "focus" = "click"
 ) {
@@ -26,7 +26,7 @@ export function useClickOutside<T extends HTMLElement = HTMLElement>(
     function handleEvent(event: Event): void {
         const target = event.target as Node;
 
-        if (!target?.isConnected || !ref.current) {
+        if (!target?.isConnected || !ref?.current) {
             logDebug("no handling event, target not connected or ref.current falsy");
             return;
         }

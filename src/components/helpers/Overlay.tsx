@@ -117,7 +117,6 @@ export default forwardRef(function Overlay(
 
 
     function handleStateChange(isOverlayVisible: boolean): void {
-
         if (isOverlayVisible)
             showOverlay();
 

@@ -45,5 +45,5 @@ export default function DefaultCodeNoteInput({noteInputEntity, propsKey, focusOn
 
 
 export const DefaultCodeNoteInputContext = createContext({
-    componentRef: {} as RefObject<HTMLDivElement>
+    componentRef: {} as RefObject<HTMLDivElement | null>
 });

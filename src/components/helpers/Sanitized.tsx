@@ -1,5 +1,5 @@
 import parse, { attributesToProps, Element, HTMLReactParserOptions } from "html-react-parser";
-import { ReactNode } from "react";
+import { JSX, ReactNode } from "react";
 import sanitize from "sanitize-html";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { DEFAULT_HTML_SANTIZER_OPTIONS } from "../../helpers/constants";
