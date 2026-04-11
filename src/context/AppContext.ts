@@ -1,5 +1,5 @@
 import { createContext, JSX, ReactNode } from "react";
-import { ToastSevirity } from "./helpers/Toast";
+import { ToastSevirity } from "@/components/helpers/Toast";
 
 
 export const AppContext = createContext({
