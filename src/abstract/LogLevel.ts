@@ -1,6 +1,6 @@
 /**
  * NOTE: order of values represents priority, dont change.
- * @since latest
+ * @since 1.1.0
  * @see 'logUtils.ts'
  */
 export enum LogLevel {

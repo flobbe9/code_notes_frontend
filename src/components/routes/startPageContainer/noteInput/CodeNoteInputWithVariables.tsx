@@ -4,7 +4,7 @@ import HiddenInput from "@/components/helpers/HiddenInput";
 import TextareaDiv, { getTextareaDivDivElement, getTextareaDivTextareaElement, TextareaDivMode } from "@/components/helpers/TextareaDiv";
 import { useHasComponentMounted } from "@/hooks/useHasComponentMounted";
 import hljs from "highlight.js";
-import React, { FormEvent, KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import sanitize from "sanitize-html";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import HelperProps from "../../../../abstract/HelperProps";
@@ -14,12 +14,12 @@ import { getDefaultVariableInput, TEXTAREA_DIV_WHITESPACE_HTML, VARIABLE_INPUT_C
 import { logError, logWarn } from "../../../../helpers/logUtils";
 import { getCursorIndex, getCursorPos, getTextWidth, moveCursor } from "../../../../helpers/projectUtils";
 import { getCssConstant, getCSSValueAsNumber, insertString, isBlank, setClipboardText, stringToHtmlElement } from "../../../../helpers/utils";
-import { AppContext } from "../../../App";
+import { AppContext } from "@/context/AppContext";
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
-import { DefaultCodeNoteInputContext } from "./DefaultCodeNoteInput";
-import { DefaultNoteInputContext } from "./DefaultNoteInput";
-import { NoteContext } from "./Note";
+import { DefaultCodeNoteInputContext } from "@/context/DefaultCodeNoteInputContext";
+import { DefaultNoteInputContext } from "@/context/DefaultNoteInputContext";
+import { NoteContext } from "@/context/NoteContext";
 import NoteInputSettings from "./NoteInputSettings";
 
 interface Props extends HelperProps {

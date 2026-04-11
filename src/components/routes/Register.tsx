@@ -1,4 +1,4 @@
-import React, { FormEvent, MouseEvent, useContext, useRef } from "react";
+import { FormEvent, MouseEvent, useContext, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
@@ -8,7 +8,7 @@ import { fetchAny, isResponseError } from "../../helpers/fetchUtils";
 import { getHeadTitleText } from "../../helpers/projectUtils";
 import { getCurrentUrlWithoutWWW, isBlank } from "../../helpers/utils";
 import { useFormInput } from "../../hooks/useFormInput";
-import { AppContext } from "../App";
+import { AppContext } from "@/context/AppContext";
 import Button from "../helpers/Button";
 import Flex from "../helpers/Flex";
 import Head from "../helpers/Head";
@@ -104,19 +104,19 @@ export default function Register({isPopupContent = false, ...props}: Props) {
         ]
     }
 
-    function handleEmailInputChange(event: FormEvent<any>): void {
+    function handleEmailInputChange(_event: FormEvent<any>): void {
 
         setEmail(emailInputRef.current!.value);
     }
 
 
-    function handlePasswordInputChange(event: FormEvent<any>): void {
+    function handlePasswordInputChange(_event: FormEvent<any>): void {
 
         setPassword(passwordInputRef.current!.value);
     }
     
 
-    function handleRepeatPasswordInputChange(event: FormEvent<any>): void {
+    function handleRepeatPasswordInputChange(_event: FormEvent<any>): void {
 
         setRepeatPassword(repeatPasswordInputRef.current!.value);
     }
@@ -129,8 +129,7 @@ export default function Register({isPopupContent = false, ...props}: Props) {
     }
 
 
-    async function handleFormSubmit(event?: any): Promise<void> {
-
+    async function handleFormSubmit(_event?: FormEvent): Promise<void> {
         triggerFormValidation();
 
         if (!isFormValid())

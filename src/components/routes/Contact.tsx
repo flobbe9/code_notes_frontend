@@ -1,4 +1,3 @@
-import React from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { HELP_EMAIL, LINK_DEFAULT_REL } from "../../helpers/constants";
 import Flex from "../helpers/Flex";

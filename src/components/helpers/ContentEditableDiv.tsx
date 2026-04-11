@@ -1,10 +1,10 @@
 import { CursorPosition } from "@/abstract/CursorPosition";
-import React, { ClipboardEvent, DragEvent, forwardRef, Fragment, KeyboardEvent, MouseEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { ClipboardEvent, DragEvent, forwardRef, Fragment, KeyboardEvent, MouseEvent, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import { getCursorIndex, getCursorLineNum } from "../../helpers/projectUtils";
 import { getClipboardText, includesIgnoreCase, isBlank, isEmpty, isEventKeyTakingUpSpace } from "../../helpers/utils";
-import { AppContext } from "../App";
+import { AppContext } from "@/context/AppContext";
 import HelperDiv from "./HelperDiv";
 import HiddenInput from "./HiddenInput";
 

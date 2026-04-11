@@ -1,19 +1,4 @@
-:root {
-    --noteInputSwitchWidth: 136px;
-}
-
 .NoteInputSettings {
-    .NoteInputSwitch {
-        // pseudo hidden to use fake "toggle slide". dont change "display" here because of <Flex>
-        opacity: 0;
-        width: 0;
-        z-index: -1;
-
-        .RadioButton {
-            position: absolute;
-        }
-    }
-
     // pseudo hidden to use fake "toggle slide". dont change "display" here because of <Flex>
     .languageSearchBar {
         opacity: 0;
@@ -34,10 +19,5 @@
     .toggleLanguageSearchBarButton {
         background-color: transparent;
         padding: 0;
-
-        .buttonContentContainer {
-            // about matches the language searchbar height
-            // min-height: 45px;
-        }
     }
 }

@@ -1,11 +1,11 @@
-import React, { forwardRef, Ref, useContext } from "react";
+import { forwardRef, Ref, useContext } from "react";
 import { ButtonProps } from "../../../abstract/ButtonProps";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../abstract/entites/NoteEntity";
 import { isResponseError } from "../../../helpers/fetchUtils";
 import { isNumberFalsy } from '../../../helpers/utils';
-import { AppContext } from "../../App";
-import { AppFetchContext } from "../../AppFetchContextProvider";
+import { AppContext } from "@/context/AppContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import Button from "../../helpers/Button";
 import Login from "../Login";
 import { NoteEntityService } from "../../../abstract/services/NoteEntityService";

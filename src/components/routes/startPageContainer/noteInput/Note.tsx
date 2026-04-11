@@ -1,20 +1,22 @@
-import React, { createContext, DragEvent, useContext, useEffect, useRef, useState } from "react";
+import { AppContext } from "@/context/AppContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
+import { NoteContext } from "@/context/NoteContext";
+import { DragEvent, JSX, useContext, useEffect, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteEntity } from "../../../../abstract/entites/NoteEntity";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import { NoteEntityService } from "../../../../abstract/services/NoteEntityService";
 import { DEFAULT_ERROR_MESSAGE } from "../../../../helpers/constants";
 import { isResponseError } from "../../../../helpers/fetchUtils";
+import { logError, logWarn } from "../../../../helpers/logUtils";
 import { handleRememberMyChoice } from "../../../../helpers/projectUtils";
-import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, parentSelector, shortenString } from '../../../../helpers/utils';
-import { AppContext } from "../../../App";
-import { AppFetchContext } from "../../../AppFetchContextProvider";
+import { getJsxElementIndexByKey, getRandomString, isNumberFalsy, shortenString } from '../../../../helpers/utils';
 import ButtonWithSlideLabel from "../../../helpers/ButtonWithSlideLabel";
 import Confirm from "../../../helpers/Confirm";
 import Flex from "../../../helpers/Flex";
 import HelperDiv from "../../../helpers/HelperDiv";
 import Login from "../../Login";
-import { StartPageContentContext } from "../StartPageContent";
+import { StartPageContentContext } from "@/context/StartPageContentContext";
 import AddNewNoteInputButtons from "./AddNewNoteInputButtons";
 import CodeNoteInput from "./CodeNoteInput";
 import CodeNoteInputWithVariables from "./CodeNoteInputWithVariables";
@@ -23,7 +25,6 @@ import DefaultNoteInput from "./DefaultNoteInput";
 import NoteTagList from "./NoteTagList";
 import NoteTitle from "./NoteTitle";
 import PlainTextNoteInput from "./PlainTextNoteInput";
-import { logWarn, logError } from "../../../../helpers/logUtils";
 
 
 interface Props extends DefaultProps {
@@ -494,32 +495,3 @@ export default function Note({propsKey, focusOnRender = false, ...props}: Props)
         </NoteContext.Provider>
     )
 }
-
-
-export const NoteContext = createContext({
-    noteEntity: {} as NoteEntity,
-    setNoteEntity: (noteEntity: NoteEntity) => {},
-
-    noteInputs: [<></>],
-    setNoteInputs: (noteInputs: JSX.Element[]) => {},
-
-    draggedNoteInputIndex: NaN as number, 
-    setDraggedNoteInputIndex: (index: number) => {},
-    dragOverNoteInputIndex: NaN as number, 
-    setDragOverNoteInputIndex: (index: number) => {},
-
-    createNoteInputByNoteInputType: (noteInputEntity: NoteInputEntity, focusOnRender = false) => {return <></>},
-
-    /**
-     * @param edited indicates whether the note entity should be considered edited (```true```) or not edited (hence saved, ``false```). Default is ```true```
-     */
-    updateNoteEdited: (edited = true) => {},
-
-    gotNewNoteInputs: false as boolean,
-    setGotNewNoteInputs: (newNoteInputs: boolean) => {},
-
-    setAreNoteInputsExpanded: (expanded: boolean) => {},
-
-    isSaveButtonDisabled: true as boolean,
-    clickSaveButton: (() => {}) as () => void
-})

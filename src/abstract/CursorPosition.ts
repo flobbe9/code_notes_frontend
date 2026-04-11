@@ -1,7 +1,7 @@
 /**
  * Describes the position of the cursor inside an input or contenteditable.
  * 
- * @since latest
+ * @since 1.1.0
  */
 export interface CursorPosition {
     /** 

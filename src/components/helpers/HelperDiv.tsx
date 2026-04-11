@@ -1,6 +1,7 @@
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
+import { AppContext } from "@/context/AppContext";
 
 
 interface Props extends HelperProps {
@@ -24,12 +25,13 @@ export default forwardRef(function HelperDiv(
     }: Props,
     ref: Ref<HTMLDivElement>
 ) {
-
     const [isHover, setIsHover] = useState(false);
     
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props);
 
     const componentRef = useRef<HTMLDivElement>(null);
+    const {} = useContext(AppContext)
+
 
     // make "ref" usable inside this component
     useImperativeHandle(ref, () => componentRef.current!, []);

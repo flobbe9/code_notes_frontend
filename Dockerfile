@@ -1,7 +1,7 @@
 ARG NODE_VERSION=latest
 
 
-FROM node:${NODE_VERSION}-alpine AS build
+FROM node:${NODE_VERSION} AS build
 
 WORKDIR /app
 

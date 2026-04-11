@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, Ref, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { getCleanDefaultProps } from '../../abstract/DefaultProps';
 import HelperProps from '../../abstract/HelperProps';
 import { InputValidationWrapper } from "../../abstract/InputValidationWrapper";
@@ -144,7 +144,7 @@ export default forwardRef(function TextInput(
     }
 
 
-    function handleFloatingLabelClick(event: React.MouseEvent): void {
+    function handleFloatingLabelClick(_event: React.MouseEvent): void {
 
         if (disabled) 
             return;

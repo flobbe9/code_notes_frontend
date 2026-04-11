@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import DefaultProps, { getCleanDefaultProps } from "../abstract/DefaultProps";
@@ -7,7 +7,7 @@ import { BACKEND_BASE_URL, EMAIL_REGEX, LOGIN_PATH, POPUP_FADE_DURATION } from "
 import { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { isBlank } from "../helpers/utils";
 import { useFormInput } from "../hooks/useFormInput";
-import { AppContext } from "./App";
+import { AppContext } from "@/context/AppContext";
 import Button from "./helpers/Button";
 import TextInput from "./helpers/TextInput";
 import Login from "./routes/Login";
@@ -61,7 +61,7 @@ export default function ResendConfirmationMail({isParentPopupContent, ...props}:
     }, []);
 
 
-    async function handleFormSubmit(event: React.MouseEvent): Promise<void> {
+    async function handleFormSubmit(_event: React.MouseEvent): Promise<void> {
 
         triggerFormValidation();
 

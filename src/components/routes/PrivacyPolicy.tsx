@@ -1,10 +1,9 @@
-import React from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { BASE_URL, HELP_EMAIL, LINK_DEFAULT_REL } from "../../helpers/constants";
-import Flex from "../helpers/Flex";
-import { getCurrentUrlWithoutWWW } from "../../helpers/utils";
-import Head from "../helpers/Head";
 import { getHeadTitleText } from "../../helpers/projectUtils";
+import { getCurrentUrlWithoutWWW } from "../../helpers/utils";
+import Flex from "../helpers/Flex";
+import Head from "../helpers/Head";
 
 
 interface Props extends DefaultProps {
@@ -137,6 +136,7 @@ export default function PrivacyPolicy({...props}: Props) {
                     <b>Right to Complain</b>
                     <p>
                         If you believe that the processing of your personal data violates data protection laws, you have the right to lodge a complaint with a supervisory authority of your choice under Article 77(1) DSGVO. 
+                        {/* eslint-disable-next-line react/jsx-no-target-blank*/}
                         This includes the supervisory authority responsible for the controller: State Commissioner for Data Protection and Freedom of Information Nordrhein-Westfalen, <a href="https://www.ldi.nrw.de/kontakt/ihre-beschwerde"  className="blueLink" target="_blank" rel={LINK_DEFAULT_REL}>https://www.ldi.nrw.de/kontakt/ihre-beschwerde</a>.
                     </p>
 
@@ -172,6 +172,7 @@ export default function PrivacyPolicy({...props}: Props) {
                     
                     <p>
                         The provider is Strato AG, Otto-Ostrowski-Straße 7, 10249 Berlin (hereinafter “Strato”). When you visit our website, Strato collects various log files, including your IP address. <br />
+                        {/* eslint-disable-next-line react/jsx-no-target-blank */}
                         For more information, please refer to Strato's privacy policy: <a className="blueLink" href="https://www.strato.de/datenschutz/" target="_blank" rel={LINK_DEFAULT_REL}>https://www.strato.de/datenschutz/</a>.
                     </p>
 

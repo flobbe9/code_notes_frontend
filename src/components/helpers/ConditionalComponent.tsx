@@ -1,4 +1,4 @@
-import React, { Fragment, ReactNode, useEffect } from "react";
+import { Fragment, ReactNode, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { START_PAGE_PATH } from "../../helpers/constants";
 import { isBlank, isPathRelative, replaceCurrentBrowserHistoryEntry } from "../../helpers/utils";

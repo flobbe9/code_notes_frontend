@@ -1,8 +1,8 @@
-import React, { forwardRef, Ref, useContext, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, JSX, Ref, useContext, useImperativeHandle, useRef, useState } from "react";
 import DefaultProps, { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import { RememberMyChoiceKey, RememberMyChoiceValue } from "../../abstract/RememberMyChoice";
 import { isBooleanFalsy } from "../../helpers/utils";
-import { AppContext } from "../App";
+import { AppContext } from "@/context/AppContext";
 import Button from "./Button";
 import Checkbox from "./Checkbox";
 import Flex from "./Flex";

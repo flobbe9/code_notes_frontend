@@ -1,9 +1,9 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { PROFILE_PATH } from "../helpers/constants";
 import DefaultProps, { getCleanDefaultProps } from "./../abstract/DefaultProps";
-import { AppContext } from "./App";
-import { AppFetchContext } from "./AppFetchContextProvider";
+import { AppContext } from "@/context/AppContext";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import Button from "./helpers/Button";
 import ButtonWithSlideLabel from "./helpers/ButtonWithSlideLabel";
 import Confirm from "./helpers/Confirm";

@@ -1,9 +1,5 @@
-import { DefinedUseQueryResult } from "@tanstack/react-query";
-import React, { createContext, useEffect } from "react";
-import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
-import { AppUserEntity } from "../abstract/entites/AppUserEntity";
-import { NoteEntity } from "../abstract/entites/NoteEntity";
-import { SearchNoteResultDto } from "../abstract/SearchNoteResultDto";
+import { AppFetchContext } from "@/context/AppFetchContext";
+import { useEffect } from "react";
 import { AppUserService } from "../abstract/services/AppUserService";
 import { LOGOUT_URL } from "../helpers/constants";
 import fetchJson from "../helpers/fetchUtils";
@@ -107,33 +103,3 @@ export default function AppFetchContextProvider({ children }) {
         </AppFetchContext.Provider>
     )
 }
-
-
-export const AppFetchContext = createContext({
-    appUserEntity: AppUserService.getDefaultInstance() as AppUserEntity,
-    setAppUserEntity: (appUserEntity: AppUserEntity) => {},
-    appUserEntityUseQueryResult: {} as DefinedUseQueryResult<AppUserEntity>,
-    fetchSaveAppUserEntity: async (appUserToSave?: AppUserEntity, decrypt = true) => {return {} as Promise<AppUserEntity | CustomExceptionFormat> },
-    fetchLogin: async (email: string, password: string) => {return {} as Promise<CustomExceptionFormat | Response>},
-
-    editedNoteEntities: [] as NoteEntity[],
-    setEditedNoteEntities: (editedNoteEntities: NoteEntity[]) => {},
-    getNoteSearchPhrase: () => "" as string,
-    setNoteSearchPhrase: (phrase: string) => {},
-    getNoteSearchTags: () => new Set<string>(),
-    setNoteSearchTags: (tags: Set<string>) => {},
-    fetchSaveNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<NoteEntity | CustomExceptionFormat>},
-    fetchSaveAllNoteEntities: async (editedNoteEntities: NoteEntity[]) => {return {} as Promise<NoteEntity[] | CustomExceptionFormat>},
-    fetchDeleteNoteEntity: async (noteEntity: NoteEntity) => {return {} as Promise<Response | CustomExceptionFormat>},
-    isFetchNoteEntitiesTakingLonger: false as boolean,
-    notesUseQueryResult: {} as DefinedUseQueryResult<SearchNoteResultDto>,
-    /** 1-based */
-    getCurrentNotesPage: () => 1 as number,
-    setCurrentNotesPage: (page: number) => {},
-    totalNotePages: 0 as number,
-
-    isLoggedIn: false,
-    isLoggedInUseQueryResult: {} as DefinedUseQueryResult<boolean>,
-
-    logout: async () => {}
-})

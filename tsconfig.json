@@ -1,20 +1,27 @@
 {
     "compilerOptions": {
-        /* Visit https://aka.ms/tsconfig to read more about this file */
-        "target": "es2022",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-        "lib": ["ES2022", "DOM"],                            /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-        "jsx": "react",                               /* Specify what JSX code is generated. */
-        "module": "es2022",                                /* Specify what module code is generated. */
-        // Enables imports without file extension 
-        "moduleResolution": "bundler",                     /* Specify how TypeScript looks up a file from a given module specifier. */
-        // make import.meta.env accessible
-        "types": ["vite/client", "node"],                                      /* Specify type package names to be included without being referenced in a source file. */
-        "noEmit": true,                                   /* Disable emitting files from a compilation. */
-        "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+        "target": "ES2022",
+        "useDefineForClassFields": true,
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
+        "types": ["vite/client", "node"],
+        "skipLibCheck": true,
+
+        /* Bundler mode */
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        // "verbatimModuleSyntax": true, // causes problems with jest
+        "moduleDetection": "force",
+        "noEmit": true,
+        "jsx": "react-jsx",
+
+        /* Linting */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true,
         "noImplicitAny": false,
-        "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
-        "strictNullChecks": true,                         /* When type checking, take into account 'null' and 'undefined'. */
-        "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
         "paths": {
             "@/*": ["./src/*"],
             "@styles/*": ["./src/assets/styles/*"]

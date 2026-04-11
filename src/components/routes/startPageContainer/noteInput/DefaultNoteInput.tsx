@@ -1,14 +1,15 @@
-import React, { createContext, DragEvent, RefObject, useContext, useEffect, useRef, useState } from "react";
+import { AppContext } from "@/context/AppContext";
+import { DefaultNoteInputContext } from "@/context/DefaultNoteInputContext";
+import { NoteContext } from "@/context/NoteContext";
+import { DragEvent, useContext, useEffect, useRef, useState } from "react";
 import { DefaultNoteInputProps } from "../../../../abstract/DefaultNoteInputProps";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { CODE_BLOCK_DEFAULT_LANGUAGE, CODE_BLOCK_WITH_VARIABLES_DEFAULT_LANGUAGE } from "../../../../helpers/constants";
+import { handleRememberMyChoice } from "../../../../helpers/projectUtils";
 import { addClass, animateAndCommit, getJsxElementIndexByKey, isNumberFalsy, removeClass, shortenString } from "../../../../helpers/utils";
-import { AppContext } from "../../../App";
 import Confirm from "../../../helpers/Confirm";
 import Flex from "../../../helpers/Flex";
 import Hr from "../../../helpers/Hr";
-import { NoteContext } from "./Note";
-import { handleRememberMyChoice } from "../../../../helpers/projectUtils";
 
 
 interface Props extends DefaultNoteInputProps {
@@ -165,9 +166,7 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
         );
     } 
 
-
-    function toggleFullScreen(event): void {
-
+    function toggleFullScreen(_event): void {
         if (isFullScreen)
             deactivateFullScreen();
         else
@@ -322,30 +321,3 @@ export default function DefaultNoteInput({noteInputEntity, propsKey, focusOnRend
         </DefaultNoteInputContext.Provider>
     )
 }
-
-
-export const DefaultNoteInputContext = createContext({
-    isShowNoteInputSettings: false,
-    setIsShowNoteInputSettings: (isShow: boolean) => {},
-    areNoteInputSettingsDisabled: false,
-    setAreNoteInputSettingsDisabled: (areDisabled: boolean) => {},
-
-    codeNoteInputLanguage: "",
-    setCodeNoteInputLanguage: (language: string) => {},
-
-    codeNoteInputWithVariablesLanguage: "", 
-    setCodeNoteInputWithVariablesLanguage: (language: string) => {},
-
-    animateCopyIcon: () => {},
-
-    isFullScreen: false as boolean,
-    setActivateFullScreenStyles: ({} as Function),
-    setDeactivateFullScreenStyles: ({} as Function),
-    toggleFullScreen: (event) => {},
-
-    handleDeleteNote: (event) => {},
-
-    focusOnRender: false as boolean,
-
-    componentRef: {} as RefObject<HTMLDivElement>
-});

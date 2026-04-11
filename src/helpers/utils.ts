@@ -1,4 +1,4 @@
-import { CSSProperties } from "react";
+import { CSSProperties, JSX } from "react";
 import { AnimationEasing } from "../abstract/CSSTypes";
 import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { BASE_URL, ENV, HOST } from "./constants";
@@ -1173,7 +1173,7 @@ export function shortenString(str: string, maxLength = 30, blankReplacement = "<
  */
 export async function sleep<T>(delay: number, resolveValue?: T): Promise<T | undefined> {
 
-    return await new Promise((res, rej) => {
+    return await new Promise((res, ) => {
         setTimeout(() => {
             res(resolveValue);
         }, delay);

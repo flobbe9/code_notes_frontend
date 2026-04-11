@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, KeyboardEvent, Ref, useEffect, useImperativeHandle, useRef } from "react";
 import { getCleanDefaultProps } from "../../abstract/DefaultProps";
 import HelperProps from "../../abstract/HelperProps";
 import { animateAndCommit } from "../../helpers/utils";
@@ -117,7 +117,6 @@ export default forwardRef(function Overlay(
 
 
     function handleStateChange(isOverlayVisible: boolean): void {
-
         if (isOverlayVisible)
             showOverlay();
 
@@ -145,8 +144,7 @@ export default forwardRef(function Overlay(
     }
 
 
-    function handleEscape(event): void {
-
+    function handleEscape(_event: KeyboardEvent): void {
         if (hideOnEscape)
             hideOverlay();
     }

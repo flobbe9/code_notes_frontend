@@ -21,7 +21,6 @@ export class CustomExceptionFormatService {
             path: window.location.pathname
         }
     }
-        
 
     /**
      * Will log instance. See {@link logApiResponse}.

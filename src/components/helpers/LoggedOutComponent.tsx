@@ -1,5 +1,5 @@
-import React, { ReactNode, useContext } from "react";
-import { AppFetchContext } from "../AppFetchContextProvider";
+import { ReactNode, useContext } from "react";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import ConditionalComponent from "./ConditionalComponent";
 
 

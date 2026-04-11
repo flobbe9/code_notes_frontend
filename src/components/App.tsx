@@ -1,9 +1,10 @@
-import React, { createContext, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
+import { AppContext } from '@/context/AppContext';
+import { JSX, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { CONTACT_PATH, LOGIN_PATH, PRIVACY_POLICY_PATH, PROFILE_PATH, REGISTER_PATH, RESET_PASSWORD_BY_TOKEN_PATH, SETTINGS_PATH, START_PAGE_PATH } from "../helpers/constants";
 import { animateAndCommit, getCssConstant, getCSSValueAsNumber, isBlank, isNumberFalsy, pauseAnimations, playAnimations } from '../helpers/utils';
 import useKeyPress from '../hooks/useKeyPress';
-import AppFetchContextProvider from "./AppFetchContextProvider";
+import AppFetchContextProvider from './AppFetchContextProvider';
 import Footer from "./Footer";
 import ConditionalComponent from './helpers/ConditionalComponent';
 import SpinnerIcon from "./helpers/icons/SpinnerIcon";
@@ -180,7 +181,7 @@ export default function App() {
      * 
      * @param event 
      */
-    function handleToastMouseLeave(event: MouseEvent): void {
+    function handleToastMouseLeave(_event: MouseEvent): void {
         playAnimations(toastRef.current!)
 
         // case: toast does hide automatically
@@ -188,7 +189,7 @@ export default function App() {
             setToastScreenTimeTimeout(setTimeout(() => moveToast(true), toastScreenTime));
     }
 
-    function handleWindowResize(event): void {
+    function handleWindowResize(_event: UIEvent): void {
         setWindowSize([window.innerWidth, window.innerHeight]);
     }
 
@@ -237,7 +238,7 @@ export default function App() {
     }
 
 
-    function handleWindowKeyUp(event): void {
+    function handleWindowKeyUp(event: KeyboardEvent): void {
         handleKeyUpUseKeyPress(event);
     }
 
@@ -380,7 +381,7 @@ export default function App() {
 
     return (
         <AppContext.Provider value={context}>
-            <BrowserRouter future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
+            <BrowserRouter>
                 <RouteContextHolder>
                     <AppFetchContextProvider>
                         <div id="App" className="App">
@@ -454,32 +455,3 @@ export default function App() {
         </AppContext.Provider>
     );
 }
-
-
-export const AppContext = createContext({
-    toast: (summary: string, message = "", sevirity: ToastSevirity = "info", screenTime?: number) => {},
-    forceToastTimeout: (screentTime?: number) => {},
-    moveToast: (hideToast = false, screenTime?: number) => {},
-
-    windowSize: [0, 0],
-    isMobileWidth: false as boolean,
-    isTableWidth: false as boolean,
-    isDesktopWidth: false as boolean,
-
-    isKeyPressed: (keyName: string): boolean => {return false},
-    isControlKeyPressed: (nonControlKeys?: string[]) => {return false as boolean},
-    pressedKeys: new Set() as Set<string>,
-
-    isAppOverlayVisible: false,
-    setIsAppOverlayVisible: (isVisible: boolean) => {},
-    isAppOverlayHideOnClick: true,
-    setIsAppOverlayHideOnClick: (isHideOnClick: boolean) => {},
-    setIsAppOverlayHideOnEscape: (isHideOnEscape: boolean) => {},
-    setAppOverlayContent: (overlayContent: JSX.Element | JSX.Element[]) => {},
-    showPendingOverlay: (overlayContent?: ReactNode) => {},
-    hidePendingOverlay: () => {},
-
-    showPopup: (popupContent?: ReactNode | undefined) => {},
-    hidePopup: () => {},
-    replacePopupContent: (content: ReactNode | undefined) => {},
-});

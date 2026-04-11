@@ -4,7 +4,7 @@ import { CustomExceptionFormat } from "../abstract/CustomExceptionFormat";
 import { AppUserEntity } from "../abstract/entites/AppUserEntity";
 import { AppUserService } from "../abstract/services/AppUserService";
 import { CustomExceptionFormatService } from "../abstract/services/CustomExceptionFormatService";
-import { AppContext } from "../components/App";
+import { AppContext } from "@/context/AppContext";
 import { BACKEND_BASE_URL } from "../helpers/constants";
 import fetchJson, { fetchAny, isResponseError } from "../helpers/fetchUtils";
 import { isBlank } from "../helpers/utils";

@@ -1,6 +1,6 @@
 import HiddenInput from '@/components/helpers/HiddenInput';
 import TextareaDiv, { getTextareaDivDivElement, getTextareaDivTextareaElement, TextareaDivMode } from '@/components/helpers/TextareaDiv';
-import React, { FormEvent, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../../abstract/DefaultProps";
 import { NoteInputEntity } from "../../../../abstract/entites/NoteInputEntity";
 import HelperProps from "../../../../abstract/HelperProps";
@@ -8,11 +8,11 @@ import { CODE_SNIPPET_SEQUENCE_MULTILINE, CODE_SNIPPET_SEQUENCE_MULTILINE_HTML_E
 import { logError, logWarn } from '../../../../helpers/logUtils';
 import { getCursorIndex, moveCursor } from '../../../../helpers/projectUtils';
 import { getCssConstant, insertString, isBlank, setClipboardText, stringToHtmlElement } from "../../../../helpers/utils";
-import { AppContext } from '../../../App';
+import { AppContext } from '@/context/AppContext';
 import Button from "../../../helpers/Button";
 import Flex from "../../../helpers/Flex";
-import { DefaultNoteInputContext } from "./DefaultNoteInput";
-import { NoteContext } from './Note';
+import { DefaultNoteInputContext } from "@/context/DefaultNoteInputContext";
+import { NoteContext } from '@/context/NoteContext';
 
 
 interface Props extends HelperProps {

@@ -1,15 +1,15 @@
 import { useClickOutside } from "@/hooks/useClickOutside";
-import React, { KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
+import { JSX, KeyboardEvent, useContext, useEffect, useRef, useState } from "react";
 import { getCleanDefaultProps } from "../../../abstract/DefaultProps";
 import { TagEntity } from "../../../abstract/entites/TagEntity";
 import HelperProps from "../../../abstract/HelperProps";
 import { matchStringsConsiderWhiteSpace } from "../../../helpers/searchUtils";
 import { getRandomString, isBlank } from "../../../helpers/utils";
-import { AppFetchContext } from "../../AppFetchContextProvider";
+import { AppFetchContext } from "@/context/AppFetchContext";
 import HelperDiv from "../../helpers/HelperDiv";
-import { StartPageContainerContext } from "./StartPageContainer";
-import { StartPageSideBarContext } from "./StartPageSideBar";
+import { StartPageContainerContext } from "@/context/StartPageContainerContext";
 import TagCheckbox from "./TagCheckbox";
+import { StartPageSideBarContext } from "@/context/StartPageSideBarContext";
 
 
 interface Props extends HelperProps {
@@ -31,7 +31,7 @@ export default function StartPageSideBarTagList({disabled, ...props}: Props) {
 
     const { id, className, style, children, ...otherProps } = getCleanDefaultProps(props, "StartPageSideBarTagList", true);
 
-    const componentRef = useRef(null);
+    const componentRef = useRef<HTMLDivElement>(null);
 
     useClickOutside(componentRef, () => {
         // trigger reorder tag checkboxes
