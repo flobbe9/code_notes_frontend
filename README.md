@@ -1,5 +1,4 @@
 # Code Notes frontend
-Frontend service of <a href="https://code-notes.net" target="_blank">https://code-notes.net</a>.
 
 ## Run the whole microservice
 `docker compose -f '.presentation/docker-compose.yml' up -d`
