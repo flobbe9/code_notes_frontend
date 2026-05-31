@@ -6,6 +6,8 @@ FROM node:${NODE_VERSION} AS build
 WORKDIR /app
 
 ARG APP_ENV=production
+ARG BACKEND_PORT=4001
+ENV BACKEND_PORT=${BACKEND_PORT}
 
 COPY ./src ./src
 COPY ./public ./public
