@@ -1,0 +1,7 @@
+services:
+  frontend:
+    build:
+      args:
+        BACKEND_PORT: 1111
+    ports:
+      - 1112:1112
